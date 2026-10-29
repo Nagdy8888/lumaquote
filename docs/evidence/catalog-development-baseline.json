@@ -1,0 +1,1211 @@
+{
+  "scope": "Generated development baseline derived from current synthetic records; not the frozen 80-scenario evaluation or client validation",
+  "method": "Exact-first PostgreSQL lexical search with explicit specification filters; no embeddings or model calls",
+  "dataset_sha256": "ddb8719e667b5041f3755674f1153380b537b5a5c38760b9f6b4ab99b6d18079",
+  "groups": {
+    "exact": {
+      "cases": 66,
+      "found": 66,
+      "recall_at_5": 1.0
+    },
+    "descriptive": {
+      "cases": 66,
+      "found": 66,
+      "recall_at_5": 1.0
+    }
+  },
+  "local_query_latency_ms": {
+    "median": 0.83,
+    "p95": 1.057
+  },
+  "cases": [
+    {
+      "kind": "exact",
+      "query": "DL-001",
+      "expected_sku": "DL-001",
+      "retrieved_skus": [
+        "DL-001"
+      ],
+      "found": true
+    },
+    {
+      "kind": "descriptive",
+      "query": "Please quote Downlights 18W 3000K IP44",
+      "expected_sku": "DL-001",
+      "retrieved_skus": [
+        "DL-001"
+      ],
+      "found": true
+    },
+    {
+      "kind": "exact",
+      "query": "DL-002",
+      "expected_sku": "DL-002",
+      "retrieved_skus": [
+        "DL-002"
+      ],
+      "found": true
+    },
+    {
+      "kind": "descriptive",
+      "query": "Please quote Downlights 18W 4000K IP44",
+      "expected_sku": "DL-002",
+      "retrieved_skus": [
+        "DL-002"
+      ],
+      "found": true
+    },
+    {
+      "kind": "exact",
+      "query": "DL-003",
+      "expected_sku": "DL-003",
+      "retrieved_skus": [
+        "DL-003"
+      ],
+      "found": true
+    },
+    {
+      "kind": "descriptive",
+      "query": "Please quote Downlights 18W 5000K IP44",
+      "expected_sku": "DL-003",
+      "retrieved_skus": [
+        "DL-003"
+      ],
+      "found": true
+    },
+    {
+      "kind": "exact",
+      "query": "DL-004",
+      "expected_sku": "DL-004",
+      "retrieved_skus": [
+        "DL-004"
+      ],
+      "found": true
+    },
+    {
+      "kind": "descriptive",
+      "query": "Please quote Downlights 21W 3000K IP44",
+      "expected_sku": "DL-004",
+      "retrieved_skus": [
+        "DL-004"
+      ],
+      "found": true
+    },
+    {
+      "kind": "exact",
+      "query": "DL-005",
+      "expected_sku": "DL-005",
+      "retrieved_skus": [
+        "DL-005"
+      ],
+      "found": true
+    },
+    {
+      "kind": "descriptive",
+      "query": "Please quote Downlights 21W 4000K IP44",
+      "expected_sku": "DL-005",
+      "retrieved_skus": [
+        "DL-005"
+      ],
+      "found": true
+    },
+    {
+      "kind": "exact",
+      "query": "DL-006",
+      "expected_sku": "DL-006",
+      "retrieved_skus": [
+        "DL-006"
+      ],
+      "found": true
+    },
+    {
+      "kind": "descriptive",
+      "query": "Please quote Downlights 21W 5000K IP44",
+      "expected_sku": "DL-006",
+      "retrieved_skus": [
+        "DL-006"
+      ],
+      "found": true
+    },
+    {
+      "kind": "exact",
+      "query": "DL-007",
+      "expected_sku": "DL-007",
+      "retrieved_skus": [
+        "DL-007"
+      ],
+      "found": true
+    },
+    {
+      "kind": "descriptive",
+      "query": "Please quote Downlights 24W 3000K IP44",
+      "expected_sku": "DL-007",
+      "retrieved_skus": [
+        "DL-007"
+      ],
+      "found": true
+    },
+    {
+      "kind": "exact",
+      "query": "DL-008",
+      "expected_sku": "DL-008",
+      "retrieved_skus": [
+        "DL-008"
+      ],
+      "found": true
+    },
+    {
+      "kind": "descriptive",
+      "query": "Please quote Downlights 24W 4000K IP44",
+      "expected_sku": "DL-008",
+      "retrieved_skus": [
+        "DL-008"
+      ],
+      "found": true
+    },
+    {
+      "kind": "exact",
+      "query": "DL-009",
+      "expected_sku": "DL-009",
+      "retrieved_skus": [
+        "DL-009"
+      ],
+      "found": true
+    },
+    {
+      "kind": "descriptive",
+      "query": "Please quote Downlights 24W 5000K IP44",
+      "expected_sku": "DL-009",
+      "retrieved_skus": [
+        "DL-009"
+      ],
+      "found": true
+    },
+    {
+      "kind": "exact",
+      "query": "DL-010",
+      "expected_sku": "DL-010",
+      "retrieved_skus": [
+        "DL-010"
+      ],
+      "found": true
+    },
+    {
+      "kind": "descriptive",
+      "query": "Please quote Downlights 27W 3000K IP44",
+      "expected_sku": "DL-010",
+      "retrieved_skus": [
+        "DL-010"
+      ],
+      "found": true
+    },
+    {
+      "kind": "exact",
+      "query": "DL-011",
+      "expected_sku": "DL-011",
+      "retrieved_skus": [
+        "DL-011"
+      ],
+      "found": true
+    },
+    {
+      "kind": "descriptive",
+      "query": "Please quote Downlights 27W 4000K IP44",
+      "expected_sku": "DL-011",
+      "retrieved_skus": [
+        "DL-011"
+      ],
+      "found": true
+    },
+    {
+      "kind": "exact",
+      "query": "EM-001",
+      "expected_sku": "EM-001",
+      "retrieved_skus": [
+        "EM-001"
+      ],
+      "found": true
+    },
+    {
+      "kind": "descriptive",
+      "query": "Please quote Emergency lighting 8W 3000K IP44",
+      "expected_sku": "EM-001",
+      "retrieved_skus": [
+        "EM-001"
+      ],
+      "found": true
+    },
+    {
+      "kind": "exact",
+      "query": "EM-002",
+      "expected_sku": "EM-002",
+      "retrieved_skus": [
+        "EM-002"
+      ],
+      "found": true
+    },
+    {
+      "kind": "descriptive",
+      "query": "Please quote Emergency lighting 8W 4000K IP44",
+      "expected_sku": "EM-002",
+      "retrieved_skus": [
+        "EM-002"
+      ],
+      "found": true
+    },
+    {
+      "kind": "exact",
+      "query": "EM-003",
+      "expected_sku": "EM-003",
+      "retrieved_skus": [
+        "EM-003"
+      ],
+      "found": true
+    },
+    {
+      "kind": "descriptive",
+      "query": "Please quote Emergency lighting 8W 5000K IP44",
+      "expected_sku": "EM-003",
+      "retrieved_skus": [
+        "EM-003"
+      ],
+      "found": true
+    },
+    {
+      "kind": "exact",
+      "query": "EM-004",
+      "expected_sku": "EM-004",
+      "retrieved_skus": [
+        "EM-004"
+      ],
+      "found": true
+    },
+    {
+      "kind": "descriptive",
+      "query": "Please quote Emergency lighting 11W 3000K IP44",
+      "expected_sku": "EM-004",
+      "retrieved_skus": [
+        "EM-004"
+      ],
+      "found": true
+    },
+    {
+      "kind": "exact",
+      "query": "EM-005",
+      "expected_sku": "EM-005",
+      "retrieved_skus": [
+        "EM-005"
+      ],
+      "found": true
+    },
+    {
+      "kind": "descriptive",
+      "query": "Please quote Emergency lighting 11W 4000K IP44",
+      "expected_sku": "EM-005",
+      "retrieved_skus": [
+        "EM-005"
+      ],
+      "found": true
+    },
+    {
+      "kind": "exact",
+      "query": "EM-006",
+      "expected_sku": "EM-006",
+      "retrieved_skus": [
+        "EM-006"
+      ],
+      "found": true
+    },
+    {
+      "kind": "descriptive",
+      "query": "Please quote Emergency lighting 11W 5000K IP44",
+      "expected_sku": "EM-006",
+      "retrieved_skus": [
+        "EM-006"
+      ],
+      "found": true
+    },
+    {
+      "kind": "exact",
+      "query": "EM-007",
+      "expected_sku": "EM-007",
+      "retrieved_skus": [
+        "EM-007"
+      ],
+      "found": true
+    },
+    {
+      "kind": "descriptive",
+      "query": "Please quote Emergency lighting 14W 3000K IP44",
+      "expected_sku": "EM-007",
+      "retrieved_skus": [
+        "EM-007"
+      ],
+      "found": true
+    },
+    {
+      "kind": "exact",
+      "query": "EM-008",
+      "expected_sku": "EM-008",
+      "retrieved_skus": [
+        "EM-008"
+      ],
+      "found": true
+    },
+    {
+      "kind": "descriptive",
+      "query": "Please quote Emergency lighting 14W 4000K IP44",
+      "expected_sku": "EM-008",
+      "retrieved_skus": [
+        "EM-008"
+      ],
+      "found": true
+    },
+    {
+      "kind": "exact",
+      "query": "EM-009",
+      "expected_sku": "EM-009",
+      "retrieved_skus": [
+        "EM-009"
+      ],
+      "found": true
+    },
+    {
+      "kind": "descriptive",
+      "query": "Please quote Emergency lighting 14W 5000K IP44",
+      "expected_sku": "EM-009",
+      "retrieved_skus": [
+        "EM-009"
+      ],
+      "found": true
+    },
+    {
+      "kind": "exact",
+      "query": "EM-010",
+      "expected_sku": "EM-010",
+      "retrieved_skus": [
+        "EM-010"
+      ],
+      "found": true
+    },
+    {
+      "kind": "descriptive",
+      "query": "Please quote Emergency lighting 17W 3000K IP44",
+      "expected_sku": "EM-010",
+      "retrieved_skus": [
+        "EM-010"
+      ],
+      "found": true
+    },
+    {
+      "kind": "exact",
+      "query": "EM-011",
+      "expected_sku": "EM-011",
+      "retrieved_skus": [
+        "EM-011"
+      ],
+      "found": true
+    },
+    {
+      "kind": "descriptive",
+      "query": "Please quote Emergency lighting 17W 4000K IP44",
+      "expected_sku": "EM-011",
+      "retrieved_skus": [
+        "EM-011"
+      ],
+      "found": true
+    },
+    {
+      "kind": "exact",
+      "query": "HB-001",
+      "expected_sku": "HB-001",
+      "retrieved_skus": [
+        "HB-001"
+      ],
+      "found": true
+    },
+    {
+      "kind": "descriptive",
+      "query": "Please quote High bays 120W 3000K IP65",
+      "expected_sku": "HB-001",
+      "retrieved_skus": [
+        "HB-001"
+      ],
+      "found": true
+    },
+    {
+      "kind": "exact",
+      "query": "HB-002",
+      "expected_sku": "HB-002",
+      "retrieved_skus": [
+        "HB-002"
+      ],
+      "found": true
+    },
+    {
+      "kind": "descriptive",
+      "query": "Please quote High bays 120W 4000K IP65",
+      "expected_sku": "HB-002",
+      "retrieved_skus": [
+        "HB-002"
+      ],
+      "found": true
+    },
+    {
+      "kind": "exact",
+      "query": "HB-003",
+      "expected_sku": "HB-003",
+      "retrieved_skus": [
+        "HB-003"
+      ],
+      "found": true
+    },
+    {
+      "kind": "descriptive",
+      "query": "Please quote High bays 120W 5000K IP65",
+      "expected_sku": "HB-003",
+      "retrieved_skus": [
+        "HB-003"
+      ],
+      "found": true
+    },
+    {
+      "kind": "exact",
+      "query": "HB-004",
+      "expected_sku": "HB-004",
+      "retrieved_skus": [
+        "HB-004"
+      ],
+      "found": true
+    },
+    {
+      "kind": "descriptive",
+      "query": "Please quote High bays 123W 3000K IP65",
+      "expected_sku": "HB-004",
+      "retrieved_skus": [
+        "HB-004"
+      ],
+      "found": true
+    },
+    {
+      "kind": "exact",
+      "query": "HB-005",
+      "expected_sku": "HB-005",
+      "retrieved_skus": [
+        "HB-005"
+      ],
+      "found": true
+    },
+    {
+      "kind": "descriptive",
+      "query": "Please quote High bays 123W 4000K IP65",
+      "expected_sku": "HB-005",
+      "retrieved_skus": [
+        "HB-005"
+      ],
+      "found": true
+    },
+    {
+      "kind": "exact",
+      "query": "HB-006",
+      "expected_sku": "HB-006",
+      "retrieved_skus": [
+        "HB-006"
+      ],
+      "found": true
+    },
+    {
+      "kind": "descriptive",
+      "query": "Please quote High bays 123W 5000K IP65",
+      "expected_sku": "HB-006",
+      "retrieved_skus": [
+        "HB-006"
+      ],
+      "found": true
+    },
+    {
+      "kind": "exact",
+      "query": "HB-007",
+      "expected_sku": "HB-007",
+      "retrieved_skus": [
+        "HB-007"
+      ],
+      "found": true
+    },
+    {
+      "kind": "descriptive",
+      "query": "Please quote High bays 126W 3000K IP65",
+      "expected_sku": "HB-007",
+      "retrieved_skus": [
+        "HB-007"
+      ],
+      "found": true
+    },
+    {
+      "kind": "exact",
+      "query": "HB-008",
+      "expected_sku": "HB-008",
+      "retrieved_skus": [
+        "HB-008"
+      ],
+      "found": true
+    },
+    {
+      "kind": "descriptive",
+      "query": "Please quote High bays 126W 4000K IP65",
+      "expected_sku": "HB-008",
+      "retrieved_skus": [
+        "HB-008"
+      ],
+      "found": true
+    },
+    {
+      "kind": "exact",
+      "query": "HB-009",
+      "expected_sku": "HB-009",
+      "retrieved_skus": [
+        "HB-009"
+      ],
+      "found": true
+    },
+    {
+      "kind": "descriptive",
+      "query": "Please quote High bays 126W 5000K IP65",
+      "expected_sku": "HB-009",
+      "retrieved_skus": [
+        "HB-009"
+      ],
+      "found": true
+    },
+    {
+      "kind": "exact",
+      "query": "HB-010",
+      "expected_sku": "HB-010",
+      "retrieved_skus": [
+        "HB-010"
+      ],
+      "found": true
+    },
+    {
+      "kind": "descriptive",
+      "query": "Please quote High bays 129W 3000K IP65",
+      "expected_sku": "HB-010",
+      "retrieved_skus": [
+        "HB-010"
+      ],
+      "found": true
+    },
+    {
+      "kind": "exact",
+      "query": "HB-011",
+      "expected_sku": "HB-011",
+      "retrieved_skus": [
+        "HB-011"
+      ],
+      "found": true
+    },
+    {
+      "kind": "descriptive",
+      "query": "Please quote High bays 129W 4000K IP65",
+      "expected_sku": "HB-011",
+      "retrieved_skus": [
+        "HB-011"
+      ],
+      "found": true
+    },
+    {
+      "kind": "exact",
+      "query": "LN-001",
+      "expected_sku": "LN-001",
+      "retrieved_skus": [
+        "LN-001"
+      ],
+      "found": true
+    },
+    {
+      "kind": "descriptive",
+      "query": "Please quote Linear systems 36W 3000K IP44",
+      "expected_sku": "LN-001",
+      "retrieved_skus": [
+        "LN-001"
+      ],
+      "found": true
+    },
+    {
+      "kind": "exact",
+      "query": "LN-002",
+      "expected_sku": "LN-002",
+      "retrieved_skus": [
+        "LN-002"
+      ],
+      "found": true
+    },
+    {
+      "kind": "descriptive",
+      "query": "Please quote Linear systems 36W 4000K IP44",
+      "expected_sku": "LN-002",
+      "retrieved_skus": [
+        "LN-002"
+      ],
+      "found": true
+    },
+    {
+      "kind": "exact",
+      "query": "LN-003",
+      "expected_sku": "LN-003",
+      "retrieved_skus": [
+        "LN-003"
+      ],
+      "found": true
+    },
+    {
+      "kind": "descriptive",
+      "query": "Please quote Linear systems 36W 5000K IP44",
+      "expected_sku": "LN-003",
+      "retrieved_skus": [
+        "LN-003"
+      ],
+      "found": true
+    },
+    {
+      "kind": "exact",
+      "query": "LN-004",
+      "expected_sku": "LN-004",
+      "retrieved_skus": [
+        "LN-004"
+      ],
+      "found": true
+    },
+    {
+      "kind": "descriptive",
+      "query": "Please quote Linear systems 39W 3000K IP44",
+      "expected_sku": "LN-004",
+      "retrieved_skus": [
+        "LN-004"
+      ],
+      "found": true
+    },
+    {
+      "kind": "exact",
+      "query": "LN-005",
+      "expected_sku": "LN-005",
+      "retrieved_skus": [
+        "LN-005"
+      ],
+      "found": true
+    },
+    {
+      "kind": "descriptive",
+      "query": "Please quote Linear systems 39W 4000K IP44",
+      "expected_sku": "LN-005",
+      "retrieved_skus": [
+        "LN-005"
+      ],
+      "found": true
+    },
+    {
+      "kind": "exact",
+      "query": "LN-006",
+      "expected_sku": "LN-006",
+      "retrieved_skus": [
+        "LN-006"
+      ],
+      "found": true
+    },
+    {
+      "kind": "descriptive",
+      "query": "Please quote Linear systems 39W 5000K IP44",
+      "expected_sku": "LN-006",
+      "retrieved_skus": [
+        "LN-006"
+      ],
+      "found": true
+    },
+    {
+      "kind": "exact",
+      "query": "LN-007",
+      "expected_sku": "LN-007",
+      "retrieved_skus": [
+        "LN-007"
+      ],
+      "found": true
+    },
+    {
+      "kind": "descriptive",
+      "query": "Please quote Linear systems 42W 3000K IP44",
+      "expected_sku": "LN-007",
+      "retrieved_skus": [
+        "LN-007"
+      ],
+      "found": true
+    },
+    {
+      "kind": "exact",
+      "query": "LN-008",
+      "expected_sku": "LN-008",
+      "retrieved_skus": [
+        "LN-008"
+      ],
+      "found": true
+    },
+    {
+      "kind": "descriptive",
+      "query": "Please quote Linear systems 42W 4000K IP44",
+      "expected_sku": "LN-008",
+      "retrieved_skus": [
+        "LN-008"
+      ],
+      "found": true
+    },
+    {
+      "kind": "exact",
+      "query": "LN-009",
+      "expected_sku": "LN-009",
+      "retrieved_skus": [
+        "LN-009"
+      ],
+      "found": true
+    },
+    {
+      "kind": "descriptive",
+      "query": "Please quote Linear systems 42W 5000K IP44",
+      "expected_sku": "LN-009",
+      "retrieved_skus": [
+        "LN-009"
+      ],
+      "found": true
+    },
+    {
+      "kind": "exact",
+      "query": "LN-010",
+      "expected_sku": "LN-010",
+      "retrieved_skus": [
+        "LN-010"
+      ],
+      "found": true
+    },
+    {
+      "kind": "descriptive",
+      "query": "Please quote Linear systems 45W 3000K IP44",
+      "expected_sku": "LN-010",
+      "retrieved_skus": [
+        "LN-010"
+      ],
+      "found": true
+    },
+    {
+      "kind": "exact",
+      "query": "LN-011",
+      "expected_sku": "LN-011",
+      "retrieved_skus": [
+        "LN-011"
+      ],
+      "found": true
+    },
+    {
+      "kind": "descriptive",
+      "query": "Please quote Linear systems 45W 4000K IP44",
+      "expected_sku": "LN-011",
+      "retrieved_skus": [
+        "LN-011"
+      ],
+      "found": true
+    },
+    {
+      "kind": "exact",
+      "query": "OD-001",
+      "expected_sku": "OD-001",
+      "retrieved_skus": [
+        "OD-001"
+      ],
+      "found": true
+    },
+    {
+      "kind": "descriptive",
+      "query": "Please quote Outdoor lighting 50W 3000K IP65",
+      "expected_sku": "OD-001",
+      "retrieved_skus": [
+        "OD-001"
+      ],
+      "found": true
+    },
+    {
+      "kind": "exact",
+      "query": "OD-002",
+      "expected_sku": "OD-002",
+      "retrieved_skus": [
+        "OD-002"
+      ],
+      "found": true
+    },
+    {
+      "kind": "descriptive",
+      "query": "Please quote Outdoor lighting 50W 4000K IP65",
+      "expected_sku": "OD-002",
+      "retrieved_skus": [
+        "OD-002"
+      ],
+      "found": true
+    },
+    {
+      "kind": "exact",
+      "query": "OD-003",
+      "expected_sku": "OD-003",
+      "retrieved_skus": [
+        "OD-003"
+      ],
+      "found": true
+    },
+    {
+      "kind": "descriptive",
+      "query": "Please quote Outdoor lighting 50W 5000K IP65",
+      "expected_sku": "OD-003",
+      "retrieved_skus": [
+        "OD-003"
+      ],
+      "found": true
+    },
+    {
+      "kind": "exact",
+      "query": "OD-004",
+      "expected_sku": "OD-004",
+      "retrieved_skus": [
+        "OD-004"
+      ],
+      "found": true
+    },
+    {
+      "kind": "descriptive",
+      "query": "Please quote Outdoor lighting 53W 3000K IP65",
+      "expected_sku": "OD-004",
+      "retrieved_skus": [
+        "OD-004"
+      ],
+      "found": true
+    },
+    {
+      "kind": "exact",
+      "query": "OD-005",
+      "expected_sku": "OD-005",
+      "retrieved_skus": [
+        "OD-005"
+      ],
+      "found": true
+    },
+    {
+      "kind": "descriptive",
+      "query": "Please quote Outdoor lighting 53W 4000K IP65",
+      "expected_sku": "OD-005",
+      "retrieved_skus": [
+        "OD-005"
+      ],
+      "found": true
+    },
+    {
+      "kind": "exact",
+      "query": "OD-006",
+      "expected_sku": "OD-006",
+      "retrieved_skus": [
+        "OD-006"
+      ],
+      "found": true
+    },
+    {
+      "kind": "descriptive",
+      "query": "Please quote Outdoor lighting 53W 5000K IP65",
+      "expected_sku": "OD-006",
+      "retrieved_skus": [
+        "OD-006"
+      ],
+      "found": true
+    },
+    {
+      "kind": "exact",
+      "query": "OD-007",
+      "expected_sku": "OD-007",
+      "retrieved_skus": [
+        "OD-007"
+      ],
+      "found": true
+    },
+    {
+      "kind": "descriptive",
+      "query": "Please quote Outdoor lighting 56W 3000K IP65",
+      "expected_sku": "OD-007",
+      "retrieved_skus": [
+        "OD-007"
+      ],
+      "found": true
+    },
+    {
+      "kind": "exact",
+      "query": "OD-008",
+      "expected_sku": "OD-008",
+      "retrieved_skus": [
+        "OD-008"
+      ],
+      "found": true
+    },
+    {
+      "kind": "descriptive",
+      "query": "Please quote Outdoor lighting 56W 4000K IP65",
+      "expected_sku": "OD-008",
+      "retrieved_skus": [
+        "OD-008"
+      ],
+      "found": true
+    },
+    {
+      "kind": "exact",
+      "query": "OD-009",
+      "expected_sku": "OD-009",
+      "retrieved_skus": [
+        "OD-009"
+      ],
+      "found": true
+    },
+    {
+      "kind": "descriptive",
+      "query": "Please quote Outdoor lighting 56W 5000K IP65",
+      "expected_sku": "OD-009",
+      "retrieved_skus": [
+        "OD-009"
+      ],
+      "found": true
+    },
+    {
+      "kind": "exact",
+      "query": "OD-010",
+      "expected_sku": "OD-010",
+      "retrieved_skus": [
+        "OD-010"
+      ],
+      "found": true
+    },
+    {
+      "kind": "descriptive",
+      "query": "Please quote Outdoor lighting 59W 3000K IP65",
+      "expected_sku": "OD-010",
+      "retrieved_skus": [
+        "OD-010"
+      ],
+      "found": true
+    },
+    {
+      "kind": "exact",
+      "query": "OD-011",
+      "expected_sku": "OD-011",
+      "retrieved_skus": [
+        "OD-011"
+      ],
+      "found": true
+    },
+    {
+      "kind": "descriptive",
+      "query": "Please quote Outdoor lighting 59W 4000K IP65",
+      "expected_sku": "OD-011",
+      "retrieved_skus": [
+        "OD-011"
+      ],
+      "found": true
+    },
+    {
+      "kind": "exact",
+      "query": "TR-001",
+      "expected_sku": "TR-001",
+      "retrieved_skus": [
+        "TR-001"
+      ],
+      "found": true
+    },
+    {
+      "kind": "descriptive",
+      "query": "Please quote Track lighting 25W 3000K IP44",
+      "expected_sku": "TR-001",
+      "retrieved_skus": [
+        "TR-001"
+      ],
+      "found": true
+    },
+    {
+      "kind": "exact",
+      "query": "TR-002",
+      "expected_sku": "TR-002",
+      "retrieved_skus": [
+        "TR-002"
+      ],
+      "found": true
+    },
+    {
+      "kind": "descriptive",
+      "query": "Please quote Track lighting 25W 4000K IP44",
+      "expected_sku": "TR-002",
+      "retrieved_skus": [
+        "TR-002"
+      ],
+      "found": true
+    },
+    {
+      "kind": "exact",
+      "query": "TR-003",
+      "expected_sku": "TR-003",
+      "retrieved_skus": [
+        "TR-003"
+      ],
+      "found": true
+    },
+    {
+      "kind": "descriptive",
+      "query": "Please quote Track lighting 25W 5000K IP44",
+      "expected_sku": "TR-003",
+      "retrieved_skus": [
+        "TR-003"
+      ],
+      "found": true
+    },
+    {
+      "kind": "exact",
+      "query": "TR-004",
+      "expected_sku": "TR-004",
+      "retrieved_skus": [
+        "TR-004"
+      ],
+      "found": true
+    },
+    {
+      "kind": "descriptive",
+      "query": "Please quote Track lighting 28W 3000K IP44",
+      "expected_sku": "TR-004",
+      "retrieved_skus": [
+        "TR-004"
+      ],
+      "found": true
+    },
+    {
+      "kind": "exact",
+      "query": "TR-005",
+      "expected_sku": "TR-005",
+      "retrieved_skus": [
+        "TR-005"
+      ],
+      "found": true
+    },
+    {
+      "kind": "descriptive",
+      "query": "Please quote Track lighting 28W 4000K IP44",
+      "expected_sku": "TR-005",
+      "retrieved_skus": [
+        "TR-005"
+      ],
+      "found": true
+    },
+    {
+      "kind": "exact",
+      "query": "TR-006",
+      "expected_sku": "TR-006",
+      "retrieved_skus": [
+        "TR-006"
+      ],
+      "found": true
+    },
+    {
+      "kind": "descriptive",
+      "query": "Please quote Track lighting 28W 5000K IP44",
+      "expected_sku": "TR-006",
+      "retrieved_skus": [
+        "TR-006"
+      ],
+      "found": true
+    },
+    {
+      "kind": "exact",
+      "query": "TR-007",
+      "expected_sku": "TR-007",
+      "retrieved_skus": [
+        "TR-007"
+      ],
+      "found": true
+    },
+    {
+      "kind": "descriptive",
+      "query": "Please quote Track lighting 31W 3000K IP44",
+      "expected_sku": "TR-007",
+      "retrieved_skus": [
+        "TR-007"
+      ],
+      "found": true
+    },
+    {
+      "kind": "exact",
+      "query": "TR-008",
+      "expected_sku": "TR-008",
+      "retrieved_skus": [
+        "TR-008"
+      ],
+      "found": true
+    },
+    {
+      "kind": "descriptive",
+      "query": "Please quote Track lighting 31W 4000K IP44",
+      "expected_sku": "TR-008",
+      "retrieved_skus": [
+        "TR-008"
+      ],
+      "found": true
+    },
+    {
+      "kind": "exact",
+      "query": "TR-009",
+      "expected_sku": "TR-009",
+      "retrieved_skus": [
+        "TR-009"
+      ],
+      "found": true
+    },
+    {
+      "kind": "descriptive",
+      "query": "Please quote Track lighting 31W 5000K IP44",
+      "expected_sku": "TR-009",
+      "retrieved_skus": [
+        "TR-009"
+      ],
+      "found": true
+    },
+    {
+      "kind": "exact",
+      "query": "TR-010",
+      "expected_sku": "TR-010",
+      "retrieved_skus": [
+        "TR-010"
+      ],
+      "found": true
+    },
+    {
+      "kind": "descriptive",
+      "query": "Please quote Track lighting 34W 3000K IP44",
+      "expected_sku": "TR-010",
+      "retrieved_skus": [
+        "TR-010"
+      ],
+      "found": true
+    },
+    {
+      "kind": "exact",
+      "query": "TR-011",
+      "expected_sku": "TR-011",
+      "retrieved_skus": [
+        "TR-011"
+      ],
+      "found": true
+    },
+    {
+      "kind": "descriptive",
+      "query": "Please quote Track lighting 34W 4000K IP44",
+      "expected_sku": "TR-011",
+      "retrieved_skus": [
+        "TR-011"
+      ],
+      "found": true
+    }
+  ]
+}

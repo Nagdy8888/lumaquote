@@ -3,6 +3,8 @@ from uuid import uuid4
 from langgraph.types import Command, interrupt
 from luma.core.database import database
 from luma.core.errors import DomainError
+from luma.features.catalog.retrieval import candidate_question, search_catalog
+from luma.features.catalog.schemas import CatalogSearch
 from luma.features.conversations.repository import conversation
 from luma.features.conversations.service import add_message
 from luma.features.quotations.drafting import draft as create_draft
@@ -21,6 +23,14 @@ def ask(state):
         if current["owner"] != "agent":
             raise DomainError("Automation paused.")
         assert_request_version(current, state)
+        if not state.get("extraction", {}).get("lines"):
+            latest = conn.execute(
+                "select body from luma.messages where company_id=%s and conversation_id=%s and actor='customer' order by created_at desc,id desc limit 1",
+                (state["company_id"], state["conversation_id"]),
+            ).fetchone()
+            if latest:
+                hits = search_catalog(conn, state["company_id"], CatalogSearch(query=latest["body"][:500]))
+                question = candidate_question(hits) or question
         conn.execute(
             """insert into luma.outbox(id,company_id,conversation_id,kind,payload,action_key)
             values(%s,%s,%s,'reply',%s,%s) on conflict(action_key) do nothing""",
@@ -35,7 +45,7 @@ def ask(state):
         conn.execute(
             "update luma.conversations set status='clarifying' where id=%s", (state["conversation_id"],)
         )
-    return {}
+    return {"clarification": question}
 
 
 def clarify(state):
@@ -57,7 +67,7 @@ def prepare(state):
         selections = []
         for line in state["extraction"]["lines"]:
             p = conn.execute(
-                "select * from luma.products where company_id=%s and sku=%s",
+                "select p.* from luma.products p join luma.sources s on s.company_id=p.company_id and s.id=p.source_id where p.company_id=%s and p.sku=%s and s.retired_at is null",
                 (state["company_id"], line["sku"].upper()),
             ).fetchone()
             if not p or p["discontinued"] or p["available"] < line["quantity"]:

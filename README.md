@@ -92,3 +92,11 @@ With paid AI disabled, staff can listen and continue manually. Enabling it uses
 and quantity confirmation. Paid canary tests are skipped by default. Their verified
 synthetic results and external account limitations are recorded in the evidence
 and morning-actions documents; ordinary tests never silently enable paid calls.
+
+Customers without a SKU can receive bounded catalog candidates from descriptive
+requirements. This is currently an exact-first lexical retrieval baseline with
+specification filters, not a verified semantic embedding pipeline. It cites source
+versions/pages and asks for a written SKU/quantity choice before quotation.
+The generated development baseline and its initial failure are retained under
+`docs/evidence/catalog-development-baseline*.json`; they do not replace the agreed
+frozen evaluation or establish real-client accuracy.

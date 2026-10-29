@@ -1,4 +1,5 @@
 from datetime import UTC, datetime, timedelta
+from decimal import Decimal
 
 from luma.core.errors import DomainError
 
@@ -19,7 +20,8 @@ def check_snapshot(conn, quote, current):
         raise DomainError("Price and stock sync is stale. Refresh Google Sheets before finalizing.")
     ids = [line["product_id"] for line in quote["content"]["lines"]]
     products = conn.execute(
-        "select * from luma.products where company_id=%s and id=any(%s::uuid[])", (quote["company_id"], ids)
+        "select p.*,s.retired_at from luma.products p join luma.sources s on s.id=p.source_id and s.company_id=p.company_id where p.company_id=%s and p.id=any(%s::uuid[])",
+        (quote["company_id"], ids),
     ).fetchall()
     lookup = {str(p["id"]): p for p in products}
     for line in quote["content"]["lines"]:
@@ -27,6 +29,11 @@ def check_snapshot(conn, quote, current):
         if (
             not p
             or p["snapshot_id"] != quote["snapshot_id"]
+            or p["retired_at"] is not None
+            or str(p["source_id"]) != line["source_id"]
+            or p["page"] != line["page"]
+            or p["price"] != Decimal(line["unit_price"])
+            or line["quantity"] % p["pack_size"] != 0
             or p["discontinued"]
             or p["available"] < line["quantity"]
         ):

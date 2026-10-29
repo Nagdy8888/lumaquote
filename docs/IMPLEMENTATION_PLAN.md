@@ -87,3 +87,10 @@ Photo intake, semantic retrieval/embeddings, broader evaluation and operational
 recovery remain unfinished. LangSmith export is blocked by the account's monthly
 trace allowance (HTTP 429), recorded in MORNING_ACTIONS.md. This is not a phase 3
 completion or whole-app release claim.
+
+The current descriptive retrieval baseline uses exact codes first, then PostgreSQL
+lexical ranking and explicit watt/CCT/IP constraints. Suggestions carry current
+source versions and original pages and require a written selection. Retired
+sources are excluded; outdated source/pages, changed prices and invalid pack quantities block old finalization.
+Generated development queries are reported separately from the frozen 80-case
+suite. Semantic embeddings and broader synonym/ambiguity coverage remain pending.

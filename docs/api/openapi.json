@@ -535,6 +535,54 @@
         }
       }
     },
+    "/api/catalog/search": {
+      "post": {
+        "summary": "Search",
+        "description": "Retrieve company-scoped descriptive candidates with source versions/pages, without calculating commercial terms.",
+        "operationId": "search_api_catalog_search_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CatalogSearch"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/CatalogHit"
+                  },
+                  "type": "array",
+                  "title": "Response Search Api Catalog Search Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
     "/api/sources/{sid}/pdf": {
       "get": {
         "summary": "Source Pdf",
@@ -628,7 +676,7 @@
     "/api/conversations/{cid}/audio": {
       "post": {
         "summary": "Upload Audio",
-        "description": "Accept at most 10 MB of actual streamed bytes; filenames/MIME never establish trusted audio content.",
+        "description": "Accept at most 10 MB of actual streamed bytes within 30 seconds; filenames/MIME never establish trusted audio content.",
         "operationId": "upload_audio_api_conversations__cid__audio_post",
         "security": [
           {
@@ -790,6 +838,132 @@
         ],
         "title": "ActivityView",
         "description": "Consequential event summary; private audit details are not part of the read contract."
+      },
+      "CatalogHit": {
+        "properties": {
+          "product_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Product Id"
+          },
+          "sku": {
+            "type": "string",
+            "pattern": "^[A-Z]{2}-\\d{3}$",
+            "title": "Sku"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          },
+          "watts": {
+            "type": "integer",
+            "title": "Watts"
+          },
+          "cct": {
+            "type": "integer",
+            "title": "Cct"
+          },
+          "ip_rating": {
+            "type": "string",
+            "pattern": "^IP[0-6][0-9]$",
+            "title": "Ip Rating"
+          },
+          "source_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Source Id"
+          },
+          "source_title": {
+            "type": "string",
+            "title": "Source Title"
+          },
+          "source_version": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Source Version"
+          },
+          "page": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Page"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "product_id",
+          "sku",
+          "name",
+          "description",
+          "watts",
+          "cct",
+          "ip_rating",
+          "source_id",
+          "source_title",
+          "source_version",
+          "page"
+        ],
+        "title": "CatalogHit",
+        "description": "One current tenant-scoped descriptive record with original-page and source-version provenance, without prices."
+      },
+      "CatalogSearch": {
+        "properties": {
+          "query": {
+            "type": "string",
+            "maxLength": 500,
+            "minLength": 1,
+            "title": "Query"
+          },
+          "watts": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 2000.0,
+                "minimum": 1.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Watts"
+          },
+          "cct": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 12000.0,
+                "minimum": 1000.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cct"
+          },
+          "ip_rating": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^IP[0-6][0-9]$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ip Rating"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "query"
+        ],
+        "title": "CatalogSearch",
+        "description": "A staff/agent search with optional explicit specification constraints; similarity never proves equivalence."
       },
       "CompanyView": {
         "properties": {

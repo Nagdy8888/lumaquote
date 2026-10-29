@@ -184,6 +184,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/catalog/search": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Search
+         * @description Retrieve company-scoped descriptive candidates with source versions/pages, without calculating commercial terms.
+         */
+        post: operations["search_api_catalog_search_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/sources/{sid}/pdf": {
         parameters: {
             query?: never;
@@ -255,7 +275,7 @@ export interface paths {
         put?: never;
         /**
          * Upload Audio
-         * @description Accept at most 10 MB of actual streamed bytes; filenames/MIME never establish trusted audio content.
+         * @description Accept at most 10 MB of actual streamed bytes within 30 seconds; filenames/MIME never establish trusted audio content.
          */
         post: operations["upload_audio_api_conversations__cid__audio_post"];
         delete?: never;
@@ -324,6 +344,54 @@ export interface components {
              * Format: date-time
              */
             created_at: string;
+        };
+        /**
+         * CatalogHit
+         * @description One current tenant-scoped descriptive record with original-page and source-version provenance, without prices.
+         */
+        CatalogHit: {
+            /**
+             * Product Id
+             * Format: uuid
+             */
+            product_id: string;
+            /** Sku */
+            sku: string;
+            /** Name */
+            name: string;
+            /** Description */
+            description: string;
+            /** Watts */
+            watts: number;
+            /** Cct */
+            cct: number;
+            /** Ip Rating */
+            ip_rating: string;
+            /**
+             * Source Id
+             * Format: uuid
+             */
+            source_id: string;
+            /** Source Title */
+            source_title: string;
+            /** Source Version */
+            source_version: number;
+            /** Page */
+            page: number;
+        };
+        /**
+         * CatalogSearch
+         * @description A staff/agent search with optional explicit specification constraints; similarity never proves equivalence.
+         */
+        CatalogSearch: {
+            /** Query */
+            query: string;
+            /** Watts */
+            watts?: number | null;
+            /** Cct */
+            cct?: number | null;
+            /** Ip Rating */
+            ip_rating?: string | null;
         };
         /**
          * CompanyView
@@ -1109,6 +1177,39 @@ export interface operations {
                 };
                 content: {
                     "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    search_api_catalog_search_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CatalogSearch"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CatalogHit"][];
                 };
             };
             /** @description Validation Error */

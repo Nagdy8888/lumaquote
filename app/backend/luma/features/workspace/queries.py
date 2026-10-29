@@ -25,7 +25,8 @@ def workspace(conn, member):
         "conversations": conversations,
         "quotes": quotes,
         "products": conn.execute(
-            "select * from luma.products where company_id=%s order by family,sku", (company,)
+            "select p.* from luma.products p join luma.sources s on s.company_id=p.company_id and s.id=p.source_id where p.company_id=%s and s.retired_at is null order by p.family,p.sku",
+            (company,),
         ).fetchall(),
         "sources": conn.execute(
             "select * from luma.sources where company_id=%s order by title", (company,)

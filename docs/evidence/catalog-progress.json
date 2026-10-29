@@ -1,0 +1,87 @@
+{
+  "revision": "catalog-baseline-2026-10-29-v1",
+  "scope": "Phase 3 exact-first lexical retrieval progress; semantic embeddings and frozen evaluation are unfinished",
+  "environment": "Windows; isolated local Supabase; synthetic company records; native API/worker and Chromium",
+  "checks": [
+    {
+      "command": "npm run lint:python",
+      "status": "Passed",
+      "seconds": 0.39,
+      "local_log": ".local/checks/lint-python.log"
+    },
+    {
+      "command": "npm run check:architecture",
+      "status": "Passed",
+      "seconds": 0.42,
+      "local_log": ".local/checks/check-architecture.log"
+    },
+    {
+      "command": "npm run check:frontend",
+      "status": "Passed",
+      "seconds": 0.6,
+      "local_log": ".local/checks/check-frontend.log"
+    },
+    {
+      "command": "npm run typecheck",
+      "status": "Passed",
+      "seconds": 5.06,
+      "local_log": ".local/checks/typecheck.log"
+    },
+    {
+      "command": "npm run test:python",
+      "status": "Passed",
+      "seconds": 136.51,
+      "local_log": ".local/checks/test-python.log"
+    },
+    {
+      "command": "npm run test:ui",
+      "status": "Passed",
+      "seconds": 3.54,
+      "local_log": ".local/checks/test-ui.log"
+    },
+    {
+      "command": "npm run test:browser",
+      "status": "Passed",
+      "seconds": 39.97,
+      "local_log": ".local/checks/test-browser.log"
+    },
+    {
+      "command": "npm run build",
+      "status": "Passed",
+      "seconds": 6.64,
+      "local_log": ".local/checks/build.log"
+    }
+  ],
+  "counts": {
+    "full_workspace_python_passed": 84,
+    "paid_canaries_skipped": 2,
+    "browser_deselected_from_python_suite": 1,
+    "separate_browser_passed": 1,
+    "frontend_passed": 5,
+    "followup_unit_passed": 33
+  },
+  "scope_notes": [
+    "The full workspace suite included one concurrent Google callback test outside this commit; it is not catalog integration evidence.",
+    "One new catalog prose-injection unit test was added after full-suite collection and passed in the followup 33-test unit run.",
+    "Concurrent Google files, configuration, migration and morning-actions edits are preserved outside this catalog commit."
+  ],
+  "behavioral_evidence": [
+    "Eight real PostgreSQL catalog tests verify exact model precedence, descriptive specification filters, family lookup, current source/page/version provenance, tenant scope, retired sources and changed commercial evidence.",
+    "A fresh-worker graph test verifies descriptive requests receive cited suggestions, then wait for explicit written SKU/quantity before preparing a draft.",
+    "Catalog prose and embedded commercial claims are excluded from deterministic customer questions.",
+    "New drafting, approval and dispatch reject retired or changed evidence; historical private originals remain separately authorized."
+  ],
+  "baseline": {
+    "initial": "docs/evidence/catalog-development-baseline-initial.json",
+    "final": "docs/evidence/catalog-development-baseline.json",
+    "finding": "Adding authoritative family text repaired the outdoor category misses; no fixture-specific synonym was invented.",
+    "limit": "132 generated development queries derived from 66 active products; not the frozen 80 scenarios or real customer accuracy."
+  },
+  "unfinished": [
+    "Semantic embeddings and broad natural-language synonym coverage",
+    "Photo intake",
+    "Noise/accent and untouched holdout evaluation",
+    "Active-job recovery and whole-app engineering/security release evidence",
+    "Verified live Google/WhatsApp operation; LangSmith export blocked by account quota"
+  ]
+}

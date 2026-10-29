@@ -21,7 +21,8 @@ def draft(conn, member, user, cid, body: DraftInput):
         raise DomainError("This request changed. Refresh before saving a revision.")
     ids = [line.product_id for line in body.lines]
     products = conn.execute(
-        "select * from luma.products where company_id=%s and id=any(%s)", (company, ids)
+        "select p.* from luma.products p join luma.sources s on s.id=p.source_id and s.company_id=p.company_id where p.company_id=%s and p.id=any(%s) and s.retired_at is null",
+        (company, ids),
     ).fetchall()
     lookup = {str(p["id"]): p for p in products}
     if any(str(line.product_id) not in lookup for line in body.lines):

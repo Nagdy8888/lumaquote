@@ -1,0 +1,22 @@
+{
+  "scope": "Generated development baseline derived from current synthetic records; not the frozen 80-scenario evaluation or client validation",
+  "method": "Exact-first PostgreSQL lexical search with explicit specification filters; no embeddings or model calls",
+  "dataset_sha256": "466c5925464d1175127fe9c6676ece877618afbb2d28ca99a874090f09ba3872",
+  "groups": {
+    "exact": {
+      "cases": 66,
+      "found": 66,
+      "recall_at_5": 1.0
+    },
+    "descriptive": {
+      "cases": 66,
+      "found": 55,
+      "recall_at_5": 0.8333333333333334
+    }
+  },
+  "local_query_latency_ms": {
+    "median": 0.861,
+    "p95": 1.42
+  },
+  "finding": "Descriptive lookup missed all 11 active Outdoor lighting records because the indexed text omitted the authoritative product family."
+}

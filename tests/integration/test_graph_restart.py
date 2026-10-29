@@ -161,3 +161,31 @@ def test_voice_waits_for_processing_and_exact_written_confirmation(environment):
     run_next(env, cid)
     assert pending(env, cid) == ("review",)
     assert get_detail(env, cid)["quote"]["content"]["total"] == "97.05"
+
+
+def test_descriptive_request_gets_cited_choices_before_selection(environment):
+    """Catalog matches help an unknown-SKU customer choose; similarity never silently creates a final line."""
+    env = environment
+    response = post(
+        env,
+        "/conversations",
+        {
+            "customer_name": "Synthetic customer",
+            "customer_company": "Fixture",
+            "text": "I need downlights 18W 4000K IP44.",
+        },
+    )
+    assert response.status_code == 200
+    cid = response.json()["id"]
+    run_next(env, cid)
+    current = get_detail(env, cid)
+    assert current["quote"] is None
+    question = current["delivery"][0]["preview"]
+    assert "DL-001" in question and "catalog v1, page 1" in question
+    assert "not confirmed equivalents" in question and "text reply" in question
+    assert (
+        post(env, f"/conversations/{cid}/customer-reply", {"text": "Please quote 3 DL-001."}).status_code
+        == 200
+    )
+    run_next(env, cid)
+    assert get_detail(env, cid)["quote"]["content"]["total"] == "97.05"

@@ -3,13 +3,27 @@ from uuid import UUID
 from fastapi import APIRouter
 from fastapi.responses import Response
 
+from luma.core.admission import rate_limit
 from luma.core.database import database
 from luma.core.errors import DomainError
 from luma.core.http import Staff
 from luma.core.identity import membership
 from luma.core.storage import get_file
 
+from .retrieval import search_catalog
+from .schemas import CatalogHit, CatalogSearch
+
 router = APIRouter()
+
+
+@router.post("/api/catalog/search", response_model=list[CatalogHit])
+def search(body: CatalogSearch, user: Staff):
+    """Retrieve company-scoped descriptive candidates with source versions/pages, without calculating commercial terms."""
+    with database(user) as conn:
+        member = membership(conn, user)
+        rate_limit(conn, f"{user}:read", 120)
+        rate_limit(conn, f"{user}:catalog_search", 30)
+        return search_catalog(conn, member["company_id"], body)
 
 
 @router.get("/api/sources/{sid}/pdf")
