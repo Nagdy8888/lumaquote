@@ -72,7 +72,12 @@
   "limits": [
     "Delivery is local_test only, not WhatsApp.",
     "Google consent/execution, paid model calls, voice/photo intake and live tracing remain unverified.",
-    "Whole-app engineering release gate remains unresolved: 40 Planned and 2 NotApplicable; later phases must supply the remaining evidence.",
-    "Remote CI is pending push and workflow dispatch."
-  ]
+    "Whole-app engineering release gate remains unresolved: 40 Planned and 2 NotApplicable; later phases must supply the remaining evidence."
+  ],
+  "remote_ci": {
+    "commit": "8a13c4f234921bb0003ffec950c029df3970c9e7",
+    "conclusion": "success",
+    "url": "https://github.com/Nagdy8888/lumaquote/actions/runs/40837010741",
+    "scope": "Static, unit/component and build checks; no Supabase/browser/live integration claim"
+  }
 }

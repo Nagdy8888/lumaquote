@@ -8,6 +8,7 @@ class AgentState(TypedDict, total=False):
     conversation_id: str
     job_id: str
     fence: int
+    customer_message_id: str
     observed_version: int
     extraction: dict
     clarification: str | None

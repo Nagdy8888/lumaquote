@@ -8,6 +8,7 @@ import httpx
 import psycopg
 import pytest
 from fastapi.testclient import TestClient
+from langgraph.checkpoint.postgres import PostgresSaver
 from luma.core.config import settings
 from luma.main import app
 from psycopg.conninfo import conninfo_to_dict
@@ -104,6 +105,18 @@ def environment(monkeypatch):
                     "files": files,
                 }
             )
+        # Checkpoints have no business-table foreign key. Remove only this
+        # generated tenant's exact conversation thread identities.
+        with psycopg.connect(dsn) as cleanup:
+            thread_ids = [
+                f"{company}:{row[0]}"
+                for row in cleanup.execute(
+                    "select id from luma.conversations where company_id=%s", (company,)
+                ).fetchall()
+            ]
+        with PostgresSaver.from_conn_string(config.luma_worker_database_url.get_secret_value()) as saver:
+            for thread_id in thread_ids:
+                saver.delete_thread(thread_id)
         # Derive every cleanup target from this fixture's own persisted records,
         # including documents generated before an interrupted browser assertion.
         with psycopg.connect(dsn) as cleanup:
@@ -113,6 +126,13 @@ def environment(monkeypatch):
                     "select id from luma.quotes where company_id=%s", (company,)
                 ).fetchall()
             )
+        with psycopg.connect(dsn) as cleanup:
+            for original, normalized in cleanup.execute(
+                "select original_path,normalized_path from luma.media where company_id=%s", (company,)
+            ).fetchall():
+                files.append(original)
+                if normalized:
+                    files.append(normalized)
         files = list(dict.fromkeys(files))
         if files:
             assert all(name.startswith(f"{company}/") for name in files)
@@ -132,6 +152,7 @@ def environment(monkeypatch):
                 "jobs",
                 "usage",
                 "inbox",
+                "media",
                 "messages",
                 "quotes",
                 "conversations",

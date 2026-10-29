@@ -68,6 +68,8 @@ def change_ownership(conn, member, user, cid, body: Ownership):
             "update luma.outbox set status='blocked',error_code='ownership_changed',updated_at=now() where conversation_id=%s and status='queued' and payload->>'origin'='staff'",
             (cid,),
         )
+    if body.owner == "agent" and current["owner"] == "staff":
+        enqueue(conn, company, cid)
     audit(conn, company, user, f"ownership.{body.owner}", cid)
     return detail(conn, company, cid)
 

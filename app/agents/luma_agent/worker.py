@@ -7,6 +7,7 @@ import time
 from luma.core.errors import DomainError
 
 from .observability import trace_outcome
+from .runtime.audio import process_audio
 from .runtime.conversations import process_conversation
 from .runtime.delivery import deliver_one
 from .runtime.jobs import claim_job, finish_job
@@ -20,9 +21,12 @@ def tick():
     if job:
         outcome = "done"
         try:
-            if job["kind"] != "agent":
+            if job["kind"] == "agent":
+                process_conversation(job)
+            elif job["kind"] == "transcribe":
+                process_audio(job)
+            else:
                 raise DomainError("This integration job is not enabled yet.")
-            process_conversation(job)
             finish_job(job, "done")
         except Exception as error:
             outcome = "blocked" if isinstance(error, DomainError) else "failed"

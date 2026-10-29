@@ -24,12 +24,15 @@ def intake(conn, member, user, body: Intake):
 
 def add_message(conn, company, cid, actor, body, kind="text", object_path=None, provider_id=None):
     """Persist a scoped message and advance the conversation version; provider message IDs deduplicate ingress."""
-    conn.execute(
+    inserted = conn.execute(
         """insert into luma.messages(id,company_id,conversation_id,actor,body,kind,object_path,provider_id)
-        values(%s,%s,%s,%s,%s,%s,%s,%s) on conflict(provider_id) do nothing""",
+        values(%s,%s,%s,%s,%s,%s,%s,%s) on conflict(provider_id) do nothing returning id""",
         (uuid4(), company, cid, actor, body, kind, object_path, provider_id),
-    )
+    ).fetchone()
+    if inserted is None:
+        return None
     conn.execute(
         "update luma.conversations set updated_at=now(),version=version+1 where id=%s and company_id=%s",
         (cid, company),
     )
+    return inserted["id"]

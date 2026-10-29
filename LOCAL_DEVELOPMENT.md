@@ -12,7 +12,8 @@ Docker must be running. The CLI is pinned in package.json and package-lock.json.
 - Local test-email inbox: http://127.0.0.1:55324
 
 Realtime, Analytics, the connection pooler, and Edge Runtime are disabled for now.
-The worker and application services will be implemented separately.
+API, UI, and worker run natively with `npm run dev:api`, `npm run dev:ui`, and
+`npm run dev:worker`; Docker is limited to Supabase and constrained media decoding.
 
 ## Start and stop
 
@@ -49,6 +50,8 @@ does not call OpenAI or LangSmith and does not establish either API connection.
 ## Schema
 
 Versioned migrations live in `supabase/migrations/`. The initial migration enables
-pgvector under the extensions schema. Business tables, staff access, RLS policies,
-and Storage buckets will be implemented against the agreed application spec.
+pgvector under the extensions schema. Business tables, staff membership/RLS,
+private Storage, immutable quotation content, and linked voice-media records are
+implemented by subsequent versioned migrations. Run `npm run setup` to apply them
+and provision this local project idempotently.
 No hosted migration, production deployment, or application readiness is implied.

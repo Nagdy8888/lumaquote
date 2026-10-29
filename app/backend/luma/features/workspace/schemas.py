@@ -119,6 +119,8 @@ class MessageView(BaseModel):
     body: str
     created_at: datetime
     outbound: bool = False
+    media_status: str | None = None
+    audio_available: bool = False
 
 
 class DeliveryView(BaseModel):

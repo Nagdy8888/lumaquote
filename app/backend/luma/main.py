@@ -5,6 +5,7 @@ from luma.core.errors import DomainError
 from luma.core.http import domain_error, response_boundaries
 from luma.features.catalog.routes import router as catalog
 from luma.features.conversations.routes import router as conversations
+from luma.features.media.routes import router as media
 from luma.features.quotations.routes import router as quotations
 from luma.features.workspace.routes import router as workspace
 
@@ -13,11 +14,11 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://127.0.0.1:5173", "http://localhost:5173"],
     allow_methods=["GET", "POST"],
-    allow_headers=["Authorization", "Content-Type", "Idempotency-Key"],
+    allow_headers=["Authorization", "Content-Type", "Idempotency-Key", "Expected-Version"],
 )
 app.add_exception_handler(DomainError, domain_error)
 app.middleware("http")(response_boundaries)
-for router in (conversations, quotations, catalog, workspace):
+for router in (conversations, quotations, catalog, workspace, media):
     app.include_router(router)
 
 

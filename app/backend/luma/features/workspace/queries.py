@@ -50,7 +50,7 @@ def detail(conn, company, cid):
     return {
         "conversation": conversation(conn, company, cid),
         "messages": conn.execute(
-            "select *, (actor='staff' and provider_id is not null) as outbound from luma.messages where company_id=%s and conversation_id=%s order by created_at,id",
+            "select m.*, (m.actor='staff' and m.provider_id is not null) as outbound, a.status as media_status, (a.normalized_path is not null) as audio_available from luma.messages m left join luma.media a on a.message_id=m.id and a.company_id=m.company_id where m.company_id=%s and m.conversation_id=%s order by m.created_at,m.id",
             (company, cid),
         ).fetchall(),
         "quote": latest_quote(conn, company, cid),

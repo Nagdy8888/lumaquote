@@ -66,7 +66,7 @@ npm run build
 It creates isolated synthetic tenants and does not reset the developer database.
 For the separate browser suite install Chromium once with `npx playwright install chromium`.
 That suite owns temporary native API/UI processes, uses an isolated tenant, and
-verifies canonical local delivery, conflict recovery, and API process restart.
+verifies voice upload/private playback, canonical local delivery, conflict recovery, and API process restart.
 The GitHub workflow runs unit/component/static/build checks; it does not claim
 those external or Docker-backed integration checks passed remotely.
 
@@ -84,3 +84,11 @@ separately. This project is not yet a production release.
 
 The private source repository is https://github.com/Nagdy8888/lumaquote.
 Completed phases are committed and pushed after their checks and review.
+
+Voice notes are uploaded from a local-test conversation. The native worker validates
+and normalizes actual audio inside the offline sandbox before any transcription.
+With paid AI disabled, staff can listen and continue manually. Enabling it uses
+`gpt-transcribe`; transcripts remain untrusted and require explicit written SKU
+and quantity confirmation. Paid canary tests are skipped by default. Their verified
+synthetic results and external account limitations are recorded in the evidence
+and morning-actions documents; ordinary tests never silently enable paid calls.

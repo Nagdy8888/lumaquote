@@ -12,6 +12,31 @@ function dispatchFixture(company) {
   if(result.status!==0)throw new Error('The isolated fixture dispatch did not complete.');
 }
 
+/** Normalize only the fixture company's queued voice note in a fresh native worker with paid inference disabled. */
+function processVoiceFixture(company) {
+  const code = `import sys
+from luma.core.database import database
+from luma_agent.runtime.audio import process_audio
+from luma_agent.runtime.jobs import finish_job
+with database(worker=True) as conn:
+    job=conn.execute("update luma.jobs set status='running',fence=fence+1,lease_until=now()+interval '120 seconds' where company_id=%s and kind='transcribe' and status='queued' returning *",(sys.argv[1],)).fetchone()
+assert job
+process_audio(job)
+finish_job(job,'done')`;
+  const result=spawnSync(process.execPath,[path.resolve('scripts/python.cjs'),'-c',code,company],
+    {cwd:path.resolve('.'),encoding:'utf8',timeout:25000,windowsHide:true,env:{...process.env,ENABLE_PAID_AI:'false',LANGSMITH_TRACING:'false'}});
+  if(result.status!==0)throw new Error('The isolated voice processor did not complete.');
+}
+
+/** Construct a labeled one-second silent PCM fixture without depending on a microphone or external speech service. */
+function syntheticVoice() {
+  const buffer=Buffer.alloc(44+32000);
+  buffer.write('RIFF',0);buffer.writeUInt32LE(buffer.length-8,4);buffer.write('WAVEfmt ',8);
+  buffer.writeUInt32LE(16,16);buffer.writeUInt16LE(1,20);buffer.writeUInt16LE(1,22);
+  buffer.writeUInt32LE(16000,24);buffer.writeUInt32LE(32000,28);buffer.writeUInt16LE(2,32);buffer.writeUInt16LE(16,34);
+  buffer.write('data',36);buffer.writeUInt32LE(32000,40);return buffer;
+}
+
 /** Exercise the actual staff UI against isolated native servers and a synthetic tenant; never record sign-in credentials. */
 async function main() {
   const configuration = JSON.parse(fs.readFileSync(process.argv[2], 'utf8'));
@@ -48,6 +73,12 @@ async function main() {
     await page.getByRole('button', { name: 'Create local request' }).click();
     await page.getByRole('heading', { name: 'Quotation workspace' }).waitFor();
     const conversation = new URL(page.url()).pathname.split('/').pop();
+    await page.getByLabel('Test customer voice note', {exact:true}).setInputFiles({name:'synthetic.wav',mimeType:'audio/wav',buffer:syntheticVoice()});
+    await page.getByRole('button',{name:'Upload test voice note',exact:true}).click();
+    await expect(page.locator('.message-list').getByText('Voice note awaiting processing.',{exact:true})).toBeVisible();
+    processVoiceFixture(configuration.company_id);
+    await page.getByRole('button',{name:'Listen to voice note',exact:true}).click({timeout:15000});
+    await expect(page.getByLabel('Voice note audio',{exact:true})).toHaveAttribute('src',/^blob:/);
     await page.getByLabel('Choose catalog product', { exact: true }).selectOption(configuration.product_id);
     await page.getByRole('button', { name: 'Add selected product' }).click();
     await page.getByLabel('Quantity for DL-001', { exact: true }).fill('3');
@@ -100,6 +131,12 @@ async function main() {
     const accessibility=await new AxeBuilder({page}).analyze();
     if(accessibility.violations.length)throw new Error('The working quotation flow has unresolved accessibility findings.');
     await page.screenshot({path:'.local/phase-2-delivered.png',fullPage:true});
+    await page.setViewportSize({width:390,height:844});
+    const portrait=await new AxeBuilder({page}).analyze();
+    if(portrait.violations.length)throw new Error('The portrait voice/quotation flow has unresolved accessibility findings.');
+    const overflows=await page.evaluate(function inspectHorizontalBounds(){return document.documentElement.scrollWidth>window.innerWidth});
+    if(overflows)throw new Error('The portrait workspace overflows horizontally.');
+    await page.screenshot({path:'.local/phase-3-portrait.png',fullPage:true});
     if (failures.length) throw new Error('Unexpected browser exception during the working flow.');
     console.log(JSON.stringify({ conversation_id: conversation, canonical_pdf_ids: [...pdfs], checks: ['auth', 'intake', 'selection', 'canonical_totals', 'takeover', 'human_reply', 'stale_edit_preserved', 'revision', 'source_pdf', 'quotation_pdf', 'approval', 'scoped_dispatch', 'reload_persistence'] }));
   } finally { clearTimeout(deadline); await browser.close(); }

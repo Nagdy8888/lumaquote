@@ -3,6 +3,7 @@ from uuid import uuid4
 
 from psycopg.types.json import Jsonb
 
+from luma.core.admission import enqueue
 from luma.core.audit import audit
 from luma.core.errors import DomainError
 from luma.features.conversations.repository import conversation
@@ -27,6 +28,7 @@ def decide(conn, member, user, cid, body: Decision):
             "update luma.conversations set status='needs_staff',version=version+1,updated_at=now() where id=%s",
             (cid,),
         )
+        enqueue(conn, company, cid, payload={"review_only": True})
         audit(conn, company, user, "quotation.rejected", quote["id"])
         return {"status": "rejected", "quote_id": quote["id"]}
     if current["owner"] != "agent":
@@ -54,5 +56,6 @@ def decide(conn, member, user, cid, body: Decision):
             f"quotation:{quote['id']}",
         ),
     )
+    enqueue(conn, company, cid, payload={"review_only": True})
     audit(conn, company, user, "quotation.approved", quote["id"], revision=quote["revision"])
     return {"status": "approved", "quote_id": quote["id"], "delivery": "queued"}

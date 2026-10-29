@@ -28,6 +28,16 @@ def process_conversation(job):
         lock.commit()
         current = conversation(lock, job["company_id"], job["conversation_id"])
         active = latest_quote(lock, job["company_id"], job["conversation_id"])
+        customer = lock.execute(
+            """select m.id,a.status as media_status from luma.messages m
+            left join luma.media a on a.message_id=m.id and a.company_id=m.company_id
+            where m.company_id=%s and m.conversation_id=%s and m.actor='customer'
+            order by m.created_at desc,m.id desc limit 1""",
+            (job["company_id"], job["conversation_id"]),
+        ).fetchone()
+        if customer and customer["media_status"] in ("queued", "processing"):
+            # Do not ask about a placeholder while its durable transcript job is pending.
+            return
         if (
             active
             and active["status"] not in ("superseded", "expired")
@@ -41,8 +51,15 @@ def process_conversation(job):
             graph = build_graph(saver)
             with tracing_context(enabled=False):
                 snapshot = graph.get_state(config)
+                if job["payload"].get("review_only") and "review" not in snapshot.next:
+                    # A decision job only completes an existing review interrupt.
+                    # It must never initiate extraction or answer a customer pause.
+                    return
                 if snapshot.next:
                     if "clarify" in snapshot.next:
+                        if customer and str(customer["id"]) == snapshot.values.get("customer_message_id"):
+                            # Duplicate queued work is not a new customer answer.
+                            return
                         graph.invoke(
                             Command(resume={"job_id": str(job["id"]), "fence": job["fence"]}),
                             config,

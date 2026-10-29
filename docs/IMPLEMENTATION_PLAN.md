@@ -26,7 +26,7 @@ only separate project docs. Root AGENTS.md defines the enforceable conventions.
 - [x] Unit/property/integration/composite/browser validation.
 
 ## 3. Persistent agent and media
-- [ ] PostgreSQL-backed LangGraph, restart/resume, customer and staff participation.
+- [x] PostgreSQL-backed LangGraph, restart/resume, customer and staff participation.
 - [ ] OpenAI structured extraction, confirmed consequential media fields, evidence-backed matching.
 - [ ] English transcription/photo intake, reservations and limits, redacted LangSmith tracing.
 - [ ] Retrieval versions/citations, embeddings, ambiguity/injection/regression checks.
@@ -75,3 +75,15 @@ Phase 1 checks are recorded in [phase-1 evidence](evidence/phase-1.json).
 Phases 1 and 2 are locally verified; agent and external integration milestones remain unchecked.
 Phase 2 checks are recorded in [manual workflow evidence](evidence/phase-2.json).
 Early manual-flow tests do not establish live WhatsApp, model, or Google execution.
+
+## Phase 3 progress (not complete)
+
+Voice upload, restricted decoding, private playback, and budget-reserved English
+transcription are implemented. Opt-in synthetic live canaries passed for Responses
+and transcription. Consequential fields require explicit written confirmation;
+model prose cannot authorize outbound commercial claims. A new worker resumes
+persisted customer/staff interrupts without trusting browser approval payloads.
+Photo intake, semantic retrieval/embeddings, broader evaluation and operational
+recovery remain unfinished. LangSmith export is blocked by the account's monthly
+trace allowance (HTTP 429), recorded in MORNING_ACTIONS.md. This is not a phase 3
+completion or whole-app release claim.

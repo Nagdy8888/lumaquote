@@ -5,6 +5,8 @@ import { Button } from "@/shared/ui/button";
 
 import { Status } from "@/shared/ui/status";
 import { useConversationAction } from "./api";
+import { VoiceNoteUpload } from "./VoiceNoteUpload";
+import { VoiceNotePlayback } from "./VoiceNotePlayback";
 import { ConversationComposer } from "./ConversationComposer";
 import { Alert, AlertTitle, AlertDescription } from "@/shared/ui/alert";
 
@@ -46,7 +48,7 @@ export function ConversationThread({
             <p>
               {capture ? "Commercial customer" : conversation.customer_company}{" "}
               <span>
-                Â·{" "}
+                ·{" "}
                 {conversation.channel === "local_test"
                   ? "Local test channel"
                   : "WhatsApp"}
@@ -72,8 +74,8 @@ export function ConversationThread({
         <span>
           <Bot />
           {conversation.owner === "agent"
-            ? "Automation permitted Â· Staff approval required"
-            : "Staff is in control Â· Automation paused"}
+            ? "Automation permitted · Staff approval required"
+            : "Staff is in control · Automation paused"}
         </span>
         <Status value={conversation.status} />
       </div>
@@ -107,7 +109,9 @@ export function ConversationThread({
               {message.kind !== "text" && (
                 <span>
                   {message.kind === "audio"
-                    ? "Voice transcript"
+                    ? message.media_status === "ready"
+                      ? "Voice transcript"
+                      : "Voice note"
                     : message.kind === "image"
                       ? "Product-label photo"
                       : "Quotation document"}
@@ -115,6 +119,14 @@ export function ConversationThread({
               )}
             </div>
             <p>{message.body}</p>
+            {message.kind === "audio" && message.media_status && (
+              <span className="message-media-status">
+                Audio: {message.media_status.replaceAll("_", " ")}
+              </span>
+            )}
+            {message.audio_available && !capture && (
+              <VoiceNotePlayback id={message.id} />
+            )}
             <div className="message-time">
               <time>
                 {new Date(message.created_at).toLocaleTimeString("en-US", {
@@ -145,6 +157,9 @@ export function ConversationThread({
             </Alert>
           ))}
       </div>
+      {conversation.channel === "local_test" && !capture && (
+        <VoiceNoteUpload id={conversation.id} version={conversation.version} />
+      )}
       <ConversationComposer conversation={conversation} />
     </section>
   );

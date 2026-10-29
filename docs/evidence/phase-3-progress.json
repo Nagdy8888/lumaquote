@@ -1,0 +1,118 @@
+{
+  "revision": "voice-and-participation-2026-10-29-v1",
+  "environment": "Windows local Supabase quotation-local-dev; native worker/API/Vite; Chromium; synthetic records only",
+  "scope": "Phase 3 progress; the full phase and whole-app release remain unfinished",
+  "checks": [
+    {
+      "command": "npm run lint:python",
+      "status": "Passed",
+      "seconds": 0.51,
+      "local_log": ".local/checks/lint-python.log"
+    },
+    {
+      "command": "npm run check:architecture",
+      "status": "Passed",
+      "seconds": 0.46,
+      "local_log": ".local/checks/check-architecture.log"
+    },
+    {
+      "command": "npm run check:frontend",
+      "status": "Passed",
+      "seconds": 0.6,
+      "local_log": ".local/checks/check-frontend.log"
+    },
+    {
+      "command": "npm run typecheck",
+      "status": "Passed",
+      "seconds": 4.88,
+      "local_log": ".local/checks/typecheck.log"
+    },
+    {
+      "command": "npm run test:python",
+      "status": "Passed",
+      "seconds": 120.05,
+      "local_log": ".local/checks/test-python.log"
+    },
+    {
+      "command": "npm run test:ui",
+      "status": "Passed",
+      "seconds": 3.58,
+      "local_log": ".local/checks/test-ui.log"
+    },
+    {
+      "command": "npm run test:browser",
+      "status": "Passed",
+      "seconds": 38.77,
+      "local_log": ".local/checks/test-browser.log"
+    },
+    {
+      "command": "npm run build",
+      "status": "Passed",
+      "seconds": 5.94,
+      "local_log": ".local/checks/build.log"
+    }
+  ],
+  "counts": {
+    "python_passed": 74,
+    "paid_canaries_skipped_by_default": 2,
+    "browser_passed": 1,
+    "frontend_followup_passed": 5
+  },
+  "followup_checks": [
+    "Voice intake six tests passed after adding the 30-second stream deadline.",
+    "Frontend five tests passed, including stable upload identity/version after an uncertain network outcome.",
+    "Architecture/doc contracts, Python lint, TypeScript and production build passed.",
+    "Browser voice/quotation flow passed after final UI copy change; zero axe violations at desktop and 390px portrait, no horizontal overflow."
+  ],
+  "live_canaries": [
+    {
+      "model": "gpt-6-luna",
+      "processing": "Standard",
+      "provider_call": "verified",
+      "data": "synthetic exact-SKU request",
+      "outcome": "review only; USD 97.05; no approval or send",
+      "usage": "token-derived estimate, not actual provider billing",
+      "estimated_usd": "0.000042"
+    },
+    {
+      "model": "gpt-transcribe",
+      "source": "local System.Speech synthetic English supplier request",
+      "provider_call": "verified",
+      "transcript": "readable English product request; confirmation still required",
+      "approval_or_send": false,
+      "estimated_usd": "0.000805",
+      "actual_billing": "not retrieved"
+    }
+  ],
+  "behavioral_evidence": [
+    "PostgreSQL checkpoints resume customer clarification and exact-revision staff decisions in independent Python worker processes.",
+    "Duplicate queued jobs do not count as customer answers; pending audio does not trigger placeholder-based responses.",
+    "Model uncertainty and duplicate SKU ambiguity use fixed safe questions; model-authored prose is never dispatched as clarification.",
+    "Voice alone and generic acknowledgments cannot authorize fields; explicit matching written SKU/quantity can proceed to staff review.",
+    "Private raw originals and bounded normalized WAV are linked to the original message; runtime and DB constraints preserve tenant/conversation provenance.",
+    "Voice upload invalidates earlier approval/outbox, replays only identical bytes and preconditions, rejects oversized streams, and fails safely for malformed audio.",
+    "Unresolved reservations from prior UTC days still consume daily allowance; duplicate paid operation identities fail closed.",
+    "Trace boundary exports only opaque UUID and fixed status; a canary privacy test includes private payload fields and provider failures."
+  ],
+  "blocked": [
+    {
+      "integration": "LangSmith",
+      "observed": "HTTP 429: monthly unique traces usage limit exceeded",
+      "action": "Account allowance/reset requires user access; no successful trace export claimed."
+    }
+  ],
+  "unfinished": [
+    "Photo intake",
+    "Versioned semantic retrieval and embeddings",
+    "Accent/noise/ambiguity evaluation corpus and holdout metrics",
+    "Active-operation crash recovery, retention and whole-app engineering release ledger",
+    "Live Google and Meta integration verification"
+  ],
+  "limits": [
+    "Amounts are estimates, not actual provider bills.",
+    "Build warns about the lazy 3D chunk size; phase 5 performance work remains.",
+    "No production deployment or real client validation.",
+    "Python static type-checking is not configured; Python gates currently comprise Ruff, AST architecture/documentation checks and behavioral tests.",
+    "Whole-app engineering ledger remains 40 Planned and 2 NotApplicable; release mode is intentionally not ready."
+  ]
+}

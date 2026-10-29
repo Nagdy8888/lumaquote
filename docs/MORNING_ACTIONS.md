@@ -55,3 +55,37 @@ local test delivery is not a WhatsApp delivery claim.
 Synthetic supplier records are explicitly labeled. No real client relationship,
 measured employee savings, or production readiness is claimed. Configured
 LangSmith/OpenAI credentials must be distinguished from live verified traces/calls.
+
+## LangSmith account limit
+
+The metadata-only trace export was attempted on October 29 and rejected with
+HTTP 429: monthly unique traces usage limit exceeded. No successful live trace
+is claimed. Check the LangSmith project's account allowance or wait for its
+reset; no paid upgrade or quota change was made. Quotation processing continues
+when optional trace export fails.
+
+## Latest verification
+
+Phase 2 commit `8a13c4f` is pushed. Its GitHub local-contracts workflow passed:
+https://github.com/Nagdy8888/lumaquote/actions/runs/40837010741
+This CI covers lint, architecture/docs, types, unit/UI tests and build; local
+Supabase, browser and sandbox checks were verified separately on this machine.
+A real budget-reserved synthetic gpt-6-luna extraction also passed, producing
+review-only state with no approval/send. The observed $0.000042 value is an
+estimate from tokens, not actual provider billing. Paid AI stays disabled by
+default; the canary requires explicit opt-in.
+
+The synthetic English voice canary also passed with `gpt-transcribe`, private
+original/normalized playback and readable transcript. Its duration-derived
+$0.000805 value is an estimate, not billed usage. Voice confirmation policy and
+worker pause/resume have separate offline tests; these two short canaries do not
+establish accent/noise accuracy or the full frozen evaluation targets.
+
+## Google callback preparation
+
+The user confirmed the synthetic workbook is ready. Callback secret, company ID
+and workbook mapping were prepared in ignored .env.local without printing secrets.
+The backend does not yet implement /callbacks/google, and no public HTTPS callback
+URL has been verified. Do not install or claim a working edit trigger until the
+callback, authenticated receipt handling and reachable URL are implemented/tested.
+The user was asked whether to use a temporary local tunnel or an existing URL.

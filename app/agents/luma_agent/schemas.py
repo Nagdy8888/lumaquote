@@ -1,12 +1,12 @@
 from luma.core.contracts import StrictModel
-from pydantic import Field
+from pydantic import Field, StrictInt
 
 
 class RequestedLine(StrictModel):
     """Untrusted model extraction of an explicit SKU and quantity; neither field establishes catalog truth."""
 
     sku: str | None
-    quantity: int | None = Field(ge=1, le=10000)
+    quantity: StrictInt | None = Field(ge=1, le=10000)
 
 
 class Extraction(StrictModel):
