@@ -1,7 +1,22 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { request } from "@/shared/api/client";
 import { useSession } from "@/shared/auth/session";
-import type { ConversationDetail } from "@/shared/api/types";
+import type {
+  ConversationDetail,
+  DraftInput,
+  DecisionInput,
+  OwnershipInput,
+  TextInput,
+  StaffReplyInput,
+} from "@/shared/api/types";
+
+export type ConversationCommand = (
+  | { action: "draft"; body: DraftInput }
+  | { action: "decision"; body: DecisionInput }
+  | { action: "ownership"; body: OwnershipInput }
+  | { action: "reply"; body: StaffReplyInput }
+  | { action: "messages" | "customer-reply"; body: TextInput }
+) & { key: string };
 
 /** Load the selected conversation using a staff-scoped query key; cancellation prevents stale selection updates. */
 export function useConversation(id?: string) {
@@ -27,11 +42,7 @@ export function useConversationAction(id: string) {
       action,
       body,
       key,
-    }: {
-      action: string;
-      body: unknown;
-      key: string;
-    }) {
+    }: ConversationCommand) {
       return request(
         `/conversations/${id}/${action}`,
         { method: "POST", body: JSON.stringify(body) },
@@ -40,8 +51,10 @@ export function useConversationAction(id: string) {
     },
     /** Invalidate affected detail and aggregates after confirmed mutation; never optimistically display approval or delivery. */
     onSuccess: function reconcileConversation() {
-      void client.invalidateQueries({ queryKey: ["conversation"] });
-      void client.invalidateQueries({ queryKey: ["workspace"] });
+      return Promise.all([
+        client.invalidateQueries({ queryKey: ["conversation"] }),
+        client.invalidateQueries({ queryKey: ["workspace"] }),
+      ]);
     },
   });
 }

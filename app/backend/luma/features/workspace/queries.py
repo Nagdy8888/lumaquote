@@ -50,12 +50,12 @@ def detail(conn, company, cid):
     return {
         "conversation": conversation(conn, company, cid),
         "messages": conn.execute(
-            "select * from luma.messages where company_id=%s and conversation_id=%s order by created_at,id",
+            "select *, (actor='staff' and provider_id is not null) as outbound from luma.messages where company_id=%s and conversation_id=%s order by created_at,id",
             (company, cid),
         ).fetchall(),
         "quote": latest_quote(conn, company, cid),
         "delivery": conn.execute(
-            "select id,kind,status,error_code,updated_at from luma.outbox where company_id=%s and conversation_id=%s order by created_at desc",
+            "select id,kind,status,error_code,updated_at,case when kind='reply' then payload->>'text' end as preview from luma.outbox where company_id=%s and conversation_id=%s order by created_at desc",
             (company, cid),
         ).fetchall(),
     }

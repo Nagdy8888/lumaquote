@@ -94,6 +94,8 @@ def environment(monkeypatch):
                     "api": api,
                     "headers": {"Authorization": f"Bearer {token}"},
                     "user": uid,
+                    "email": email,
+                    "password": password,
                     "company": company,
                     "products": products,
                     "dsn": dsn,
@@ -102,6 +104,16 @@ def environment(monkeypatch):
                     "files": files,
                 }
             )
+        # Derive every cleanup target from this fixture's own persisted records,
+        # including documents generated before an interrupted browser assertion.
+        with psycopg.connect(dsn) as cleanup:
+            files.extend(
+                f"{company}/quotes/{row[0]}.pdf"
+                for row in cleanup.execute(
+                    "select id from luma.quotes where company_id=%s", (company,)
+                ).fetchall()
+            )
+        files = list(dict.fromkeys(files))
         if files:
             assert all(name.startswith(f"{company}/") for name in files)
             auth.request(

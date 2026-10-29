@@ -5,6 +5,72 @@
     "version": "0.1.0"
   },
   "paths": {
+    "/api/conversations/{cid}/reply": {
+      "post": {
+        "summary": "Staff Reply",
+        "description": "Authorize and idempotently queue a human customer reply; takeover and current authorship are enforced server-side.",
+        "operationId": "staff_reply_api_conversations__cid__reply_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "cid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Cid"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Idempotency-Key"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StaffReply"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConversationDetail"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/conversations/{cid}": {
       "get": {
         "summary": "Detail",
@@ -822,6 +888,17 @@
             "type": "string",
             "format": "date-time",
             "title": "Updated At"
+          },
+          "preview": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Preview"
           }
         },
         "type": "object",
@@ -1004,6 +1081,11 @@
             "type": "string",
             "format": "date-time",
             "title": "Created At"
+          },
+          "outbound": {
+            "type": "boolean",
+            "title": "Outbound",
+            "default": false
           }
         },
         "type": "object",
@@ -1400,6 +1482,29 @@
         ],
         "title": "SourceView",
         "description": "An authorized catalog reference without its private Storage path."
+      },
+      "StaffReply": {
+        "properties": {
+          "text": {
+            "type": "string",
+            "maxLength": 2000,
+            "minLength": 1,
+            "title": "Text"
+          },
+          "expected_version": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Expected Version"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "text",
+          "expected_version"
+        ],
+        "title": "StaffReply",
+        "description": "A bounded human reply tied to the staff-owned conversation version, never a quotation approval command."
       },
       "TextInput": {
         "properties": {

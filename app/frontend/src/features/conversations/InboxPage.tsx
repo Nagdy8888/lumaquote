@@ -93,12 +93,12 @@ export function InboxPage() {
         ) : detail.data ? (
           <>
             <ConversationThread
-              key={selected}
+              key={`thread:${selected}`}
               detail={detail.data}
               capture={capture}
             />
             <QuotationPanel
-              key={`${selected}:${detail.data.quote?.id ?? "new"}`}
+              key={`quotation:${selected}`}
               detail={detail.data}
               products={data.products}
               role={data.role}

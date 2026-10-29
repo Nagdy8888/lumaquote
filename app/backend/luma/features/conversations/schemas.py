@@ -23,3 +23,10 @@ class Intake(TextInput):
 
     customer_name: str = Field(min_length=1, max_length=120)
     customer_company: str = Field(default="", max_length=160)
+
+
+class StaffReply(TextInput):
+    """A bounded human reply tied to the staff-owned conversation version, never a quotation approval command."""
+
+    text: str = Field(min_length=1, max_length=2000)
+    expected_version: int = Field(ge=1, strict=True)

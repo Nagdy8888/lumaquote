@@ -3,22 +3,37 @@ from uuid import UUID
 from fastapi import APIRouter
 from fastapi.encoders import jsonable_encoder
 
-from luma.core.admission import enqueue, rate_limit
-from luma.core.audit import audit
+from luma.core.admission import rate_limit
 from luma.core.database import database
-from luma.core.errors import DomainError
 from luma.core.http import OperationKey, Staff
 from luma.core.idempotency import operation
 from luma.core.identity import membership
 from luma.features.workspace.queries import detail as get_detail
 from luma.features.workspace.schemas import ConversationDetail
 
-from .repository import conversation
-from .schemas import Intake, Ownership, TextInput
-from .service import add_message
+from .participation import change_ownership, queue_staff_reply, record_customer_reply, record_note
+from .schemas import Intake, Ownership, StaffReply, TextInput
 from .service import intake as create_intake
 
 router = APIRouter()
+
+
+@router.post("/api/conversations/{cid}/reply", response_model=ConversationDetail)
+def staff_reply(cid: UUID, body: StaffReply, user: Staff, key: OperationKey):
+    """Authorize and idempotently queue a human customer reply; takeover and current authorship are enforced server-side."""
+    with database(user) as conn:
+        member = membership(conn, user)
+        rate_limit(conn, f"{user}:mutation", 30)
+        rate_limit(conn, f"{user}:reply", 10)
+        return operation(
+            conn,
+            member,
+            user,
+            f"reply:{cid}",
+            key,
+            body.model_dump(),
+            lambda: queue_staff_reply(conn, member, user, cid, body),
+        )
 
 
 @router.get("/api/conversations/{cid}", response_model=ConversationDetail)
@@ -55,11 +70,8 @@ def message(cid: UUID, body: TextInput, user: Staff, key: OperationKey):
         rate_limit(conn, f"{user}:mutation", 30)
 
         def execute():
-            """Apply this route's authorized mutation atomically and return canonical persisted detail for idempotent replay."""
-            conversation(conn, member["company_id"], cid, lock=True)
-            add_message(conn, member["company_id"], cid, "staff", body.text)
-            audit(conn, member["company_id"], user, "staff.note_added", cid)
-            return get_detail(conn, member["company_id"], cid)
+            """Delegate the authorized participation change and return its canonical detail for idempotent replay."""
+            return record_note(conn, member, user, cid, body)
 
         return operation(conn, member, user, f"note:{cid}", key, body.model_dump(), execute)
 
@@ -72,26 +84,8 @@ def customer_reply(cid: UUID, body: TextInput, user: Staff, key: OperationKey):
         rate_limit(conn, f"{user}:mutation", 30)
 
         def execute():
-            """Apply this route's authorized mutation atomically and return canonical persisted detail for idempotent replay."""
-            current = conversation(conn, member["company_id"], cid, lock=True)
-            if current["channel"] != "local_test":
-                raise DomainError(
-                    "Simulated customer replies are only available in the local test channel.", 403
-                )
-            rate_limit(conn, f"conversation:{cid}", 6)
-            add_message(conn, member["company_id"], cid, "customer", body.text)
-            conn.execute("update luma.conversations set last_customer_at=now() where id=%s", (cid,))
-            conn.execute(
-                "update luma.quotes set status='superseded' where conversation_id=%s and status in ('review','approved')",
-                (cid,),
-            )
-            conn.execute(
-                "update luma.outbox set status='blocked',error_code='customer_revision' where conversation_id=%s and status='queued'",
-                (cid,),
-            )
-            if current["owner"] == "agent":
-                enqueue(conn, member["company_id"], cid)
-            return get_detail(conn, member["company_id"], cid)
+            """Delegate the authorized participation change and return its canonical detail for idempotent replay."""
+            return record_customer_reply(conn, member, user, cid, body)
 
         return operation(conn, member, user, f"customer:{cid}", key, body.model_dump(), execute)
 
@@ -104,19 +98,7 @@ def ownership(cid: UUID, body: Ownership, user: Staff, key: OperationKey):
         rate_limit(conn, f"{user}:mutation", 30)
 
         def execute():
-            """Apply this route's authorized mutation atomically and return canonical persisted detail for idempotent replay."""
-            current = conversation(conn, member["company_id"], cid, lock=True)
-            if current["version"] != body.expected_version:
-                raise DomainError("Conversation changed. Refresh before changing ownership.")
-            conn.execute(
-                "update luma.conversations set owner=%s,version=version+1 where id=%s", (body.owner, cid)
-            )
-            if body.owner == "staff":
-                conn.execute(
-                    "update luma.outbox set status='blocked',error_code='staff_takeover' where conversation_id=%s and status='queued'",
-                    (cid,),
-                )
-            audit(conn, member["company_id"], user, f"ownership.{body.owner}", cid)
-            return get_detail(conn, member["company_id"], cid)
+            """Delegate the authorized participation change and return its canonical detail for idempotent replay."""
+            return change_ownership(conn, member, user, cid, body)
 
         return operation(conn, member, user, f"ownership:{cid}", key, body.model_dump(), execute)

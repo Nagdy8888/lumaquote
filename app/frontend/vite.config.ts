@@ -11,7 +11,9 @@ export default defineConfig({
     host: "127.0.0.1",
     port: 5173,
     strictPort: true,
-    proxy: { "/api": "http://127.0.0.1:8001" },
+    proxy: {
+      "/api": process.env.LUMA_API_PROXY_TARGET ?? "http://127.0.0.1:8001",
+    },
   },
   preview: { host: "127.0.0.1", port: 4173 },
   build: { chunkSizeWarningLimit: 700 },

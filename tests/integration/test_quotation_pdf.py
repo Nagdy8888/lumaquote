@@ -13,6 +13,15 @@ def test_pdf_uses_persisted_revision_and_stable_private_bytes(environment):
     env = environment
     cid = create_request(env)
     quote = make_draft(env, cid)
+    # Customer labels may change independently; PDF content must retain the
+    # customer identity that staff actually reviewed in this immutable revision.
+    import psycopg
+
+    with psycopg.connect(env["dsn"]) as conn:
+        conn.execute(
+            "update luma.conversations set customer_name=%s where id=%s and company_id=%s",
+            ("Changed after review", cid, env["company"]),
+        )
     path = f"/api/quotes/{quote['id']}/pdf"
     response = env["api"].get(path, headers=env["headers"])
     assert response.status_code == 200
@@ -26,6 +35,8 @@ def test_pdf_uses_persisted_revision_and_stable_private_bytes(environment):
         value in text
         for value in ("DL-001", "97.05", "Revision 1", "Tax excluded", "Synthetic test customer")
     )
+    assert "Changed after review" not in text
+    assert "(Cairo)" in text
     second = env["api"].get(path, headers=env["headers"])
     assert second.content == response.content
     assert env["api"].get(path).status_code in (401, 403)

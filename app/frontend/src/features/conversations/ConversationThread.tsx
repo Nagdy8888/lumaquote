@@ -1,17 +1,12 @@
-import { useState, type FormEvent } from "react";
-import {
-  Bot,
-  CheckCheck,
-  MessageSquareText,
-  Send,
-  UserRound,
-} from "lucide-react";
+import { Bot, CheckCheck, UserRound } from "lucide-react";
 import type { ConversationDetail } from "@/shared/api/types";
 import { customerName } from "@/shared/api/workspace-context";
 import { Button } from "@/shared/ui/button";
-import { Textarea } from "@/shared/ui/textarea";
+
 import { Status } from "@/shared/ui/status";
 import { useConversationAction } from "./api";
+import { ConversationComposer } from "./ConversationComposer";
+import { Alert, AlertTitle, AlertDescription } from "@/shared/ui/alert";
 
 /** Render plain escaped conversation content and explicitly distinguish staff notes from local customer simulations. */
 export function ConversationThread({
@@ -22,23 +17,7 @@ export function ConversationThread({
   capture: boolean;
 }) {
   const { conversation, messages } = detail;
-  const [text, setText] = useState("");
-  const [mode, setMode] = useState("messages");
   const mutation = useConversationAction(conversation.id);
-  /** Add a staff note or local-test customer reply; preserve the draft if the server rejects the action. */
-  function submit(event: FormEvent) {
-    event.preventDefault();
-    if (!text.trim()) return;
-    mutation.mutate(
-      { action: mode, body: { text }, key: crypto.randomUUID() },
-      {
-        /** Clear the composer only after the server confirms the saved message. */
-        onSuccess: function clearConfirmedDraft() {
-          setText("");
-        },
-      },
-    );
-  }
   /** Pause or explicitly resume automation using the currently displayed optimistic version. */
   function changeOwnership() {
     mutation.mutate({
@@ -67,7 +46,7 @@ export function ConversationThread({
             <p>
               {capture ? "Commercial customer" : conversation.customer_company}{" "}
               <span>
-                ·{" "}
+                Â·{" "}
                 {conversation.channel === "local_test"
                   ? "Local test channel"
                   : "WhatsApp"}
@@ -93,8 +72,8 @@ export function ConversationThread({
         <span>
           <Bot />
           {conversation.owner === "agent"
-            ? "Automation permitted · Staff approval required"
-            : "Staff is in control · Automation paused"}
+            ? "Automation permitted Â· Staff approval required"
+            : "Staff is in control Â· Automation paused"}
         </span>
         <Status value={conversation.status} />
       </div>
@@ -121,7 +100,9 @@ export function ConversationThread({
                 : message.actor === "assistant"
                   ? "LumaQuote"
                   : message.actor === "staff"
-                    ? "Staff note"
+                    ? message.outbound
+                      ? "Sales team"
+                      : "Staff note"
                     : "Workflow update"}
               {message.kind !== "text" && (
                 <span>
@@ -145,63 +126,26 @@ export function ConversationThread({
             </div>
           </article>
         ))}
+        {detail.delivery
+          .filter(
+            (item) =>
+              item.kind === "reply" &&
+              ["queued", "submitting", "blocked", "failed", "unknown"].includes(
+                item.status,
+              ),
+          )
+          .map((item) => (
+            <Alert role="status" key={item.id}>
+              <AlertTitle>
+                Customer reply <Status value={item.status} />
+              </AlertTitle>
+              <AlertDescription>
+                {item.preview ?? "Waiting for a confirmed delivery outcome."}
+              </AlertDescription>
+            </Alert>
+          ))}
       </div>
-      <form className="composer" onSubmit={submit}>
-        <div className="composer-mode">
-          <MessageSquareText />
-          <label className="sr-only" htmlFor="reply-mode">
-            Reply mode
-          </label>
-          <select
-            id="reply-mode"
-            value={mode}
-            onChange={(e) => setMode(e.target.value)}
-          >
-            <option value="messages">Internal staff note</option>
-            {conversation.channel === "local_test" && (
-              <option value="customer-reply">
-                Simulate customer reply · local test
-              </option>
-            )}
-          </select>
-        </div>
-        <Textarea
-          aria-label={
-            mode === "messages"
-              ? "Internal staff note"
-              : "Local test customer reply"
-          }
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          placeholder={
-            mode === "messages"
-              ? "Add a note for your team…"
-              : "Enter the customer’s clarification…"
-          }
-          maxLength={8000}
-          rows={3}
-        />
-        <div className="composer-footer">
-          <span>
-            {mode === "messages"
-              ? "Visible to your team. Not sent externally."
-              : "Test reply. No real customer is contacted."}
-          </span>
-          <Button
-            type="submit"
-            size="sm"
-            disabled={mutation.isPending || !text.trim()}
-          >
-            <Send data-icon="inline-start" />
-            {mode === "messages" ? "Add note" : "Add test reply"}
-          </Button>
-        </div>
-        {mutation.isError && (
-          <p className="error-text" role="alert">
-            {mutation.error.message}
-          </p>
-        )}
-      </form>
+      <ConversationComposer conversation={conversation} />
     </section>
   );
 }

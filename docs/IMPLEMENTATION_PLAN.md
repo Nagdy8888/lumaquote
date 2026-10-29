@@ -20,10 +20,10 @@ only separate project docs. Root AGENTS.md defines the enforceable conventions.
 - [x] Real resource-bounded, network-disabled media sandbox.
 
 ## 2. Manual quotation workflow
-- [ ] Intake, clarification, evidence, product selection, deterministic Decimal totals.
-- [ ] Immutable revisions, PDF parity, exact customer/revision approval, rejection, takeover.
-- [ ] Durable inbox/jobs/outbox, honest delivery state, scoped idempotency and audit.
-- [ ] Unit/property/integration/composite/browser validation.
+- [x] Intake, clarification, evidence, product selection, deterministic Decimal totals.
+- [x] Immutable revisions, PDF parity, exact customer/revision approval, rejection, takeover.
+- [x] Durable inbox/jobs/outbox, honest delivery state, scoped idempotency and audit.
+- [x] Unit/property/integration/composite/browser validation.
 
 ## 3. Persistent agent and media
 - [ ] PostgreSQL-backed LangGraph, restart/resume, customer and staff participation.
@@ -72,5 +72,6 @@ accounts. Live tests and offline substitutes must be reported separately.
 ## Evidence and commits
 
 Phase 1 checks are recorded in [phase-1 evidence](evidence/phase-1.json).
-Only the foundation phase is complete; later milestones remain unchecked.
+Phases 1 and 2 are locally verified; agent and external integration milestones remain unchecked.
+Phase 2 checks are recorded in [manual workflow evidence](evidence/phase-2.json).
 Early manual-flow tests do not establish live WhatsApp, model, or Google execution.

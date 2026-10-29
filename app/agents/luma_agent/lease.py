@@ -1,6 +1,14 @@
 from luma.core.errors import DomainError
 
 
+def assert_request_version(current, state):
+    """Reject preparation or clarification based on a request changed since extraction began, preserving staff/customer edits."""
+    if current["version"] != state.get("observed_version"):
+        raise DomainError(
+            "The request changed during preparation. Review the latest conversation before retrying."
+        )
+
+
 def assert_job(conn, state):
     """Reject side effects when the persisted job no longer holds the matching live fenced lease."""
     row = conn.execute(

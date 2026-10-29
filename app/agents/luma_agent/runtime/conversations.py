@@ -6,6 +6,8 @@ from langsmith import tracing_context
 from luma.core.config import settings
 from luma.core.database import database
 from luma.core.errors import DomainError
+from luma.features.conversations.repository import conversation
+from luma.features.quotations.repository import latest_quote
 
 from ..graph import build_graph
 
@@ -24,6 +26,17 @@ def process_conversation(job):
         # Session lock spans graph commits; released on connection close/crash.
         lock.execute("select pg_advisory_lock(hashtextextended(%s,0))", (thread,))
         lock.commit()
+        current = conversation(lock, job["company_id"], job["conversation_id"])
+        active = latest_quote(lock, job["company_id"], job["conversation_id"])
+        if (
+            active
+            and active["status"] not in ("superseded", "expired")
+            and current["last_customer_at"] <= active["created_at"]
+            and not job["payload"].get("review_only")
+        ):
+            # A queued older preparation must not replace a staff-prepared or
+            # already approved/rejected revision, or incur another model call.
+            return
         with PostgresSaver.from_conn_string(settings().luma_worker_database_url.get_secret_value()) as saver:
             graph = build_graph(saver)
             with tracing_context(enabled=False):

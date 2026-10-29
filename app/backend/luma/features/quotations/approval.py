@@ -23,6 +23,10 @@ def decide(conn, member, user, cid, body: Decision):
         raise DomainError("This quotation has expired. Create a new revision.")
     if body.decision == "reject":
         conn.execute("update luma.quotes set status='rejected' where id=%s", (quote["id"],))
+        conn.execute(
+            "update luma.conversations set status='needs_staff',version=version+1,updated_at=now() where id=%s",
+            (cid,),
+        )
         audit(conn, company, user, "quotation.rejected", quote["id"])
         return {"status": "rejected", "quote_id": quote["id"]}
     if current["owner"] != "agent":
@@ -34,6 +38,10 @@ def decide(conn, member, user, cid, body: Decision):
         (uuid4(), company, quote["id"], user, quote["content_hash"], quote["recipient"]),
     )
     conn.execute("update luma.quotes set status='approved' where id=%s", (quote["id"],))
+    conn.execute(
+        "update luma.conversations set status='delivery_queued',version=version+1,updated_at=now() where id=%s",
+        (cid,),
+    )
     conn.execute(
         """insert into luma.outbox(id,company_id,conversation_id,quote_id,kind,payload,action_key)
         values(%s,%s,%s,%s,'quotation',%s,%s)""",

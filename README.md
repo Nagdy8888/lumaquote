@@ -58,11 +58,15 @@ npm run typecheck
 npm run test:unit
 npm run test:ui
 npm run test:python
+npm run test:browser
 npm run build
 ```
 
 `test:python` includes real local Auth/PostgreSQL/Storage and media-container tests.
 It creates isolated synthetic tenants and does not reset the developer database.
+For the separate browser suite install Chromium once with `npx playwright install chromium`.
+That suite owns temporary native API/UI processes, uses an isolated tenant, and
+verifies canonical local delivery, conflict recovery, and API process restart.
 The GitHub workflow runs unit/component/static/build checks; it does not claim
 those external or Docker-backed integration checks passed remotely.
 

@@ -43,6 +43,11 @@ def draft(conn, member, user, cid, body: DraftInput):
     totals["customer_name"] = current["customer_name"]
     totals["customer_company"] = current["customer_company"]
     previous = latest_quote(conn, company, cid, lock=True)
+    conn.execute(
+        """update luma.outbox set status='blocked',error_code='quotation_prepared',updated_at=now()
+        where company_id=%s and conversation_id=%s and kind='reply' and status='queued'""",
+        (company, cid),
+    )
     revision = previous["revision"] + 1 if previous else 1
     if previous:
         conn.execute("update luma.quotes set status='superseded' where id=%s", (previous["id"],))

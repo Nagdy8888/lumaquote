@@ -62,11 +62,11 @@ def test_complete_manual_quotation_and_local_delivery(environment):
     first = post(env, f"/conversations/{cid}/decision", body, key)
     assert first.status_code == 200, first.text
     assert post(env, f"/conversations/{cid}/decision", body, key).json() == first.json()
-    assert deliver_one()
+    assert deliver_one(env["company"])
     current = get_detail(env, cid)
     assert current["delivery"][0]["status"] == "local_delivered"
     assert len([m for m in current["messages"] if m["kind"] == "document"]) == 1
-    assert deliver_one() is False
+    assert deliver_one(env["company"]) is False
 
 
 def test_revision_invalidates_approval_and_blocks_old_dispatch(environment):
@@ -108,7 +108,7 @@ def test_takeover_prevents_queued_delivery(environment):
     )
     assert response.status_code == 200, response.text
     assert get_detail(env, cid)["delivery"][0]["status"] == "blocked"
-    assert deliver_one() is False
+    assert deliver_one(env["company"]) is False
 
 
 def test_changed_idempotent_payload_conflicts(environment):

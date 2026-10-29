@@ -9,6 +9,9 @@ const project = "quotation-local-dev";
 const names = ["db", "kong", "studio", "inbucket"].map(
   (service) => `supabase_${service}_${project}`,
 );
+const databaseClients = ["auth", "rest", "storage", "pg_meta"].map(
+  (service) => `supabase_${service}_${project}`,
+);
 const privateDir = path.join(root, "supabase", ".temp");
 fs.mkdirSync(privateDir, { recursive: true });
 
@@ -54,6 +57,7 @@ function api(method, route, body) {
 
 /** Restrict only this project's published services to loopback, preserving named volumes and Kong's required runtime files. */
 async function restrictPorts() {
+  let databaseRecreated = false;
   for (const name of names) {
     const container = await api("GET", `/containers/${name}/json`);
     if (container.Name !== `/${name}`) throw new Error("Unexpected container identity");
@@ -97,10 +101,20 @@ async function restrictPorts() {
           { input: fs.readFileSync(gatewayArchive), stdio: ["pipe", "pipe", "pipe"] });
       }
       await api("POST", `/containers/${name}/start`);
+      if (name === `supabase_db_${project}`) databaseRecreated = true;
     } catch {
       throw new Error(`Could not recreate ${name}; volumes preserved and private restore config saved.`);
     }
     console.log(`${name}: restricted published ports to 127.0.0.1`);
+  }
+  if (databaseRecreated) {
+    // These processes may retain sockets to the old database container even
+    // while their liveness probes remain green. Reconnect only this project's
+    // database clients before reporting the restarted stack ready.
+    for (const name of databaseClients) {
+      await api("POST", `/containers/${name}/restart?t=10`);
+    }
+    console.log("This project's database clients restarted after loopback port rebinding.");
   }
 }
 
@@ -122,7 +136,7 @@ async function restrictPorts() {
   await restrictPorts();
   const deadline = Date.now() + 90000;
   for (;;) {
-    const states = await Promise.all(names.map((name) => api("GET", `/containers/${name}/json`)));
+    const states = await Promise.all([...names,...databaseClients].map((name) => api("GET", `/containers/${name}/json`)));
     if (states.every((item) => item.State.Running && (!item.State.Health || item.State.Health.Status === "healthy"))) break;
     if (Date.now() > deadline) throw new Error("Local Supabase did not become healthy after port restriction.");
     await new Promise((resolve) => setTimeout(resolve, 1000));

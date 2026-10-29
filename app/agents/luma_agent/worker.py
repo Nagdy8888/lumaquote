@@ -32,7 +32,8 @@ def tick():
             trace_outcome(job, outcome)
         except Exception as error:
             logger.warning("Trace export unavailable: %s", type(error).__name__)
-    return bool(job) or deliver_one()
+    dispatched = deliver_one()
+    return bool(job) or dispatched
 
 
 def main():

@@ -118,6 +118,7 @@ class MessageView(BaseModel):
     kind: str
     body: str
     created_at: datetime
+    outbound: bool = False
 
 
 class DeliveryView(BaseModel):
@@ -128,6 +129,7 @@ class DeliveryView(BaseModel):
     status: str
     error_code: str | None
     updated_at: datetime
+    preview: str | None = None
 
 
 class ConversationDetail(BaseModel):

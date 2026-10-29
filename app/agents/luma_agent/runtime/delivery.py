@@ -3,22 +3,37 @@
 from luma.core.audit import audit
 from luma.core.database import database
 from luma.core.errors import DomainError
+from luma.features.conversations.repository import conversation
 from luma.features.conversations.service import add_message
-from luma.features.quotations.dispatch import dispatch_check
+from luma.features.messaging.authorization import authorize_outbound
 
 
-def deliver_one():
-    """Deliver one local-test intent after final authorization, recording honest local-channel status."""
+def deliver_one(company_id=None):
+    """Dispatch one authorized intent; trusted tests may restrict the worker to their isolated company."""
     with database(worker=True) as conn:
-        conn.execute("""update luma.outbox set status='unknown',error_code='submission_interrupted'
-            where status='submitting' and updated_at<now()-interval '2 minutes'""")
-        item = conn.execute(
-            "select * from luma.outbox where status='queued' order by created_at for update skip locked limit 1"
+        conn.execute(
+            """update luma.outbox set status='unknown',error_code='submission_interrupted',updated_at=now()
+            where status='submitting' and updated_at<now()-interval '2 minutes'
+            and (%s::uuid is null or company_id=%s)""",
+            (company_id, company_id),
+        )
+        candidate = conn.execute(
+            "select id,company_id,conversation_id from luma.outbox where status='queued' and (%s::uuid is null or company_id=%s) order by created_at limit 1",
+            (company_id, company_id),
         ).fetchone()
-        if not item:
+        if not candidate:
+            return False
+        # Every edit/approval/takeover takes the conversation lock first. The
+        # dispatcher follows that same order to avoid C->O / O->C deadlocks.
+        conversation(conn, candidate["company_id"], candidate["conversation_id"], lock=True)
+        item = conn.execute(
+            "select * from luma.outbox where id=%s and status='queued' for update skip locked",
+            (candidate["id"],),
+        ).fetchone()
+        if item is None:
             return False
         try:
-            current, quote = dispatch_check(conn, item)
+            current, quote = authorize_outbound(conn, item)
             if current["channel"] != "local_test":
                 conn.execute(
                     "update luma.outbox set status='blocked',error_code='live_adapter_not_enabled',updated_at=now() where id=%s",
@@ -45,7 +60,7 @@ def deliver_one():
             conn,
             item["company_id"],
             item["conversation_id"],
-            "assistant",
+            "staff" if item["payload"].get("origin") == "staff" else "assistant",
             text,
             kind="document" if quote else "text",
             provider_id=provider_id,

@@ -84,6 +84,7 @@ def extract(state):
     missing = not result.lines or any(not line.sku or not line.quantity for line in result.lines)
     question = result.clarification if result.uncertain_critical_fields or missing else None
     return {
+        "observed_version": current["version"],
         "extraction": result.model_dump(),
         "clarification": question or ("Please confirm the product SKU and quantity." if missing else None),
     }

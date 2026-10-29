@@ -1,5 +1,6 @@
 from io import BytesIO
 from xml.sax.saxutils import escape
+from zoneinfo import ZoneInfo
 
 from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet
@@ -7,22 +8,26 @@ from reportlab.lib.units import mm
 from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
 
 
-def quotation_pdf(quote: dict, customer: dict) -> bytes:
+def quotation_pdf(quote: dict) -> bytes:
     """Render the persisted canonical revision as a readable PDF; never recalculate prices during document generation."""
     output = BytesIO()
     styles = getSampleStyleSheet()
     content = quote["content"]
+    validity = (
+        quote["valid_until"].astimezone(ZoneInfo("Africa/Cairo")).strftime("%d %b %Y at %H:%M %Z")
+        + " (Cairo)"
+    )
     story = [
         Paragraph("LumaQuote / Commercial lighting", styles["Title"]),
-        Paragraph("Synthetic supplier records — portfolio project", styles["Normal"]),
+        Paragraph("Synthetic supplier records â€” portfolio project", styles["Normal"]),
         Spacer(1, 9 * mm),
         Paragraph(escape(f"{quote['number']} / Revision {quote['revision']}"), styles["Heading1"]),
         Paragraph(
-            escape(f"Prepared for {customer['customer_name']} · {customer['customer_company']}"),
+            escape(f"Prepared for {content['customer_name']} Â· {content['customer_company']}"),
             styles["Normal"],
         ),
         Paragraph(
-            escape(f"Valid until {quote['valid_until'].strftime('%d %b %Y')} · USD · Tax excluded"),
+            escape(f"Valid until {validity} Â· USD Â· Tax excluded"),
             styles["Normal"],
         ),
         Spacer(1, 7 * mm),

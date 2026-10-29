@@ -1,0 +1,78 @@
+{
+  "revision": "manual-workflow-2026-10-29-v1",
+  "environment": "Windows; real isolated local Supabase; Chromium; synthetic supplier data",
+  "scope": "Phase 2 manual quotation workflow, including human reply and local test dispatch; no production readiness claim",
+  "checks": [
+    {
+      "command": "npm run lint:python",
+      "status": "Passed",
+      "seconds": 0.37,
+      "local_log": ".local/checks/lint-python.log"
+    },
+    {
+      "command": "npm run check:architecture",
+      "status": "Passed",
+      "seconds": 0.43,
+      "local_log": ".local/checks/check-architecture.log"
+    },
+    {
+      "command": "npm run check:frontend",
+      "status": "Passed",
+      "seconds": 0.56,
+      "local_log": ".local/checks/check-frontend.log"
+    },
+    {
+      "command": "npm run typecheck",
+      "status": "Passed",
+      "seconds": 4.2,
+      "local_log": ".local/checks/typecheck.log"
+    },
+    {
+      "command": "npm run test:python",
+      "status": "Passed",
+      "seconds": 46.27,
+      "local_log": ".local/checks/test-python.log"
+    },
+    {
+      "command": "npm run test:ui",
+      "status": "Passed",
+      "seconds": 3.2,
+      "local_log": ".local/checks/test-ui.log"
+    },
+    {
+      "command": "npm run test:browser",
+      "status": "Passed",
+      "seconds": 31.64,
+      "local_log": ".local/checks/test-browser.log"
+    },
+    {
+      "command": "npm run build",
+      "status": "Passed",
+      "seconds": 14.46,
+      "local_log": ".local/checks/build.log"
+    }
+  ],
+  "counts": {
+    "python": 44,
+    "browser": 1,
+    "frontend": 4
+  },
+  "behavioral_evidence": [
+    "Real Auth and company isolation; stale revision and duplicate approval concurrency tests.",
+    "Runtime roles cannot mutate canonical quotation content; PDF retains reviewed customer identity after conversation edits.",
+    "Browser: intake, selection, totals, human takeover/reply, stale draft preservation, revision, private source/PDF, approval, scoped worker delivery and reload.",
+    "Browser completed with zero axe violations; a fresh API process read persisted revision 2 and local_delivered after restart.",
+    "Queued human replies recheck active author membership and ownership; automation is blocked during takeover.",
+    "Cold Supabase restart preserved local data and recovered Auth connections after DB port rebinding."
+  ],
+  "private_artifacts": [
+    ".local/phase-2-stale-editor.png",
+    ".local/phase-2-delivered.png"
+  ],
+  "limits": [
+    "Delivery is local_test only, not WhatsApp.",
+    "Google consent/execution, paid model calls, voice/photo intake and live tracing remain unverified.",
+    "Whole-app engineering release gate remains unresolved: 40 Planned and 2 NotApplicable; later phases must supply the remaining evidence.",
+    "Remote CI is pending push and workflow dispatch."
+  ]
+}

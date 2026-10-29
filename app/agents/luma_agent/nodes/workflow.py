@@ -9,7 +9,7 @@ from luma.features.quotations.drafting import draft as create_draft
 from luma.features.quotations.schemas import DraftInput, Selection
 from psycopg.types.json import Jsonb
 
-from ..lease import assert_job
+from ..lease import assert_job, assert_request_version
 
 
 def ask(state):
@@ -20,6 +20,7 @@ def ask(state):
         current = conversation(conn, state["company_id"], state["conversation_id"], lock=True)
         if current["owner"] != "agent":
             raise DomainError("Automation paused.")
+        assert_request_version(current, state)
         conn.execute(
             """insert into luma.outbox(id,company_id,conversation_id,kind,payload,action_key)
             values(%s,%s,%s,'reply',%s,%s) on conflict(action_key) do nothing""",
@@ -52,6 +53,7 @@ def prepare(state):
         current = conversation(conn, state["company_id"], state["conversation_id"], lock=True)
         if current["owner"] != "agent":
             raise DomainError("Automation paused.")
+        assert_request_version(current, state)
         selections = []
         for line in state["extraction"]["lines"]:
             p = conn.execute(

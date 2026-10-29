@@ -1,23 +1,17 @@
 import "./quotations.css";
-import { useState } from "react";
-import {
-  BookOpenCheck,
-  Check,
-  ChevronDown,
-  FileCheck2,
-  Plus,
-  ShieldCheck,
-  Trash2,
-} from "lucide-react";
+
+import { ChevronDown, FileCheck2 } from "lucide-react";
 import type { ConversationDetail, Product } from "@/shared/api/types";
 import { useWorkspaceContext } from "@/shared/api/workspace-context";
 import { useConversationAction } from "@/features/conversations/api";
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
-import { Status, money } from "@/shared/ui/status";
-import { DocumentButton } from "@/shared/ui/document-button";
+import { Status } from "@/shared/ui/status";
 
-type Line = { product_id: string; quantity: number };
+import { useQuotationDraft } from "./useQuotationDraft";
+import { ProductSelections } from "./ui/ProductSelections";
+import { QuoteSummary } from "./ui/QuoteSummary";
+import { ReviewActions } from "./ui/ReviewActions";
 
 /** Edit product selections and review server-calculated quotations; approval never uses a browser-calculated total. */
 export function QuotationPanel({
@@ -30,50 +24,29 @@ export function QuotationPanel({
   role: string;
 }) {
   const { capture } = useWorkspaceContext();
-  const { conversation, quote, delivery } = detail;
-  const [lines, setLines] = useState<Line[]>(
-    quote?.content.lines.map((line) => ({
-      product_id: line.product_id,
-      quantity: line.quantity,
-    })) ?? [],
-  );
-  const [selected, setSelected] = useState("");
-  const [dirty, setDirty] = useState(false);
-  const [discount, setDiscount] = useState(
-    quote?.content.discount_percent ?? "0",
-  );
-  const [shipping, setShipping] = useState(quote?.content.shipping ?? "0");
+  const { conversation, quote } = detail;
+  const delivery = detail.delivery.filter((item) => item.kind === "quotation");
+  const draft = useQuotationDraft(detail);
+  const { lines, discount, shipping, dirty } = draft;
   const action = useConversationAction(conversation.id);
-  const available = products.filter(
-    (p) =>
-      !p.discontinued &&
-      p.available > 0 &&
-      !lines.some((line) => line.product_id === p.id),
-  );
-  /** Add a selected catalog product using its required pack size; the server revalidates stock before saving. */
-  function addProduct() {
-    const p = products.find((product) => product.id === selected);
-    if (p) {
-      setLines([...lines, { product_id: p.id, quantity: p.pack_size }]);
-      setSelected("");
-      setDirty(true);
-    }
-  }
   /** Persist selected products as a new immutable revision; the currently displayed conversation version detects conflicts. */
   function saveDraft() {
-    action.mutate({
-      action: "draft",
-      body: {
-        expected_version: conversation.version,
-        lines,
-        discount_percent: discount,
-        shipping,
-        terms:
-          quote?.content.terms ??
-          "Delivery date subject to staff confirmation.",
+    action.mutate(
+      {
+        action: "draft",
+        body: {
+          expected_version: dirty ? draft.baseVersion : conversation.version,
+          lines,
+          discount_percent: discount,
+          shipping,
+          terms:
+            quote?.content.terms ??
+            "Delivery date subject to staff confirmation.",
+        },
+        key: crypto.randomUUID(),
       },
-      key: crypto.randomUUID(),
-    });
+      { onSuccess: draft.markSaved },
+    );
   }
   /** Submit the exact displayed revision for authorized approval or rejection; the outbox handles delivery separately. */
   function decide(decision: "approve" | "reject") {
@@ -84,8 +57,16 @@ export function QuotationPanel({
         key: crypto.randomUUID(),
       });
   }
+  /** Explicitly discard local fields and clear a prior conflict after loading the current canonical revision. */
+  function discardLocalEdits() {
+    draft.discardEdits();
+    action.reset();
+  }
   return (
-    <aside className="quotation-panel" aria-label="Quotation editing and approval">
+    <aside
+      className="quotation-panel"
+      aria-label="Quotation editing and approval"
+    >
       <header>
         <div>
           <FileCheck2 />
@@ -103,107 +84,21 @@ export function QuotationPanel({
           </p>
           {quote && <Status value={quote.status} />}
         </div>
-        <div className="quote-lines">
-          {lines.map((line, index) => {
-            const p = products.find(
-              (product) => product.id === line.product_id,
-            );
-            return (
-              <div className="quote-line" key={line.product_id}>
-                <div className="line-heading">
-                  <span className="product-thumb">
-                    <span />
-                  </span>
-                  <div>
-                    <strong>{p?.sku ?? "Product unavailable"}</strong>
-                    <span>{p?.name}</span>
-                  </div>
-                  <button
-                    className="icon-button"
-                    aria-label={`Remove ${p?.sku ?? "product"}`}
-                    onClick={() => {
-                      setLines(lines.filter((_, i) => i !== index));
-                      setDirty(true);
-                    }}
-                  >
-                    <Trash2 />
-                  </button>
-                </div>
-                <div className="line-commercial">
-                  <label>
-                    Quantity
-                    <Input
-                      aria-label={`Quantity for ${p?.sku}`}
-                      type="number"
-                      min={p?.pack_size ?? 1}
-                      step={p?.pack_size ?? 1}
-                      max={10000}
-                      value={line.quantity}
-                      onChange={(event) => {
-                        setLines(
-                          lines.map((value, i) =>
-                            i === index
-                              ? {
-                                  ...value,
-                                  quantity: Number(event.target.value),
-                                }
-                              : value,
-                          ),
-                        );
-                        setDirty(true);
-                      }}
-                    />
-                  </label>
-                  <div>
-                    <span>Unit price</span>
-                    <strong>{p ? money(p.price) : "—"}</strong>
-                  </div>
-                  <span className="stock-label">
-                    {p?.available ?? 0} available
-                  </span>
-                </div>
-                <div className="line-evidence">
-                  <BookOpenCheck />
-                  <span>Catalog evidence · Page {p?.page ?? 1}</span>
-                  {p && (
-                    <DocumentButton
-                      path={`/sources/${p.source_id}/pdf`}
-                      title={`${p.sku} · Original catalog`}
-                      label="View"
-                      page={p.page}
-                    />
-                  )}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-        <div className="add-product">
-          <label className="sr-only" htmlFor="product-selection">
-            Choose catalog product
-          </label>
-          <select
-            id="product-selection"
-            value={selected}
-            onChange={(event) => setSelected(event.target.value)}
-          >
-            <option value="">Choose a product…</option>
-            {available.map((p) => (
-              <option key={p.id} value={p.id}>
-                {p.sku} · {p.name}
-              </option>
-            ))}
-          </select>
-          <Button
-            variant="outline"
-            size="icon"
-            aria-label="Add selected product"
-            onClick={addProduct}
-            disabled={!selected}
-          >
-            <Plus />
-          </Button>
-        </div>
+        {draft.conflict && (
+          <div role="alert" className="unsaved-note">
+            This request changed while you were editing. Your local entries are
+            preserved. Save will require a fresh version.
+            <Button type="button" variant="outline" onClick={discardLocalEdits}>
+              Discard local edits & load latest
+            </Button>
+          </div>
+        )}
+        <ProductSelections
+          lines={lines}
+          products={products}
+          onChange={draft.updateLines}
+        />
+
         <details className="commercial-adjustments">
           <summary>
             Commercial adjustments
@@ -220,8 +115,7 @@ export function QuotationPanel({
                 value={discount}
                 disabled={role !== "admin"}
                 onChange={(event) => {
-                  setDiscount(event.target.value);
-                  setDirty(true);
+                  draft.updateDiscount(event.target.value);
                 }}
               />
             </label>
@@ -234,53 +128,15 @@ export function QuotationPanel({
                 step="0.01"
                 value={shipping}
                 onChange={(event) => {
-                  setShipping(event.target.value);
-                  setDirty(true);
+                  draft.updateShipping(event.target.value);
                 }}
               />
             </label>
           </div>
           <small>Discounts require administrator access.</small>
         </details>
-        {quote && !dirty && (
-          <div className="quote-totals">
-            <div>
-              <span>Subtotal</span>
-              <strong>{money(quote.content.subtotal)}</strong>
-            </div>
-            <div>
-              <span>Discount</span>
-              <span>−{money(quote.content.discount)}</span>
-            </div>
-            <div>
-              <span>Shipping</span>
-              <span>{money(quote.content.shipping)}</span>
-            </div>
-            <div className="quote-grand-total">
-              <span>
-                Total <small>USD</small>
-              </span>
-              <strong>{money(quote.content.total)}</strong>
-            </div>
-            <p>Tax excluded. Valid for 7 days. Stock is not reserved.</p>
-          </div>
-        )}
-        {dirty && (
-          <div className="unsaved-note">
-            Save a new revision to calculate the total. Any previous approval
-            will be invalidated.
-          </div>
-        )}
-        {quote && (
-          <div className="quote-terms">
-            <ShieldCheck />
-            <p>
-              {quote.content.terms}
-              <br />
-              Availability is observed, not reserved.
-            </p>
-          </div>
-        )}
+        <QuoteSummary quote={quote} dirty={dirty} />
+
         {delivery[0] && (
           <div className="delivery-summary">
             <span>Latest delivery</span>
@@ -296,61 +152,15 @@ export function QuotationPanel({
           </p>
         )}
       </div>
-      <footer className="quotation-actions">
-        {!quote ||
-        dirty ||
-        quote.status === "rejected" ||
-        quote.status === "superseded" ? (
-          <Button
-            size="lg"
-            disabled={!lines.length || action.isPending}
-            onClick={saveDraft}
-          >
-            {action.isPending ? "Saving revision…" : "Save quotation revision"}
-            <Check data-icon="inline-end" />
-          </Button>
-        ) : quote.status === "review" ? (
-          <>
-            <div className="approval-summary">
-              Approving revision {quote.revision} for{" "}
-              {capture ? "this customer" : conversation.customer_name}.<br />
-              It will queue delivery through{" "}
-              {conversation.channel === "local_test"
-                ? "the local test channel"
-                : "WhatsApp"}
-              .
-            </div>
-            <Button
-              size="lg"
-              disabled={action.isPending || conversation.owner === "staff"}
-              onClick={() => decide("approve")}
-            >
-              <ShieldCheck data-icon="inline-start" />
-              {action.isPending
-                ? "Recording decision…"
-                : "Approve & queue delivery"}
-            </Button>
-            <Button
-              variant="ghost"
-              disabled={action.isPending}
-              onClick={() => decide("reject")}
-            >
-              Request changes
-            </Button>
-          </>
-        ) : (
-          <Status value={quote.status} />
-        )}
-        {quote && !capture && (
-          <DocumentButton
-            path={`/quotes/${quote.id}/pdf`}
-            title={`${quote.number} · Revision ${quote.revision}`}
-          />
-        )}
-        <span className="review-footnote">
-          Your approval is tied to this exact revision.
-        </span>
-      </footer>
+      <ReviewActions
+        detail={detail}
+        dirty={dirty}
+        hasLines={lines.length > 0}
+        pending={action.isPending}
+        capture={capture}
+        onSave={saveDraft}
+        onDecide={decide}
+      />
     </aside>
   );
 }

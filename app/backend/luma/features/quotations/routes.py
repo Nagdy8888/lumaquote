@@ -10,7 +10,6 @@ from luma.core.http import OperationKey, Staff
 from luma.core.idempotency import operation
 from luma.core.identity import membership
 from luma.core.storage import get_file, put_file
-from luma.features.conversations.repository import conversation
 
 from .approval import decide
 from .documents import quotation_pdf
@@ -64,11 +63,10 @@ def pdf(qid: UUID, user: Staff):
         ).fetchone()
         if not row:
             raise DomainError("Quotation not found.", 404)
-        current = conversation(conn, member["company_id"], row["conversation_id"])
         path = f"{member['company_id']}/quotes/{qid}.pdf"
         content = get_file(path)
         if content is None:
-            content = quotation_pdf(row, current)
+            content = quotation_pdf(row)
             put_file(path, content, "application/pdf")
             content = get_file(path) or content
         return Response(

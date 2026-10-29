@@ -8,6 +8,7 @@ const labels: Record<string, string> = {
   needs_staff: "Needs your attention",
   local_delivered: "Delivered in local test",
   approved: "Approved",
+  delivery_queued: "Delivery queued",
   superseded: "Previous revision",
   configured_unverified: "Configured · unverified",
   not_connected: "Not connected",
