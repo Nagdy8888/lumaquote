@@ -1,0 +1,260 @@
+{
+  "schema_version": 1,
+  "scope": "Complete local LumaQuote workflow including staff API, direct Supabase paths, worker, media, model tools, integrations and browser",
+  "revision": "implementation-working-tree",
+  "environment": "local-windows",
+  "assessments": [
+    {
+      "id": "B01",
+      "status": "Planned",
+      "reason": "Map the implemented browser/Auth/API/worker/database/file trust transitions and the planned Meta/Google/OpenAI boundaries; verify the complete release inventory.",
+      "evidence": []
+    },
+    {
+      "id": "B02",
+      "status": "Planned",
+      "reason": "Local Auth token verification is implemented; invalid/expired/issuer/audience and outage behavior need the complete authentication suite.",
+      "evidence": []
+    },
+    {
+      "id": "B03",
+      "status": "Planned",
+      "reason": "Staff and worker interfaces need full allowed/forbidden role tests, including future admin integration operations.",
+      "evidence": []
+    },
+    {
+      "id": "B04",
+      "status": "Planned",
+      "reason": "Scoped reads are tested; all update/export/resume/media objects still need cross-tenant negative coverage.",
+      "evidence": []
+    },
+    {
+      "id": "B05",
+      "status": "Planned",
+      "reason": "Strict request schemas reject undeclared fields; verify every future mutation/tool/Google import path before coverage.",
+      "evidence": []
+    },
+    {
+      "id": "B06",
+      "status": "Planned",
+      "reason": "Restricted local API RLS is exercised; complete direct REST/RPC/Storage, all writer operations, and elevated-function checks remain.",
+      "evidence": []
+    },
+    {
+      "id": "B07",
+      "status": "Planned",
+      "reason": "Membership revocation blocks existing tokens in tests; role downgrade, session rotation, and stream/file revocation require more evidence.",
+      "evidence": []
+    },
+    {
+      "id": "B08",
+      "status": "Planned",
+      "reason": "Ignored environment files and backend-only secrets exist; staged/build/log/trace canaries and key rotation still need complete checks.",
+      "evidence": []
+    },
+    {
+      "id": "B09",
+      "status": "Planned",
+      "reason": "Exact loopback CORS is configured; browser and non-browser negative-origin authorization tests remain.",
+      "evidence": []
+    },
+    {
+      "id": "B10",
+      "status": "NotApplicable",
+      "reason": "Staff requests attach bearer tokens explicitly; Auth state is in sessionStorage, the API has no credential-cookie fallback, and CORS does not enable credential cookies. Reassess if cookie-authenticated routes are introduced.",
+      "evidence": []
+    },
+    {
+      "id": "B11",
+      "status": "Planned",
+      "reason": "React text rendering is used; hostile snippets/links/filenames and production header policy remain to verify.",
+      "evidence": []
+    },
+    {
+      "id": "B12",
+      "status": "Planned",
+      "reason": "Queries are parameterized and processor commands fixed; hostile values through all provider/tool/document/Sheet paths remain to exercise.",
+      "evidence": []
+    },
+    {
+      "id": "B13",
+      "status": "Planned",
+      "reason": "Provider media and future outbound adapter destination allowlists/redirect handling are not implemented and tested yet.",
+      "evidence": []
+    },
+    {
+      "id": "B14",
+      "status": "Planned",
+      "reason": "Actual constrained-container PDF/image/audio tests pass; API byte admission, decoder resource attacks, and complete output-bound tests remain.",
+      "evidence": []
+    },
+    {
+      "id": "B15",
+      "status": "Planned",
+      "reason": "Shared PostgreSQL minute counters exist; boundary, concurrent-process, clock, and proxy-identity cases remain.",
+      "evidence": []
+    },
+    {
+      "id": "B16",
+      "status": "Planned",
+      "reason": "Estimated reservations exist but paid model/media paths, concurrent last-budget and uncertain-usage recovery remain to verify.",
+      "evidence": []
+    },
+    {
+      "id": "B17",
+      "status": "Planned",
+      "reason": "Durable queue and worker caps exist; multi-worker races, fairness, stale leases, and overload responsiveness remain.",
+      "evidence": []
+    },
+    {
+      "id": "B18",
+      "status": "Planned",
+      "reason": "Provider deadlines exist; complete eligible-retry/backoff/cancellation/outage recovery remains to implement and test.",
+      "evidence": []
+    },
+    {
+      "id": "B19",
+      "status": "Planned",
+      "reason": "Scoped mutation replay is tested; concurrent replay, denied reauthorization, and uncertain live external outcomes remain.",
+      "evidence": []
+    },
+    {
+      "id": "B20",
+      "status": "Planned",
+      "reason": "Manual approval and outbox share a real transaction; crash-point and concurrent transaction behavior remain.",
+      "evidence": []
+    },
+    {
+      "id": "B21",
+      "status": "Planned",
+      "reason": "Schema constraints are installed; invalid direct writes and full referential-domain invariant tests remain.",
+      "evidence": []
+    },
+    {
+      "id": "B22",
+      "status": "Planned",
+      "reason": "Revision and takeover cases pass; actual edit/approve/source/dispatch races across connections remain.",
+      "evidence": []
+    },
+    {
+      "id": "B23",
+      "status": "Planned",
+      "reason": "Durable jobs/outbox and fences exist; lease reclaim/crash/dead-letter/unknown-submission recovery need stronger evidence.",
+      "evidence": []
+    },
+    {
+      "id": "B24",
+      "status": "Planned",
+      "reason": "Meta and Google callback verification, durable batching/deduplication and receipt ordering still need implementation and tests.",
+      "evidence": []
+    },
+    {
+      "id": "B25",
+      "status": "Planned",
+      "reason": "Model extraction cannot approve or send directly; hostile catalogs/transcripts/messages and all future tool boundaries remain to evaluate.",
+      "evidence": []
+    },
+    {
+      "id": "B26",
+      "status": "Planned",
+      "reason": "Private original sources and exact SKU lookup exist; hybrid retrieval, source replacement, insufficient evidence, and ACL changes remain.",
+      "evidence": []
+    },
+    {
+      "id": "B27",
+      "status": "Planned",
+      "reason": "Manual exact-revision approval is tested; durable graph interrupt/restart/resume, duplicate callbacks, and revoked decision replay remain.",
+      "evidence": []
+    },
+    {
+      "id": "B28",
+      "status": "Planned",
+      "reason": "Explicit trace allowlisting is scaffolded; nested/export/log canary checks and a real redacted LangSmith trace remain.",
+      "evidence": []
+    },
+    {
+      "id": "B29",
+      "status": "Planned",
+      "reason": "Consequential local audit events exist; alert conditions, audit mutation resistance, and full decision-to-result correlation remain.",
+      "evidence": []
+    },
+    {
+      "id": "B30",
+      "status": "Planned",
+      "reason": "Local services bind to loopback; external TLS/tunnel and integration credential handling/rotation still need live verification.",
+      "evidence": []
+    },
+    {
+      "id": "B31",
+      "status": "Planned",
+      "reason": "Private PDF no-store behavior is tested; all private cache/HTTP/pagination/signed capability cases remain.",
+      "evidence": []
+    },
+    {
+      "id": "B32",
+      "status": "Planned",
+      "reason": "Loopback setup and disabled-live defaults exist; unsafe/missing configuration and ingress surface isolation need complete tests.",
+      "evidence": []
+    },
+    {
+      "id": "B33",
+      "status": "Planned",
+      "reason": "Lockfiles and runtime npm audit are checked. clasp development-only optional MCP zod advisory is triaged in phase-1 evidence; Python audit and complete artifact review remain.",
+      "evidence": []
+    },
+    {
+      "id": "B34",
+      "status": "Planned",
+      "reason": "Local migrations are applied; clean install, upgrade with pending jobs, and compatibility/rollback cases remain.",
+      "evidence": []
+    },
+    {
+      "id": "B35",
+      "status": "Planned",
+      "reason": "An isolated database/private-file restore and measured local recovery have not yet been implemented and demonstrated.",
+      "evidence": []
+    },
+    {
+      "id": "B36",
+      "status": "Planned",
+      "reason": "The agreed retention policy is documented but deletion across private media, vectors, checkpoints, exports and backups remains unfinished.",
+      "evidence": []
+    },
+    {
+      "id": "B37",
+      "status": "Planned",
+      "reason": "Decimal, stock/pack, discount, expiry checks and canonical PDF tests pass; broader currency/time/effective-source boundary regressions remain.",
+      "evidence": []
+    },
+    {
+      "id": "B38",
+      "status": "Planned",
+      "reason": "clasp source push is verified but Google execution is blocked. Meta/Google/OpenAI contracts, OAuth scope and live checks remain.",
+      "evidence": []
+    },
+    {
+      "id": "B39",
+      "status": "Planned",
+      "reason": "Deny/revision/takeover/local integration tests exist; multi-process races and durable recovery cases remain.",
+      "evidence": []
+    },
+    {
+      "id": "B40",
+      "status": "Planned",
+      "reason": "Four local desktop/portrait route captures have zero axe findings and reviewed fixes; all remaining failure/reconnect/capture-privacy flows remain.",
+      "evidence": []
+    },
+    {
+      "id": "B41",
+      "status": "NotApplicable",
+      "reason": "The approved v1 has no anonymous public playground or hosting. The local test-customer route requires authenticated staff and cannot send real customer messages.",
+      "evidence": []
+    },
+    {
+      "id": "B42",
+      "status": "Planned",
+      "reason": "Inventory the final staff API, isolated webhook ingress, direct Supabase schemas/buckets and all external adapters before release review.",
+      "evidence": []
+    }
+  ]
+}

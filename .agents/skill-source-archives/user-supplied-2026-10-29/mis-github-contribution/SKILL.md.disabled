@@ -1,0 +1,231 @@
+---
+name: mis-github-contribution
+description: MIS standard GitHub contribution workflow — branching (main / dev / feature), Conventional Commits, PR templates, and pre-commit gates. Use whenever working in an MIS repo on git, GitHub, branches, commits, pull requests, code review, or when bootstrapping contribution standards in a new repository.
+license: Proprietary — MIS (Modern Intelligence Solutions) internal use
+metadata:
+  team: MIS
+  version: "1.0"
+---
+
+# MIS GitHub contribution workflow
+
+The standard contribution model for every MIS repo. The goal is simple:
+
+- Anything on `main` is in **production**.
+- Anything on `dev` is integration-tested and on **staging**.
+- Feature branches are **short-lived**, single-purpose, and cut from `dev`.
+- Every commit and PR is **machine-readable** (Conventional Commits) so changelogs, release notes, and triage tooling work without human curation.
+
+This file is the day-to-day decision tree. For depth on any one area, open the matching reference under `references/`. Reusable templates live under `assets/`.
+
+| Topic | Reference |
+|-------|-----------|
+| Branching, environments, protection | `references/BRANCHING.md` |
+| Commit message conventions | `references/COMMITS.md` |
+| PR review etiquette & merge rules | `references/PR_REVIEW.md` |
+| Pre-commit / lint / test gates per stack | `references/PRE_COMMIT.md` |
+
+## Decision tree
+
+Pick the action that matches the user's request:
+
+| If the user asked to… | Go to |
+|-----------------------|-------|
+| Start a new feature or fix | [1. Cut a feature branch](#1-cut-a-feature-branch) |
+| Commit work | [2. Write a commit](#2-write-a-commit) |
+| Open a PR | [3. Open a PR](#3-open-a-pr) |
+| Review a PR | [4. Review a PR](#4-review-a-pr) |
+| Promote `dev` to `main` | [5. Promote dev to main](#5-promote-dev-to-main) |
+| Set up a new repo | [6. Bootstrap a new repo](#6-bootstrap-a-new-repo) |
+
+---
+
+## 1. Cut a feature branch
+
+**Base branch:** always `dev`, never `main`. `main` is production; `dev` is staging.
+
+```bash
+git fetch origin
+git switch dev
+git pull --ff-only
+git switch -c <type>/<ticket-id>-<short-kebab-summary>
+```
+
+Branch types (the prefix is mandatory):
+
+| Prefix      | Use for |
+|-------------|---------|
+| `feat/`     | New user-visible behaviour |
+| `fix/`      | Bug fix |
+| `chore/`    | Tooling, deps, config, housekeeping |
+| `refactor/` | Internal change with no behaviour change |
+| `infra/`    | Infrastructure, deploy, CI/CD |
+| `docs/`     | Docs-only changes |
+| `test/`     | Test-only changes |
+
+Branch names are kebab-case and must include the ticket id when one exists. Examples:
+
+- `feat/MIS-142-stripe-webhook-retry`
+- `fix/MIS-189-null-user-on-signup`
+- `chore/bump-node-22`
+
+Keep branches alive for **hours or days, not weeks**. Rebase on `dev` daily to avoid drift.
+
+For environment promotion and hotfix paths, see `references/BRANCHING.md`.
+
+---
+
+## 2. Write a commit
+
+Format — [Conventional Commits](https://www.conventionalcommits.org/):
+
+```
+<type>(<optional-scope>): <imperative summary, ≤ 72 chars>
+
+<body — what changed and why, wrapped at 72 chars>
+
+<footer — ticket refs, breaking-change marker>
+```
+
+Rules:
+
+- **One commit per task or user story.** Squash WIP locally before pushing.
+- **Imperative present tense:** `add`, `fix`, `update` — never `added` or `fixes`.
+- **Reference the ticket** in the footer: `Refs: MIS-142` or `Closes: MIS-142`.
+- **Breaking changes** get a `BREAKING CHANGE: <description>` footer line. The PR title also gets a `!`: `feat(api)!: drop /v1 endpoints`.
+- **Do not** add `Co-authored-by` trailers for AI agents. The author is the human who reviewed and merged.
+
+Install the shared commit-message template once per machine:
+
+```bash
+cp assets/commit-template.txt ~/.config/git/mis-commit-template.txt
+git config --global commit.template ~/.config/git/mis-commit-template.txt
+```
+
+Full type table, scope guidance, and worked examples — `references/COMMITS.md`.
+
+---
+
+## 3. Open a PR
+
+**Target branch:** `dev` for normal work. `main` only for release-promotion PRs (see [section 5](#5-promote-dev-to-main)).
+
+Before opening:
+
+1. Rebase on the latest `dev`:
+   ```bash
+   git fetch origin && git rebase origin/dev
+   ```
+2. Run the local gates — see [Pre-commit gates](#pre-commit-gates) below. CI runs the same gates; running locally first saves a round-trip.
+3. Self-review the diff. Delete dead code, commented-out blocks, and stray `console.log` / `print` statements.
+
+**PR title** uses Conventional Commits, same format as the commit:
+
+> `feat(billing): add Stripe webhook retry (MIS-142)`
+
+**PR body** uses `assets/pull_request_template.md`. Copy it to `.github/pull_request_template.md` in every repo so GitHub pre-fills the body. Required sections:
+
+- **Summary** — what and why, 1–3 bullets
+- **Changes** — bulleted list of notable changes (one per commit is fine)
+- **Testing** — exact commands run + manual steps performed
+- **Screenshots / recordings** — required for any UI change
+- **Checklist** — lint, type-check, tests, docs, migrations, secrets
+- **Ticket** — `Closes MIS-142`
+
+Sizing: keep PRs **small and single-purpose**, ideally **< 400 LOC of net diff**. If a PR grows beyond that, split it before requesting review.
+
+Merge rules and review SLAs — `references/PR_REVIEW.md`.
+
+---
+
+## 4. Review a PR
+
+- First review within **one working day**.
+- Be specific. Prefer GitHub "suggested change" blocks over vague asks.
+- **Block on:** correctness, security, test coverage, public-API contracts.
+- **Comment-only on:** style, naming bikesheds, hypothetical future refactors.
+- Approve when it is good enough, not perfect.
+- Authors must resolve every thread before merge.
+- Do not force-push after approval without flagging it — pushes dismiss stale approvals automatically.
+
+Escalation rules and CODEOWNERS behaviour — `references/PR_REVIEW.md`.
+
+---
+
+## 5. Promote `dev` to `main`
+
+Promotion happens on a fixed cadence (default: weekly) or on-demand for a release. Open a PR titled:
+
+> `release: promote dev → main (YYYY-MM-DD)`
+
+Body: bullet list of the user-visible features / fixes since the last promotion, generated from the squash-merge commit log on `dev`:
+
+```bash
+git log --oneline origin/main..origin/dev
+```
+
+Required before merging the promotion PR:
+
+- All CI green on `dev` for at least one full run after the latest merge.
+- Staging smoke checks signed off (link to the run / checklist in the PR body).
+- Migration plan documented if any migrations are included.
+
+Use a **merge commit** (not squash) for promotion PRs so the individual feature commits remain visible on `main`'s history.
+
+**Hotfix path** (bypass `dev`): branch `fix/<ticket>-hotfix-<summary>` off `main`, open PR targeting `main`, and immediately back-merge `main` into `dev` once shipped. See `references/BRANCHING.md`.
+
+---
+
+## 6. Bootstrap a new repo
+
+Drop these files into a fresh repo to make it MIS-standard:
+
+| Source (this skill)               | Destination in the new repo               |
+|-----------------------------------|-------------------------------------------|
+| `assets/pull_request_template.md` | `.github/pull_request_template.md`        |
+| `assets/CODEOWNERS`               | `.github/CODEOWNERS`                      |
+| `assets/commit-template.txt`      | `.gitmessage` (and `git config commit.template .gitmessage`) |
+| `assets/pre-commit-config.yaml`   | `.pre-commit-config.yaml`                 |
+| `assets/branch-protection.md`     | Apply settings via GitHub UI or `gh api`  |
+
+Then:
+
+1. Create `dev` from `main` and push:
+   ```bash
+   git switch -c dev && git push -u origin dev
+   ```
+2. Set `dev` as the **default branch** in repo settings so new PRs target it.
+3. Apply branch protection to **both** `main` and `dev` per `assets/branch-protection.md`.
+4. Install pre-commit hooks locally:
+   ```bash
+   pre-commit install
+   ```
+5. Add a `CONTRIBUTING.md` in the repo that links back to this skill instead of restating the rules.
+
+---
+
+## Pre-commit gates
+
+Every repo runs the same four classes of check, locally (via the [pre-commit](https://pre-commit.com/) framework) and again in CI:
+
+1. **Lint** — language-appropriate (ruff / eslint / golangci-lint / etc.)
+2. **Format check** — `--check` mode of the formatter (ruff format / prettier / gofmt).
+3. **Type-check** — mypy / tsc / etc., where the language has one.
+4. **Tests** — at minimum the affected package's unit tests.
+
+The shared starter — `assets/pre-commit-config.yaml` — covers Python (ruff + mypy), TypeScript (eslint + tsc), and generic hooks (trailing whitespace, large-file guard, secret scan).
+
+Per-stack details and CI mirroring — `references/PRE_COMMIT.md`.
+
+---
+
+## Anti-patterns (do not do this)
+
+- Branching off `main` for a feature. Always branch off `dev`.
+- Pushing directly to `main` or `dev`. Both are protected; the push will be rejected.
+- Multi-purpose PRs ("misc fixes", "address review"). Split into focused PRs.
+- WIP commit noise on the branch you intend to merge. Squash locally first.
+- `--no-verify` to skip hooks. If a hook fails, fix the underlying issue.
+- `git push --force` to a shared branch. Use `--force-with-lease` and only on your own feature branch.
+- `Co-authored-by` trailers for AI agents.
+- Long-lived branches (> 1 week). Either merge or close.

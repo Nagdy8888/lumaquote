@@ -1,0 +1,41 @@
+{
+  "name": "supplier-quotation-assistant",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "db:start": "node scripts/start-local-supabase.cjs",
+    "db:stop": "supabase stop",
+    "db:status": "supabase status",
+    "dev:ui": "npm run dev --workspace @lumaquote/frontend",
+    "build": "npm run build --workspace @lumaquote/frontend",
+    "typecheck": "npm run typecheck --workspace @lumaquote/frontend",
+    "setup": "node scripts/python.cjs -m luma.setup.bootstrap",
+    "dev:api": "node scripts/python.cjs -m uvicorn luma.main:app --host 127.0.0.1 --port 8001",
+    "dev:worker": "node scripts/python.cjs -m luma_agent.worker",
+    "test:python": "node scripts/python.cjs -m pytest",
+    "check:architecture": "node scripts/python.cjs scripts/check_architecture.py",
+    "lint:python": "node scripts/python.cjs -m ruff check app/backend app/agents tests scripts/check_architecture.py",
+    "check:frontend": "node scripts/check_frontend.cjs",
+    "test:unit": "node scripts/python.cjs -m pytest tests/unit -q",
+    "test:ui": "npm run test --workspace @lumaquote/frontend",
+    "media:build": "docker build --tag lumaquote-media:local --file app/backend/luma/features/media/Dockerfile app/backend/luma/features/media",
+    "google:status": "node scripts/google.cjs status",
+    "google:push": "node scripts/google.cjs push",
+    "google:initialize": "node scripts/google.cjs initialize",
+    "google:install-trigger": "node scripts/google.cjs install-trigger",
+    "db:configure": "node scripts/configure-local.cjs",
+    "verify": "node scripts/verify.cjs",
+    "verify:full": "node scripts/verify.cjs --full"
+  },
+  "devDependencies": {
+    "@google/clasp": "3.4.1",
+    "supabase": "2.122.0",
+    "typescript": "5.9.3"
+  },
+  "workspaces": [
+    "app/frontend"
+  ],
+  "overrides": {
+    "typescript": "5.9.3"
+  }
+}

@@ -1,0 +1,7 @@
+* text=auto eol=lf
+# Skill provenance manifests hash original bytes, including supplied line endings.
+.agents/** -text
+*.exe binary
+*.png binary
+*.jpg binary
+*.pdf binary

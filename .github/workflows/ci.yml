@@ -1,0 +1,33 @@
+name: Application checks
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  local-contracts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+      - run: npm ci
+      - run: python -m venv .venv
+      - run: .venv/bin/python -m pip install -r requirements.lock.txt
+      - run: npm run lint:python
+      - run: npm run check:architecture
+      - run: npm run check:frontend
+      - run: npm run typecheck
+      - run: npm run test:unit
+      - run: npm run test:ui
+      - run: npm run build
+        env:
+          VITE_SUPABASE_URL: http://127.0.0.1:55321
+          VITE_SUPABASE_ANON_KEY: synthetic-ci-public-placeholder

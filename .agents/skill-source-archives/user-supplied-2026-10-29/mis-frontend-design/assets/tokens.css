@@ -1,0 +1,187 @@
+/* ---------------------------------------------------------------------------
+ * MIS app design tokens — starter.
+ *
+ * Components reference these tokens, never raw values. Add new tokens here
+ * before using a new colour / radius / duration in a component.
+ *
+ * Tune the values per-app, but keep the SHAPE: one neutral curve, one accent,
+ * status colours, type/spacing/radius/shadow/motion scales.
+ *
+ * Light theme is :root. Dark theme is [data-theme="dark"]. Don't ship a
+ * `prefers-color-scheme: dark` fallback — set the attribute explicitly.
+ * --------------------------------------------------------------------------- */
+
+:root {
+  /* ── Neutral curve (zinc-leaning, slightly warm) ─────────────────────── */
+  --neutral-50:  #fafafa;
+  --neutral-100: #f4f4f5;
+  --neutral-200: #e4e4e7;
+  --neutral-300: #d4d4d8;
+  --neutral-400: #a1a1aa;
+  --neutral-500: #71717a;
+  --neutral-600: #52525b;
+  --neutral-700: #3f3f46;
+  --neutral-800: #27272a;
+  --neutral-900: #18181b;
+  --neutral-950: #09090b;
+
+  /* ── Semantic colour tokens — what components actually reference ─────── */
+  --color-bg:             var(--neutral-50);
+  --color-surface-1:      #ffffff;
+  --color-surface-2:      #ffffff;
+  --color-fg:             var(--neutral-900);
+  --color-fg-muted:       var(--neutral-500);
+  --color-fg-subtle:      var(--neutral-400);
+  --color-border:         var(--neutral-200);
+  --color-border-strong:  var(--neutral-300);
+
+  /* Accent — teal-leaning blue. Replace per-app. */
+  --color-accent:         #0a7ea4;
+  --color-accent-fg:      #ffffff;
+  --color-accent-hover:   #086c8c;
+  --color-accent-soft:    rgba(10, 126, 164, 0.10);
+
+  /* Status — used on foreground / icons; *-soft for tinted backgrounds */
+  --color-danger:         #c0392b;
+  --color-danger-fg:      #ffffff;
+  --color-danger-soft:    rgba(192, 57, 43, 0.10);
+
+  --color-warning:        #c5860b;
+  --color-warning-fg:     #1a1a1a;
+  --color-warning-soft:   rgba(197, 134, 11, 0.12);
+
+  --color-success:        #1a7a4c;
+  --color-success-fg:     #ffffff;
+  --color-success-soft:   rgba(26, 122, 76, 0.10);
+
+  --color-info:           #2563eb;
+  --color-info-fg:        #ffffff;
+  --color-info-soft:      rgba(37, 99, 235, 0.10);
+
+  /* ── Typography ──────────────────────────────────────────────────────── */
+  --font-sans:    "ABC Diatype", "Söhne", "Geist", system-ui, sans-serif;
+  --font-display: "GT Sectra", "PP Editorial New", Georgia, serif;
+  --font-mono:    "Berkeley Mono", "JetBrains Mono", ui-monospace, monospace;
+
+  /* Size scale */
+  --text-xs:   12px;
+  --text-sm:   14px;
+  --text-md:   16px;
+  --text-lg:   20px;
+  --text-xl:   28px;
+  --text-2xl:  44px;
+
+  /* Line height */
+  --leading-tight:  1.2;
+  --leading-snug:   1.3;
+  --leading-normal: 1.5;
+  --leading-flat:   1.0;
+
+  /* Letter spacing */
+  --tracking-display: -0.02em;
+  --tracking-caps:     0.06em;
+
+  /* Weight (only ship 3 max) */
+  --weight-regular:   400;
+  --weight-medium:    500;
+  --weight-semibold:  600;
+
+  /* ── Spacing ─────────────────────────────────────────────────────────── */
+  --space-1:  4px;
+  --space-2:  8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+
+  /* Density modes — flip --row-height + --field-gap to switch */
+  --row-height: 44px;    /* comfortable. Switch to 32px for compact. */
+  --field-gap:  var(--space-4);
+
+  /* ── Radius ──────────────────────────────────────────────────────────── */
+  --radius-1:  6px;
+  --radius-2: 10px;
+  --radius-3: 14px;
+  --radius-full: 999px;
+
+  /* ── Shadow (two-layer max: border + soft shadow) ─────────────────────── */
+  --shadow-1: 0 1px 2px rgba(0,0,0,0.04),  0 0 0 1px rgba(0,0,0,0.04);
+  --shadow-2: 0 4px 12px rgba(0,0,0,0.06), 0 0 0 1px rgba(0,0,0,0.05);
+  --shadow-3: 0 16px 32px rgba(0,0,0,0.10), 0 0 0 1px rgba(0,0,0,0.05);
+
+  /* ── Motion ──────────────────────────────────────────────────────────── */
+  --ease-out:  cubic-bezier(0.20, 0.80, 0.20, 1);
+  --ease-in:   cubic-bezier(0.40, 0.00, 1.00, 1);
+  --ease-soft: cubic-bezier(0.40, 0.00, 0.20, 1);
+
+  --dur-1: 120ms;  /* micro: hover, focus, colour shift */
+  --dur-2: 180ms;  /* standard: drawer, popover, dropdown, toast */
+  --dur-3: 260ms;  /* deliberate: page transition, layout shift */
+
+  /* ── Z-index scale ───────────────────────────────────────────────────── */
+  --z-base:     0;
+  --z-sticky:   10;
+  --z-dropdown: 20;
+  --z-popover:  30;
+  --z-drawer:   40;
+  --z-modal:    50;
+  --z-toast:    60;
+  --z-tooltip:  70;
+}
+
+/* ── Dark theme — peer, not inversion ───────────────────────────────────── */
+[data-theme="dark"] {
+  --color-bg:             #0a0a0b;
+  --color-surface-1:      #131316;
+  --color-surface-2:      #1c1c20;
+  --color-fg:             #ededef;
+  --color-fg-muted:       #9b9ba3;
+  --color-fg-subtle:      #6c6c75;
+  --color-border:         #26262b;
+  --color-border-strong:  #34343a;
+
+  --color-accent:         #38bdf8;
+  --color-accent-fg:      #0a0a0b;
+  --color-accent-hover:   #5cc8f7;
+  --color-accent-soft:    rgba(56, 189, 248, 0.16);
+
+  --color-danger:         #f87171;
+  --color-danger-fg:      #1a0a0a;
+  --color-danger-soft:    rgba(248, 113, 113, 0.16);
+
+  --color-warning:        #fbbf24;
+  --color-warning-fg:     #1a1408;
+  --color-warning-soft:   rgba(251, 191, 36, 0.16);
+
+  --color-success:        #34d399;
+  --color-success-fg:     #06241a;
+  --color-success-soft:   rgba(52, 211, 153, 0.16);
+
+  --color-info:           #60a5fa;
+  --color-info-fg:        #061a3a;
+  --color-info-soft:      rgba(96, 165, 250, 0.16);
+
+  /* Shadows are weaker in dark mode — borders do most of the work */
+  --shadow-1: 0 0 0 1px rgba(255,255,255,0.05);
+  --shadow-2: 0 4px 12px rgba(0,0,0,0.30), 0 0 0 1px rgba(255,255,255,0.05);
+  --shadow-3: 0 16px 32px rgba(0,0,0,0.40), 0 0 0 1px rgba(255,255,255,0.05);
+}
+
+/* ── Reduced motion ─────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ── Default focus ring ─────────────────────────────────────────────────── */
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+  border-radius: inherit;
+}

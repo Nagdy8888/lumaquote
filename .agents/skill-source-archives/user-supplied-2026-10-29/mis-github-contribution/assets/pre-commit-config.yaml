@@ -1,0 +1,81 @@
+# MIS standard .pre-commit-config.yaml
+#
+# Drop into the repo root, then run:
+#   pre-commit install            # installs the git hook
+#   pre-commit run --all-files    # one-time backfill on existing code
+#
+# Remove the stacks your repo does not use. Pin tool versions; bump
+# them quarterly via `pre-commit autoupdate` as a chore(deps) PR.
+
+repos:
+  # -------- Generic (every repo) --------
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-merge-conflict
+      - id: check-yaml
+      - id: check-json
+      - id: check-added-large-files
+        args: [--maxkb=500]
+
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.18.4
+    hooks:
+      - id: gitleaks
+
+  # -------- Python (remove if N/A) --------
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.6.9
+    hooks:
+      - id: ruff
+        args: [--fix]
+      - id: ruff-format
+
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.11.2
+    hooks:
+      - id: mypy
+        args: [--strict]
+        additional_dependencies:
+          # Add stubs your project needs, e.g.:
+          # - types-requests
+
+  # -------- TypeScript / JS (remove if N/A) --------
+  # These call into the repo's own toolchain. Adjust `pnpm` → `npm` / `yarn`
+  # to match the project's package manager.
+  - repo: local
+    hooks:
+      - id: eslint
+        name: eslint
+        entry: pnpm exec eslint
+        language: system
+        files: \.(ts|tsx|js|jsx)$
+
+      - id: prettier
+        name: prettier
+        entry: pnpm exec prettier --check
+        language: system
+        files: \.(ts|tsx|js|jsx|json|md|yaml|yml)$
+
+      - id: tsc
+        name: tsc
+        entry: pnpm exec tsc --noEmit
+        language: system
+        pass_filenames: false
+        types: [ts]
+
+  # -------- Go (remove if N/A) --------
+  # - repo: https://github.com/golangci/golangci-lint
+  #   rev: v1.61.0
+  #   hooks:
+  #     - id: golangci-lint
+
+  # -------- Terraform (remove if N/A) --------
+  # - repo: https://github.com/antonbabenko/pre-commit-terraform
+  #   rev: v1.96.1
+  #   hooks:
+  #     - id: terraform_fmt
+  #     - id: terraform_validate
+  #     - id: terraform_tflint

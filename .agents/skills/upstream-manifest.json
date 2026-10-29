@@ -1,0 +1,350 @@
+{
+  "version": 1,
+  "installed_on": "2026-10-23",
+  "scope": "repository",
+  "skills": {
+    "security-audit": {
+      "source": "https://github.com/cloudflare/security-audit-skill",
+      "commit": "c1c8a8c1471069fb0e188eeaff69b8e8db6564a8",
+      "upstream_path": "skills/security-audit",
+      "archived": false,
+      "root_license": "_licenses/cloudflare--security-audit-skill--c1c8a8c14710--LICENSE",
+      "files": {
+        "AI-AND-LLM.md": "7335a95c43554eadefcf03ece639291bb0e038c398a179299e3887ffe06bd2ef",
+        "ATTACK-CLASSES.md": "3ee4f00c6e8c9dcf6dd02dd5ac2a4ceb322e2085f3e9fbe79cf0c6330bc7ef83",
+        "CLIENT-SIDE.md": "613f6b98f86083e045525c5b60154ffdab122bac35f1e05eb17488e6e453370c",
+        "CLOUD-AND-DEPLOYMENT.md": "3c80f3088be22345e07b057c056d6ed99fe2b0304f794398964f7ccd5a496ca3",
+        "DATA-ISOLATION-AND-LIFECYCLE.md": "307dcb3e24d292715c4a041190e7bb135646a37eb6187619ae01d000a634a4ad",
+        "DESKTOP-MOBILE-AND-LOCAL-IPC.md": "58eae8ee0ca6a46611c501ec5a3ab47fdff88dd7db0d8d74789bbf8bb19d8cb2",
+        "HUNTING.md": "71c121decea1322c47c718f6e110f1a892980bb4266bd7ac55ef043a213ade09",
+        "MEMORY-SAFETY-AND-BINARY.md": "7c8b0dccfb35315cca2455509674d49632b2fe37e1f3aac16c1a496a7e9924a7",
+        "PROTOCOLS-RPC-AND-MESSAGING.md": "8b73816fa5b3697c9c40977f0c836b40f01d6e81929ff2720fe83ce089e9a619",
+        "RECONNAISSANCE.md": "02ca887aca84de8ae137f1891bd2f0a54f28d3fa6da92a27f54734382b3381a2",
+        "report-schema.json": "6575c9de4a62255699ea052ebf9a49ebfb373a32891bcd89af6f55cc84b35519",
+        "RESOURCE-EXHAUSTION-AND-AVAILABILITY.md": "4326fab5c92a0b4c420a70196254040105cd794026562130b59bf1a6db3e4baa",
+        "SKILL.md": "5e3e96a1e438d8f35fef0a1e38f02d4f00e2bdf910401b7dfe00e6779c6dac85",
+        "SUPPLY-CHAIN-AND-RELEASE.md": "f372e919940e335468ba1ae09f99026c3986a345f7fe26f8068f132e199f52a5",
+        "validate-coverage-ledger.cjs": "2eb280bd2e33c002916f86db9b29f9edfedb6454e5db973c766290465b868ac8",
+        "validate-coverage-ledger.test.cjs": "cfb9df26b03469a4279a70e7664a2a5434dd6f8c2c204e91f9b0aeb9dd71e648",
+        "validate-findings.cjs": "e85f232e36bfac0f866f244da50376692d6b45c690beadcb00608b0e6c8b5283",
+        "validate-findings.test.cjs": "b92001117a92c4161d43777a0ba2fa182a8a4d97f2304cc8c0cee5331497b73b",
+        "VALIDATION-AND-REPORTING.md": "b892470cb89bb31f33403e050d4bdfbe2cdaef940ade1496fa65e32b2e129449",
+        "WEB-PROTOCOL-AND-AUTH.md": "4f3066dffa23c5635859187be9b96c32f2aff29a688186b91ff0c63e47d62b5c"
+      }
+    },
+    "frontend-design": {
+      "source": "https://github.com/anthropics/skills",
+      "commit": "dbd4588f9e1033efb41dad4bef2f7947c8993d44",
+      "upstream_path": "skills/frontend-design",
+      "archived": false,
+      "root_license": null,
+      "files": {
+        "LICENSE.txt": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594",
+        "references/application-workspace.md": "8ff134c44cbaaab8f58c88104c7b85640f1701cd7717f215b16d1326f468e7e7",
+        "SKILL.md": "ab79ad9a276633b75e3b33349dd4cc43f8a587c1ddb54bd261c5008ceff1a65b"
+      },
+      "license_file": "LICENSE.txt",
+      "third_party_notices": "_licenses/anthropics--skills--dbd4588f9e10--THIRD_PARTY_NOTICES.md",
+      "upstream_files": {
+        "LICENSE.txt": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594",
+        "SKILL.md": "d91970639e9f5c37682ac7ab60094d35f1c7c1f38d731bd56396563aee10c1d3"
+      },
+      "local_modifications": [
+        "Integrated supplied working-surface guidance while preserving the approved visual direction and 3D"
+      ],
+      "adaptation_source_archive": "../skill-source-archives/user-supplied-2026-10-29"
+    },
+    "codebase-design": {
+      "source": "https://github.com/mattpocock/skills",
+      "commit": "5beb35b040e3de97e54fa9e386d7e42d15c295c2",
+      "upstream_path": "skills/engineering/codebase-design",
+      "archived": false,
+      "root_license": "_licenses/mattpocock--skills--5beb35b040e3--LICENSE",
+      "files": {
+        "agents/openai.yaml": "edebc9e4fcfe102114012575eaa9600b9b5fd08c311664f389c36e7bc717740f",
+        "DEEPENING.md": "f3dd099ce99289bd213914d8ee3e2429b78309c3957ca4583f7659551b1d53c1",
+        "DESIGN-IT-TWICE.md": "52b52e75655a27aea59c6966b410bac82448968ad46ef1ebb9f07c274e3ae010",
+        "SKILL.md": "2c20617f87ec8af6a434859f381b2f061a69b530444e74eb39e78bb016a6d1e2"
+      }
+    },
+    "setup-pre-commit": {
+      "source": "https://github.com/mattpocock/skills",
+      "commit": "5beb35b040e3de97e54fa9e386d7e42d15c295c2",
+      "upstream_path": "skills/misc/setup-pre-commit",
+      "archived": false,
+      "root_license": "_licenses/mattpocock--skills--5beb35b040e3--LICENSE",
+      "files": {
+        "agents/openai.yaml": "acf41db398c5c43afe504008bb7d615a97b6498b0f1f6c5b2395254c0bfb57d1",
+        "SKILL.md": "73cfdfed51ba39569dee94032a69e40ed5f167f04f9176eb115f482fb5a576bc"
+      },
+      "upstream_files": {
+        "agents/openai.yaml": "acf41db398c5c43afe504008bb7d615a97b6498b0f1f6c5b2395254c0bfb57d1",
+        "SKILL.md": "c9819d7f1e3b198064edc1faa3154224ed67395e9f07f5d3cea4b67cf0a11a98"
+      },
+      "local_modifications": [
+        "Unified mixed-stack hook guidance and removed competing-runner and automatic-commit requirements"
+      ],
+      "adaptation_source_archive": "../skill-source-archives/user-supplied-2026-10-29"
+    },
+    "resolving-merge-conflicts": {
+      "source": "https://github.com/mattpocock/skills",
+      "commit": "153fc1b93de6584562765cdce299324e1ff9e661",
+      "upstream_path": "skills/engineering/resolving-merge-conflicts",
+      "archived": true,
+      "root_license": "_licenses/mattpocock--skills--153fc1b93de6--LICENSE",
+      "files": {
+        "agents/openai.yaml": "a1f4f96838f2ed6282eb28abbbf99029cb8fadce552baf53da90a025b8bffddf",
+        "SKILL.md": "9d8114f8ef0b31f535a265fc05c364bd8cf2e2895a830040e06c22acb11f54b0"
+      }
+    },
+    "react-best-practices": {
+      "source": "https://github.com/vercel-labs/agent-skills",
+      "commit": "063bee94c3f4df8453406c830b0a7df0f2860278",
+      "upstream_path": "skills/react-best-practices",
+      "archived": false,
+      "root_license": null,
+      "files": {
+        "AGENTS.md": "fc93e7421177bbf869cce892bc60a6c83a4517d974bc3bf65c4e2c1e58a6ccf6",
+        "metadata.json": "c4e18bac3290fbe1b471a605867d4df68b03144ea26b8befdbe8f9d8fd124354",
+        "README.md": "9eafb2123d3b8b2aef41fba0db2648a3f4f49996f8c7c8bb2c86263befd8b48a",
+        "rules/_sections.md": "01c59969e4e867f0708c8f8ef9c6d87fab9a07d0586244f429ff84013db8a115",
+        "rules/_template.md": "99df2a3ea088c6c22de2484ddc7e964d0e9923846f44c63380343ecc64455442",
+        "rules/advanced-effect-event-deps.md": "55ed8f9f27a1bff803d6fa55828176207714b02123cbb97ddb8a90d88024a723",
+        "rules/advanced-event-handler-refs.md": "a3097edeecfb2ff6851cd66ed8cdf0617c3c88180504bee824aa6e75a215bbbc",
+        "rules/advanced-init-once.md": "3e4dc22173eb0e2b6dcf583e3babd862b8696328f8f59aee7c4d746c5bc05f6c",
+        "rules/advanced-use-latest.md": "8a3f64dfe5a77d1564248faf17fe662ae75b55d497a243cb30b38eb07ccbbf9a",
+        "rules/async-api-routes.md": "523338540d73427dc14c0cbb19f2741ebccdf8b105a7b2c1b33d2905cf237a42",
+        "rules/async-cheap-condition-before-await.md": "03107c1f70a293cd58a8abc5474c5548e20ea4efdf01b6d45aae7ad0ac1cb32c",
+        "rules/async-defer-await.md": "f3c142d090615abdcc99d31c123be37b31f0f1ed8d9ec9f7789a3bc6883ae0fb",
+        "rules/async-dependencies.md": "16ef469f877e30c6b8e1e1b4bc3e527312fa3c6318cb785a4eca186ea236131a",
+        "rules/async-parallel.md": "6d2f841896279e976dfcdc1ac89e70771ac188baadfd43c096b5706cb838b961",
+        "rules/async-suspense-boundaries.md": "de05fedac2eb7ae563b887b5a424464ec3dfaf84e5b7797467ebe2a796ac8afc",
+        "rules/bundle-analyzable-paths.md": "62090b5c815fd71bf1133dce754f51abc16a9456d0ccd025fd627de27726e92a",
+        "rules/bundle-barrel-imports.md": "e648f6d54525f07a691357040ca5bff6ea3424788a91ff63812adb29622a671b",
+        "rules/bundle-conditional.md": "09c8259c3efb04fc0abb8e412ccbda217c222ae8118516283e571c995fe3a7d4",
+        "rules/bundle-defer-third-party.md": "3719fb47b191e8db4fe22686ec88448ad5af9e6838585425abbe103d0b642e37",
+        "rules/bundle-dynamic-imports.md": "401817a7369f315fc5a68a1095742ff7d53d0461906880dc9d64a41495ee1986",
+        "rules/bundle-preload.md": "d1f7cc28da7cd5ab249acd287edc5b761afcfb194e9cb62cd44c5f3543db2de2",
+        "rules/client-event-listeners.md": "242a873349febc1ce685e85617994784dbab92c2eaa68aed7fed5a83e7680e93",
+        "rules/client-localstorage-schema.md": "0fb7cdf9dc93fdf22f87e3669f953fb9d4ac9b0be42eec4a29fe9a2560610b88",
+        "rules/client-passive-event-listeners.md": "1f35016f9053de69e884ee9be00654e37979c2ca85f5e57764dc2626ff7acb4b",
+        "rules/client-swr-dedup.md": "644652c39c6cc00de8d1c77a7273612e868dc3f7edda30764164c12ec0f764a3",
+        "rules/js-batch-dom-css.md": "480b891b9eaf96e929dc1e964274a4828e3a78009b7d00ccd965a0d425215959",
+        "rules/js-cache-function-results.md": "3daaa11d24f4295cb6be8bc6f407f2ce83cc7b5bd1f0e68891ea8ab835721dc7",
+        "rules/js-cache-property-access.md": "73e47431e74878a927061bf0ddc7cd91a7556cb35d2573f3421e82300d9ae311",
+        "rules/js-cache-storage.md": "11b826b0433898c1ece2d3547010d8e77db9fb240185748c45db91493de9b6cc",
+        "rules/js-combine-iterations.md": "71add08aeeb43091d4ff4c0b2842cce8b4bdef8ad3e732cc034bb5a84827e746",
+        "rules/js-early-exit.md": "925ce5ce87f3347186ca62212f29cc6baa2b8c85a96d2720ad07c3d0abf781c0",
+        "rules/js-flatmap-filter.md": "9e5b166a41914d975bef7635467f8fb32cd98b5c3126c0bc6f163490812fb5f0",
+        "rules/js-hoist-regexp.md": "f9e9aef2f7c2307dd7310f283df85dcada45fc43e9bb941b0c3aa414dec21ec4",
+        "rules/js-index-maps.md": "5df1bdc2cfabb2c98abd55d26762e5c18189535c2e686184f426082e62920391",
+        "rules/js-length-check-first.md": "8b54a311c826b299272f29187fc58bc55772a04c4a72eeb29456ee96dc9fc624",
+        "rules/js-min-max-loop.md": "87dfb67e2f39df6ad8bcfb5b78c5fb364d3c07554ad188a202408d99f3763421",
+        "rules/js-request-idle-callback.md": "ee08f83905b4011abbc33d594033157d77561b5bbd9b36b04f0f409581ffec32",
+        "rules/js-set-map-lookups.md": "a7fd781a6ba9ad49065961b6f9a90ef486bf6b648390e1a08704025f98e1642b",
+        "rules/js-tosorted-immutable.md": "d0a5e1b0fec48a0a81397957e2f068e224329f7c42cb5feeed8aae6fa64025e8",
+        "rules/rendering-activity.md": "1e5e7eaf3555e61d6a2e900089c676527d26259501db5594f59544b6c664f85a",
+        "rules/rendering-animate-svg-wrapper.md": "9c6ae0ca7a51434e803887c64cded760956579a1452ccb80a461a03f9c937c77",
+        "rules/rendering-conditional-render.md": "2ec2fa23c4148285144687050c52369adba3da2fbe3d486f8d3e0aad8f06f2bc",
+        "rules/rendering-content-visibility.md": "64eee6d5b916fe74df33363994b27fc7f71bea3bcedc7ee04bda23107ca3e6e4",
+        "rules/rendering-hoist-jsx.md": "93b229560fae92005ed9a2a829064607b39b2e984e92d221d05b2d41df2b7c0e",
+        "rules/rendering-hydration-no-flicker.md": "dc7ab358c67c177bca6e6f360fbc935ebe4efa928c0ba3ebd3f9f3d9e2000ca3",
+        "rules/rendering-hydration-suppress-warning.md": "915bacb934e2927d84b37a3f3d225a47b309ac8f9e494ed2bcb66ce07c5676a2",
+        "rules/rendering-resource-hints.md": "351b1095d641717b930f1b2253282b7120af3023bc74e06c17675168d4286864",
+        "rules/rendering-script-defer-async.md": "4cea07b7875ba7fc2c7465ff23b63a2bb334f90aaf2d9293d38d67b05fdb32ab",
+        "rules/rendering-svg-precision.md": "ed468533f6e95f622859c884b122cf21f9f593ed6bb3d500a54de4b9f9bcb9fb",
+        "rules/rendering-usetransition-loading.md": "3a1249c3f13026b6f54ab5712c388df219d6af01b12aa542749acd99a46f4bc1",
+        "rules/rerender-defer-reads.md": "234050a77faf50cb306be10a9e15bd4421134ab5907e75f13e6d78e2bd262dc9",
+        "rules/rerender-dependencies.md": "17eb5830956fb56486fd3cfc7431f5849d39751730c05ad9e77dd4f0c27169c5",
+        "rules/rerender-derived-state-no-effect.md": "cb11ec76f50aa7b6847269f02d79b120c889a30d9ecd2c1d578f75144419c77a",
+        "rules/rerender-derived-state.md": "1c326bb67b01fb084eb00c8911b0a7cff54681c2315b629f88e49b64eaa6481d",
+        "rules/rerender-functional-setstate.md": "5e68df6b2ae8058e67f476ff1ac67bde159f5a9d18df439e46eabcdeb7b52e58",
+        "rules/rerender-lazy-state-init.md": "4ae844740f266fc8cbf050701230286624a2440ec5be67b9a63d9edc3c580573",
+        "rules/rerender-memo-with-default-value.md": "81c47476564ad8a79fc68fc442734255ca7d6829424359464503fda0a9f9a0dd",
+        "rules/rerender-memo.md": "1f258990c2f27ff6256b3cc5c43300631bb3f0d81f749aed08d07fcdcc131dd1",
+        "rules/rerender-move-effect-to-event.md": "abc2cbf167bee056743023351e96806a411d3398da8802093620aecf0721f029",
+        "rules/rerender-no-inline-components.md": "1cc32907a770272524ba682eef9e7efdd8ad4533b6f89b718a1fcd7d1d0eb6a3",
+        "rules/rerender-simple-expression-in-memo.md": "5bdcf2d1558ba5204e643c887b7b4060f89630969425651eb68e96427d97f800",
+        "rules/rerender-split-combined-hooks.md": "6f45d703343484ef9acef9388397f3642966ae6a5a258899a0cf1f9977cfbf6c",
+        "rules/rerender-transitions.md": "60f4033909a62df5e5b8c601494f9e50a562e2f8c1c2d81eac24f38142265f1c",
+        "rules/rerender-use-deferred-value.md": "8c3579576a61a949884167745dcfaf1d5426ba305cc61fd0a79602d70fda4909",
+        "rules/rerender-use-ref-transient-values.md": "f1a649af9d1d0b5c762f6c9c4c1c70c90d7df82aa10296ee87aadb78c1b76c54",
+        "rules/server-after-nonblocking.md": "d0b8d24a3db9f0f65f9e2bddbf230b0e03a5f60e1229d93a4a18f5e7a991c7c2",
+        "rules/server-auth-actions.md": "a2ca8aa102839251c7971ec784560fab943c20b36fe6f80365d4110c13260c23",
+        "rules/server-cache-lru.md": "1924b64561841923b88a657085097a0aeba3e0ba2d5470b9f5c15cc10d6ae70f",
+        "rules/server-cache-react.md": "fddeea6c870bb3da4134b61d54b7d09b83d2603f929b7547cd3dc1dc269edd5c",
+        "rules/server-dedup-props.md": "c2747424cdac46be62f835f245a0aa887b0090b416d28e2ac8676702645eeb37",
+        "rules/server-hoist-static-io.md": "5abea4dd882b13661bd5f7dfb93f9e547d5f08176c61c448ade91b210ed5d49f",
+        "rules/server-no-shared-module-state.md": "4d869bf1cd2f1632e5ca4c0e64b1cf0e71c5f5a0f940bc8a22174d205e735ed7",
+        "rules/server-parallel-fetching.md": "569a2e9fc04f9606686cd75c5894ef8781b502786a7fffe241396846c7733472",
+        "rules/server-parallel-nested-fetching.md": "ad5d9656984d4a959997a2367bf59cc6632297b4634a1dd13a087939d83f30b3",
+        "rules/server-serialization.md": "f4c7d68b29c82381baad059c4a7f09e868e71ec9c3115a26ad3ae7d24c0dfe1f",
+        "SKILL.md": "71ed7794962fa6e803ee83030517b5b93a9f70fbfeb431ec4535c5480a8d8355"
+      },
+      "root_license_note": "No standalone license file supplied in the pinned upstream tree; preserve frontmatter declarations and source reference."
+    },
+    "web-design-guidelines": {
+      "source": "https://github.com/vercel-labs/agent-skills",
+      "commit": "063bee94c3f4df8453406c830b0a7df0f2860278",
+      "upstream_path": "skills/web-design-guidelines",
+      "archived": false,
+      "root_license": null,
+      "files": {
+        "SKILL.md": "f4647ca866a3accf763777f83e7682954f0187cd6bea7eea0399796652414e8f"
+      },
+      "root_license_note": "No standalone license file supplied in the pinned upstream tree; preserve frontmatter declarations and source reference."
+    },
+    "whatsapp-webhooks": {
+      "source": "https://github.com/hookdeck/webhook-skills",
+      "commit": "c764bd14611072eb81fe55ff850c79963a456158",
+      "upstream_path": "skills/whatsapp-webhooks",
+      "installed_on": "2026-10-28",
+      "root_license": "_licenses/hookdeck--webhook-skills--c764bd146110--LICENSE",
+      "root_license_sha256": "d6cb78f3eddd65a7a7c0d0154f0442897aabdbaac283bf513ed65ebb667dcd5c",
+      "files": {
+        "SKILL.md": "8b3e5dce67b3f65c872efe0f7fff94969d9dd0a96d0d85693dda1bb11802dcad",
+        "examples/express/.env.example": "a0591f61bca88ec3e027c69af07a8f95412b923237212ac930766ed85c40b816",
+        "examples/express/package.json": "13d104498b41effd1c7df728887ceef8f4917e7119263f25ff449aec16b1d8c6",
+        "examples/express/README.md": "e390baa51830f862256d305e7a9cfe8005b7954b3d28d7eb790193d0b20d22ef",
+        "examples/express/src/index.js": "19d407da7480a392cfb33af9d12747c5a70c3cb8fd1dfc0547b35d5f97ff4a13",
+        "examples/express/test/webhook.test.js": "326d08a1812ec1aefd219793e75cd57cdf47a64738340efb51095166bb32d217",
+        "examples/fastapi/.env.example": "7f98a1451fe0e4d8ecca6b92a5f2aaa79c0f534892b36968a8a1df269965b444",
+        "examples/fastapi/main.py": "f05ee2d696099c44ce3ff6f30295b4de3533e125b158296ddd7ee57013a6d38f",
+        "examples/fastapi/README.md": "dc6a6462d7007a880f6b9bf10971cc3001777dcc233551c94b4860ac9ce6b810",
+        "examples/fastapi/requirements.txt": "7c6583d76265461d22820a9a5cb0ac9baa7d65136281e63e83ec9065e538d749",
+        "examples/fastapi/test_webhook.py": "682e4f77d2bdebe19518a9d14ce6bcc6d3aa6b5c4c7c849d4349d8780323582a",
+        "examples/nextjs/.env.example": "7f98a1451fe0e4d8ecca6b92a5f2aaa79c0f534892b36968a8a1df269965b444",
+        "examples/nextjs/package.json": "dee2fda591672a62ffe24b073c44f980f2a7cf7aa703f79276f645b5eb5a490b",
+        "examples/nextjs/README.md": "3a1f481475e9eb40477ba31eb1899fa81196126b9c5b23ffb468ef44871d8302",
+        "examples/nextjs/vitest.config.ts": "9e3e419416bff80157d7afaba5e20037e55cb1ce3fc259963a8fa81396139967",
+        "examples/nextjs/app/webhooks/whatsapp/route.ts": "79d05edb58475e0afb6bfb9c2ca6dd5ea2488ac93cd1e331581655dfe31fc402",
+        "examples/nextjs/test/webhook.test.ts": "c8b24ae7f7c2a44d418ca10d12d1bb975e86587f3e88687f567c62e5bc11c74a",
+        "references/overview.md": "6cbcd594220c8bb86aef5ceb4efb0cf3ac003685fcd93a301beb4a80bac52991",
+        "references/setup.md": "44589a370c288c83cdb2b4bf6b0f025dd85d44c7b895c454db4bd29228bbb031",
+        "references/verification.md": "aaa04b37d8fb21e3ec71ade6432ff11b487820a7c961359872b2e71571bce876"
+      }
+    },
+    "langgraph-fundamentals": {
+      "source": "https://github.com/langchain-ai/langchain-skills",
+      "commit": "126c384d8552dcb476b226c244172186cc3f4328",
+      "upstream_path": "config/skills/langgraph-fundamentals",
+      "installed_on": "2026-10-28",
+      "root_license": "_licenses/langchain-ai--langchain-skills--126c384d8552--LICENSE",
+      "root_license_sha256": "4ec67e4ca6e6721dba849b2ca82261597c86a61ee214bbf21416006b7b2d0478",
+      "files": {
+        "SKILL.md": "193bea142c9df04abc44917fb96c0be53ec9b5c77f56670004d3c03c117fb990",
+        "references/python.md": "3d30871a6463f955452fdebe607248c39b6806cf07c0fe655e3783b48acc6d91",
+        "references/typescript.md": "8cf8577265a75a1e46a5e1dfc7599c63efb60059591593dbb92dbd51acd5d22a"
+      }
+    },
+    "langgraph-human-in-the-loop": {
+      "source": "https://github.com/langchain-ai/langchain-skills",
+      "commit": "126c384d8552dcb476b226c244172186cc3f4328",
+      "upstream_path": "config/skills/langgraph-human-in-the-loop",
+      "installed_on": "2026-10-28",
+      "root_license": "_licenses/langchain-ai--langchain-skills--126c384d8552--LICENSE",
+      "root_license_sha256": "4ec67e4ca6e6721dba849b2ca82261597c86a61ee214bbf21416006b7b2d0478",
+      "files": {
+        "SKILL.md": "ce56e8ce58548dd1d7cb0d3e524cf546cef0c712e3c35d63fdd4ae354b40d3c1"
+      }
+    },
+    "langgraph-persistence": {
+      "source": "https://github.com/langchain-ai/langchain-skills",
+      "commit": "126c384d8552dcb476b226c244172186cc3f4328",
+      "upstream_path": "config/skills/langgraph-persistence",
+      "installed_on": "2026-10-28",
+      "root_license": "_licenses/langchain-ai--langchain-skills--126c384d8552--LICENSE",
+      "root_license_sha256": "4ec67e4ca6e6721dba849b2ca82261597c86a61ee214bbf21416006b7b2d0478",
+      "files": {
+        "SKILL.md": "0a9a4f36e6d7895a273ce0882655e57023d2d992d4fde8e033e2936ac1df789e"
+      }
+    },
+    "fastapi": {
+      "source": "https://github.com/fastapi/fastapi",
+      "commit": "79cab5bed28b24d92c185d236feb33f5783dfeb3",
+      "upstream_path": "fastapi/.agents/skills/fastapi",
+      "installed_on": "2026-10-29",
+      "root_license": "_licenses/fastapi--fastapi--79cab5bed28b--LICENSE",
+      "root_license_sha256": "4ec89ffc81485b97fec584b2d4a961032eeffe834453894fd9c1274906cc744e",
+      "files": {
+        "SKILL.md": "353cf43e70602453ba902a800f3c03f0b6c2e71130cfc0da0f1f60764d47defe",
+        "references/dependencies.md": "60e92fc8544fd326f7d112d0994cbaa9b860282d440ad2dd8e3629a466cb9dd0",
+        "references/other-tools.md": "2daf0c09ec6f77d90d9c0dcfec448b4133b05302dc3a574dafce0216bf4d6339",
+        "references/path-operations.md": "ed8d2a21123bcf63dd1e9aa61cc8e4e33a878cbbf1d09498a556a420302995ca",
+        "references/pydantic.md": "840ab962739861aed2ea77805dc46979c9a96abd8fc0043f197b3bd5d638e84b",
+        "references/responses.md": "7c921508bbd093697301ca9612038976cfb5b65bdc2dc42a0c02e2809d3652a7",
+        "references/streaming.md": "3ff148c6d153affa960f421d13d27eb8225b70e579ed833c61c6b1a9ff17fa87"
+      }
+    },
+    "shadcn": {
+      "source": "https://github.com/shadcn-ui/ui",
+      "commit": "96da9cc7f1aa10580a3741664e2a77c721206c00",
+      "upstream_path": "skills/shadcn",
+      "installed_on": "2026-10-29",
+      "root_license": "_licenses/shadcn-ui--ui--96da9cc7f1aa--LICENSE",
+      "root_license_sha256": "1564074e13439397221ffd522e2e504d56561994a23d371aa5e3ad43e4f5423f",
+      "files": {
+        "cli.md": "a381e35bf36fe7bb851952c13707e01e82434fd7a4a4e53f6df26c6370838904",
+        "customization.md": "a19e81c78843df255e85755e52659268d793845add845b34ad8091f62bff3af9",
+        "design-system-page.md": "c541d661af159548744be3e27f79e7da710ab83f9afd448a4346f7ff1531d328",
+        "design-system.md": "9ed11e93e7e80e34c8795d5ba82e5420ca905e8e9949fef79cbe9239184fd06b",
+        "mcp.md": "8d696b4e45b7d0e337367248513bd9acebe8f3bcfd7b748c775e5a337c8f38c8",
+        "registry.md": "4f239be36bd2b58e17047db1ca80ab7da00e15a8b73242e5e4d50d113c4caa05",
+        "SKILL.md": "dd2bde962d9996e0bbcdaf3349258e6ef4cdf98e21d4ccc84e4492c435cee0d8",
+        "agents/openai.yml": "35db91b1eef58b2abe01da9b88577de5a44e233b740cd93d692ddeeadd2afe4d",
+        "assets/shadcn-small.png": "0ecc62d682727f68fc4937eed19960c706714fa084d44f63028d611ae02bf3d7",
+        "assets/shadcn.png": "7d60ad6fec4d89a0d44ba5a3c9283d2fea0047af5467f9227040e20d927d39b7",
+        "assets/showcase/color-pair.tsx": "6028f0b677912216822fdaf76ae6b8863c429916ed4a9626b73f4de4506f8ee4",
+        "assets/showcase/preview-states.css": "8d9e3cec24dd01b11c5ba12196d0376a131797d9ad247ea624e66eb8bbf61b0e",
+        "assets/showcase/state-matrix.tsx": "07794119fe05ff735358b3f8ca30a8297617ab64dfb3901dce4d89fe5f443458",
+        "evals/evals.json": "e82c747326a5c21e37a1c962274d36b1bfebb3e6602ee368b98e2dba5db18369",
+        "rules/base-vs-radix.md": "2b2deb47d004285220c1fc6b38bb2edc2d0ccbcdafd031b0b189d5d8ed0d1ba8",
+        "rules/chat.md": "4b4610d487ddc9751f3cfe0c554a06560ac723fcc2460abad77a1d3c7c9a4b95",
+        "rules/composition.md": "f282df828d83a91132a846ddb62eea149a7c7c94822e9ca88cfddf85af01aa41",
+        "rules/forms.md": "29593e14381e34626f8e0e9c15c59f3394b92a0623af6a6ec94585400123853c",
+        "rules/icons.md": "d4a58266648872d9ee07d0c2368843a1cb88b8253b7f528dd7bda9d68b6c2535",
+        "rules/styling.md": "f88fbd72dff862805b786dc7d7e4c74c83030fc278c5b97c993e4e665001798c",
+        "scripts/showcase-coverage.mjs": "fb593e0806414d23b51354a46881f0b2873afc226bda0926a22f83cbd60af2fa"
+      },
+      "upstream_files": {
+        "cli.md": "a381e35bf36fe7bb851952c13707e01e82434fd7a4a4e53f6df26c6370838904",
+        "customization.md": "a19e81c78843df255e85755e52659268d793845add845b34ad8091f62bff3af9",
+        "design-system-page.md": "c541d661af159548744be3e27f79e7da710ab83f9afd448a4346f7ff1531d328",
+        "design-system.md": "9ed11e93e7e80e34c8795d5ba82e5420ca905e8e9949fef79cbe9239184fd06b",
+        "mcp.md": "8d696b4e45b7d0e337367248513bd9acebe8f3bcfd7b748c775e5a337c8f38c8",
+        "registry.md": "4f239be36bd2b58e17047db1ca80ab7da00e15a8b73242e5e4d50d113c4caa05",
+        "SKILL.md": "93951e5e83f616a3e046491c00d770bd54c0a64164706cd1191822a233d27592",
+        "agents/openai.yml": "35db91b1eef58b2abe01da9b88577de5a44e233b740cd93d692ddeeadd2afe4d",
+        "assets/shadcn-small.png": "0ecc62d682727f68fc4937eed19960c706714fa084d44f63028d611ae02bf3d7",
+        "assets/shadcn.png": "7d60ad6fec4d89a0d44ba5a3c9283d2fea0047af5467f9227040e20d927d39b7",
+        "assets/showcase/color-pair.tsx": "6028f0b677912216822fdaf76ae6b8863c429916ed4a9626b73f4de4506f8ee4",
+        "assets/showcase/preview-states.css": "8d9e3cec24dd01b11c5ba12196d0376a131797d9ad247ea624e66eb8bbf61b0e",
+        "assets/showcase/state-matrix.tsx": "07794119fe05ff735358b3f8ca30a8297617ab64dfb3901dce4d89fe5f443458",
+        "evals/evals.json": "e82c747326a5c21e37a1c962274d36b1bfebb3e6602ee368b98e2dba5db18369",
+        "rules/base-vs-radix.md": "2b2deb47d004285220c1fc6b38bb2edc2d0ccbcdafd031b0b189d5d8ed0d1ba8",
+        "rules/chat.md": "4b4610d487ddc9751f3cfe0c554a06560ac723fcc2460abad77a1d3c7c9a4b95",
+        "rules/composition.md": "f282df828d83a91132a846ddb62eea149a7c7c94822e9ca88cfddf85af01aa41",
+        "rules/forms.md": "29593e14381e34626f8e0e9c15c59f3394b92a0623af6a6ec94585400123853c",
+        "rules/icons.md": "d4a58266648872d9ee07d0c2368843a1cb88b8253b7f528dd7bda9d68b6c2535",
+        "rules/styling.md": "f88fbd72dff862805b786dc7d7e4c74c83030fc278c5b97c993e4e665001798c",
+        "scripts/showcase-coverage.mjs": "fb593e0806414d23b51354a46881f0b2873afc226bda0926a22f83cbd60af2fa"
+      },
+      "local_modifications": [
+        "Removed unsupported user-invocable and host-specific Bash tool metadata",
+        "Replaced automatic shell interpolation with explicit Codex terminal context guidance"
+      ]
+    },
+    "langsmith-trace": {
+      "source": "https://github.com/langchain-ai/langsmith-skills",
+      "commit": "d69a8fe41816c1faba25399e60301b79b747d147",
+      "upstream_path": "config/skills/langsmith-trace",
+      "installed_on": "2026-10-29",
+      "root_license": "_licenses/langchain-ai--langsmith-skills--d69a8fe41816--LICENSE",
+      "root_license_sha256": "4ec67e4ca6e6721dba849b2ca82261597c86a61ee214bbf21416006b7b2d0478",
+      "files": {
+        "SKILL.md": "6f16ba0969d0327ad4a097d97f30aa0b1daac6141a57ca8d9fd1dd6caa1d5b9e"
+      }
+    }
+  },
+  "selection_updated_on": "2026-10-29"
+}

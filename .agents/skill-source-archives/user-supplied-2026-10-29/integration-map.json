@@ -1,0 +1,32 @@
+{
+  "integrated_on": "2026-10-29",
+  "original_to_active": {
+    "client-crud-state": [
+      "client-crud-state"
+    ],
+    "mis-documentation": [
+      "project-documentation"
+    ],
+    "mis-github-contribution": [
+      "contribution-workflow",
+      "setup-pre-commit"
+    ],
+    "mis-nextjs-fsd": [
+      "react-feature-structure"
+    ],
+    "mis-frontend-design": [
+      "frontend-design/references/application-workspace.md"
+    ],
+    "mis-langgraph": [
+      "plan-quotation-app/references/agent-organization.md"
+    ],
+    "mis-nextjs-api-guards": [
+      "secure-quotation-app/references/fastapi-request-boundaries.md",
+      "implement-abuse-controls"
+    ],
+    "mis-guidelines": [
+      "plan-quotation-app"
+    ]
+  },
+  "license_note": "Original supplied license and attribution notices remain unchanged in the archived source files."
+}

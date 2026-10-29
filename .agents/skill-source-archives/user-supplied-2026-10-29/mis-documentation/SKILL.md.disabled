@@ -1,0 +1,382 @@
+---
+name: mis-documentation
+description: MIS standard for project documentation. Covers Diataxis (Tutorials / How-to / Reference / Explanation) for user- and dev-facing docs, ADRs for decisions made, RFCs for decisions in flight, C4 model for architecture diagrams (Context, Container, Component), runbooks for operational procedures, blameless postmortems for incidents, keep-a-changelog for releases, READMEs as canonical entry points, and onboarding docs distinct from setup. Use whenever creating, updating, or reviewing any documentation in an MIS repo — code-adjacent docs, architecture diagrams, decision records, runbooks, postmortems, or onboarding material.
+license: Proprietary — MIS (Modern Intelligence Solutions) internal use
+metadata:
+  team: MIS
+  version: "1.0"
+  frameworks: diataxis, adr, c4, keepachangelog
+---
+
+# MIS documentation standard
+
+One opinion for every kind of doc that ships in an MIS repo. The goal is that any engineer (human or AI) opening the repo can find:
+
+- **Why** decisions were made — ADRs.
+- **What's still being decided** — RFCs.
+- **How the system fits together** — C4 diagrams (Context, Container, Component).
+- **How to do specific things** — Diataxis (Tutorials, How-tos, Reference, Explanation).
+- **What to do when alerts fire** — Runbooks.
+- **What broke and what we learned** — Postmortems.
+- **What changed in each release** — Changelog.
+- **Where to start** — README → navigation tree.
+- **How to become productive** — Onboarding.
+
+| Topic                                   | Reference                              |
+|-----------------------------------------|----------------------------------------|
+| Diataxis quadrants — when to use each   | `references/DIATAXIS.md`               |
+| ADRs — template, lifecycle, status flow | `references/ADRS.md`                   |
+| RFCs — relationship to ADRs             | `references/RFCS.md`                   |
+| C4 model — levels and tooling           | `references/C4_ARCHITECTURE.md`        |
+| Runbooks — operational procedures       | `references/RUNBOOKS.md`               |
+| Postmortems — blameless template        | `references/POSTMORTEMS.md`            |
+| Where everything lives in a repo        | `references/REPO_LAYOUT.md`            |
+
+Templates live in `assets/`.
+
+---
+
+## Decision tree
+
+| If the user asked to… | Go to |
+|-----------------------|-------|
+| Bootstrap docs in a new repo | [1. Bootstrap](#1-bootstrap-docs-in-a-new-repo) |
+| Write a tutorial / how-to / reference / explanation | [2. Pick a Diataxis quadrant](#2-pick-a-diataxis-quadrant) |
+| Document a decision that was made | [3. Write an ADR](#3-write-an-adr) |
+| Propose a change before deciding | [4. Write an RFC](#4-write-an-rfc) |
+| Draw / update architecture | [5. C4 diagrams](#5-c4-diagrams) |
+| Document an operational procedure | [6. Write a runbook](#6-write-a-runbook) |
+| Write up an incident | [7. Write a postmortem](#7-write-a-postmortem) |
+| Update the changelog | [8. Update the changelog](#8-update-the-changelog) |
+| Onboard a new engineer | [9. Onboarding docs](#9-onboarding-docs) |
+| Review docs in a PR | [10. Review checklist](#10-review-checklist) |
+
+---
+
+## 1. Bootstrap docs in a new repo
+
+Drop these into a new repo so it matches the MIS standard. The `docs/` tree organises by **purpose** at the top level (not by Diataxis quadrant):
+
+```
+<repo-root>/
+├── README.md                       # repo entry point — what is this, how to start
+├── CHANGELOG.md                    # keep-a-changelog format
+└── docs/
+    ├── README.md                   # docs navigation index
+    ├── onboarding.md               # day-1 → day-30 for a new engineer
+    │
+    ├── architecture/               # how the system fits together
+    │   ├── README.md
+    │   ├── c4/
+    │   │   ├── context.md          # C4 Level 1: System Context
+    │   │   ├── containers.md       # C4 Level 2: Containers
+    │   │   └── components/
+    │   │       └── <container>.md  # C4 Level 3: per container
+    │   └── <topic>.md              # architectural explanations
+    │
+    ├── decisions/                  # ADRs (immutable once accepted)
+    │   ├── README.md               # ADR index
+    │   └── 0001-use-postgres.md
+    │
+    ├── planning/                   # forward-looking work
+    │   ├── rfcs/
+    │   │   ├── README.md           # RFC index
+    │   │   └── 0001-event-bus-redesign.md
+    │   └── plans/
+    │       └── 001-redis-streams-migration.md
+    │
+    ├── guides/                     # tutorials + how-tos (Diataxis 1+2)
+    │   ├── 01-getting-started.md   # tutorial
+    │   ├── setup.md                # how-to: local dev environment
+    │   └── deploy-to-staging.md    # how-to
+    │
+    ├── references/                 # reference docs (Diataxis 3)
+    │   └── api.md
+    │
+    ├── runbooks/                   # one per alert / symptom
+    │   └── api-error-rate-high.md
+    │
+    └── postmortems/                # incident write-ups, blameless
+        └── 2026-05-20-payment-outage.md
+```
+
+Copy templates from `assets/`:
+
+| Source                              | Destination                                       |
+|-------------------------------------|---------------------------------------------------|
+| `assets/template-readme.md`         | `README.md`                                       |
+| `assets/template-changelog.md`      | `CHANGELOG.md`                                    |
+| `assets/template-docs-readme.md`    | `docs/README.md`                                  |
+| `assets/template-onboarding.md`     | `docs/onboarding.md`                              |
+| `assets/template-adr.md`            | `docs/decisions/0001-<short-name>.md`             |
+| `assets/template-rfc.md`            | `docs/planning/rfcs/0001-<short-name>.md`         |
+| `assets/template-plan.md`           | `docs/planning/plans/001-<short-name>.md`         |
+| `assets/template-c4-context.md`     | `docs/architecture/c4/context.md`                 |
+| `assets/template-c4-container.md`   | `docs/architecture/c4/containers.md`              |
+| `assets/template-runbook.md`        | `docs/runbooks/<alert>.md`                        |
+| `assets/template-postmortem.md`     | `docs/postmortems/YYYY-MM-DD-<summary>.md`        |
+
+Full layout discussion + naming conventions — `references/REPO_LAYOUT.md`.
+
+---
+
+## 2. Pick a Diataxis quadrant
+
+Diataxis applies to user-facing / dev-facing docs. The four quadrants map to the MIS folder layout like this:
+
+| Quadrant     | Reader is…   | Lives in                                                |
+|--------------|--------------|---------------------------------------------------------|
+| Tutorial     | Learning     | `docs/guides/` (numbered prefix: `01-getting-started.md`) |
+| How-to guide | Working      | `docs/guides/` (descriptive kebab: `deploy-to-staging.md`) |
+| Reference    | Working      | `docs/references/`                                       |
+| Explanation  | Studying     | `docs/architecture/<topic>.md` (most explanations are architectural) |
+
+Internal docs — ADRs, RFCs, plans, runbooks, postmortems — are **not** Diataxis.
+
+Ask:
+
+1. **Is the reader learning by doing?** → **Tutorial**. Hand-held, complete, predictable end state.
+2. **Does the reader have a specific task in mind?** → **How-to guide**. Recipe. Assumes competence.
+3. **Is the reader looking up specific facts (API, config, CLI)?** → **Reference**. Dry, exhaustive.
+4. **Is the reader trying to understand why?** → **Explanation**. Discursive, opinionated.
+
+Hard rule: **do not mix quadrants in one doc.** A tutorial that drifts into reference becomes useless to both audiences. Split it.
+
+Full per-quadrant guidance + style notes — `references/DIATAXIS.md`.
+
+---
+
+## 3. Write an ADR
+
+An **ADR** (Architecture Decision Record) captures a decision **after** it has been made, with enough context that a future engineer can understand why.
+
+Filename: `docs/decisions/<NNNN>-<short-kebab-name>.md`. Numbering is monotonic — never reuse.
+
+Required sections (full template: `assets/template-adr.md`):
+
+- **Title** — `ADR-NNNN: <decision>`
+- **Status** — `proposed | accepted | superseded by ADR-MMMM | deprecated`
+- **Context** — what is the issue we're seeing
+- **Decision** — what we are going to do
+- **Consequences** — positive, negative, neutral. What gets harder, what gets easier.
+- **Alternatives considered** — what else we looked at and why we didn't pick it
+
+Rules:
+
+- **One decision per ADR.** If two decisions are tangled, write two ADRs that reference each other.
+- **ADRs are immutable once accepted.** To change a decision, write a new ADR with `Status: supersedes ADR-NNNN`; mark the old one `superseded by`.
+- **No "we'll think about this later" ADRs.** If the decision isn't made, it's an RFC (see below).
+- **Link the ADR from any code / docs the decision affects** so the rationale is one click away.
+
+Full lifecycle + status diagram — `references/ADRS.md`.
+
+---
+
+## 4. Write an RFC (and the plan that follows)
+
+An **RFC** (Request for Comments) captures a decision **in flight**. It's where the team debates the merits before it becomes an ADR.
+
+Filename: `docs/planning/rfcs/<NNNN>-<short-kebab-name>.md`. Separate numbering from ADRs.
+
+Once an RFC is **accepted**, two artefacts follow:
+
+- One or more **ADRs** in `docs/decisions/` capturing the specific decisions taken.
+- An **implementation plan** in `docs/planning/plans/<NNN>-<short-name>.md` — the post-decision roadmap (phases, owners, milestones, rollback). Template: `assets/template-plan.md`.
+
+A plan is **not** an RFC: the decision is made, the plan sequences the doing. Plans are time-bounded and get archived (kept, not deleted) once the work ships.
+
+Required sections (full template: `assets/template-rfc.md`):
+
+- **Title** — `RFC-NNNN: <proposal>`
+- **Status** — `draft | review | accepted → ADR-MMMM | rejected | withdrawn`
+- **Summary** — one paragraph: what and why
+- **Motivation** — the problem and why now
+- **Detailed design** — the proposal
+- **Drawbacks** — what we lose by adopting this
+- **Alternatives** — what else was considered
+- **Open questions** — what we haven't resolved
+- **Rollout plan** — how we'd ship it
+
+When an RFC is **accepted**, it spawns an ADR (or several) summarising the decisions taken. The RFC stays as the public record of the deliberation; the ADR is the canonical decision.
+
+When to write an RFC instead of an ADR:
+
+- The change is large enough that you want feedback **before** committing.
+- The decision affects multiple teams or services.
+- There are credible alternatives and the team isn't aligned.
+
+If you'd write the same content in either form, just write the ADR.
+
+Full guidance — `references/RFCS.md`.
+
+---
+
+## 5. C4 diagrams
+
+The MIS architecture diagramming standard is the **[C4 model](https://c4model.com/)**. We use three of its four levels — Level 4 (Code) is replaced by reading the code.
+
+| Level | What it shows                                            | Audience                          | Lives in                                       |
+|-------|----------------------------------------------------------|-----------------------------------|------------------------------------------------|
+| 1     | **System Context** — your system as a box, users + external systems | Everyone (PMs, eng, leadership)   | `docs/architecture/c4/context.md`              |
+| 2     | **Containers** — apps, services, databases, queues       | Engineering                       | `docs/architecture/c4/containers.md`           |
+| 3     | **Components** — major modules inside one container      | Engineers working on that container | `docs/architecture/c4/components/<container>.md` |
+| 4     | Code — usually skipped; read the code                    | (skip)                            | —                                              |
+
+**"Container" predates Docker.** In C4 it means any independently runnable unit — a web app, an API service, a database, a queue, a Lambda. Mostly orthogonal to Docker containers.
+
+### Tooling
+
+- **Mermaid** with C4 syntax for diagrams checked into the repo (renders in GitHub). Templates in `assets/template-c4-context.md` and `assets/template-c4-container.md`.
+- **Structurizr DSL** for repos that need the full C4 toolchain (workspace.dsl + cloud rendering). Optional; pick one per repo.
+
+Rules:
+
+- **Every repo has Level 1 + Level 2.** Level 3 is per-container, on demand.
+- **One diagram per file.** Even if the file also has prose.
+- **Annotate every line / box** — purpose, protocol (HTTPS / gRPC / SQL), datastore type.
+- **Update the diagram when wiring changes.** Stale diagrams are worse than missing ones.
+
+Full C4 reference + Mermaid syntax — `references/C4_ARCHITECTURE.md`.
+
+---
+
+## 6. Write a runbook
+
+A **runbook** is the operational doc that fires when an alert pages someone or a known issue recurs. Optimise for the 3am-tired-oncall reader.
+
+Filename: `docs/runbooks/<alert-or-symptom-kebab>.md`. Match the alert name if there is one.
+
+Required sections (full template: `assets/template-runbook.md`):
+
+- **Alert / symptom** — what triggers this runbook
+- **Severity** — sev1 / sev2 / sev3 with definitions
+- **Impact** — who/what is affected
+- **Diagnose** — fast checks (dashboards, queries, logs) — links live, not just names
+- **Remediate** — exact commands, in order
+- **Verify** — how you know it's fixed
+- **Escalate** — who to page if remediation fails, in priority order
+- **Postmortem trigger** — when this incident requires a postmortem
+
+Rules:
+
+- **Runbooks are not how-tos.** A how-to assumes you can read at leisure. A runbook assumes you can't.
+- **Every command is copy-pasteable.** No "edit X then run Y" — write both as separate steps.
+- **Every link goes to the live thing**, not its name. "Check the API latency dashboard" → linked.
+- **The author is on the hook for keeping it accurate.** A wrong runbook is worse than no runbook.
+
+Full structure + examples — `references/RUNBOOKS.md`.
+
+---
+
+## 7. Write a postmortem
+
+Every **sev1 / sev2** incident produces a postmortem within **5 working days**.
+
+Filename: `docs/postmortems/YYYY-MM-DD-<short-summary>.md`. Date = day the incident started.
+
+Required sections (full template: `assets/template-postmortem.md`):
+
+- **Summary** — 3 sentences: what happened, impact, fixed by
+- **Impact** — duration, users affected, revenue / SLA impact, data loss?
+- **Timeline** — events in UTC. Detection, triage, mitigation, resolution, comms.
+- **Root cause(s)** — use 5-whys or a fault tree. Multiple causes are normal.
+- **What went well** — keep the team honest about successes
+- **What went poorly** — system gaps, not personal failures
+- **Action items** — each has an owner, a due date, and a tracker link
+- **Lessons learned** — captured for the next on-caller
+
+**Blameless rule.** Postmortems describe *systems* failing, not *people*. Replace "Alice deployed the bad change" with "the deploy pipeline allowed an unreviewed change to reach prod". If the writeup names a person as a cause, rewrite it.
+
+Action items that fall out of postmortems often turn into ADRs (decisions to change something) and/or runbook updates (so the next on-caller is faster).
+
+Full template + facilitation tips — `references/POSTMORTEMS.md`.
+
+---
+
+## 8. Update the changelog
+
+`CHANGELOG.md` lives at the repo root and follows **[keep-a-changelog](https://keepachangelog.com/)**.
+
+Sections per release, in this order:
+
+- `Added` — new features
+- `Changed` — changes in existing functionality
+- `Deprecated` — soon-to-be removed
+- `Removed` — removed in this release
+- `Fixed` — bug fixes
+- `Security` — vulnerability fixes
+
+```markdown
+## [Unreleased]
+### Added
+- New /export endpoint for CSV downloads.
+
+### Fixed
+- Logout no longer fails for users with > 5 sessions (MIS-318).
+
+## [1.4.0] - 2026-05-12
+### Added
+- Stripe webhook retries with exponential backoff (MIS-142).
+```
+
+Rules:
+
+- **Every PR that changes user-visible behaviour updates `[Unreleased]`.** Enforced in code review.
+- **Versions are SemVer.** A breaking change bumps major.
+- **Reference the ticket id** in parens, never the PR number — tickets outlive PRs.
+- **`[Unreleased]` is rolled into the next dated section on release** by the release-promotion PR (see `mis-github-contribution`).
+
+Template: `assets/template-changelog.md`.
+
+---
+
+## 9. Onboarding docs
+
+`docs/onboarding.md` is the **day-1 → day-30 path** for a new engineer. It is **not** a setup guide — setup is a Diataxis how-to (`docs/guides/setup.md`).
+
+Onboarding answers: who am I, who do I talk to, where do I read first, what do I work on, what does done-look-like in my first month?
+
+Required sections (full template: `assets/template-onboarding.md`):
+
+- **Welcome** — who reads this, what to expect
+- **Day 1 checklist** — accounts, accesses, the local environment up and running
+- **Week 1** — read these ADRs, run this tutorial, ship a tiny PR
+- **Month 1** — ship a small feature end-to-end, attend an oncall shadowing
+- **Who to ask** — by topic, with current handles (kept fresh)
+- **Where to read** — links to architecture, ADRs, runbooks
+- **Where to write** — link to this skill
+
+Onboarding ages fast. **Re-read on every new hire** and update what's stale.
+
+---
+
+## 10. Review checklist
+
+For any PR that touches docs, block on:
+
+- [ ] Each new doc has a clear top-line statement of its role (which kind of doc it is).
+- [ ] If it's user-facing, it lives in `docs/guides/` (tutorial / how-to) or `docs/references/` and stays inside one Diataxis quadrant.
+- [ ] If it's an ADR, it has a number, a status, all required sections, and is linked from affected code/docs.
+- [ ] If it's an RFC, it has open questions and a clear "what would make this accepted" framing.
+- [ ] If it's an architecture change, the relevant C4 diagram is updated in the same PR.
+- [ ] If user-visible behaviour changed, `CHANGELOG.md` `[Unreleased]` is updated.
+- [ ] If it's a runbook, every command is copy-pasteable and every link is live.
+- [ ] If it's a postmortem, it is blameless (no named individuals as causes).
+- [ ] Internal links use relative paths (`./adr/0001-…`) and resolve.
+
+Comment-only (not blocking): prose style, headline wording, optional cross-references.
+
+---
+
+## Anti-patterns
+
+- A README that lists every detail instead of pointing at where details live. The README is a hub.
+- ADRs without a `Status` field. The lifecycle is the point.
+- ADRs mutated to "update" a decision. Write a new ADR that supersedes.
+- A doc that's half tutorial and half reference. Pick one quadrant.
+- C4 Level 2 ("containers") used to mean "Docker containers". Read `references/C4_ARCHITECTURE.md`.
+- Runbooks written in narrative prose. The 3am reader wants steps, not paragraphs.
+- Postmortems that name people as causes. Always blame the system.
+- `docs/` folders organised by team or service when the team / service later moves or renames. Organise by content type.
+- A changelog entry per PR. The entry is per user-visible *change*, which may be many PRs or one.
+- Diagrams as `.png` checked into the repo with no source. Use Mermaid (or commit the Structurizr DSL).

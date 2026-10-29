@@ -1,0 +1,92 @@
+---
+name: mis-guidelines
+description: Behavioral guidelines for AI coding agents working in MIS repos — reduce common LLM coding mistakes by thinking before coding, biasing toward simplicity, making surgical changes, and defining verifiable success criteria. Use when writing, reviewing, or refactoring code to avoid overcomplication, surface assumptions explicitly, scope changes tightly, and frame work as goals with checks rather than vague tasks.
+license: MIT — see Attribution
+metadata:
+  team: MIS
+  version: "1.0"
+  source: https://x.com/karpathy/status/2015883857489522876
+---
+
+# Karpathy Guidelines (MIS port)
+
+Behavioral guidelines to reduce common LLM coding mistakes, derived from [Andrej Karpathy's observations](https://x.com/karpathy/status/2015883857489522876) on LLM coding pitfalls. Ported from [forrestchang/andrej-karpathy-skills](https://github.com/forrestchang/andrej-karpathy-skills) and lightly framed for MIS.
+
+**Tradeoff:** These guidelines bias toward caution over speed. For trivial tasks, use judgment.
+
+## 1. Think Before Coding
+
+**Don't assume. Don't hide confusion. Surface tradeoffs.**
+
+Before implementing:
+- State your assumptions explicitly. If uncertain, ask.
+- If multiple interpretations exist, present them — don't pick silently.
+- If a simpler approach exists, say so. Push back when warranted.
+- If something is unclear, stop. Name what's confusing. Ask.
+
+## 2. Simplicity First
+
+**Minimum code that solves the problem. Nothing speculative.**
+
+- No features beyond what was asked.
+- No abstractions for single-use code.
+- No "flexibility" or "configurability" that wasn't requested.
+- No error handling for impossible scenarios.
+- If you write 200 lines and it could be 50, rewrite it.
+
+Ask yourself: "Would a senior engineer say this is overcomplicated?" If yes, simplify.
+
+## 3. Surgical Changes
+
+**Touch only what you must. Clean up only your own mess.**
+
+When editing existing code:
+- Don't "improve" adjacent code, comments, or formatting.
+- Don't refactor things that aren't broken.
+- Match existing style, even if you'd do it differently.
+- If you notice unrelated dead code, mention it — don't delete it.
+
+When your changes create orphans:
+- Remove imports/variables/functions that YOUR changes made unused.
+- Don't remove pre-existing dead code unless asked.
+
+The test: every changed line should trace directly to the user's request.
+
+## 4. Goal-Driven Execution
+
+**Define success criteria. Loop until verified.**
+
+Transform tasks into verifiable goals:
+- "Add validation" → "Write tests for invalid inputs, then make them pass"
+- "Fix the bug" → "Write a test that reproduces it, then make it pass"
+- "Refactor X" → "Ensure tests pass before and after"
+
+For multi-step tasks, state a brief plan:
+
+```
+1. [Step] → verify: [check]
+2. [Step] → verify: [check]
+3. [Step] → verify: [check]
+```
+
+Strong success criteria let you loop independently. Weak criteria ("make it work") require constant clarification.
+
+---
+
+## How this composes with other MIS skills
+
+These four rules are stack-agnostic. The other MIS skills give them teeth in specific contexts:
+
+| Karpathy rule           | Pairs with                                                                                                  |
+|-------------------------|-------------------------------------------------------------------------------------------------------------|
+| **1. Think before coding** | `mis-documentation` — non-trivial design questions get an RFC before the PR, not after.                  |
+| **2. Simplicity first**    | `mis-github-contribution` — PRs under ~400 LOC, single-purpose. If the diff is bigger, the design is too.|
+| **3. Surgical changes**    | `mis-github-contribution` — one commit per task; don't bundle "drive-by improvements" into a feature PR. |
+| **4. Goal-driven execution** | `mis-langgraph` — Deep Agents' `write_todos` is the same idea: externalize the plan, verify each step. |
+
+These guidelines apply to **AI agents and humans equally**. When reviewing a PR by either, the questions are the same:
+
+- Did the author state their assumptions, or quietly pick one?
+- Could the change be smaller?
+- Does every changed line trace to the stated task?
+- Is the success criterion something we can verify, or just vibes?

@@ -1,0 +1,419 @@
+﻿{
+    "archived_on":  "2026-10-29",
+    "original_root":  "skills",
+    "entrypoints_disabled":  8,
+    "files":  [
+                  {
+                      "path":  "client-crud-state/SKILL.md",
+                      "sha256":  "27a75d2d69c15053386738d603077364209532e1eaaa2a70e0b01b01e95b738b"
+                  },
+                  {
+                      "path":  "mis-documentation/SKILL.md",
+                      "sha256":  "fc09023bd42fcb6e2d930c141bfb6cb8be1b068e30445736a263ee0eca0ba410"
+                  },
+                  {
+                      "path":  "mis-documentation/assets/template-adr.md",
+                      "sha256":  "d14af606c0d95b04e017088337d6f9f68905959aa5292755020f11d5bdc7a14d"
+                  },
+                  {
+                      "path":  "mis-documentation/assets/template-c4-container.md",
+                      "sha256":  "3fc76f22a466a89490e7ccb129964ef2b0ece9bad5002bc943c0054c67b44774"
+                  },
+                  {
+                      "path":  "mis-documentation/assets/template-c4-context.md",
+                      "sha256":  "7f3c7be70180554a2d2b67287d1f0406591c10fd46934533592b3a46d9c0b382"
+                  },
+                  {
+                      "path":  "mis-documentation/assets/template-changelog.md",
+                      "sha256":  "2e66f80376f247b8f11a822ecf90bc75b6c69c95002ddfc257cb51b3f9b2f31b"
+                  },
+                  {
+                      "path":  "mis-documentation/assets/template-docs-readme.md",
+                      "sha256":  "269a847da3d571fa999a63cbb5a27cfcef26f84748f65d9bc8ef69c8fa8b173d"
+                  },
+                  {
+                      "path":  "mis-documentation/assets/template-onboarding.md",
+                      "sha256":  "4c4ceb782c9943d4cd665ff491fd621df76018fc6a2241ad14c7491633afc53b"
+                  },
+                  {
+                      "path":  "mis-documentation/assets/template-plan.md",
+                      "sha256":  "2fec78495ac37ddce75adce2de3d1cca8418f90aaab4cc74be1dc6da6a5bfa20"
+                  },
+                  {
+                      "path":  "mis-documentation/assets/template-postmortem.md",
+                      "sha256":  "adde929bd9e9fbf0f9f329715f6c2d201753a83d09778b2992e29f3eb88a3fba"
+                  },
+                  {
+                      "path":  "mis-documentation/assets/template-readme.md",
+                      "sha256":  "f247e7f9a33235f311a1a5bdb723a06b822e591f285f7262377af79d02d8229a"
+                  },
+                  {
+                      "path":  "mis-documentation/assets/template-rfc.md",
+                      "sha256":  "17db073d58340e3a13978f1fa5ec2b36e081ac1da7cf5e1913123042e4974d84"
+                  },
+                  {
+                      "path":  "mis-documentation/assets/template-runbook.md",
+                      "sha256":  "cad336781a30652d6d9122700adf4c327db2e03dd65cc40f3d25566257139b63"
+                  },
+                  {
+                      "path":  "mis-documentation/references/ADRS.md",
+                      "sha256":  "3c469611bb7510d46dbee542f818fb8b7b00d56a7e1c9aabd307b6710f798809"
+                  },
+                  {
+                      "path":  "mis-documentation/references/C4_ARCHITECTURE.md",
+                      "sha256":  "7c2206480e77016fe8961d7e9b8e011635d47b84925cdafa93e27e44b9c4faf2"
+                  },
+                  {
+                      "path":  "mis-documentation/references/DIATAXIS.md",
+                      "sha256":  "84708c09f6a3adade3876cc8b13b9c2ec708b7d347b9249202e34918f302addb"
+                  },
+                  {
+                      "path":  "mis-documentation/references/POSTMORTEMS.md",
+                      "sha256":  "64617001bc259d94299852a3bade2e0eaca9dfb701a6839ee992c0fe82591244"
+                  },
+                  {
+                      "path":  "mis-documentation/references/REPO_LAYOUT.md",
+                      "sha256":  "4b07b961b5f714f0d3b58c234950c602e24d70d30330fe23b3b2a83e4e8c4184"
+                  },
+                  {
+                      "path":  "mis-documentation/references/RFCS.md",
+                      "sha256":  "2429eb8737fc356c0aeb5e261dd88464cefba5a1f8c4dc09bf88d83c0c2fc696"
+                  },
+                  {
+                      "path":  "mis-documentation/references/RUNBOOKS.md",
+                      "sha256":  "150bee6333afdb672d105f17a1b65f3bd5a67a9834f33dbc45854657af672f3a"
+                  },
+                  {
+                      "path":  "mis-frontend-design/SKILL.md",
+                      "sha256":  "73e5e184728bb3b8233277a1e4882710963b766e8e512f5cefc0877074b3b74e"
+                  },
+                  {
+                      "path":  "mis-frontend-design/assets/component-checklist.md",
+                      "sha256":  "677886fd886c113c828b8c350f142819b8546a3172e0d61db0da8f0d9fd1c3e0"
+                  },
+                  {
+                      "path":  "mis-frontend-design/assets/feature-design-brief.md",
+                      "sha256":  "543b01dc0c2162f6cdb33dc0eb6d3afc29ce369717f62ad6b35715a0cd9c4da2"
+                  },
+                  {
+                      "path":  "mis-frontend-design/assets/tailwind.config.ts",
+                      "sha256":  "8bb739d21d9725a419f19e27940af1c973de2d3a3378629ff46769278cba400a"
+                  },
+                  {
+                      "path":  "mis-frontend-design/assets/tokens.css",
+                      "sha256":  "9d350a7d059f4a4c6943a95fef2c5a902b56c3b4385b747001738c2399a2cffb"
+                  },
+                  {
+                      "path":  "mis-frontend-design/references/ACCESSIBILITY_AND_KEYBOARD.md",
+                      "sha256":  "44cef49030273e7210cd31c72dc77cb2951a48ccf1b8d228455f3ece785dcc00"
+                  },
+                  {
+                      "path":  "mis-frontend-design/references/APP_PATTERNS.md",
+                      "sha256":  "efb49c0330b782f79f0b052f8f37b4d3be61d2ec5dc5fa901b560490d8165192"
+                  },
+                  {
+                      "path":  "mis-frontend-design/references/AVOID.md",
+                      "sha256":  "610d1362c7ee9aef61af54d9a6d54763d08391c05703d668be85e2f60b477f77"
+                  },
+                  {
+                      "path":  "mis-frontend-design/references/DESIGN_LANGUAGE.md",
+                      "sha256":  "bd3940960d111c1435a1e1d34f350aba6847668d96da6c5a1da9f00928a22456"
+                  },
+                  {
+                      "path":  "mis-frontend-design/references/INSPIRATION.md",
+                      "sha256":  "92f456be55e7949ed28b53d66f736292371a901bbe377f21aa54a0adddf0c6eb"
+                  },
+                  {
+                      "path":  "mis-frontend-design/references/STATES_AND_FEEDBACK.md",
+                      "sha256":  "59dfaf4ad25767b68207284c93491f2f3c002f9adbea226f1d8e8c745656f85c"
+                  },
+                  {
+                      "path":  "mis-github-contribution/SKILL.md",
+                      "sha256":  "177a3b29a3b0ae211996b561246f655c3e1d803ca2495f535af12ff8db1cca37"
+                  },
+                  {
+                      "path":  "mis-github-contribution/assets/branch-protection.md",
+                      "sha256":  "a882a03b5873854559fc0e898eb320b4f99bbabd16777d4392bb70ef495d4b93"
+                  },
+                  {
+                      "path":  "mis-github-contribution/assets/CODEOWNERS",
+                      "sha256":  "a1fc223c442f4c5c7d1d908991c14986c4b2d16cc30779817b1ff10f90f7fdec"
+                  },
+                  {
+                      "path":  "mis-github-contribution/assets/commit-template.txt",
+                      "sha256":  "f461e3997eefb8e89d6254a859d06a3d33431bc0395c197da01ac18ec46c12c1"
+                  },
+                  {
+                      "path":  "mis-github-contribution/assets/pre-commit-config.yaml",
+                      "sha256":  "f25ef14df5384143b66ca1acf29405546812c9c5c81945ef5143048460cfd71e"
+                  },
+                  {
+                      "path":  "mis-github-contribution/assets/pull_request_template.md",
+                      "sha256":  "3a1ef9707739151670f672c94061045b9696250c3a11635d84a1d7224ee6dc48"
+                  },
+                  {
+                      "path":  "mis-github-contribution/references/BRANCHING.md",
+                      "sha256":  "60b4ca2add64ef00ae6d700a55d25a068e8cd198a558353e71f530bebdd21288"
+                  },
+                  {
+                      "path":  "mis-github-contribution/references/COMMITS.md",
+                      "sha256":  "9d44bb10e5835bcd41c83ed501e442a1e3dbc10008a8015331972ad07af24139"
+                  },
+                  {
+                      "path":  "mis-github-contribution/references/PRE_COMMIT.md",
+                      "sha256":  "a958c64a46b440d9c81bb4287421a5fb1b8638130d3046a07dbefdeb472c97d3"
+                  },
+                  {
+                      "path":  "mis-github-contribution/references/PR_REVIEW.md",
+                      "sha256":  "f270cde15c8b0ec65b3b951eebd37cebb240623d94fbd50deedb2edc2cda967a"
+                  },
+                  {
+                      "path":  "mis-guidelines/SKILL.md",
+                      "sha256":  "a3efa4b35e9c68957f2f5e0b9f55fe9fa2d6f0573348f0ff9e18321b88deb0be"
+                  },
+                  {
+                      "path":  "mis-langgraph/SKILL.md",
+                      "sha256":  "30947f47ace831bbd0053cbb81d6d6bb1a452affdbf80bb02b2fd7483962f175"
+                  },
+                  {
+                      "path":  "mis-langgraph/assets/template-deep-agent.py",
+                      "sha256":  "d0042f328bade5f1921919d2c2d5648787ef75b5a2f08232d413ee022b91453b"
+                  },
+                  {
+                      "path":  "mis-langgraph/assets/template-graph-builder.py",
+                      "sha256":  "a89a05dd7dce33867e0cbac82d82052f1733e644440a3c4c29249c4e057d9ac8"
+                  },
+                  {
+                      "path":  "mis-langgraph/assets/template-langgraph-json.json",
+                      "sha256":  "e2922410fc771bc3d575a1c80cf09d93fa726117fa881aa8c5ae115a95842d6b"
+                  },
+                  {
+                      "path":  "mis-langgraph/assets/template-node.py",
+                      "sha256":  "bad2fea472c1fd751b5e898d4cd4020e96315705598e5b025cc1423a6a4bf0ef"
+                  },
+                  {
+                      "path":  "mis-langgraph/assets/template-state-schema.py",
+                      "sha256":  "cdf0baf0ef4e53c49c8ae6c78a089be9b2f340c7fee8ce6493b9e57f679e8297"
+                  },
+                  {
+                      "path":  "mis-langgraph/assets/template-tool.py",
+                      "sha256":  "694ab8578bb98c2387d884b5f925b6e027cae3207a0050cfd674e2b3e78e28ef"
+                  },
+                  {
+                      "path":  "mis-langgraph/references/DEEP_AGENTS_HARNESS.md",
+                      "sha256":  "2a44c303c7be76bb3f0eacbbd8d2a14209f6cb030ebd54027169e763fc60947a"
+                  },
+                  {
+                      "path":  "mis-langgraph/references/FOLDER_STRUCTURE.md",
+                      "sha256":  "9e450d13a3bdfeebe539e41fc8079e05953ad295b30563673489cdadbbb20655"
+                  },
+                  {
+                      "path":  "mis-langgraph/references/GRAPH_ARCHITECTURE.md",
+                      "sha256":  "2abb5e796f5f9a4ec1b0c2717dbad734f5baa88d6446c88605475e1398c2ce17"
+                  },
+                  {
+                      "path":  "mis-langgraph/references/TESTING.md",
+                      "sha256":  "a5aa468cac689ea42f1c0e5c0587e252dcb9b4ffea070232d644f16f33bb7542"
+                  },
+                  {
+                      "path":  "mis-langgraph/references/TOOLS_AND_SERVICES.md",
+                      "sha256":  "0484e94cb3d8248e4f418a9fc39033548cca48e728fa0889b7b04e47067e674b"
+                  },
+                  {
+                      "path":  "mis-nextjs-api-guards/SKILL.md",
+                      "sha256":  "3a828af92df174e215077a3d8bbc13387258c237505def9c942af502ec2d98aa"
+                  },
+                  {
+                      "path":  "mis-nextjs-api-guards/assets/env.example",
+                      "sha256":  "492ca9b0506bbf6614205049f4261c23d684bf22f116128627a4a7fea8a5aa59"
+                  },
+                  {
+                      "path":  "mis-nextjs-api-guards/assets/guards-types.test-d.ts",
+                      "sha256":  "36baf307a5b0867ff48cfa868d181582378588bb1ef7fb6f60d3f1803740b7aa"
+                  },
+                  {
+                      "path":  "mis-nextjs-api-guards/assets/template-bootstrap.ts",
+                      "sha256":  "d88eaf0286808f0258cbf88fd7110b56e74db41e1d85c54071cec45cb853ae23"
+                  },
+                  {
+                      "path":  "mis-nextjs-api-guards/assets/template-route-handler.test.ts",
+                      "sha256":  "5526f77b6936f838f61d5f6a9b206f799983da410416d2d35196640bb56e2ce7"
+                  },
+                  {
+                      "path":  "mis-nextjs-api-guards/assets/template-route-handler.ts",
+                      "sha256":  "830a19f74f68002dcd8dcfa70257f6d4dc4702e6099ebe148639d89cb4ef218b"
+                  },
+                  {
+                      "path":  "mis-nextjs-api-guards/assets/shared/api/config.ts",
+                      "sha256":  "346e5584f66fd7de8c2fd3d3f54df595dcafeac7ed8914bee0752226be7946de"
+                  },
+                  {
+                      "path":  "mis-nextjs-api-guards/assets/shared/api/errors.ts",
+                      "sha256":  "75be2b7e904e540c0dfeec4dea483381adb0eeb799e1d1ddf0d705a58fd3ac12"
+                  },
+                  {
+                      "path":  "mis-nextjs-api-guards/assets/shared/api/respond.ts",
+                      "sha256":  "6289d97b2704279d40c6f9a1eaa2dc1513e72431d8a23cc644f6980dcc5adf6c"
+                  },
+                  {
+                      "path":  "mis-nextjs-api-guards/assets/shared/api/run-route.ts",
+                      "sha256":  "65188946e5e51703ef1dd38d9985b319e3008077aa4c47b66314e33f3eea691d"
+                  },
+                  {
+                      "path":  "mis-nextjs-api-guards/assets/shared/api/types.ts",
+                      "sha256":  "33e24585501f0b8b723b9f28b702e138c1e3a8293cae3d75f8b2329ec70ff970"
+                  },
+                  {
+                      "path":  "mis-nextjs-api-guards/assets/shared/api/adapters/console-logger.ts",
+                      "sha256":  "fdea97c6156748dfb2754b59c37f6bb215842b666fde3ebc8bd80aa8e5f5c580"
+                  },
+                  {
+                      "path":  "mis-nextjs-api-guards/assets/shared/api/adapters/in-memory-rate-limit.ts",
+                      "sha256":  "b6ab0d4ff3e56eb95e2bcc1268d620e1ed6fbf55c6cccf96f65fec0719b661c1"
+                  },
+                  {
+                      "path":  "mis-nextjs-api-guards/assets/shared/api/adapters/supabase-auth.ts",
+                      "sha256":  "9e75a6c0a50c898511097c2cd9e8e4c4204c88aa2e51b504e290e9796fb4c91a"
+                  },
+                  {
+                      "path":  "mis-nextjs-api-guards/assets/shared/api/adapters/types.ts",
+                      "sha256":  "d554b6b4a49106acdd6c5581d35b87c67722f4493b6f5b6d6b46687dc88b7cc9"
+                  },
+                  {
+                      "path":  "mis-nextjs-api-guards/assets/shared/api/adapters/upstash-idempotency.ts",
+                      "sha256":  "0dac9181820f13f9a39bf14b88038a8766a0775fadc4124661c61f6a3dfadb4c"
+                  },
+                  {
+                      "path":  "mis-nextjs-api-guards/assets/shared/api/adapters/upstash-rate-limit.ts",
+                      "sha256":  "146e144474a6bc9e0c8df0b0e0f67c925d014304051461ef584668137f0c0f7d"
+                  },
+                  {
+                      "path":  "mis-nextjs-api-guards/assets/shared/api/guards/audit.ts",
+                      "sha256":  "7dea84d0d7713e698b05be1d8404f10c25cdc0fcb7b8c21f8f009054c3d553fc"
+                  },
+                  {
+                      "path":  "mis-nextjs-api-guards/assets/shared/api/guards/auth.ts",
+                      "sha256":  "f1aac3040d9cd33e30da6085e631db1f0a547b393dee35e119c683b0dc3866fe"
+                  },
+                  {
+                      "path":  "mis-nextjs-api-guards/assets/shared/api/guards/authorize.ts",
+                      "sha256":  "7787ba4022745569cf9c7addec80c58b09039a12a9160290e34a079601bd7f8b"
+                  },
+                  {
+                      "path":  "mis-nextjs-api-guards/assets/shared/api/guards/cors.ts",
+                      "sha256":  "885e3fe016936e7809e915b6a52bf26eea21ba292705513985e097e816693253"
+                  },
+                  {
+                      "path":  "mis-nextjs-api-guards/assets/shared/api/guards/gate.ts",
+                      "sha256":  "15c0a680967b995cd7716ed81ef37abcdeb1266bf3985e364168b7af1e6f8827"
+                  },
+                  {
+                      "path":  "mis-nextjs-api-guards/assets/shared/api/guards/http.ts",
+                      "sha256":  "9e449421a053c140b14ee219a24362839892703d224e559c1cd1c5b24cf96308"
+                  },
+                  {
+                      "path":  "mis-nextjs-api-guards/assets/shared/api/guards/idempotency.ts",
+                      "sha256":  "3576109c5760bd949eb11187166db01e32ce07cb1906d17efe3bbdf26bc3f034"
+                  },
+                  {
+                      "path":  "mis-nextjs-api-guards/assets/shared/api/guards/rate-limit.ts",
+                      "sha256":  "b6b96acabad197de391e20b9918093b4ab3c0e5de62427b66c97344265c24b80"
+                  },
+                  {
+                      "path":  "mis-nextjs-api-guards/assets/shared/api/guards/timeout.ts",
+                      "sha256":  "14444beb54bb5dd5a4bd9b258919dd49958860c84762ba2f7c0ea49faf915643"
+                  },
+                  {
+                      "path":  "mis-nextjs-api-guards/assets/shared/api/guards/validate.ts",
+                      "sha256":  "40e9dd341bc5a7ec14236de9fc6d2998f9ea2046b262f581f692dd47c9503b02"
+                  },
+                  {
+                      "path":  "mis-nextjs-api-guards/references/ADAPTERS.md",
+                      "sha256":  "b1a62d7425b6d524ef2dc343f2f4d7c4c7f7243bf571ecc688b59326650e5e51"
+                  },
+                  {
+                      "path":  "mis-nextjs-api-guards/references/CONVENTION_COMPARISON.md",
+                      "sha256":  "7e0c5a043e93137c98c8d4998f9073f1adfa103332d19493f6c74a35680109f4"
+                  },
+                  {
+                      "path":  "mis-nextjs-api-guards/references/ERROR_ENVELOPE.md",
+                      "sha256":  "dceadb7415709e400aa10344cfe585d847323b2f4b1bbab62e0e5d469815b0d9"
+                  },
+                  {
+                      "path":  "mis-nextjs-api-guards/references/GUARD_CATALOG.md",
+                      "sha256":  "3dc3aa168fda62b5a8b0ad3fe731c28fcc47266df3d338db0f6eaccdbc9ae2f2"
+                  },
+                  {
+                      "path":  "mis-nextjs-api-guards/references/GUARD_PIPELINE.md",
+                      "sha256":  "4018fb9aee8fd0713271153f61368555d41bab6b1166bb007026eacad636aaeb"
+                  },
+                  {
+                      "path":  "mis-nextjs-api-guards/references/MIGRATION_FROM_HOF.md",
+                      "sha256":  "fa3888c264d3760a3de9b6e829952f488f5c8ef637ea6362cd08689903973e28"
+                  },
+                  {
+                      "path":  "mis-nextjs-api-guards/references/SECURITY_NOTES.md",
+                      "sha256":  "a979fb61617bcb74a52520ce6952ab5e1907f590c82b951a2921d00da1841880"
+                  },
+                  {
+                      "path":  "mis-nextjs-fsd/SKILL.md",
+                      "sha256":  "96db515b3eed01c24f4d0609509b2eadb3b3736f16aafb069df7cbe6fedbfac4"
+                  },
+                  {
+                      "path":  "mis-nextjs-fsd/assets/directory-tree.md",
+                      "sha256":  "fdea485936e90af4cfd529f8d20593d3fa1bf76d6f5f0d5b4ab647439c25505e"
+                  },
+                  {
+                      "path":  "mis-nextjs-fsd/assets/eslint.config.mjs",
+                      "sha256":  "e581630e6ecce4179c49393f4aca2487cad7c8a859ef4bc1087a76c1b1eaafbd"
+                  },
+                  {
+                      "path":  "mis-nextjs-fsd/assets/steiger.config.ts",
+                      "sha256":  "1acee80a688b85e73b564c316e3b3ef445f292b14afd86c3735adb995b2d7744"
+                  },
+                  {
+                      "path":  "mis-nextjs-fsd/assets/template-component.tsx",
+                      "sha256":  "a8a9dc37ae90c7ce17bf9dd444a99d4688f9d15d3c8856cb2ffc36f89a93988b"
+                  },
+                  {
+                      "path":  "mis-nextjs-fsd/assets/template-hook.ts",
+                      "sha256":  "cd5fadc93b348eeba37527b9d91d0b48ff3204080f4b09266305b977803fe169"
+                  },
+                  {
+                      "path":  "mis-nextjs-fsd/assets/template-route-handler.ts",
+                      "sha256":  "47b2d4633bc1db5cfad9a5e7a57412b292b342d123e09864b938e0c960d49c77"
+                  },
+                  {
+                      "path":  "mis-nextjs-fsd/assets/template-slice-index.ts",
+                      "sha256":  "6c59abce54fabdd93e854b605c12d3592a3529e69cda5b3efd8f529f86a0ffd0"
+                  },
+                  {
+                      "path":  "mis-nextjs-fsd/assets/template-view.tsx",
+                      "sha256":  "5ac71747e7b90d406e26341af70cdcc0c9fdc1cb307655218171ac1e2ab7419e"
+                  },
+                  {
+                      "path":  "mis-nextjs-fsd/assets/tsconfig.json",
+                      "sha256":  "6d1740f7d23bfec6300f4ef88500a3f249edea72740b247d5a9c688d4a7da396"
+                  },
+                  {
+                      "path":  "mis-nextjs-fsd/references/DOCSTRINGS.md",
+                      "sha256":  "d3390731854ae33652e860e519f7de5b845244aa387d835aabd964be5bdbde61"
+                  },
+                  {
+                      "path":  "mis-nextjs-fsd/references/FSD_LAYERS.md",
+                      "sha256":  "c10ebe376338e0058d982b8d40c59de0636a3c6675d5e64a5ea1d3392264eac9"
+                  },
+                  {
+                      "path":  "mis-nextjs-fsd/references/HOOKS_NAMED_FNS.md",
+                      "sha256":  "139d96a24697f97ce4f758e00ba0ee1c9cd2c709c9d7c045a344951932861f90"
+                  },
+                  {
+                      "path":  "mis-nextjs-fsd/references/NEXT_APP_ROUTER.md",
+                      "sha256":  "e443a76d9f312540ad9325cf2489c3ae192e4909eedd5d5d4e9183742d15c37b"
+                  },
+                  {
+                      "path":  "mis-nextjs-fsd/references/TYPESCRIPT.md",
+                      "sha256":  "0c0d59d83f7224fb6b3677aac59a12367231300e5022524af17550883af5315d"
+                  }
+              ]
+}

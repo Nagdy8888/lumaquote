@@ -1,0 +1,404 @@
+---
+name: mis-langgraph
+description: MIS standard for building LangGraph (Python) AI agents. Covers project layout (shared services + per-agent packages with nodes / prompts / schemas / tools), graph architecture (state, nodes, edges, routing, checkpointers), the Deep Agents harness (write_todos, task / subagents, virtual filesystem, permissions, interrupts, memory, skills), tool & service organisation, human-in-the-loop patterns, and the testing layout (unit / integration / notebook). Use whenever creating, extending, or reviewing a LangGraph agent in an MIS repo.
+license: Proprietary — MIS (Modern Intelligence Solutions) internal use
+compatibility: Requires Python 3.11+, langgraph >= 0.2, langchain-core, and (for the Deep Agents sections) the `deepagents` package.
+metadata:
+  team: MIS
+  version: "1.0"
+  stack: python, langgraph, langchain, deepagents
+---
+
+# MIS LangGraph application standard
+
+The contract for every MIS LangGraph repo:
+
+1. **Project layout is two-tier.** Shared `services/` (API clients, integrations) sit alongside per-agent packages. Each agent is a self-contained Python package with consistent subfolders: `nodes/`, `prompts/`, `schemas/`, `tools/`, optional `eval/`.
+2. **One graph per agent.** A single compiled `StateGraph` is the unit of deployment. `langgraph.json` registers each one.
+3. **Nodes are pure functions** `(state, …) -> dict`. All I/O is funnelled through `tools/` or `services/`. Routing is in dedicated routing functions, not buried in node logic.
+4. **State is typed and minimal.** A `TypedDict` (or Pydantic model) with explicit reducers. No "kitchen-sink" state.
+5. **Deep agents use the harness primitives.** Multi-step / long-running agents adopt the Deep Agents harness — `write_todos` for planning, `task` for subagents, the virtual filesystem for shared scratch, declarative permissions, `interrupt_on` for HITL gates, persistent memory in `AGENTS.md`, and skills for progressive expertise loading.
+6. **Tools have an approval boundary.** Side-effecting tools (send email, write to a calendar, post to Slack) are wrapped with `add_approval` outside of dev mode.
+7. **Every module has a top-level docstring; every public function / node / tool has its own.**
+
+When in doubt on any of these, open the matching reference:
+
+| Topic                                           | Reference                            |
+|-------------------------------------------------|--------------------------------------|
+| Project / folder layout (shared services + agents) | `references/FOLDER_STRUCTURE.md`     |
+| State, nodes, edges, routing, checkpointers     | `references/GRAPH_ARCHITECTURE.md`   |
+| Deep Agents harness — when & how to use it      | `references/DEEP_AGENTS_HARNESS.md`  |
+| Tools, services, approval, registration         | `references/TOOLS_AND_SERVICES.md`   |
+| Unit / integration / notebook testing layout    | `references/TESTING.md`              |
+
+Drop-in starter templates live in `assets/`.
+
+---
+
+## Decision tree
+
+| If the user asked to… | Go to |
+|-----------------------|-------|
+| Bootstrap a new LangGraph repo | [1. Bootstrap](#1-bootstrap-a-new-repo) |
+| Add a new agent (graph) | [2. Add an agent](#2-add-an-agent) |
+| Add a new shared service | [3. Add a shared service](#3-add-a-shared-service) |
+| Design state for a graph | [4. State design](#4-state-design) |
+| Add a node, edge, or routing function | [5. Nodes, edges, routing](#5-nodes-edges-routing) |
+| Add or wrap a tool | [6. Tools](#6-tools) |
+| Decide between vanilla ReAct and a Deep Agent | [7. Deep agents — when & how](#7-deep-agents--when--how) |
+| Add HITL / interrupts / approval | [8. Human-in-the-loop](#8-human-in-the-loop) |
+| Write tests for a graph / node / tool | [9. Testing](#9-testing) |
+| Review a PR | [10. Review checklist](#10-review-checklist) |
+
+---
+
+## 1. Bootstrap a new repo
+
+```bash
+mkdir <repo> && cd <repo>
+uv init && uv venv && source .venv/bin/activate
+uv add langgraph langchain-core langchain-anthropic pydantic python-dotenv
+uv add --dev pytest pytest-asyncio ruff mypy jupyter
+# Deep Agents (only if the repo will host deep agents)
+uv add deepagents
+```
+
+Scaffold the canonical tree (full reference: `references/FOLDER_STRUCTURE.md`):
+
+```
+apps/agents/
+├── langgraph.json
+├── pyproject.toml
+├── src/
+│   ├── services/                  # shared integrations
+│   │   └── <service>/{client,settings,tools}.py
+│   └── <agent_name>/
+│       ├── <agent_name>.py        # compiled graph entry point
+│       ├── graph_builder.py
+│       ├── configuration.py
+│       ├── settings.py
+│       ├── nodes/
+│       ├── prompts/
+│       ├── schemas/
+│       ├── tools/
+│       └── eval/
+└── tests/
+    ├── unit/
+    ├── integration/
+    └── notebooks/
+```
+
+Drop in templates from `assets/`:
+
+| Source                              | Destination                                |
+|-------------------------------------|--------------------------------------------|
+| `assets/template-langgraph-json.json` | `langgraph.json`                          |
+| `assets/template-graph-builder.py`  | `src/<agent>/graph_builder.py`            |
+| `assets/template-state-schema.py`   | `src/<agent>/schemas/states.py`            |
+| `assets/template-node.py`           | `src/<agent>/nodes/<node>.py`              |
+| `assets/template-tool.py`           | `src/<agent>/tools/<tool>.py`              |
+| `assets/template-deep-agent.py`     | `src/<agent>/<agent>.py` (deep agent flavor) |
+
+---
+
+## 2. Add an agent
+
+1. Create the package: `src/<agent_name>/` with the full subfolder set (or copy the templates listed above).
+2. Build the graph in `graph_builder.py` — see [section 5](#5-nodes-edges-routing).
+3. Export the compiled graph from `<agent_name>.py`:
+   ```python
+   """Entry point for the <agent_name> graph. Imported by langgraph.json."""
+   from <agent_name>.graph_builder import build_graph
+   graph = build_graph()
+   ```
+4. Register in `langgraph.json`:
+   ```json
+   {
+     "graphs": {
+       "<agent_name>": "./src/<agent_name>/<agent_name>.py:graph"
+     }
+   }
+   ```
+5. Add unit + integration tests in `tests/` (see `references/TESTING.md`).
+6. Document setup quirks in `docs/<AGENT>_SETUP.md` if any.
+
+Naming:
+
+- **Package & graph name:** `snake_case` noun describing the agent's role (`email_assistant`, `meeting_scheduler`, `research_agent`).
+- **Node functions:** `snake_case` verb (`triage_email`, `draft_reply`, `route_after_tools`).
+- **Tools:** `snake_case` verb (`send_email`, `read_inbox`, `add_event`).
+- **Schemas / state classes:** `PascalCase` (`AgentState`, `TriageDecision`).
+
+---
+
+## 3. Add a shared service
+
+A **service** is reusable integration code (API client, auth, parsing). It does **not** know about LangGraph — no `@tool` decorators, no node functions. That layer is added in the agent's `tools/`.
+
+```
+src/services/<service>/
+├── __init__.py
+├── client.py        # API wrapper (auth + fetch + send)
+├── settings.py      # env vars, base URLs, scopes
+├── prompts.py       # optional — only if the service ships canonical prompts
+├── tools.py         # @tool-decorated wrappers ONLY if every agent uses them the same way
+└── scripts/         # one-off CLI scripts (OAuth setup, manual ingest, …)
+```
+
+Rules:
+
+- **Services don't import from agents.** Strict one-way dependency.
+- If two agents need the same API call **but with different wrapping**, the call lives in `services/` and the wrapping lives in each agent's `tools/`.
+- If you find a service growing agent-specific logic, extract that logic into an agent's `tools/`.
+
+---
+
+## 4. State design
+
+State is the contract between nodes. Get it right and the rest of the graph reads naturally.
+
+Use `TypedDict` (with `Annotated[..., reducer]` for accumulators) for ergonomic state, or Pydantic when you need validation. Keep state **minimal** — what each node needs to read or update, and nothing more.
+
+```python
+"""State and routing types for the email_assistant graph."""
+from typing import Annotated, Literal, TypedDict
+from langchain_core.messages import AnyMessage
+from langgraph.graph.message import add_messages
+
+class AgentState(TypedDict):
+    """Working state for the email assistant graph."""
+    messages: Annotated[list[AnyMessage], add_messages]
+    triage_decision: Literal["respond", "ignore", "notify"] | None
+    inbound_email_id: str
+    draft: str | None
+```
+
+Rules:
+
+- **Use reducers** (`add_messages`, `operator.add`, custom) for accumulating fields. Replacement is the default; reducers are explicit.
+- **No raw API responses in state.** Parse them in the node and put the parsed shape in state.
+- **Don't stash secrets in state.** They go in `configuration` (LangGraph's configurable) or env vars.
+- **Don't conflate transient with persistent.** Big intermediate artefacts go in the virtual filesystem (deep agents) or external storage, not in state. State is what the checkpointer persists at every step.
+
+Full discussion + reducer cookbook — `references/GRAPH_ARCHITECTURE.md`.
+
+---
+
+## 5. Nodes, edges, routing
+
+Nodes are pure functions of state.
+
+```python
+"""Triage node: classifies the inbound email as respond / ignore / notify."""
+from <agent>.schemas.states import AgentState
+from <agent>.prompts.triage import TRIAGE_PROMPT
+from <agent>.utils import call_structured_llm
+
+async def triage_email(state: AgentState) -> dict:
+    """Decide whether to respond, ignore, or notify on the inbound email."""
+    decision = await call_structured_llm(TRIAGE_PROMPT, state["messages"][-1])
+    return {"triage_decision": decision.kind}
+```
+
+Rules:
+
+- **One concern per node.** If a node both fetches data and decides what to do with it, split it.
+- **All I/O goes through `services/` or tool nodes.** Plain reasoning nodes call the LLM; they don't `requests.get(...)` directly.
+- **Return only the keys you change.** LangGraph merges the dict into state; don't echo unchanged fields.
+
+Routing functions are **separate** from compute nodes — name them `route_after_<phase>` and put them in `nodes/routing.py`:
+
+```python
+def route_after_triage(state: AgentState) -> Literal["draft", "notify", "__end__"]:
+    """Pick the next branch from the triage decision."""
+    match state["triage_decision"]:
+        case "respond": return "draft"
+        case "notify":  return "notify"
+        case "ignore":  return "__end__"
+```
+
+Wiring lives in `graph_builder.py` — see `assets/template-graph-builder.py`. Edges should read like a sentence; if you can't say what the graph does in one paragraph, simplify.
+
+---
+
+## 6. Tools
+
+Three kinds of tool surface, in order of preference:
+
+1. **Pure tools** — no side effects, deterministic (search a vector store, parse a file). No approval needed.
+2. **Read-side tools** — fetch data via a service (read inbox, list calendar events). No approval needed.
+3. **Side-effecting tools** — change something in the world (send email, write to calendar, post to Slack). **Always** wrapped in `add_approval` outside dev mode.
+
+Pattern (full template in `assets/template-tool.py`):
+
+```python
+"""Send an email via the Gmail service. Wrapped with approval in non-dev mode."""
+from langchain_core.tools import tool
+from services.gmail.client import GmailClient
+
+@tool
+def send_email(to: str, subject: str, body: str) -> str:
+    """Send an email. Returns the sent message id.
+
+    Args:
+        to: recipient email address
+        subject: subject line
+        body: plain-text body
+    """
+    return GmailClient().send(to=to, subject=subject, body=body)
+```
+
+Assembly + approval wrapping in `tools/base.py`:
+
+```python
+NEEDS_APPROVAL = {"send_email", "delete_event", "post_to_slack"}
+
+def get_tools(dev_mode: bool = False) -> tuple[list, dict]:
+    """Assemble agent tools; wrap side-effecting ones with approval outside dev mode."""
+    tools = [send_email, read_inbox, search_messages]
+    if not dev_mode:
+        tools = [add_approval(t) if t.name in NEEDS_APPROVAL else t for t in tools]
+    return tools, {t.name: t for t in tools}
+```
+
+Full discussion (services vs tools, registration, retries, error mapping) — `references/TOOLS_AND_SERVICES.md`.
+
+---
+
+## 7. Deep agents — when & how
+
+Adopt the **[Deep Agents harness](https://docs.langchain.com/oss/python/deepagents/harness)** (the `deepagents` package) when **two or more** of these are true:
+
+- The agent runs for many turns / hours and accumulates significant context.
+- The work decomposes into independent subtasks that benefit from isolated context.
+- You need a virtual filesystem for shared scratch, drafts, or artefact handoff between turns.
+- You want declarative permissions on what the agent may read / write.
+- You need explicit, inspectable planning (a todo list humans can review).
+- The work spans multiple sessions and the agent benefits from persistent memory.
+
+If only one is true, a vanilla ReAct loop over a small `StateGraph` is usually simpler.
+
+### Harness primitives — when each fires
+
+| Primitive | Use when |
+|-----------|----------|
+| `write_todos` | Multi-step task; you want the plan to be inspectable & resumable. |
+| `task` (subagent) | Subtask is large enough that its intermediate reasoning would crowd the main context, or it parallelises with peers. |
+| Virtual filesystem (`read_file`, `write_file`, `edit_file`, `glob`, `grep`) | The agent produces durable artefacts (a draft document, a research report, code) that later steps will read. |
+| Permissions | Always. Start with deny-by-default and an allowlist of paths. |
+| `interrupt_on` | Any tool whose effect cannot be undone cheaply (send_email, delete_*, transfer_*, …). |
+| Memory (`AGENTS.md`) | Long-running collaboration with the same user where preferences and conventions should carry over. |
+| Skills | The agent should know how to do a class of task (e.g. "respond to support tickets") that has its own playbook. Load progressively, not in the system prompt. |
+| Harness profiles | Per-model tuning (excluded tools, system-prompt tweaks). Keep model-specific config out of agent code. |
+
+### Construction pattern (full template in `assets/template-deep-agent.py`)
+
+```python
+"""Deep agent build for <agent_name>. Composes a deepagents harness around our tools."""
+from deepagents import create_deep_agent, FileSystemPermission
+from <agent_name>.tools.base import get_tools
+from <agent_name>.prompts.system import SYSTEM_PROMPT
+
+tools, _ = get_tools(dev_mode=False)
+
+permissions = [
+    FileSystemPermission(operation="read",  path_pattern="/workspace/**", mode="allow"),
+    FileSystemPermission(operation="write", path_pattern="/workspace/drafts/**", mode="allow"),
+    FileSystemPermission(operation="write", path_pattern="**",            mode="deny"),
+]
+
+graph = create_deep_agent(
+    model="anthropic:claude-sonnet-4-6",
+    system_prompt=SYSTEM_PROMPT,
+    tools=tools,
+    permissions=permissions,
+    interrupt_on={"send_email": True, "delete_event": True},
+    memory=["./AGENTS.md"],
+    # subagents=...  # omit to use the default general-purpose subagent
+)
+```
+
+### Best practices
+
+- **Don't disable the planning tool.** `write_todos` is cheap and pays for itself in inspectability.
+- **Spawn subagents at clean task boundaries.** "Research X and return a one-paragraph summary" is a good subagent task. "Help me think about Y" is not.
+- **Permissions deny-by-default.** Allow `/workspace/**` (or narrower) and explicitly deny everything else, including `.env`, `~/.ssh/**`, etc.
+- **Interrupt on every side-effecting tool by default.** Loosen explicitly per environment (dev mode skips all interrupts).
+- **Skills over fat system prompts.** If the agent's playbook for "handle a refund" is 300 lines, that's a skill, not a system prompt section.
+- **AGENTS.md is for stable preferences and conventions.** Working state lives in the virtual filesystem; chat history is the checkpointer's job.
+- **One harness profile per model.** Put per-model exclusions / system-prompt tweaks in a registered `HarnessProfile`, not in every agent.
+
+Full discussion + worked examples — `references/DEEP_AGENTS_HARNESS.md`.
+
+---
+
+## 8. Human-in-the-loop
+
+Two HITL surfaces:
+
+1. **Tool approval** — `add_approval(tool)` wraps a side-effecting tool. The graph pauses before the tool runs; a human approves, edits the args, or rejects.
+2. **`interrupt_on` (deep agents)** — declarative gate at the harness level; same effect, configured per-tool centrally.
+
+When to use which:
+
+- **`add_approval`** for vanilla LangGraph graphs without the deep agents harness.
+- **`interrupt_on`** for deep agents; it consolidates the gating config in one place.
+
+Rules:
+
+- The set of approval-gated tools is the same in production for every agent: anything that mutates external state.
+- In **dev mode**, approval is off so iteration is fast. Dev mode is a runtime flag, not a code branch left in main.
+- Approval prompts include the **tool name + arguments**. The reviewer should see what is about to happen without reading code.
+- Rejected calls **never silently no-op.** They surface an error to the agent that lets it re-plan.
+
+---
+
+## 9. Testing
+
+Three test surfaces — full layout in `references/TESTING.md`:
+
+| Layer       | Path                    | What it tests                                                                   |
+|-------------|-------------------------|---------------------------------------------------------------------------------|
+| Unit        | `tests/unit/`           | Pure functions: nodes, tools (with mocked services), routing, schemas, prompts. |
+| Integration | `tests/integration/`    | Compiled graph end-to-end with fakes for the network; live runs against staging. |
+| Notebooks   | `tests/notebooks/`      | Interactive walkthroughs — useful for debugging + onboarding, **not** CI gates. |
+
+Required for every PR that touches nodes / tools:
+
+- A unit test for the new / changed node, with mocked services.
+- An integration test that runs the compiled graph for the affected branch.
+
+Notebooks are explicitly **not** required and **not** in CI. They are a debugging aid.
+
+---
+
+## 10. Review checklist
+
+Block a PR on:
+
+- [ ] Each new file has a top-level docstring.
+- [ ] Each new node / tool / public function has its own docstring (intent + args + returns).
+- [ ] Nodes are pure functions of state — no direct I/O.
+- [ ] Side-effecting tools are wrapped with approval (or `interrupt_on` in deep agents).
+- [ ] State is typed; new fields have an explicit reducer if accumulated.
+- [ ] Routing functions live in `nodes/routing.py`, named `route_after_<phase>`.
+- [ ] `langgraph.json` updated when a new agent is registered.
+- [ ] Unit + integration tests added for new nodes / tools.
+- [ ] Deep agents: permissions are deny-by-default with an explicit allowlist; `interrupt_on` covers every destructive tool.
+- [ ] No secrets in state, prompts, or test fixtures.
+
+Comment-only (not blocking): prompt wording, naming bikesheds, optional eval scaffolding.
+
+---
+
+## Anti-patterns (do not do this)
+
+- One mega-graph with every responsibility. Split by agent; each agent has one graph.
+- Direct API calls inside nodes. Push them through `services/` (and a tool, if the LLM needs to invoke them).
+- Untyped state (`state: dict`). Always `TypedDict` or Pydantic.
+- Routing logic inside compute nodes. Routing lives in dedicated functions.
+- Side-effecting tools without an approval wrap in production.
+- Stashing large artefacts (full email bodies, file contents) in state. Use the virtual filesystem (deep agents) or external storage and pass a reference.
+- Disabling `write_todos` to save tokens. It's an inspectability tool — keep it.
+- Per-model branches in agent code (`if model == "gpt-4o": …`). Use a `HarnessProfile`.
+- Putting setup secrets in prompts. They go in env / configuration.

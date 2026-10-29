@@ -1,0 +1,443 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-29T03:28:03.818323+00:00",
+  "title": "Design System: LumaQuote",
+  "extensions": {
+    "colorMeta": {
+      "primary": {
+        "role": "primary",
+        "displayName": "Primary",
+        "canonical": "#8d452c",
+        "tonalRamp": [
+          "oklch(15% 0.10497 39.52)",
+          "oklch(26% 0.10497 39.52)",
+          "oklch(38% 0.10497 39.52)",
+          "oklch(49% 0.10497 39.52)",
+          "oklch(61% 0.10497 39.52)",
+          "oklch(72% 0.10497 39.52)",
+          "oklch(84% 0.10497 39.52)",
+          "oklch(95% 0.10497 39.52)"
+        ]
+      },
+      "primary-foreground": {
+        "role": "neutral",
+        "displayName": "Primary Foreground",
+        "canonical": "#ffffff",
+        "tonalRamp": [
+          "oklch(15% 0.00000 89.88)",
+          "oklch(26% 0.00000 89.88)",
+          "oklch(38% 0.00000 89.88)",
+          "oklch(49% 0.00000 89.88)",
+          "oklch(61% 0.00000 89.88)",
+          "oklch(72% 0.00000 89.88)",
+          "oklch(84% 0.00000 89.88)",
+          "oklch(95% 0.00000 89.88)"
+        ]
+      },
+      "graphite": {
+        "role": "neutral",
+        "displayName": "Graphite",
+        "canonical": "#191e1f",
+        "tonalRamp": [
+          "oklch(15% 0.00767 211.07)",
+          "oklch(26% 0.00767 211.07)",
+          "oklch(38% 0.00767 211.07)",
+          "oklch(49% 0.00767 211.07)",
+          "oklch(61% 0.00767 211.07)",
+          "oklch(72% 0.00767 211.07)",
+          "oklch(84% 0.00767 211.07)",
+          "oklch(95% 0.00767 211.07)"
+        ]
+      },
+      "scene-graphite": {
+        "role": "neutral",
+        "displayName": "Scene Graphite",
+        "canonical": "#202727",
+        "tonalRamp": [
+          "oklch(15% 0.00996 196.57)",
+          "oklch(26% 0.00996 196.57)",
+          "oklch(38% 0.00996 196.57)",
+          "oklch(49% 0.00996 196.57)",
+          "oklch(61% 0.00996 196.57)",
+          "oklch(72% 0.00996 196.57)",
+          "oklch(84% 0.00996 196.57)",
+          "oklch(95% 0.00996 196.57)"
+        ]
+      },
+      "background": {
+        "role": "neutral",
+        "displayName": "Background",
+        "canonical": "#f5f4f0",
+        "tonalRamp": [
+          "oklch(15% 0.00541 95.10)",
+          "oklch(26% 0.00541 95.10)",
+          "oklch(38% 0.00541 95.10)",
+          "oklch(49% 0.00541 95.10)",
+          "oklch(61% 0.00541 95.10)",
+          "oklch(72% 0.00541 95.10)",
+          "oklch(84% 0.00541 95.10)",
+          "oklch(95% 0.00541 95.10)"
+        ]
+      },
+      "foreground": {
+        "role": "neutral",
+        "displayName": "Foreground",
+        "canonical": "#24292a",
+        "tonalRamp": [
+          "oklch(15% 0.00738 211.05)",
+          "oklch(26% 0.00738 211.05)",
+          "oklch(38% 0.00738 211.05)",
+          "oklch(49% 0.00738 211.05)",
+          "oklch(61% 0.00738 211.05)",
+          "oklch(72% 0.00738 211.05)",
+          "oklch(84% 0.00738 211.05)",
+          "oklch(95% 0.00738 211.05)"
+        ]
+      },
+      "secondary": {
+        "role": "neutral",
+        "displayName": "Secondary",
+        "canonical": "#e9e7e1",
+        "tonalRamp": [
+          "oklch(15% 0.00832 91.49)",
+          "oklch(26% 0.00832 91.49)",
+          "oklch(38% 0.00832 91.49)",
+          "oklch(49% 0.00832 91.49)",
+          "oklch(61% 0.00832 91.49)",
+          "oklch(72% 0.00832 91.49)",
+          "oklch(84% 0.00832 91.49)",
+          "oklch(95% 0.00832 91.49)"
+        ]
+      },
+      "muted-foreground": {
+        "role": "neutral",
+        "displayName": "Muted Foreground",
+        "canonical": "#666b68",
+        "tonalRamp": [
+          "oklch(15% 0.00769 159.89)",
+          "oklch(26% 0.00769 159.89)",
+          "oklch(38% 0.00769 159.89)",
+          "oklch(49% 0.00769 159.89)",
+          "oklch(61% 0.00769 159.89)",
+          "oklch(72% 0.00769 159.89)",
+          "oklch(84% 0.00769 159.89)",
+          "oklch(95% 0.00769 159.89)"
+        ]
+      },
+      "border": {
+        "role": "neutral",
+        "displayName": "Border",
+        "canonical": "#dcded5",
+        "tonalRamp": [
+          "oklch(15% 0.01229 116.83)",
+          "oklch(26% 0.01229 116.83)",
+          "oklch(38% 0.01229 116.83)",
+          "oklch(49% 0.01229 116.83)",
+          "oklch(61% 0.01229 116.83)",
+          "oklch(72% 0.01229 116.83)",
+          "oklch(84% 0.01229 116.83)",
+          "oklch(95% 0.01229 116.83)"
+        ]
+      },
+      "card": {
+        "role": "neutral",
+        "displayName": "Card",
+        "canonical": "#ffffff",
+        "tonalRamp": [
+          "oklch(15% 0.00000 89.88)",
+          "oklch(26% 0.00000 89.88)",
+          "oklch(38% 0.00000 89.88)",
+          "oklch(49% 0.00000 89.88)",
+          "oklch(61% 0.00000 89.88)",
+          "oklch(72% 0.00000 89.88)",
+          "oklch(84% 0.00000 89.88)",
+          "oklch(95% 0.00000 89.88)"
+        ]
+      },
+      "copper-highlight": {
+        "role": "neutral",
+        "displayName": "Copper Highlight",
+        "canonical": "#c59372",
+        "tonalRamp": [
+          "oklch(15% 0.07593 54.55)",
+          "oklch(26% 0.07593 54.55)",
+          "oklch(38% 0.07593 54.55)",
+          "oklch(49% 0.07593 54.55)",
+          "oklch(61% 0.07593 54.55)",
+          "oklch(72% 0.07593 54.55)",
+          "oklch(84% 0.07593 54.55)",
+          "oklch(95% 0.07593 54.55)"
+        ]
+      },
+      "focus": {
+        "role": "neutral",
+        "displayName": "Focus",
+        "canonical": "#b67151",
+        "tonalRamp": [
+          "oklch(15% 0.09887 45.32)",
+          "oklch(26% 0.09887 45.32)",
+          "oklch(38% 0.09887 45.32)",
+          "oklch(49% 0.09887 45.32)",
+          "oklch(61% 0.09887 45.32)",
+          "oklch(72% 0.09887 45.32)",
+          "oklch(84% 0.09887 45.32)",
+          "oklch(95% 0.09887 45.32)"
+        ]
+      },
+      "review-surface": {
+        "role": "secondary",
+        "displayName": "Review Surface",
+        "canonical": "#f6eddb",
+        "tonalRamp": [
+          "oklch(15% 0.02572 84.59)",
+          "oklch(26% 0.02572 84.59)",
+          "oklch(38% 0.02572 84.59)",
+          "oklch(49% 0.02572 84.59)",
+          "oklch(61% 0.02572 84.59)",
+          "oklch(72% 0.02572 84.59)",
+          "oklch(84% 0.02572 84.59)",
+          "oklch(95% 0.02572 84.59)"
+        ]
+      },
+      "review-text": {
+        "role": "secondary",
+        "displayName": "Review Text",
+        "canonical": "#81611e",
+        "tonalRamp": [
+          "oklch(15% 0.09186 82.03)",
+          "oklch(26% 0.09186 82.03)",
+          "oklch(38% 0.09186 82.03)",
+          "oklch(49% 0.09186 82.03)",
+          "oklch(61% 0.09186 82.03)",
+          "oklch(72% 0.09186 82.03)",
+          "oklch(84% 0.09186 82.03)",
+          "oklch(95% 0.09186 82.03)"
+        ]
+      },
+      "approved-surface": {
+        "role": "secondary",
+        "displayName": "Approved Surface",
+        "canonical": "#eaf0e6",
+        "tonalRamp": [
+          "oklch(15% 0.01471 132.48)",
+          "oklch(26% 0.01471 132.48)",
+          "oklch(38% 0.01471 132.48)",
+          "oklch(49% 0.01471 132.48)",
+          "oklch(61% 0.01471 132.48)",
+          "oklch(72% 0.01471 132.48)",
+          "oklch(84% 0.01471 132.48)",
+          "oklch(95% 0.01471 132.48)"
+        ]
+      },
+      "approved-text": {
+        "role": "secondary",
+        "displayName": "Approved Text",
+        "canonical": "#48643a",
+        "tonalRamp": [
+          "oklch(15% 0.07268 135.76)",
+          "oklch(26% 0.07268 135.76)",
+          "oklch(38% 0.07268 135.76)",
+          "oklch(49% 0.07268 135.76)",
+          "oklch(61% 0.07268 135.76)",
+          "oklch(72% 0.07268 135.76)",
+          "oklch(84% 0.07268 135.76)",
+          "oklch(95% 0.07268 135.76)"
+        ]
+      },
+      "blocked-surface": {
+        "role": "secondary",
+        "displayName": "Blocked Surface",
+        "canonical": "#fae8df",
+        "tonalRamp": [
+          "oklch(15% 0.02314 48.46)",
+          "oklch(26% 0.02314 48.46)",
+          "oklch(38% 0.02314 48.46)",
+          "oklch(49% 0.02314 48.46)",
+          "oklch(61% 0.02314 48.46)",
+          "oklch(72% 0.02314 48.46)",
+          "oklch(84% 0.02314 48.46)",
+          "oklch(95% 0.02314 48.46)"
+        ]
+      },
+      "blocked-text": {
+        "role": "secondary",
+        "displayName": "Blocked Text",
+        "canonical": "#944a32",
+        "tonalRamp": [
+          "oklch(15% 0.10626 38.57)",
+          "oklch(26% 0.10626 38.57)",
+          "oklch(38% 0.10626 38.57)",
+          "oklch(49% 0.10626 38.57)",
+          "oklch(61% 0.10626 38.57)",
+          "oklch(72% 0.10626 38.57)",
+          "oklch(84% 0.10626 38.57)",
+          "oklch(95% 0.10626 38.57)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Lighting presentation heading."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Workspace page titles."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Section headings."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Operational reading."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Compact labels and textual states."
+      }
+    },
+    "shadows": [
+      {
+        "name": "control-subtle",
+        "value": "0 1px 2px rgb(0 0 0 / 0.05)",
+        "purpose": "Shared outline buttons and inputs."
+      },
+      {
+        "name": "mobile-disclosure",
+        "value": "0 12px 24px #0a140d33",
+        "purpose": "Mobile navigation overlay."
+      }
+    ],
+    "motion": [
+      {
+        "name": "reduced-motion",
+        "value": "animation: none; transition: none; scroll-behavior: auto",
+        "purpose": "System preference removes CSS motion and selects a static lighting fallback."
+      },
+      {
+        "name": "scene-rendering",
+        "value": "demand",
+        "purpose": "Optional scene renders on demand; no automatic rotation."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "portrait",
+        "value": "680px"
+      },
+      {
+        "name": "inbox-reflow",
+        "value": "900px"
+      },
+      {
+        "name": "compact-rail",
+        "value": "1050px"
+      },
+      {
+        "name": "compact-desktop",
+        "value": "1250px"
+      },
+      {
+        "name": "wide",
+        "value": "1650px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Copper action control; specimen only.",
+      "html": "<button class=\"ds-primary\">Review revision</button>",
+      "css": ".ds-primary{font-family:\"IBM Plex Sans\",sans-serif;font-size:14px;display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:8px;padding:8px 16px;height:36px;font-weight:500;cursor:pointer;transition:all .15s cubic-bezier(.4,0,.2,1);background:var(--primary,#8d452c);color:var(--primary-foreground,#fff);border:0}.ds-primary:hover{opacity:.9}.ds-primary:disabled{opacity:.5;pointer-events:none}.ds-primary:focus-visible{outline:3px solid var(--focus,#b67151);outline-offset:4px}@media(prefers-reduced-motion:reduce){.ds-primary,.ds-outline,.ds-ghost{transition:none}}"
+    },
+    {
+      "name": "Outline button",
+      "kind": "button",
+      "refersTo": "button-outline",
+      "description": "Secondary action with a quiet border.",
+      "html": "<button class=\"ds-outline\">Save revision</button>",
+      "css": ".ds-outline{font-family:\"IBM Plex Sans\",sans-serif;font-size:14px;display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:8px;padding:8px 16px;height:36px;font-weight:500;cursor:pointer;transition:all .15s cubic-bezier(.4,0,.2,1);background:var(--background,#f5f4f0);color:var(--foreground,#24292a);border:1px solid var(--border,#dcded5);box-shadow:0 1px 2px #0000000d}.ds-outline:hover{background:var(--secondary,#e9e7e1)}.ds-outline:focus-visible{outline:3px solid var(--focus,#b67151);outline-offset:4px}@media(prefers-reduced-motion:reduce){.ds-primary,.ds-outline,.ds-ghost{transition:none}}"
+    },
+    {
+      "name": "Ghost button",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "Low-emphasis supporting action.",
+      "html": "<button class=\"ds-ghost\">View evidence</button>",
+      "css": ".ds-ghost{font-family:\"IBM Plex Sans\",sans-serif;font-size:14px;display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:8px;padding:8px 16px;height:36px;font-weight:500;cursor:pointer;transition:all .15s cubic-bezier(.4,0,.2,1);color:var(--foreground,#24292a);background:transparent;border:0}.ds-ghost:hover{background:var(--secondary,#e9e7e1)}.ds-ghost:focus-visible{outline:3px solid var(--focus,#b67151);outline-offset:4px}@media(prefers-reduced-motion:reduce){.ds-primary,.ds-outline,.ds-ghost{transition:none}}"
+    },
+    {
+      "name": "Text field",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Labeled native field with focus and invalid presentation.",
+      "html": "<label class=\"ds-field\">Customer reference<input aria-label=\"Customer reference\" placeholder=\"Enter reference\"></label>",
+      "css": ".ds-field{font-family:\"IBM Plex Sans\",sans-serif;font-size:14px;display:grid;gap:8px;color:var(--foreground,#24292a)}.ds-field input{font-family:\"IBM Plex Sans\",sans-serif;font-size:14px;height:36px;border-radius:8px;border:1px solid var(--border,#dcded5);background:transparent;color:var(--foreground,#24292a);padding:4px 12px;box-shadow:0 1px 2px #0000000d}.ds-field input:hover{border-color:var(--muted-foreground,#666b68)}.ds-field input:focus-visible{outline:3px solid #8d452c80;border-color:var(--primary,#8d452c)}.ds-field input[aria-invalid=true]{border-color:#c24b3f}.ds-field input:disabled{opacity:.5}@media(prefers-reduced-motion:reduce){.ds-primary,.ds-outline,.ds-ghost{transition:none}}"
+    },
+    {
+      "name": "Navigation link",
+      "kind": "nav",
+      "refersTo": "navigation",
+      "description": "Graphite route framing with active and hover state.",
+      "html": "<nav class=\"ds-nav\" aria-label=\"Specimen\"><a href=\"#inbox\" aria-current=\"page\">Inbox</a><a href=\"#catalog\">Catalog</a></nav>",
+      "css": ".ds-nav{font-family:\"IBM Plex Sans\",sans-serif;font-size:14px;background:#191e1f;padding:12px;display:grid;gap:6px}.ds-nav a{font-size:13px;padding:11px 12px;border-radius:7px;text-decoration:none;color:#aeb6b1}.ds-nav a[aria-current]{background:#343a38;color:#f7f6ef}.ds-nav a:hover{background:#2a302f;color:#fff}.ds-nav a:focus-visible{outline:3px solid var(--focus,#b67151);outline-offset:4px}@media(prefers-reduced-motion:reduce){.ds-primary,.ds-outline,.ds-ghost{transition:none}}"
+    },
+    {
+      "name": "Review status",
+      "kind": "chip",
+      "refersTo": "status-review",
+      "description": "Noninteractive textual state badge.",
+      "html": "<span class=\"ds-status\">Review</span>",
+      "css": ".ds-status{font-family:\"IBM Plex Sans\",sans-serif;font-size:14px;display:inline-flex;font-size:12px;font-weight:500;padding:3px 7px;border:1px solid #e8d9b3;border-radius:9999px;background:#f6eddb;color:#81611e}@media(prefers-reduced-motion:reduce){.ds-primary,.ds-outline,.ds-ghost{transition:none}}"
+    },
+    {
+      "name": "Working container",
+      "kind": "card",
+      "refersTo": "working-container",
+      "description": "Flat bordered quotation register surface.",
+      "html": "<section class=\"ds-card\"><h3>Quotation revisions</h3><p>Exact revision and review state</p></section>",
+      "css": ".ds-card{font-family:\"IBM Plex Sans\",sans-serif;font-size:14px;background:var(--card,#fff);color:var(--foreground,#24292a);border:1px solid var(--border,#dcded5);border-radius:12px;padding:20px 24px}.ds-card h3{font-family:\"Space Grotesk Variable\",sans-serif;font-size:17px;font-weight:500;letter-spacing:-.03em;margin:0 0 8px}.ds-card p{font-size:12px;line-height:1.7;color:var(--muted-foreground,#666b68);margin:0}@media(prefers-reduced-motion:reduce){.ds-primary,.ds-outline,.ds-ghost{transition:none}}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Lighting Sales Desk",
+    "overview": "The lighting supplier?s sales desk combines a graphite navigation frame, warm copper actions, and light mineral working surfaces. It feels restrained and practical: dense operational information remains readable while Space Grotesk gives titles and totals a distinct character.\n\nDepth comes mainly from tonal separation and fine borders. The optional procedural lighting scene supplies a controlled presentation moment; the workspace stays usable with its static fallback and reduced motion. Surface-specific composition belongs in docs/UI_DIRECTION.md.",
+    "keyCharacteristics": [
+      "Graphite framing with mineral working panels.",
+      "Warm copper for primary actions and selective emphasis.",
+      "Compact, readable information with explicit textual states.",
+      "Optional illustrative 3D with a complete static fallback."
+    ],
+    "rules": [
+      {
+        "name": "The Textual State Rule",
+        "body": "Status color always accompanies a readable state label.",
+        "section": "colors"
+      },
+      {
+        "name": "The Two-Face Rule",
+        "body": "Space Grotesk carries headings and totals; IBM Plex Sans carries operational reading and controls.",
+        "section": "typography"
+      },
+      {
+        "name": "The Working Surface Rule",
+        "body": "Establish panel hierarchy through tone and borders before adding elevation.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do keep primary actions copper and working panels light.",
+      "Do pair each status color with its truthful textual state.",
+      "Do retain visible keyboard focus and meaningful navigation names.",
+      "Do preserve the static scene fallback and reduced-motion behavior."
+    ],
+    "donts": [
+      "Don?t make WebGL a requirement for a commercial task.",
+      "Don?t present the procedural luminaire as a verified product render.",
+      "Don?t replace actual workflow states with decorative success claims."
+    ]
+  }
+}

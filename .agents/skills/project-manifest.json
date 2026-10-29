@@ -1,0 +1,227 @@
+{
+  "version": 1,
+  "updated_on": "2026-10-29",
+  "scope": "repository",
+  "retired_skill_folders": [
+    "code-review",
+    "find-skills",
+    "git-guardrails-claude-code",
+    "implement",
+    "implement-api-security",
+    "implement-hybrid-retrieval",
+    "implement-ingestion-pipeline",
+    "implement-lightrag-graph",
+    "implement-observability-evals",
+    "implement-plan-phase",
+    "implement-query-agent",
+    "implement-rag-frontend",
+    "implement-structured-table",
+    "implement-supabase-security",
+    "improve-codebase-architecture",
+    "ios-design",
+    "scaffold-exercises",
+    "scaffold-monorepo-layout",
+    "skill-creator",
+    "to-spec",
+    "ui-taste",
+    "ui-ux-pro-max",
+    "verify-release-gates"
+  ],
+  "retired_location": "../retired-skills-2026-10-28",
+  "retirement": "Moved outside active skills and renamed SKILL.md to SKILL.md.disabled; originals retained",
+  "skills": {
+    "plan-quotation-app": {
+      "origin": "project-authored",
+      "files": {
+        "references/agent-organization.md": "cf958c9f3c106db5e60a85e586679ed292d71f8a9304ffd38416e8f04b30fbb1",
+        "SKILL.md": "9f0dcf1629bd779ea61cb964e9ec45f087151a198a2f90600fe7ad89111d846c"
+      },
+      "source_archive": "../skill-source-archives/user-supplied-2026-10-29",
+      "adaptation": "Project-specific integration; original notices preserved in non-active archive"
+    },
+    "integrate-whatsapp": {
+      "origin": "project-authored",
+      "files": {
+        "SKILL.md": "2ff021b7abdb8da0354e9cf8f91f4abdfc0626ea08cdf5a7df90075f7961bbcf"
+      }
+    },
+    "process-voice-notes": {
+      "origin": "project-authored",
+      "files": {
+        "SKILL.md": "c7e1f69cd46a070c71480fd1597a57bfda01391c8758a95d5c275b37e2a4dad8"
+      }
+    },
+    "implement-human-approval": {
+      "origin": "project-authored",
+      "files": {
+        "SKILL.md": "b7ff639c7a92a7ab6eec2173a8f96a466d2aefcf3bb4d6d9181a4d94e43dd828"
+      }
+    },
+    "build-quotations": {
+      "origin": "project-authored",
+      "files": {
+        "SKILL.md": "573057579ffa4e9d5e00933edf81c4daca690a86c2195cba1d0c3bcfe9b75e1b"
+      }
+    },
+    "automate-google-workspace": {
+      "origin": "project-authored",
+      "files": {
+        "SKILL.md": "9fd7fe2618624942ed2067a2fe5f3682803e17892f6aadfb028a0690f614538f"
+      }
+    },
+    "ingest-supplier-evidence": {
+      "origin": "project-authored",
+      "files": {
+        "SKILL.md": "407e989c7d7e0ceebbc0428a5ba141c921445756ac3ddcbcfef0c94ee864c287"
+      }
+    },
+    "secure-quotation-app": {
+      "origin": "project-authored",
+      "files": {
+        "references/access-and-browser.md": "6bbdfac1f888243548e1b55dfe54ab302d5c2c79ec25aae40cfc85bf93f7d062",
+        "references/fastapi-request-boundaries.md": "3914903ec3319c01f9e6ac740913262808d62ab785c08f5bb946a8c8787ed075",
+        "references/files-agent-and-operations.md": "e6f8a3db7e867ae9fef07ec588aa489c807a9669abca23b60540ed391a4953f1",
+        "SKILL.md": "35f287a27235752c1e0c0917d2fffb41cb3c391bc44b79502c0366f1dbf98bbe"
+      },
+      "source_archive": "../skill-source-archives/user-supplied-2026-10-29",
+      "adaptation": "Project-specific integration; original notices preserved in non-active archive"
+    },
+    "evaluate-quotation-agent": {
+      "origin": "project-authored",
+      "files": {
+        "SKILL.md": "2f4dd3956a4f4508570bd613d247fbe4c436cba215ed1687d03e205ea8c540ad"
+      }
+    },
+    "verify-quotation-release": {
+      "origin": "project-authored",
+      "files": {
+        "SKILL.md": "68010f51c20ec43a021c0bfc07ad66b0464352f8b97f55836f02eae334cea2cc"
+      }
+    },
+    "review-quotation-code": {
+      "origin": "project-authored",
+      "files": {
+        "SKILL.md": "720a2c1b81228055a652f677533e04f7aa2da1dd93401a955f3e2522a2beee0d"
+      }
+    },
+    "impeccable": {
+      "origin": "retained-local",
+      "note": "Existing skill preserved unchanged; hashes are a local baseline, not verified upstream provenance",
+      "files": {
+        "SKILL.md": "38c2e839e130008b6da814ab9c16f3fcbbedfdf721a9638eebd31a9e65341a7a",
+        "agents/impeccable_asset_producer.toml": "37080ea5e5b381adb7eae7a427231b0ad0dee0f0916fc1d6b673b7101a5b425b",
+        "agents/impeccable_documenter.toml": "2feb3768125ba6469c92a50d516727e6d42f44579165ddfd33409948e2a3803d",
+        "agents/impeccable_finish_reviewer.toml": "869fa5390b84bfd00d072f5280a9002ea3e3936edf5985241be641a87f03ff7b",
+        "agents/impeccable_manual_edit_applier.toml": "6c9ce3e27ec4520ead001da3aad2a2ebba481c4e5cd22873db8890259ee579fe",
+        "agents/openai.yaml": "cbd8bd68fa00935dd0f179adb169252629cf7ee443ea9dc7db77e7ef2cf77446",
+        "reference/adapt.md": "bead87679caad7c537dd7c04c3bb78be56ac7eec279ad6aad7322f48ff2df2d9",
+        "reference/adapt.native.md": "6acc0bf221a4ddc6e5c6438348920b2ca2393b29c4314dbde2cdc23f2b1a9639",
+        "reference/android.md": "058f81f256134841875fd3183e06b37a023de0c877fd2b9eecd97011640791fe",
+        "reference/animate.md": "d658c48ffbe0031e8e3b318996cad6ceafe29e40aa50d5bb25e4bf1d6839dc7c",
+        "reference/audit.md": "910461b1c1f8216155165955c860a884a1e2f557cb38f21ef512ea90ef6503c2",
+        "reference/audit.native.md": "960cb922bc934adbf9192e9428ff6bec1f382038166f02a785939c93b7391067",
+        "reference/bolder.md": "f964506c0fae87b3c2c1db7016ddc9be9ef970bbcf5548d684b997b5d5991586",
+        "reference/clarify.md": "173dd66abe65633910dcb04a51f40d6ff2a793f87088f022a02fc4cad24dd133",
+        "reference/colorize.md": "bc5f71f1129d0f2c310d913d07c8dc609a1d25644121bd78c308f42d52a0b9e9",
+        "reference/craft-floor.md": "e802e4f7bdc89050a9c0f2ca506e1d493a2316e6e810c0336c57aa073717ef3e",
+        "reference/craft.md": "9205e222bc6565b37fb504ceec93233c2d2a456802b69d16e6b1c44723907c4c",
+        "reference/critique.md": "cb8caddbb3919e5bf7f252143b519fb16db28a244642d937b186cb89962d9201",
+        "reference/delight.md": "098a891028ce59c212b747d3c70468dd750aff7053a703d1336045ed31e0da7c",
+        "reference/distill.md": "ea8432c90c30ecb0426662a681ead5c0941113079704e1a766cda09e85b15b4f",
+        "reference/doctor.md": "a98b397cedeeaa1da57f3395b3d9b6c1fc477f4247fb9dc13e4da3da588283ff",
+        "reference/document.md": "3673248740bcdd1122ccc610093ba2fe52f3943a61ce0b7170b74dc49e5b6098",
+        "reference/extract.md": "31b90048c0b540daec46762a10c2b6b6434737a89af005054d8b848d829d003b",
+        "reference/harden.md": "b31ff29c7a1ea979c6d039f7e8d17007410697ab49536690dca109f0af3f20f8",
+        "reference/hooks.md": "12fefe52d80d25014e5f7e2f9b278275a675653d3d99ae8f0ecf344cdb9abbe6",
+        "reference/init.md": "bb069b43c09109d7031b0374e31955749fec657b252d39782f11e8985aca2b51",
+        "reference/ios.md": "40c87038b5f75147a5952a96237acf312a327bf70c1bcd8e0a5f064625ae9668",
+        "reference/layout.md": "0bc7d7971b3edf2acd0580e847458dc6d84129d90715b452799ace3bed815c7c",
+        "reference/live-setup.md": "2b5b2fbf5f658f34ea1997fb1aeebe01604d05187f75c6a4f1f55a5bc78520a4",
+        "reference/live.md": "68c5636a7858dd0b5137a9229c15e25fdc2ee40a0f8a4e9d809f78e809256262",
+        "reference/new-work.md": "85b9c2d051de94ee9129c58be111946f73035ca62bbd2a3936f4fa48768fe5cf",
+        "reference/onboard.md": "ef2dde00030580ed2765cbf7be9b2ea4a6f64cb915b804fd6f6abcf38051c7b9",
+        "reference/operate.md": "a9d2203acd45ca33a13d5c68b02b23ed512425ac15f0e8438318ed124b43729d",
+        "reference/optimize.md": "f672ef8251a3ed4051a053d30819664951b17540b2899acd27d20e500c234abc",
+        "reference/overdrive.md": "fce6688138d2ceb1e3d2cde5231f54b1d8dc8748b4c95a7919aa83b6f924cf96",
+        "reference/polish.md": "81666fc7f783b4e3514db6554e713dc0479bd9cdedb06e93d15f8b579aae869a",
+        "reference/quieter.md": "190a4e642ca362d7499f3c3ab123e21f18f75457d11f072b545a183f296e6495",
+        "reference/routing.md": "ef0b8eca20e1321cf7216fd0bda41ce54b0cca197cfd1b075eb51f3436f59059",
+        "reference/shape.md": "a55f016c046cb6a27c55bd7f346375aeb506a755c4fbca19a5f92dbd42309c23",
+        "reference/typeset.md": "442749aed338f51c1a3ccfb182c6ade9b74b90590b67984062ac94a5b100e914",
+        "reference/visualize.md": "896da399bafcffb0623bdd81bb18709d6eab25c9d5917e739c8798f31ff0d076",
+        "reference/degraded/asset-producer.md": "a8547c8565979894f0c07f92a96ac2a38e681a31fbf155ffeefc7566e185d9c2",
+        "reference/degraded/documenter.md": "bcc05ea92faebb5c74037a9d4263a5ce9a56f5ab07c8ab3c59ee704d8cade745",
+        "reference/degraded/finish-reviewer.md": "5f24c5a97b4ffcabc7c432b064cfdd04c7a2ad52f52e765be648dc0aadab8f38",
+        "reference/degraded/manual-edit-applier.md": "5fae7f8a2fc3ddd49ad0a413446dc44daedef5b6b7de5eb935bd2fbfad646d58",
+        "scripts/command-metadata.json": "6bdbc3f745ceee15e10b050f109ce42bbeb53ab3c3b5239257de1d596654dee7",
+        "scripts/impeccable": "39d9600489073e227e4f4d55c451ce4252a6632ed7ae37923efbbcbc91f16d07",
+        "scripts/impeccable.cmd": "759bab1d8adc071fdde2efcf6e2157aa4026f3c2b4f3c342a8070bf328011616",
+        "scripts/live-browser-dom.js": "de1b7404f4cdfd7b515196afb17b74b1980f0bc88cb8681ae93a76ca48ec7bdb",
+        "scripts/live-browser-ignores.js": "c1cb6877ca99a0c1b38ba0c7d59f32702d3022f6821d8045f7133f7c40b6362f",
+        "scripts/live-browser-session.js": "edddeb3fad88adec9a055b1bf9d5c75418cbe97a13b1a7f6765e73249e482563",
+        "scripts/live-browser.js": "7af0a8665057c83b39bca2c8c7427ef2343734f70d4128c377113a6726a1e3b1",
+        "scripts/modern-screenshot.umd.js": "bb36665889124a0b6e15f16045265737449c3bdcf2712cdb08af3cfa01563e2b",
+        "scripts/VERSION": "800cf1c0392b24de7c0a1c6ea6778ecb433dec71c49a150bce96a98477527b2f",
+        "scripts/bin/windows-x64/impeccable.exe": "477e544fc8880a5e82e427490cb9a5f5adab480c0e02966d33fd50772b531c71",
+        "scripts/data/font-index-failures.json": "835f19a0a3812f3652dd6979a2ce5597f654fd01f26e1b420b92d5f42b997ce4",
+        "scripts/data/font-index.json": "47edbdfaf27073c47033d1ac7dfee881be49e2dcbda7671d1157300481dde6da"
+      }
+    },
+    "implement-abuse-controls": {
+      "origin": "project-authored",
+      "files": {
+        "references/abuse-verification.md": "5ced4706fb7f3d12ffccfe806eaa00209b72c8a2136b152fee3984184296f300",
+        "references/policy-and-implementation.md": "5a366b28126c0d0a5caaa42ebefd9a0b91c81d1c5aefc7844a833c520cd2c62c",
+        "SKILL.md": "1088d6ecb450913f73f93aea0621663877f2106163af5720555128b4f7ba9376"
+      }
+    },
+    "verify-engineering-coverage": {
+      "origin": "project-authored",
+      "files": {
+        "references/concepts.json": "9c35c1cd0ef0e107690a122fbb877685032f0ee7ae2e5382426a0b40a7e9c483",
+        "references/ledger.md": "4df0de9a95944e2bb4707582ee7d213d664e9470e2afca4730ba67f115971875",
+        "references/research.md": "9a4e4ab4a5063bfb66c73890815bc7d8a7ab1dd9f1ec671f85159cf75069967b",
+        "scripts/check_coverage.py": "5fd0975192091e8bc5c9f025d9cd8f8074255bebb4405e23ccb4a5503fadf523",
+        "scripts/test_check_coverage.py": "f0c86560beb0a4f68bee38dff53a282ff82edd9f6dabe3ffafd8159a61447494",
+        "SKILL.md": "6ee2c862a33f80dbf40706137bef09bc0ff30b1ea3558247c1518f9fb34e68a2"
+      }
+    },
+    "client-crud-state": {
+      "origin": "adapted-user-supplied",
+      "source_archive": "../skill-source-archives/user-supplied-2026-10-29",
+      "adaptation": "Project-specific integration; original notices preserved in non-active archive",
+      "files": {
+        "SKILL.md": "4b199c81b2b0d81d39ef1d4dfecd0e49c054d3d679cda5a3a30f9ce34ebedc12"
+      }
+    },
+    "project-documentation": {
+      "origin": "adapted-user-supplied",
+      "source_archive": "../skill-source-archives/user-supplied-2026-10-29",
+      "adaptation": "Project-specific integration; original notices preserved in non-active archive",
+      "files": {
+        "assets/decision-prompts.md": "0cb25d821d08f33ace44fda3a3652e81f35c3cb3a3b6377b31938f7cec7f0c2c",
+        "assets/runbook-prompts.md": "617aca9d71ce01cf8e33430ac8156097be23d5c0926ca57f8340cb7a0d00d215",
+        "references/document-patterns.md": "f001e619c1f0e99a022ac303ffe3b5cef7747d47926b1ce13c690ba5905b7b05",
+        "SKILL.md": "18c7fb0f11fbefe1cd40104a48abda1fd8774c89b5c74a841ff4cdadf82871c4"
+      }
+    },
+    "contribution-workflow": {
+      "origin": "adapted-user-supplied",
+      "source_archive": "../skill-source-archives/user-supplied-2026-10-29",
+      "adaptation": "Project-specific integration; original notices preserved in non-active archive",
+      "files": {
+        "assets/pr-description-prompts.md": "ebe7350bdbdf8aea6f34306519a792f0a22195d750c8468ba4ae36903e22746d",
+        "SKILL.md": "2501eff53b717f11c5f36c9fdc14f9d0e36bf2e43c4534c5f8e7f7fa40d25b7c"
+      }
+    },
+    "react-feature-structure": {
+      "origin": "adapted-user-supplied",
+      "source_archive": "../skill-source-archives/user-supplied-2026-10-29",
+      "adaptation": "Project-specific integration; original notices preserved in non-active archive",
+      "files": {
+        "references/feature-boundaries.md": "150c9d4e7cb3dab7b4d670e0010728c0a012019e2f3dd48d93485b8da3442494",
+        "SKILL.md": "051fc39e961b1335a2b32dc6e1a0060379c59a4c558fd0bd0a79e234ad8b332f"
+      }
+    }
+  }
+}

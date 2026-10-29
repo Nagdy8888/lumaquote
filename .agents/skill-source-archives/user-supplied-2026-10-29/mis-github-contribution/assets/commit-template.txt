@@ -1,0 +1,13 @@
+# <type>(<optional-scope>): <imperative summary, <= 72 chars>
+#
+# Types: feat, fix, perf, refactor, docs, test, build, ci, chore, revert
+# Imperative present tense. No trailing period.
+#
+# Body: explain what & why (not how). Wrap at 72.
+#
+#
+# Footer:
+#   Refs: MIS-<id>      # or "Closes: MIS-<id>"
+#   BREAKING CHANGE: <description + migration> (only if breaking)
+#
+# Do NOT add Co-authored-by trailers for AI agents.

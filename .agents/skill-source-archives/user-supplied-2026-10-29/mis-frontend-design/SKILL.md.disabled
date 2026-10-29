@@ -1,0 +1,308 @@
+---
+name: mis-frontend-design
+description: MIS standard for designing and building web-application interfaces. Inherits the spirit of Claude's frontend-design skill (avoid generic AI aesthetics, commit to a clear point of view) but re-tunes it for app product work — consistency on repeat-use surfaces, polish in states and feedback, keyboard-first interaction, branded expression reserved for brand moments. Use whenever creating, redesigning, or reviewing a screen, component, or feature inside an MIS web application (dashboards, internal tools, SaaS apps) — NOT for marketing sites or landing pages.
+license: Proprietary — MIS (Modern Intelligence Solutions) internal use
+metadata:
+  team: MIS
+  version: "1.0"
+  related: mis-nextjs-fsd
+  scope: web-applications (not marketing sites)
+---
+
+# MIS frontend design — for web apps, not landing pages
+
+The Claude `frontend-design` skill optimises for **first-impression spectacle** — distinctive aesthetic commitment, expressive layouts, bold motion. That is right for a landing page someone sees once. It is **wrong** for a screen someone uses fifty times a day.
+
+This skill re-frames the same craft for **web application** work. The user spends hours in your app — every keystroke, click, and state transition compounds. The goal flips from "unforgettable on first view" to "feels like an extraordinarily well-made tool on the hundredth view".
+
+## Inherited principles (kept)
+
+From the source skill, we keep:
+
+- **No "AI slop" aesthetics.** No Inter / Roboto / system-only stacks by default. No purple-on-white gradient hero. No identical-everywhere card layouts.
+- **Commit to a point of view.** Apps without a design language read as utilities; apps with one read as products.
+- **Match implementation to vision.** Restraint is the default; expression appears on purpose.
+- **Cohesion over per-screen flourish.** Every detail belongs to a system.
+
+## Re-tuned for apps
+
+What changes:
+
+| The Claude skill says…                          | For MIS app work, instead…                                               |
+|-------------------------------------------------|--------------------------------------------------------------------------|
+| Pick an extreme aesthetic (brutalist, maximalist, …) | Pick a **calm modern direction**. Confident, restrained, opinionated. Save expression for brand moments. |
+| Hero-grade typography on every surface          | Two-tier system: **utility type** for working surfaces, **expressive type** for brand moments only. |
+| Generous asymmetric layouts, diagonal flow      | Predictable grids on repeat-use surfaces. Asymmetry in landing / empty / onboarding states only. |
+| Scattered scroll-triggered effects              | Motion exclusively for **feedback and state continuity**. No decorative scroll choreography. |
+| "One thing someone will remember"               | "Fifty things they won't have to think about." Memorability comes from feeling, not novelty. |
+| Avoid Inter                                     | Avoid Inter as the **brand voice**. Use a neutral grotesque for dense UI is fine — just not Inter, and not as the only typeface. |
+
+The principle is not "be boring." It is **"be confident in the right register."** Linear, Notion, Vercel, Raycast, Stripe Dashboard, Arc, Cron / Notion Calendar — these are calm, opinionated, and unmistakable. None of them are "maximalist." None of them are "AI slop." Match that register.
+
+For depth on any one area, open the matching reference:
+
+| Topic | Reference |
+|-------|-----------|
+| Typography, color, motion, spacing system | `references/DESIGN_LANGUAGE.md` |
+| Common app feature patterns (tables, forms, navs, …) | `references/APP_PATTERNS.md` |
+| Empty / loading / error / partial / success states | `references/STATES_AND_FEEDBACK.md` |
+| Accessibility + keyboard-first interaction | `references/ACCESSIBILITY_AND_KEYBOARD.md` |
+| Apps to study, with what each does well | `references/INSPIRATION.md` |
+| Anti-patterns to refuse | `references/AVOID.md` |
+
+Drop-in starters:
+
+- `assets/tokens.css` — design-token CSS variables (colors, spacing, type, motion).
+- `assets/tailwind.config.ts` — Tailwind v4 config wired to the tokens.
+- `assets/component-checklist.md` — per-component QA: states, keyboard, a11y.
+- `assets/feature-design-brief.md` — kick-off template before designing a new feature.
+
+When working in a Next.js repo, this skill **complements** `mis-nextjs-fsd`: that one says **where** the code lives; this one says **how** it looks and feels.
+
+---
+
+## Decision tree
+
+| If the user asked to… | Go to |
+|-----------------------|-------|
+| Start designing a new feature | [1. Feature design brief](#1-feature-design-brief) |
+| Bootstrap design tokens / theme for a new app | [2. Bootstrap design tokens](#2-bootstrap-design-tokens) |
+| Pick fonts | [3. Typography](#3-typography) |
+| Pick colors / build a palette | [4. Color](#4-color) |
+| Add motion / transitions | [5. Motion](#5-motion) |
+| Design a table / form / modal / nav / settings page | [6. App patterns](#6-app-patterns) |
+| Design states (empty, loading, error, …) | [7. States and feedback](#7-states-and-feedback) |
+| Add keyboard shortcuts / a11y | [8. Keyboard and a11y](#8-keyboard-and-a11y) |
+| Review a design / PR | [9. Review checklist](#9-review-checklist) |
+
+---
+
+## 1. Feature design brief
+
+Before any pixels, answer six questions (template: `assets/feature-design-brief.md`):
+
+1. **Who uses this feature, and how often?** Daily power user vs once-a-quarter admin. Repeat-use surfaces optimise for speed; rare surfaces optimise for legibility.
+2. **What is the primary job-to-be-done?** One sentence. If you can't write it, the feature isn't ready to design.
+3. **What is the user holding in their head when they arrive?** Determines what context the screen must show without them asking.
+4. **What is the smallest successful interaction?** The path the screen should make trivial. Everything else is secondary.
+5. **What states does this surface have?** Empty, loading, partial, error, optimistic, success. Enumerate now, before composing the happy path. (See [section 7](#7-states-and-feedback).)
+6. **What keyboard-only path completes the main task?** Apps are tools; tools must work without the mouse. (See [section 8](#8-keyboard-and-a11y).)
+
+Only then start composing.
+
+---
+
+## 2. Bootstrap design tokens
+
+Every MIS app has the same **token shape**, with project-specific values. Tokens are the design system's source of truth — components consume tokens, never raw values.
+
+```css
+:root {
+  /* COLOR — semantic, not literal */
+  --color-bg:          /* surface base */;
+  --color-surface-1:   /* elevated surface 1 */;
+  --color-surface-2:   /* elevated surface 2 */;
+  --color-fg:          /* primary text */;
+  --color-fg-muted:    /* secondary text */;
+  --color-border:      /* hairlines */;
+  --color-accent:      /* primary action / brand */;
+  --color-accent-fg:   /* text on accent */;
+  --color-danger:      /* destructive */;
+  --color-warning:
+  --color-success:
+
+  /* TYPE */
+  --font-sans: …;        /* utility / UI */
+  --font-display: …;     /* brand moments */
+  --font-mono: …;        /* code, ids, data */
+
+  /* RADIUS, SHADOW, SPACING use a single scale each */
+  --radius-1: 6px; --radius-2: 10px; --radius-3: 14px;
+  --shadow-1: …; --shadow-2: …; --shadow-3: …;
+  --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px;
+  --space-5: 24px; --space-6: 32px; --space-7: 48px; --space-8: 64px;
+
+  /* MOTION */
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --ease-in:  cubic-bezier(0.4, 0, 1, 1);
+  --dur-1: 120ms; --dur-2: 180ms; --dur-3: 260ms;
+}
+```
+
+Drop in `assets/tokens.css` and `assets/tailwind.config.ts` as starters. Full guidance: `references/DESIGN_LANGUAGE.md`.
+
+---
+
+## 3. Typography
+
+Two tiers — pick one font per tier, max three families total in the app.
+
+| Tier        | Used for                                  | Picks                                                                |
+|-------------|-------------------------------------------|----------------------------------------------------------------------|
+| **Utility** | UI labels, body, tables, forms (95% of surfaces) | A neutral, well-built grotesque or humanist sans. **Not Inter, not Roboto, not system-ui.** Try: Söhne, ABC Diatype, Geist, Switzer, General Sans, IBM Plex Sans. |
+| **Display**  | Hero, onboarding, marketing-adjacent moments, empty-state illustrations | A characterful display face or a confident serif. Try: GT Sectra, PP Editorial New, JetBrains Mono Display, Söhne Breit, Tiempos, ABC Marfa. |
+| **Mono**    | Code, ids, numerical data, command palette | A modern mono with good character distinction. Try: Berkeley Mono, JetBrains Mono, Geist Mono, Commit Mono, IBM Plex Mono. |
+
+Rules:
+
+- **Inter is banned as the brand voice.** It is acceptable as the utility face *only* when paired with a distinctive display face, and never as the only font in the app.
+- **System-ui stacks are banned.** Apps that look the same on every OS are not a feature — they are a missed opportunity. Self-host or use a font CDN.
+- **Two weights per family, max three.** Most apps need: regular (400), medium (500), semibold (600). Adding more weights is a code-smell.
+- **Size scale**: 5 sizes max. `12 / 14 / 16 / 20 / 28` works for most apps. Use the scale; do not invent `13px`.
+- **Line height by purpose**: 1.5 for body, 1.3 for headings, 1.0 for numerals in dense tables.
+
+Worked examples + pairing rules: `references/DESIGN_LANGUAGE.md`.
+
+---
+
+## 4. Color
+
+Semantic over literal. Components reference `--color-fg-muted`, not `#71717a`.
+
+The **MIS palette posture**:
+
+- **One dominant surface tone**, two elevated surfaces, hairline borders.
+- **One accent**, used sparingly. Accent is for *primary action* and brand moments — not every interactive element.
+- **Status colors** (danger / warning / success) deferred to the foreground/icon, never the entire surface, except in toast / banner contexts.
+- **Dark mode is first-class**, not a `prefers-color-scheme` afterthought. Design the dark theme as a peer, with its own neutral curve.
+
+Anti-patterns:
+
+- Purple-on-white gradient backgrounds. Don't.
+- Drop shadows everywhere to "create depth". Borders + a single subtle shadow do the same job with more refinement.
+- Saturated full-bleed banners. Use the accent as an accent.
+- A palette of seven distinct hues. Apps with a coherent identity have ≤ 2 hues + a neutral curve.
+
+Full discussion: `references/DESIGN_LANGUAGE.md`.
+
+---
+
+## 5. Motion
+
+Motion in apps **earns its keep by explaining state**, not by decorating. The same micro-interaction triggered fifty times a day will be loved or hated — restraint wins.
+
+| Use motion for                                                                 | Don't use it for                              |
+|--------------------------------------------------------------------------------|-----------------------------------------------|
+| Transitioning a panel / drawer / modal in and out                              | Animating every list item on mount            |
+| Connecting cause and effect (clicked thing → revealed thing)                   | Scroll-triggered "wow" reveals on app surfaces |
+| Communicating async work (pending → success / error)                           | Bouncing icons / spring effects on hover      |
+| Telegraphing affordance on hover for non-obvious controls                      | Decorative ambient motion in the chrome       |
+
+Durations:
+
+- Micro (`--dur-1: 120ms`): hover, focus rings, color shifts.
+- Standard (`--dur-2: 180ms`): drawers, popovers, dropdowns.
+- Deliberate (`--dur-3: 260ms`): full-page transitions, large layout shifts.
+
+Easing: `--ease-out` for "appearing" motion (the user is the cause); `--ease-in` for "leaving" (the result is the cause). A symmetric ease for both is amateurish.
+
+**Respect `prefers-reduced-motion: reduce`.** Replace motion with instant state changes, never just shorten the duration.
+
+Full motion patterns + Framer Motion examples: `references/DESIGN_LANGUAGE.md`.
+
+---
+
+## 6. App patterns
+
+The patterns that make or break a web app live in `references/APP_PATTERNS.md`. Quick map:
+
+| Pattern              | Notes                                                                                            |
+|----------------------|--------------------------------------------------------------------------------------------------|
+| **Data table**       | Density modes; sticky headers; per-row hover affordance; bulk actions; row-level keyboard nav.   |
+| **Form**             | Inline validation; clear required vs optional; primary action right-aligned; cancel never destructive. |
+| **Modal / dialog**   | Sized to content; focus trap; ESC to close; primary action confirms, never destroys silently.     |
+| **Drawer / side-panel** | Right-aligned by default; preserves table context behind it; URL-addressable when stateful.   |
+| **Command palette**  | ⌘K (Ctrl+K). Indexes navigation, actions, search. Required for any app with > 8 navigation items. |
+| **Settings**         | Sectioned, sticky in-page nav, single-column form layout; no nested tabs.                         |
+| **Empty state**      | Earned brand moment — illustration, voice, clear "first action". See [section 7](#7-states-and-feedback). |
+| **Notification / toast** | Bottom-right; auto-dismiss with hover-pause; include an undo where applicable.               |
+| **Confirmation**     | Destructive actions require type-to-confirm; non-destructive use the standard dialog.            |
+| **Pagination**       | Prefer infinite scroll for feeds, explicit pagination for tabular data, with page-size selector. |
+
+---
+
+## 7. States and feedback
+
+Every interactive surface has at least these states. Design them up-front; don't bolt them on:
+
+| State              | What it shows                                                                  |
+|--------------------|--------------------------------------------------------------------------------|
+| **Empty (first run)** | Brand moment. Illustration, one-sentence pitch, one primary CTA. The only place expressive motion is welcome. |
+| **Empty (cleared)** | After a filter / search returns nothing. Calm, with a "clear filters" affordance. |
+| **Loading (initial)** | **Skeleton matching the final layout**, not a spinner. Spinner is for loads < 1s only. |
+| **Loading (incremental)** | Pending row / inline progress. Do not block the rest of the UI. |
+| **Partial**        | Some data loaded, some still pending. Show what you have; mark the rest.        |
+| **Optimistic**     | UI updates before the server confirms; reverts on failure with a toast + undo.  |
+| **Error**          | Specific message, suggested next step, retry affordance. **Never** "Something went wrong." |
+| **Success**        | Inline confirmation (✓ Saved) for low-stakes; toast for cross-screen; modal only for high-stakes irreversibles. |
+
+Full guidance + copy patterns: `references/STATES_AND_FEEDBACK.md`.
+
+---
+
+## 8. Keyboard and a11y
+
+Apps are tools; tools must be usable from the keyboard, by screen readers, and at every zoom level.
+
+Required for every screen:
+
+- **Tab order matches visual order.** No `tabindex` > 0.
+- **Visible focus rings on everything focusable.** Use the accent color; never `outline: none` without a replacement.
+- **The primary task completes from the keyboard.** Including modals, drawers, command palette, autosuggests.
+- **Shortcuts are documented in-app.** A `?` keystroke opens a shortcuts cheat sheet.
+- **Color is never the only signal.** Pair color with icon, text, or pattern.
+- **Form labels are real `<label>`s.** Placeholders are not labels.
+- **Live regions for async feedback.** Toast / inline confirmation use `aria-live`.
+
+Conventional shortcuts (don't reinvent):
+
+| Shortcut   | Action                       |
+|------------|------------------------------|
+| ⌘K / Ctrl+K | Command palette              |
+| ⌘/ / Ctrl+/ | Shortcuts cheat sheet         |
+| ⌘Enter      | Submit current form          |
+| Esc        | Dismiss the topmost overlay  |
+| g, then …  | Navigation prefix (Linear / GitHub style) |
+| j / k      | Next / previous in lists     |
+
+Full guidance: `references/ACCESSIBILITY_AND_KEYBOARD.md`.
+
+---
+
+## 9. Review checklist
+
+Block a design PR on:
+
+- [ ] No banned aesthetics (Inter as brand voice, purple-on-white gradient, system-ui stack, identical-everywhere cards, scattered decorative scroll motion).
+- [ ] All values reference tokens — no raw hex / px in component code.
+- [ ] Every interactive surface has empty / loading / error states (not just the happy path).
+- [ ] Loading > 1s uses skeleton matching final layout; < 1s may use a spinner.
+- [ ] Errors are specific and have a next-step affordance.
+- [ ] Primary task completes from the keyboard.
+- [ ] Focus rings visible; tab order matches visual order.
+- [ ] Color paired with a second signal (icon / text).
+- [ ] Dark mode is a peer theme, not an afterthought.
+- [ ] `prefers-reduced-motion` is honoured.
+- [ ] Type scale used (no `13px`, no inline `font-size`).
+- [ ] Motion durations come from the scale (`--dur-1/2/3`).
+- [ ] Destructive actions require explicit confirm (type-to-confirm for permanent ones).
+- [ ] Tables, forms, modals, drawers, settings pages follow the patterns in `APP_PATTERNS.md`.
+
+Comment-only (not blocking): copy wording, icon choice, exact pixel nudges.
+
+---
+
+## Anti-patterns (do not ship)
+
+- **Landing-page energy on app surfaces.** Hero-grade typography, full-bleed gradients, scroll-triggered reveals — none of these belong on a screen used daily.
+- **Generic AI aesthetic.** Inter + purple gradient + soft shadows + rounded cards. Refuse.
+- **Spinner as the only loading state.** Skeletons for anything > 1s.
+- **"Something went wrong."** Useless. Errors are specific or they're broken.
+- **Color as the only signal.** Status pills, validation, charts — pair with icons, labels, or patterns.
+- **Decorative motion on repeat-use surfaces.** Drawing the user's eye fifty times a day is hostile.
+- **Identical cards on every screen.** Cohesion ≠ uniformity. Differentiate by purpose.
+- **Dark mode as an inverted afterthought.** Design it as a peer; tweak the neutral curve and contrasts, not a global `filter: invert(1)` energy.
+- **Modals that confirm by reloading the page.** Optimistic UI + toast + undo, not full re-fetches.
+- **Settings pages with nested tabs.** Sectioned single column with sticky in-page nav.
+- **Tooltips for primary information.** Tooltips are for hints; primary information is visible.
+- **Hiding bulk actions in row menus.** Selection summary bar at the top is standard.

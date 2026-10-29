@@ -1,0 +1,102 @@
+---
+name: mis-client-crud-state
+description: >-
+  Frontend pattern for CRUD mutations without refetching lists — optimistic or
+  in-flight row states plus local store patches from API responses. Use when
+  implementing create, update, delete, or rename in client-hydrated lists,
+  sidebars, tables, or when the user asks to avoid refetch after mutations.
+---
+
+# MIS client CRUD state
+
+Prefer **local list state patches** over **refetch-after-mutation** when the UI already holds the collection and the mutation response (or submitted input) is enough to update it.
+
+## When to use
+
+| Situation | Patch local state | Refetch |
+|-----------|-------------------|---------|
+| Create returns the new row (id, title, timestamps) | Prepend/append from response | Initial page load only |
+| Update/rename with known final fields | `map` + merge patch | Never, unless server computes fields you don't have |
+| Delete on success | `filter` out id | Never |
+| Server derives opaque fields (counts, permissions, sort keys) | Partial patch + targeted refetch of **one** item or **one** scope | Scoped refetch only |
+| Multi-tab / multi-user consistency is critical | Invalidate or refetch on focus | Full or scoped refetch |
+
+Default for MIS app surfaces (sidebars, nested lists): **patch in the provider that owns the list**.
+
+## Contract
+
+1. **One store** owns the collection (`ProjectsProvider`, table context, etc.).
+2. **Expose narrow mutators** — `addX`, `updateX`, `removeX` — not raw `setState` from widgets.
+3. **Track in-flight rows** separately from the collection when the row should show a spinner:
+   - Create: `pendingChat` placeholder before id exists
+   - Update/delete: `mutatingChat` (or `mutatingIds`) keyed by stable id
+4. **Mutation hook flow**:
+   - Set in-flight marker → call API → patch store from response/input → clear marker
+   - On error: clear marker only; do not patch
+5. **No `refetch()` / `router.refresh()`** after success unless SSR-only surfaces still need it (prefer patching those from the same store).
+
+## Per-operation patterns
+
+### Create
+
+```ts
+setPendingRow({ projectId, title });        // instant sidebar row + spinner
+const created = await api.create(body);
+addRow(projectId, mapResponseToRow(created)); // use response id — no GET list
+clearPendingRow();
+navigate(`/…/${created.id}`);
+```
+
+### Update / rename
+
+```ts
+setMutatingRow({ id, operation: "rename", title: nextTitle });
+await api.patch(id, { title: nextTitle });
+updateRow(projectId, id, { title: nextTitle, updatedAt: now });
+clearMutatingRow();
+```
+
+Show the **new title** on the loading row during rename.
+
+### Delete
+
+```ts
+setMutatingRow({ id, operation: "delete", title: currentTitle });
+await api.delete(id);
+removeRow(projectId, id);
+clearMutatingRow();
+if (routeIsDeletedChat) navigate(parent);
+```
+
+Keep the row visible with a spinner until the DELETE succeeds, then remove it from state.
+
+## UI rules
+
+- In-flight row: spinner icon, reduced opacity, disable link and row menu.
+- Dedupe: drop `pending*` row once the real id appears in the collection.
+- Expand parent groups while a pending/mutating child exists so the user sees feedback.
+- Button-level `isPending` is fine for dialogs; **row-level** state must use the shared store so the correct row loads.
+
+## Anti-patterns
+
+- `await refetch()` after every create/rename/delete when the API already returned enough data.
+- `router.refresh()` to sync a client-hydrated sidebar — patch `getXById` consumers instead.
+- Global `isPending` without row id — wrong row won't show loading.
+- Optimistic patch before API **without** rollback on failure (in-flight marker only is safer for delete).
+
+## Reference implementation (this repo)
+
+| Concern | Location |
+|---------|----------|
+| List store + mutators | `features/projects/hooks/use-projects.tsx` |
+| Create + pending row | `features/chat/hooks/use-create-project-chat.ts` |
+| Rename/delete + mutating row | `features/chat/hooks/use-chat-mutations.ts` |
+| Sidebar rendering | `widgets/producer-app/ProjectGroup.tsx` |
+
+## Review checklist
+
+- [ ] Success path patches local collection; no list refetch.
+- [ ] In-flight state is keyed by id (or pending placeholder) and cleared on error.
+- [ ] Response body fields used for create; submitted input used for rename when response is empty.
+- [ ] Deleted row removed from state; navigation away if viewing deleted resource.
+- [ ] Header/detail views read from the same store (`getChatById`) so patches propagate.

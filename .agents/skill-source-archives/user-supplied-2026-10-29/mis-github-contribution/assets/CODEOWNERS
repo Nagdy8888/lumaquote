@@ -1,0 +1,36 @@
+# MIS standard CODEOWNERS
+#
+# Place at .github/CODEOWNERS in the repo root. GitHub auto-requests
+# review from the listed owners on any PR that touches matching paths,
+# and at least one owner approval is required to merge.
+#
+# Format: <path-pattern>  <@user-or-team>...
+# Later rules override earlier ones. Use @org/team-name for team handles.
+
+# Fallback: every file has an owner so nothing slips through.
+*                           @MIS-org/eng-leads
+
+# Backend / API
+/api/                       @MIS-org/backend
+/services/                  @MIS-org/backend
+/migrations/                @MIS-org/backend @MIS-org/dba
+
+# Frontend / web / mobile
+/web/                       @MIS-org/frontend
+/app/                       @MIS-org/frontend
+/mobile/                    @MIS-org/frontend
+
+# Infrastructure / DevOps
+/infra/                     @MIS-org/devops
+/.github/                   @MIS-org/devops
+/.github/workflows/         @MIS-org/devops
+/Dockerfile                 @MIS-org/devops
+/docker-compose*.yml        @MIS-org/devops
+
+# Security-sensitive files — require security review
+/auth/                      @MIS-org/security @MIS-org/backend
+**/secrets*                 @MIS-org/security
+
+# Docs — anyone in eng can approve
+*.md                        @MIS-org/eng
+/docs/                      @MIS-org/eng

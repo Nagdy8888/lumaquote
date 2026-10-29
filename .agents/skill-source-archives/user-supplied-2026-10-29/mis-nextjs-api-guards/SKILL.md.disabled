@@ -1,0 +1,235 @@
+---
+name: mis-nextjs-api-guards
+description: MIS standard for guarding Next.js (App Router) API route handlers — authentication, RBAC + permissions, ownership, rate limiting, input validation, idempotency, CORS/CSRF, timeouts, and a consistent error envelope. Guards are declared in one array via `defineRoute({ guards: [...], handler })`, run in order, and progressively type the context (NestJS `@UseGuards` / Django DRF `permission_classes` in spirit). Backends are pluggable adapters (Supabase auth + Upstash rate limit by default). Use whenever creating or reviewing a `route.ts` handler, adding auth/role/permission/rate-limit/validation checks to an API endpoint, standardizing API error responses, or migrating ad-hoc `withAuth`-style wrappers in an MIS Next.js repo.
+license: Proprietary — MIS (Modern Intelligence Solutions) internal use
+metadata:
+  team: MIS
+  version: "1.0"
+  stack: nextjs, typescript, zod
+  related: mis-nextjs-fsd, mis-gas-api
+---
+
+# MIS Next.js API route guards
+
+The contract for every guarded API route in an MIS Next.js app:
+
+1. **Guards are declarative.** Each `route.ts` verb is `export const POST = defineRoute({ guards: [...], handler })`. The `guards` array reads top-to-bottom in execution order — it *is* the list of what protects the route.
+2. **The context is progressively typed.** Guards fold their additions into one `ctx`: `ctx.principal` is non-null after `auth()`, `ctx.body` is typed after `validate({ body })`. No manual annotations.
+3. **The runner owns cross-cutting output.** Correlation id (`X-Request-Id`), the success/failure envelope, and the audit log are produced in one place — guards and handlers never reinvent them.
+4. **Backends are pluggable adapters.** Auth, rate-limit, idempotency, and logging are wired once via `configureGuards(...)`. Swap Supabase or Upstash for anything without touching a route.
+5. **The principal comes from the verified session only** — never a header. No mass-assignment: validation passes only the schema's fields.
+
+Drop-in implementation lives in `assets/shared/api/` — copy the tree as-is. Depth on each topic:
+
+| Topic | Reference |
+|-------|-----------|
+| `defineRoute` / `Guard` / context contract + the type fold | `references/GUARD_PIPELINE.md` |
+| Why declarative over HOF wrappers (the decision/ADR) | `references/CONVENTION_COMPARISON.md` |
+| Every guard: config, failure codes, examples | `references/GUARD_CATALOG.md` |
+| Adapters, custom backends, Edge/Node matrix, setup | `references/ADAPTERS.md` |
+| Error envelope, codes, correlation + audit, GasError→502 | `references/ERROR_ENVELOPE.md` |
+| Migrating from `withAuth` / `withRole` wrappers | `references/MIGRATION_FROM_HOF.md` |
+| Security rules (session-only, CSRF, idempotency, ordering) | `references/SECURITY_NOTES.md` |
+
+---
+
+## Decision tree
+
+| If the user asked to… | Go to |
+|-----------------------|-------|
+| Protect an API route / add guards | [1. Guard a route](#1-guard-a-route) |
+| Require login, a role, a permission, or ownership | [2. Auth & authorization](#2-auth--authorization) |
+| Rate-limit an endpoint | [3. Rate limiting](#3-rate-limiting) |
+| Validate body / query / params | [4. Validation](#4-validation) |
+| Return errors consistently | [5. Responses & errors](#5-responses--errors) |
+| Wire or swap a backend (Supabase, Upstash, logger) | [6. Configure adapters](#6-configure-adapters) |
+| Migrate `withAuth(...)` wrappers | [7. Migrate from HOF wrappers](#7-migrate-from-hof-wrappers) |
+| Review a route for compliance | [8. Review checklist](#8-review-checklist) |
+| Understand why the array style was chosen | `references/CONVENTION_COMPARISON.md` |
+
+---
+
+## 1. Guard a route
+
+A route handler is one `defineRoute` per HTTP verb, exported under that verb's name. Guards run in array order; the handler runs only if all pass and receives a fully-typed `ctx`.
+
+```ts
+/**
+ * @file app/api/orders/[id]/route.ts
+ * PATCH /api/orders/:id — managers update an order's note.
+ */
+import { z } from "zod"
+import { ok } from "@/shared/api/respond"
+import { defineRoute } from "@/shared/api/run-route"
+import { auth } from "@/shared/api/guards/auth"
+import { roles } from "@/shared/api/guards/authorize"
+import { rateLimit } from "@/shared/api/guards/rate-limit"
+import { validate } from "@/shared/api/guards/validate"
+import { updateOrder } from "@/entities/order"
+
+const Params = z.object({ id: z.string().uuid() })
+const Body = z.object({ note: z.string().min(1).max(500) })
+
+export const PATCH = defineRoute({
+  guards: [
+    rateLimit({ window: "1m", limit: 20 }),
+    auth(),
+    roles("admin", "manager"),
+    validate({ params: Params, body: Body }),
+  ],
+  handler: async function patchOrder(_req, ctx) {
+    // ctx.principal: Principal · ctx.params.id: string · ctx.body.note: string — all inferred
+    const updated = await updateOrder(ctx.params.id, { note: ctx.body.note })
+    return ok(ctx, updated)
+  },
+})
+```
+
+The handler stays **thin** (an FSD rule from `mis-nextjs-fsd`): guards handle cross-cutting concerns, the body delegates to an entity/feature `api/`. Full working example: `assets/template-route-handler.ts`.
+
+### Canonical guard order
+
+Cheap, cacheable rejections first; expensive, DB-touching ones last:
+
+```
+method → contentType → bodyLimit → cors → origin → maintenance/featureFlag
+       → rateLimit → auth → roles/permissions/ownership → idempotency → validate → handler
+```
+
+Rate-limit **before** `auth()` so unauthenticated floods are cheap. For per-user throttling, add a second `rateLimit({ keyBy: "principal" })` *after* `auth()`. `audit()` goes after `auth()` so the actor is known.
+
+---
+
+## 2. Auth & authorization
+
+Four guards, each composing on the previous. `roles`, `permissions`, and `ownership` **require `auth()` earlier** — their context need is `{ principal }`.
+
+| Need | Guard | Result on failure |
+|------|-------|-------------------|
+| Logged in | `auth()` → adds `ctx.principal` | 401 |
+| Logged in or not | `optionalAuth()` → `ctx.principal: Principal \| null` | never |
+| One of N roles (ADMIN bypasses) | `roles("admin", "manager")` | 403 |
+| All of N permissions (DRF-style) | `permissions("orders:write")` | 403 |
+| Owns the resource (admins bypass) | `ownership(load)` → adds `ctx.resource` | 404 then 403 |
+
+```ts
+guards: [
+  auth(),
+  ownership(async function loadOrder(ctx) {
+    const order = await getOrder(ctx.params.id)
+    return order ? { ownerId: order.userId, resource: order } : null
+  }),
+]
+// handler reads ctx.resource (typed) — no second fetch
+```
+
+`Principal` is `{ id, roles, permissions?, ...claims }`. The `AuthAdapter` builds it from the **verified session**; roles/permissions come from your DB (see `mapUser` in `assets/template-bootstrap.ts`). Details: `references/GUARD_CATALOG.md`.
+
+---
+
+## 3. Rate limiting
+
+```ts
+rateLimit({ window: "1m", limit: 10 })                 // by IP (default)
+rateLimit({ window: "1h", limit: 100, keyBy: "principal" })  // by user — needs auth() first
+rateLimit({ window: "1m", limit: 5, keyBy: (ctx) => ctx.req.headers.get("x-api-key") ?? "anon" })
+```
+
+`window` is a number (ms) or `"30s"`/`"1m"`/`"1h"`/`"1d"`. The guard adds `X-RateLimit-*` headers and returns **429 + `Retry-After`** when exceeded.
+
+**Serverless-critical:** the default adapter is Upstash Redis (REST), shared across isolates. The in-memory adapter is **dev/test only** — per-process, so on Vercel the real limit becomes `limit × instances`. See `references/ADAPTERS.md`.
+
+---
+
+## 4. Validation
+
+```ts
+validate({
+  params: z.object({ id: z.string().uuid() }),
+  query: z.object({ page: z.coerce.number().default(1) }),
+  body: z.object({ title: z.string().min(1) }),
+})
+// → ctx.params.id, ctx.query.page, ctx.body.title — all typed; only these fields survive
+```
+
+Each provided surface is parsed with Zod; failure returns **400 `validation_failed`** with `error.details` carrying the flattened issues. `validate({ body })` consumes the request stream — read the body via `ctx.body`, not `req.json()`.
+
+---
+
+## 5. Responses & errors
+
+Every response is one envelope shape so clients branch on `ok` + `code`, never prose:
+
+```jsonc
+{ "ok": true,  "data": { /* ... */ }, "requestId": "..." }
+{ "ok": false, "error": { "code": "forbidden", "message": "...", "details": {} }, "requestId": "..." }
+```
+
+Build them with `ok(ctx, data)` and `fail(ctx, status, code, message, details?)`. Or **throw** a typed error — the runner renders it:
+
+```ts
+import { NotFoundError, ForbiddenError } from "@/shared/api/errors"
+if (!order) throw new NotFoundError("Order not found")
+```
+
+Any non-`ApiError` throw becomes a 500 `internal_error` (internals never leak). The runner stamps `X-Request-Id` and writes the audit log on **every** path. Codes + GAS `502` mapping: `references/ERROR_ENVELOPE.md`.
+
+---
+
+## 6. Configure adapters
+
+Wire backends **once** at boot — copy `assets/template-bootstrap.ts` to `shared/api/bootstrap.ts` and import it from `instrumentation.ts`:
+
+```ts
+configureGuards({
+  auth: supabaseAuth({ mapUser: async (u) => ({ id: u.id, roles: await rolesFor(u.id) }) }),
+  rateLimit: upstashRateLimit(),       // or inMemoryRateLimit() in dev
+  idempotency: upstashIdempotency(),
+  // logger defaults to consoleLogger(); swap for pino here
+})
+```
+
+A backend is only required when a guard that uses it runs (unconfigured → a clear boot-time error). Writing a custom adapter (Auth0, Clerk, Prisma roles, sliding-window limiter): `references/ADAPTERS.md`.
+
+---
+
+## 7. Migrate from HOF wrappers
+
+The old `withAuth(withRole('admin')(withValidation(schema)(handler)))` maps mechanically:
+
+| Old wrapper | New guard |
+|-------------|-----------|
+| `withAuth(h)` | `auth()` |
+| `withRole('admin')(h)` | `roles("admin")` |
+| `withOwnership(load)(h)` | `ownership(load)` |
+| `withValidation(schema)(h)` | `validate({ body: schema })` |
+
+Prefer `defineRoute({ guards: [...] })`. Teams that insist on composition can use the `compose(...guards)(handler)` escape hatch — identical runner, HOF shape. Before/after examples: `references/MIGRATION_FROM_HOF.md`.
+
+---
+
+## 8. Review checklist
+
+When reviewing a `route.ts` in an MIS repo, block on:
+
+- [ ] Every verb is `defineRoute({ guards, handler })` (or `compose`), not a bare handler doing ad-hoc checks.
+- [ ] Guards are in canonical order; `rateLimit` before `auth`; `roles`/`permissions`/`ownership` after `auth`.
+- [ ] Mutations (POST/PUT/PATCH/DELETE) have `validate({ body })` and, for cookie auth, `origin()`.
+- [ ] No business logic in the handler beyond delegating to an entity/feature `api/`.
+- [ ] Responses use `ok()`/`fail()` or thrown `ApiError`s — never hand-rolled `NextResponse.json` envelopes.
+- [ ] Principal is read from `ctx.principal`, never from a request header.
+- [ ] Rate limiting uses the distributed adapter in production (not `inMemoryRateLimit`).
+- [ ] The body is read via `ctx.body`, not a second `req.json()`.
+
+---
+
+## Anti-patterns (do not do this)
+
+- Ad-hoc `if (!session) return ...` inside the handler. Use `auth()` — one place, typed, testable.
+- Hand-built error shapes (`NextResponse.json({ error })`). Use the envelope so clients stay stable.
+- Reading the principal from `X-Auth-User` / any header. Only the verified session is trusted.
+- `inMemoryRateLimit()` in production. It doesn't share state across serverless isolates.
+- Deep HOF nesting (`withA(withB(withC(h)))`). It fights inference and reads inside-out; use the array.
+- Calling `req.json()` in the handler after `validate({ body })`. The stream is already consumed — use `ctx.body`.
+- Putting guards in the wrong order (e.g. `validate` before `auth`) so you parse bodies for unauthenticated callers.
+- Skipping `configureGuards` and expecting `auth()` to work — wire adapters at boot.
