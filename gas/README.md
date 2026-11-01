@@ -1,0 +1,141 @@
+# Google Apps Script integration
+
+This folder is the single source managed by the root `.clasp.json` mapping.
+Use `npm run google:status` and `npm run google:push` from the repository root.
+After adding files, verify a remote pull; a skipped upload is not evidence of a
+successful upload. No Google Cloud Console or backend Google OAuth setup is needed.
+
+The [backend synchronization reference](../docs/reference/GOOGLE_SYNC.md) details
+exact envelopes, signature/mapping/replay checks, whole-table validation,
+transactional publication and freshness semantics. The [data model](../docs/reference/DATA_MODEL.md)
+explains receipt/snapshot ownership and grants. This file remains the clasp/account
+setup guide so operating instructions have one primary home.
+
+## Source responsibilities
+
+- `appsscript.json`: V8 runtime, Cairo timezone, Sheets/trigger/HTTP scopes. Drive
+  access is not currently requested because the export adapter is unfinished.
+- `Configuration.gs`: required Script Properties, HTTPS callback destination,
+  and SHA-256 HMAC signing of exact UTF-8 request bytes.
+- `Workbook.gs`: non-destructive synthetic initializer and safe workbook/tab
+  diagnostics through `inspectSupplierWorkbook`.
+- `Notifications.gs`: owned manual-edit trigger, signed invalidation and editor
+  test. The updated handler also attempts a full snapshot after notification.
+- `Synchronization.gs`: bounded table capture, stable-read checks, signed full
+  snapshots and the owned one-minute reconciliation trigger.
+
+The workbook is authoritative for commercial inputs. The ingested catalog remains
+the evidence authority for supported product specifications. Backend validated
+snapshots are synchronized observations, not independent editable price lists.
+The Quote Register tab is initialized with headers; automatic register writes are
+not implemented. Initializer completion preserves existing populated tabs and
+does not by itself prove the intended workbook was filled.
+
+## Account setup
+
+Script Properties: `LUMA_SPREADSHEET_ID`, `LUMA_COMPANY_ID`,
+`LUMA_CALLBACK_URL`, `LUMA_CALLBACK_SECRET`. The ignored private setup file
+contains this machine's callback values. Never put the secret in source or chat.
+
+1. Run `initializeSyntheticWorkbook` for an empty dedicated synthetic workbook.
+2. Run `installSupplierEditTrigger` and `verifySupplierCallback`.
+3. Run `installSupplierSynchronization`. It sends an initial complete snapshot
+   and installs an owned one-minute trigger. The installer requires an idle script;
+   if another synchronization is running, wait for it to finish and run again.
+4. Manually edit Inventory, then verify backend stock and a fresh sync observation.
+
+The backend validates exact headers, unique/matching SKU sets, catalog-backed
+specifications, USD decimal prices, effective dates, stock, pack size and approved
+policies before atomically updating records. New SKUs/specification changes require
+catalog evidence ingestion first. Unknown columns, formulas, missing rows and
+conflicting policies are rejected. A 202 edit hint alone is not an imported snapshot.
+
+Timer pushes cover API edits that do not fire manual edit triggers. Google schedules
+timers approximately, so stale evidence must still block finalization. Failed pushes
+are retried with a fresh full read by the next timer; they never refresh backend
+freshness. The script lock coordinates this script, not human/API writers. Double
+reads detect changes during capture but cannot provide an atomic multi-tab Sheets
+transaction; avoid simultaneous multi-tab administrative updates during import.
+
+## Local receiver
+
+`node scripts/python.cjs -m uvicorn luma.google_gateway:app --host 127.0.0.1 --port 8002 --no-access-log`
+
+`ngrok http 8002 --inspect=false`
+
+Only callback routes are exposed by this gateway. The tunnel must stay running;
+update the callback property if its HTTPS address changes. GAS can access Sheets
+using the authorizing Google account; it does not forward Google tokens to the backend.
+
+## Backend contracts and persistence
+
+Both routes require `X-Luma-Signature`: lowercase SHA-256 HMAC hex over the exact
+request body with the shared secret. Version 1 envelopes carry company/workbook
+mapping, timestamp, UUID nonce and event. Timestamp acceptance is five minutes;
+snapshots additionally reject observations over five seconds in the future.
+
+- `POST /callbacks/google`: `supplier_records_changed`, at most 4096 bytes.
+  A 202 response means durable invalidation receipt, with `sync_status: pending`.
+  At most 120 new receipts per company per minute are admitted.
+- `POST /callbacks/google/snapshot`: `supplier_snapshot`, at most 512 KiB.
+  Includes Products, Prices, Inventory and Policies. A 202 response distinguishes
+  `validated` from `duplicate`. At most 30 new snapshots per company per minute
+  are admitted. Older/equal observations with new nonces are rejected.
+
+Identical nonce/body retries have one effect; nonce reuse with different bytes is
+a conflict. Authentication/mapping errors return 401/403, schema/domain rejection
+422, conflicts 409, body limits 413, rate limits 429, and unavailable configuration
+or database storage 503. Database transactions serialize imports per company and
+acknowledge only after commit. Replay receipts are pruned after ten minutes on
+accepted callback traffic. No background retention sweep is claimed.
+
+The `google_sync` backend feature owns routes, signing checks, schemas, validation
+and imports. `luma.google_gateway` composes only callback routes; it does not expose
+staff APIs or documentation endpoints. The callback router is not mounted in the
+normal staff application. Migrations `20261029120100_google_edit_receipts.sql` and
+`20261029123000_gas_snapshots.sql` add worker-only receipt/signal/state tables with
+RLS; browser and staff API roles have no direct table access.
+
+`google_edit_receipts` and `google_refresh_signals` record invalidation;
+`google_snapshot_receipts` deduplicates snapshot requests; `google_sync_state`
+stores the latest validated observation and source tables. Unchanged normalized
+data keeps its snapshot ID and refreshes observation time. Changed commercial data
+gets a new snapshot ID while preserving product/catalog identities and stored
+quotation revisions. Retained inventory locations/effective dates are in the
+source tables; the current product projection stores available quantity and price.
+
+## Troubleshooting and verification
+
+If the editor file list is empty, verify the linked project and `clasp status`.
+In this chat, a normal push reported `Skipping push` while a separate remote pull
+contained only the hidden manifest. A deliberate `clasp push --force` restored the
+four source files; an independent pull proved they arrived. This is clasp source
+upload, not a Git force-push. Inspect the intended mapping and remote state before
+overwriting source. After later additions, refresh the editor and select the
+relevant file to see its functions. The current project has five uploaded files.
+
+The execution API returned application-level `USER_ERROR / NOT_FOUND` even with
+clasp exit code zero. `scripts/google.cjs` checks the JSON error and does not count
+that as execution success. Editor runs and source uploads are separate capabilities;
+GAS-only push integration does not require repairing execution-API access.
+
+Run locally from the repository root:
+
+```powershell
+npm run check:architecture
+node scripts/python.cjs -m ruff check app/backend/luma/features/google_sync app/backend/luma/google_gateway.py tests/integration/test_google_callback.py tests/integration/test_gas_snapshots.py
+node scripts/python.cjs -m pytest tests/integration/test_google_callback.py tests/integration/test_gas_snapshots.py -q --tb=short
+Get-Content gas/Configuration.gs,gas/Notifications.gs,gas/Synchronization.gs,gas/Workbook.gs | node --check
+```
+
+These checks cover Python structure/contracts, lint, HTTP/database behavior and GAS
+syntax. They do not execute GAS services inside Google or prove timer installation.
+See [progress evidence](../docs/evidence/google-gas-progress.json) and
+[remaining account steps](../docs/MORNING_ACTIONS.md).
+
+## Evidence limits
+
+Edit-trigger delivery is live verified. Full snapshot import is locally verified;
+its live editor/timer runs are pending. Drive export is not implemented yet. It
+will use GAS authorization and a private configured folder, not backend OAuth or
+public sharing. No WhatsApp delivery or whole-phase completion is claimed.

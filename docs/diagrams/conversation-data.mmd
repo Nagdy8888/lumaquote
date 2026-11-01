@@ -1,0 +1,30 @@
+erDiagram
+  accTitle: Conversation, exact media message and durable job scope
+  accDescr: Conversations own messages and jobs within a company. A media row references its exact company, conversation and source message, so another conversation's message cannot be relabeled as its attachment.
+  companies ||--o{ conversations : scopes
+  conversations ||--o{ messages : contains
+  conversations ||--o{ jobs : queues
+  conversations ||--o{ media : scopes
+  messages ||--o| media : attaches
+  conversations {
+    uuid id PK
+    uuid company_id FK
+    integer version
+  }
+  messages {
+    uuid id PK
+    uuid company_id FK
+    uuid conversation_id FK
+  }
+  media {
+    uuid message_id PK,FK
+    uuid company_id FK
+    uuid conversation_id FK
+    text status
+  }
+  jobs {
+    uuid id PK
+    uuid conversation_id FK
+    integer fence
+    timestamp lease_until
+  }

@@ -76,12 +76,12 @@ def extract(state):
             ) / Decimal(1000000)
             with database(worker=True) as conn:
                 conn.execute(
-                    "update luma.usage set status='settled',estimated=%s where job_id=%s",
+                    "update luma.usage set status='settled',estimated=%s where job_id=%s and operation='primary'",
                     (estimate, state["job_id"]),
                 )
         except Exception:
             with database(worker=True) as conn:
-                conn.execute("update luma.usage set status='unknown' where job_id=%s", (state["job_id"],))
+                conn.execute("update luma.usage set status='unknown' where job_id=%s and operation='primary'", (state["job_id"],))
             raise
     else:
         result = baseline_extract(text)

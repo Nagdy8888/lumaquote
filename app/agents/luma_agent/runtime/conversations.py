@@ -13,7 +13,16 @@ from ..graph import build_graph
 
 
 def process_conversation(job):
-    """Serialize a company's graph thread and resume only its pending authorized participation point."""
+    """Run one trusted job against its company/conversation PostgreSQL thread.
+
+    A session advisory lock spans checkpoint commits. Pending media, duplicate
+    customer turns and older work already covered by staff/decided quotes return
+    without new extraction. Review-only jobs can complete only an existing review
+    pause; customer clarification resumes only on a new customer message. Resume
+    commands carry job identity, never approval authority. Persist checkpoints
+    synchronously with bounded recursion and raw tracing disabled. Node/business
+    errors propagate to worker outcome handling; this function does not dispatch.
+    """
     state = {
         "company_id": str(job["company_id"]),
         "conversation_id": str(job["conversation_id"]),

@@ -1,0 +1,38 @@
+erDiagram
+  accTitle: Current catalog evidence and semantic cache relationships
+  accDescr: Companies own sources, commercial snapshots and products. The current embedding cache references the product and source within the same company, with source version, page and content validated at retrieval time.
+  companies ||--o{ sources : owns
+  companies ||--o{ snapshots : observes
+  companies ||--o{ products : scopes
+  sources ||--o{ products : supports
+  snapshots ||--o{ products : prices
+  products ||--o| catalog_embeddings : caches
+  sources ||--o{ catalog_embeddings : binds
+  companies {
+    uuid id PK
+    boolean synthetic
+  }
+  sources {
+    uuid id PK
+    uuid company_id FK
+    integer version
+    timestamp retired_at
+  }
+  snapshots {
+    uuid id PK
+    timestamp observed_at
+    text digest
+  }
+  products {
+    uuid id PK
+    text sku
+    uuid source_id FK
+    uuid snapshot_id FK
+  }
+  catalog_embeddings {
+    uuid company_id PK
+    uuid product_id PK,FK
+    integer source_version
+    text content
+    vector embedding
+  }

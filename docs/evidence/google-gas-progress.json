@@ -1,0 +1,27 @@
+{
+  "date": "2026-10-29",
+  "timezone": "Africa/Cairo",
+  "scope": "Google Apps Script work from this chat; phase 4 remains incomplete",
+  "revision": "working tree based on 6b645856ff98ee4ca404fe246d83c9f0cca93e37",
+  "environment": "isolated local Supabase; native callback gateway; temporary ngrok tunnel; authorized synthetic Google workbook",
+  "decision": "GAS-only Workspace access; no backend Google OAuth or Google Cloud setup",
+  "current_checks": [
+    {"command": "npm run check:architecture", "status": "Passed", "result": "74 Python modules"},
+    {"command": "node scripts/python.cjs -m ruff check app/backend/luma/features/google_sync app/backend/luma/google_gateway.py tests/integration/test_google_callback.py tests/integration/test_gas_snapshots.py", "status": "Passed"},
+    {"command": "node scripts/python.cjs -m pytest tests/integration/test_google_callback.py tests/integration/test_gas_snapshots.py -q --tb=short", "status": "Passed", "result": "2 passed"},
+    {"command": "Get-Content gas/Configuration.gs,gas/Notifications.gs,gas/Synchronization.gs,gas/Workbook.gs | node --check", "status": "Passed", "limit": "Syntax only; not GAS service execution"},
+    {"check": "Read-only database count of luma.google_sync_state", "status": "Passed", "result": "0 validated sync rows; live full-snapshot import remains pending"}
+  ],
+  "historical_chat_observations": [
+    "Remote source initially contained only the manifest; forced clasp upload and independent remote pull restored and verified four files.",
+    "User confirmed initialized workbook readiness.",
+    "Public callback accepted signed test with 202 and rejected forged signature with 401.",
+    "Editor verifier receipt independently observed at 2026-10-29 11:22:19 Africa/Cairo.",
+    "User manual Inventory edit receipt independently observed at 2026-10-29 11:28:32 Africa/Cairo.",
+    "Five files uploaded after adding Synchronization.gs; final small lock-error change was subsequently uploaded.",
+    "Public snapshot receiver rejected forged signature with 401."
+  ],
+  "blocked": ["Clasp execution returned Google USER_ERROR/NOT_FOUND; editor execution remains the account path", "No available browser automation host"],
+  "not_run_or_unfinished": ["Live full-snapshot acceptance", "Installed periodic trigger and subsequent automatic full refresh", "Drive canonical PDF export and independent retry", "Automatic Quote Register updates", "WhatsApp integration", "Whole-phase release verification"],
+  "notes": ["Historical observations are from tool results/user evidence in this chat, not newly repeated live tests", "Temporary tunnel availability is not production hosting", "No secrets, OAuth tokens or private property values are included", "No phase completion, deployment, new Git commit or push is claimed"]
+}

@@ -1,0 +1,27 @@
+---
+description: Apply this project's deep documentation and per-step documentation requirements.
+alwaysApply: true
+---
+
+# Project documentation
+
+Read root `AGENTS.md` and applicable nested instructions at the start of every
+project prompt. Its documentation requirements are the canonical project rules.
+
+For every file-changing task or completed implementation/setup/verification step,
+use `.agents/skills/project-documentation/SKILL.md` and its linked deep documentation
+standard. Read the affected reference through `docs/README.md` before changing it.
+
+Keep meaningful function/class contracts adjacent to definitions and explain
+affected cross-module behavior in the focused `docs/reference/` guide. Update
+documentation and `docs/WORK_LOG.md` after each coherent step, before the next.
+A file list, one-line purpose label, generated schema or log alone is insufficient.
+
+Maintain affected source-backed Mermaid and SVG views using the documentation
+skill's visual standard. Run diagram consistency checks and inspect actual output;
+parse success alone cannot establish a readable, accurate diagram.
+
+Before reporting completion, review affected paths against source-backed docs and
+validate relevant links/examples/inline contracts. Preserve honest evidence and
+approved scope. This entry point delegates details to AGENTS.md and the skill;
+do not maintain a conflicting second copy of their policy here.

@@ -64,12 +64,28 @@ days; business data/checkpoints/audit 90 days; backups seven days.
 
 ## Provider defaults
 
+Google integration decision (user approved October 29): use Apps Script only for
+Google Workspace access. GAS sends HMAC-signed complete snapshots after edits and
+on a one-minute timer to the backend. No backend Google OAuth client/refresh token
+or Google Cloud setup is required. The phase 4 Google OAuth requirement is fulfilled
+through the user's Apps Script authorization rather than a separate backend grant.
+Drive exports must also use GAS and preserve the canonical approved PDF; that
+adapter remains unfinished. One-minute scheduling is approximate, not a 60-second
+delivery guarantee. Milestone checkboxes remain pending live verification.
+
 gpt-6-luna Responses, gpt-transcribe, text-embedding-3-small (1536 dimensions).
 Unavailable models are explicit blockers; never silently choose a costly fallback.
 Google consent/Apps Script authorization and Meta test settings require the user's
 accounts. Live tests and offline substitutes must be reported separately.
 
 ## Evidence and commits
+
+Google work from this chat is documented in [the GAS setup guide](../gas/README.md),
+[work log](WORK_LOG.md), and [GAS progress evidence](evidence/google-gas-progress.json).
+Local snapshot tests and live signed edit callbacks passed. Live full-snapshot
+import, periodic timer execution and Drive export remain pending; phase 4 is not
+complete. Root `AGENTS.md` requires documentation updates after every completed
+step or coherent file-change group and reading the rules at each project prompt.
 
 Phase 1 checks are recorded in [phase-1 evidence](evidence/phase-1.json).
 Phases 1 and 2 are locally verified; agent and external integration milestones remain unchecked.
@@ -83,9 +99,11 @@ transcription are implemented. Opt-in synthetic live canaries passed for Respons
 and transcription. Consequential fields require explicit written confirmation;
 model prose cannot authorize outbound commercial claims. A new worker resumes
 persisted customer/staff interrupts without trusting browser approval payloads.
-Photo intake, semantic retrieval/embeddings, broader evaluation and operational
-recovery remain unfinished. LangSmith export is blocked by the account's monthly
-trace allowance (HTTP 429), recorded in MORNING_ACTIONS.md. This is not a phase 3
+Photo intake and version-bound semantic retrieval/embeddings are implemented in
+the working tree with targeted database checks and a full local regression pass.
+Broader evaluation and remaining operational safeguards are unfinished. LangSmith
+export encountered an account monthly trace allowance rejection (HTTP 429) on
+October 29; current availability has not been reverified. This is not a phase 3
 completion or whole-app release claim.
 
 The current descriptive retrieval baseline uses exact codes first, then PostgreSQL
@@ -93,4 +111,10 @@ lexical ranking and explicit watt/CCT/IP constraints. Suggestions carry current
 source versions and original pages and require a written selection. Retired
 sources are excluded; outdated source/pages, changed prices and invalid pack quantities block old finalization.
 Generated development queries are reported separately from the frozen 80-case
-suite. Semantic embeddings and broader synonym/ambiguity coverage remain pending.
+suite. Paid semantic fallback and broader synonym/ambiguity evaluation remain pending.
+
+Photo intake progress: private image uploads now share bounded media processing
+with voice notes; normalized previews and literal unconfirmed label readings are
+implemented. Local provider-boundary tests and a synthetic vision canary passed.
+Browser/full regression verification passed with paid inference disabled; no new
+milestone is checked yet because broader evaluation/integration gates remain.

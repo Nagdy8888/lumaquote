@@ -9,7 +9,16 @@ from luma.features.messaging.authorization import authorize_outbound
 
 
 def deliver_one(company_id=None):
-    """Dispatch one authorized intent; trusted tests may restrict the worker to their isolated company."""
+    """Resolve one queued intent and apply only the implemented local-channel effect.
+
+    The optional company scope is trusted test control, not client authority.
+    Reclassify old submitting outcomes as unknown, then lock conversation before
+    outbox and reauthorize origin/ownership/approval/freshness. Ineligible or
+    nonlocal work is visibly blocked. Local message identity derives from the
+    intent, and message plus local_delivered status commit together. Return True
+    when an intent was handled (including blocked), False when none was selected;
+    neither value is a live provider receipt or an instruction to retry unknowns.
+    """
     with database(worker=True) as conn:
         conn.execute(
             """update luma.outbox set status='unknown',error_code='submission_interrupted',updated_at=now()

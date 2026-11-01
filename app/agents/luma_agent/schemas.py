@@ -10,7 +10,14 @@ class RequestedLine(StrictModel):
 
 
 class Extraction(StrictModel):
-    """Typed model result carrying explicit product requests and consequential uncertainty for clarification."""
+    """Bounded untrusted model output consumed by deterministic confirmation policy.
+
+    At most 20 requested lines carry nullable explicit fields; missing/uncertain
+    consequential values must lead to clarification. The model's clarification
+    prose is not outbound commercial authority: requirements.clarification_for
+    chooses fixed safe wording. Valid structure does not prove a SKU exists,
+    quantity is available, price is current or a quotation is approved.
+    """
 
     lines: list[RequestedLine] = Field(max_length=20)
     clarification: str | None

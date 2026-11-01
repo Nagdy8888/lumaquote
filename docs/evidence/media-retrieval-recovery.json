@@ -1,0 +1,92 @@
+{
+  "scope": "Local post-recovery working-tree verification; phase 3 remains incomplete",
+  "revision": "media-semantic-recovery-2026-10-29-working-tree",
+  "environment": "Isolated local Supabase/Auth/private Storage, offline Docker parser and native app processes",
+  "aggregate": {
+    "python_passed": 120,
+    "paid_canaries_skipped": 3,
+    "browser_deselected_from_python": 1,
+    "ui_passed": 5,
+    "commands": [
+      {
+        "command": "npm run lint:python",
+        "status": "Passed",
+        "seconds": 0.37,
+        "local_log": ".local/checks/lint-python.log"
+      },
+      {
+        "command": "npm run check:architecture",
+        "status": "Passed",
+        "seconds": 0.38,
+        "local_log": ".local/checks/check-architecture.log"
+      },
+      {
+        "command": "npm run check:frontend",
+        "status": "Passed",
+        "seconds": 0.55,
+        "local_log": ".local/checks/check-frontend.log"
+      },
+      {
+        "command": "npm run typecheck",
+        "status": "Passed",
+        "seconds": 4.21,
+        "local_log": ".local/checks/typecheck.log"
+      },
+      {
+        "command": "npm run test:python",
+        "status": "Passed",
+        "seconds": 153.49,
+        "local_log": ".local/checks/test-python.log"
+      },
+      {
+        "command": "npm run test:ui",
+        "status": "Passed",
+        "seconds": 3.83,
+        "local_log": ".local/checks/test-ui.log"
+      },
+      {
+        "command": "npm run test:browser",
+        "status": "Passed",
+        "seconds": 47.87,
+        "local_log": ".local/checks/test-browser.log"
+      },
+      {
+        "command": "npm run build",
+        "status": "Passed",
+        "seconds": 5.96,
+        "local_log": ".local/checks/build.log"
+      }
+    ]
+  },
+  "follow_up": [
+    {
+      "command": "pytest tests/integration/test_agent_retrieval.py -q",
+      "result": "passed",
+      "count": 4,
+      "seconds": 6.47
+    },
+    {
+      "command": "LUMA_RUN_LIVE_EMBEDDINGS=1 pytest tests/integration/test_live_embeddings.py -q",
+      "result": "passed",
+      "count": 1,
+      "seconds": 4.5
+    },
+    {
+      "command": "pytest tests/integration/test_live_embeddings.py -q",
+      "result": "skipped as intended without opt-in",
+      "count": 1
+    }
+  ],
+  "recovery": [
+    "Expired jobs are fenced and failed without provider replay.",
+    "Reserved usage becomes unknown and pending media exposes interruption.",
+    "Two actual DB connections verify locked transactions are skipped."
+  ],
+  "limits": [
+    "No whole-phase or production readiness claim.",
+    "LangSmith monthly quota remains blocked.",
+    "Frozen evaluation, retention, complete retry UI and live Meta integration remain pending.",
+    "Semantic plumbing canary embeds unchanged evidence and does not establish natural-language recall.",
+    "Concurrent GAS changes are outside this implementation checkpoint."
+  ]
+}

@@ -13,34 +13,47 @@ this document or a Git commit.
 
 ## Google Workspace / clasp
 
-Clasp authentication works. A dedicated project was created and the four source
-files were uploaded successfully:
+Clasp source management was verified during this chat. The initial four files
+were uploaded and read back; the later snapshot implementation added a fifth
+file, `Synchronization.gs`. Source now lives in root `gas/`.
 
 - [Supplier workbook](https://docs.google.com/spreadsheets/d/1rqDJM9DDnefp97Dr5RILn4SwHjI2Re0hSkbKK_JFBTE/edit)
 - [Apps Script editor](https://script.google.com/d/1j3tPsSvxcqsfFnI_nUw-vZRiM1JAERAuXZbMNBnICxcBtSWwUWe9e_7E/edit)
 
-The initializer has **not** been verified. The Google execution API returned
-`USER_ERROR / NOT_FOUND` while accessing storage. Clasp's exit code was zero;
-the project wrapper now rejects application-level errors as well.
+The editor execution was shown as Completed, and the user subsequently confirmed
+the workbook is ready. The initial normal clasp upload had skipped the source;
+a forced source upload and independent remote pull verified all four files.
+This does not establish execution through clasp: Google's execution API returned
+`USER_ERROR / NOT_FOUND`. Editor authorization and execution-API requirements
+are distinct; do not assume one fixes the other.
 
-1. Open the workbook and confirm that this Google account can access it.
-2. Open the script editor and accept required Google authorization when prompted.
-3. In Project Settings / Script Properties set `LUMA_SPREADSHEET_ID` to the
-   workbook ID above. Run `initializeSyntheticWorkbook` once from the editor.
-   It only fills empty dedicated tabs and preserves existing populated tabs.
-4. After authorization, `npm run google:initialize` should also execute successfully.
-5. The edit trigger additionally needs `LUMA_COMPANY_ID`, `LUMA_CALLBACK_URL`, and
-   `LUMA_CALLBACK_SECRET`. The backend callback/tunnel setup will be documented
-   with the integration phase. Keep the secret in Script Properties and ignored
-   backend environment configuration, never source control.
+- [x] Workbook ready, confirmed by the user in this session.
+- [x] Four source files uploaded and independently read back from Google.
+- [x] Manual Inventory edit confirmed by the user; a new signed receipt and refresh
+  signal were verified in the database at October 29, 2026, 11:28:32 Africa/Cairo.
+- [x] User confirmed `verifySupplierCallback` and `installSupplierEditTrigger`
+  both completed. Database verification found a second receipt at October 29,
+  2026, 11:22:19 Africa/Cairo, confirming the signed editor test reached the backend.
+  The subsequent manual-cell-edit receipt is verified above.
+- [x] User chose GAS-only Google integration. No backend Google OAuth client,
+  refresh token or Google Cloud Console setup is required.
+- [ ] Run `installSupplierSynchronization` in the refreshed Apps Script editor.
+  This validates the first full snapshot and installs a one-minute reconciliation
+  trigger. Verify a persisted `google_sync_state` row and subsequent timer refresh.
+- [ ] GAS Drive export remains to be implemented and verified. Choose its private
+  folder through Script Properties when that adapter is ready; no backend OAuth
+  credentials should be collected for it.
 
 Use `npm run google:status` and `npm run google:push` to manage the linked source.
 The ignored `.clasp.json` holds this machine's project mapping. Do not paste OAuth
-tokens into chat. No deployment or edit-trigger execution is claimed yet.
+tokens into chat. Manual edit-trigger delivery is verified. No public GAS web app
+deployment is required or claimed by this push-based design.
 
 Google Sheets and Drive also need authorized access to the chosen synthetic
 workbook and export folder. Apps Script edit notifications do not cover API edits,
-so the app additionally reconciles Sheet snapshots periodically.
+so the GAS-only adapter includes a one-minute reconciliation trigger. Its installation
+and live execution remain pending. Apps Script scheduling is approximate; stale
+commercial evidence continues to block finalization.
 
 ## WhatsApp test connection
 
@@ -49,6 +62,13 @@ recipient, and webhook registration. Credentials go only into ignored `.env`.
 The exact variable names and callback setup will be documented with the adapter.
 Until verified, the UI must show the connection as unverified or disconnected;
 local test delivery is not a WhatsApp delivery claim.
+
+Current local configuration check found all of these missing:
+`WHATSAPP_TOKEN`, `WHATSAPP_APP_SECRET`, `WHATSAPP_VERIFY_TOKEN`,
+`WHATSAPP_PHONE_ID`, `WHATSAPP_COMPANY_ID`, and `WHATSAPP_TEST_RECIPIENTS`.
+Enter credentials only in the ignored backend environment file, never chat.
+Meta adapter/webhook implementation remains a separate unfinished plan item;
+account setup alone will not establish live messaging.
 
 ## Evidence limits
 
@@ -85,7 +105,55 @@ establish accent/noise accuracy or the full frozen evaluation targets.
 
 The user confirmed the synthetic workbook is ready. Callback secret, company ID
 and workbook mapping were prepared in ignored .env.local without printing secrets.
-The backend does not yet implement /callbacks/google, and no public HTTPS callback
-URL has been verified. Do not install or claim a working edit trigger until the
-callback, authenticated receipt handling and reachable URL are implemented/tested.
-The user was asked whether to use a temporary local tunnel or an existing URL.
+The user authorized a temporary tunnel. A separate callback-only gateway on
+127.0.0.1:8002 now accepts signed hints durably; ngrok exposes that gateway with
+request inspection disabled. Public HTTPS checks returned 202 for a valid
+signature and 401 for a forged signature. The integration test covers concurrent
+duplicates, timestamp/company checks, size rejection, and staff-route isolation.
+Architecture/documentation and scoped Ruff checks passed.
+
+Completed account handoff: the user copied the callback properties and confirmed
+both editor functions completed; the backend independently received the signed
+test and subsequent manual-edit notification. Keep the ignored private setup file
+private. Clasp execution returned Google USER_ERROR/NOT_FOUND during this chat;
+available browser control had no host. Use the editor for remaining account runs.
+
+Next account action: refresh the editor, open `Synchronization`, and run
+`installSupplierSynchronization`. Verify a validated snapshot and a later timer
+refresh in the backend. A documentation-pass database check on October 29 found
+zero `google_sync_state` rows, so full live synchronization remains unverified.
+
+Manual edit notifications have been verified. GAS-only full-snapshot import and
+one-minute reconciliation are now implemented with local HTTP/database tests;
+live snapshot acceptance and timer execution remain pending that installer run.
+Drive export is unfinished. The tunnel/gateway must stay running; a changed tunnel URL requires a
+Script Property update. Gateway startup: `node scripts/python.cjs -m uvicorn
+luma.google_gateway:app --host 127.0.0.1 --port 8002 --no-access-log`.
+Tunnel startup: `ngrok http 8002 --inspect=false`; do not tunnel the staff API.
+
+The voice/resume progress commit `968ac22` is pushed and its static/unit/UI/build
+CI passed: https://github.com/Nagdy8888/lumaquote/actions/runs/40840676874
+A separate pre-existing edit to Apps Script `Workbook.gs` was preserved outside
+that commit. No account consent, quota increase or external deployment was made
+as part of this progress checkpoint.
+
+## Local Docker / WSL availability
+
+Historical interruption: the engine was unavailable and local Supabase Auth refused connections.
+Docker logs identify WSL distribution-list command timeouts; a bounded ordinary
+Docker Desktop restart also timed out. Starting the Docker Windows service was
+denied because the service could not be opened. No data reset or forced WSL
+shutdown was performed.
+
+When interactive Windows access is available, recover Docker Desktop/WSL (possibly
+with administrator assistance), preserving all project volumes. Do not factory
+reset Docker or delete VHDX/volumes as a routine repair. Then run this project's
+`npm run db:start`, `npm run db:configure` and `npm run setup` before integration
+verification. Photo/browser and new embedding migration/SQL tests are pending;
+offline implementation and tests continued independently.
+
+Recovery verified October 29 after the user restarted Docker: Engine 29.6.1 and
+`npm run db:start` are healthy; `npm run setup` applied pending migrations without
+resetting data. The targeted semantic/budget/photo/restart suite passed 22 tests.
+The prior Windows recovery action is resolved. Browser and full regression
+results are recorded separately in WORK_LOG.md; no manual reset is needed.

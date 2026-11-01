@@ -1,0 +1,16 @@
+flowchart TD
+  accTitle: Paid-operation estimated admission and uncertainty
+  accDescr: Primary and retrieval operations share one run maximum and global allowance lock. Existing operations cannot call again. Unknown responses retain reservations across the UTC day boundary.
+  Request["Fixed model and bounded operation"] --> Lock["Take global budget transaction lock"]
+  Lock --> Existing{"Operation already recorded?"}
+  Existing -->|Yes| Reconcile["Deny another call; require reconciliation"]
+  Existing -->|No| Amount["Primary run cap or bounded query reserve"]
+  Amount --> Room{"Within shared allowances?"}
+  Room -->|No| Manual["Deny paid work; staff path remains"]
+  Room -->|Yes| Reserve["Commit estimated reservation before call"]
+  Reserve --> Provider["Single bounded provider attempt"]
+  Provider --> Outcome{"Usable known result?"}
+  Outcome -->|Yes| Settled["Settle observed calculated estimate"]
+  Outcome -->|Lost or interrupted| Unknown["Keep unknown consumption reserved"]
+  Unknown --> Reconcile
+  %% This is internal estimated admission, never a provider invoice hard cap.

@@ -37,3 +37,25 @@ def test_duplicate_paid_operation_never_reserves_again(environment):
             reserve(conn, env["company"], job)
         assert conn.execute("select count(*) n from luma.usage where job_id=%s", (job,)).fetchone()["n"] == 1
         conn.rollback()
+
+
+def test_retrieval_requires_settled_room_and_cannot_repeat(environment):
+    """A child embedding shares the run allowance and cannot reuse an unresolved primary reservation."""
+    env = environment
+    job = uuid4()
+    with psycopg.connect(env["dsn"], row_factory=dict_row) as conn:
+        reserve(conn, env["company"], job)
+        with pytest.raises(DomainError, match="no remaining"):
+            reserve(conn, env["company"], job, operation="retrieval")
+        conn.execute("update luma.usage set status='settled',estimated=0.001 where job_id=%s", (job,))
+        reserve(conn, env["company"], job, operation="retrieval")
+        with pytest.raises(DomainError, match="reconciliation"):
+            reserve(conn, env["company"], job, operation="retrieval")
+        rows = conn.execute(
+            "select operation,reserved from luma.usage where job_id=%s order by operation", (job,)
+        ).fetchall()
+        assert rows == [
+            {"operation": "primary", "reserved": Decimal("0.25")},
+            {"operation": "retrieval", "reserved": Decimal("0.01")},
+        ]
+        conn.rollback()

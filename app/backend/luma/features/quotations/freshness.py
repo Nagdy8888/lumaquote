@@ -5,7 +5,15 @@ from luma.core.errors import DomainError
 
 
 def check_snapshot(conn, quote, current):
-    """Block finalization when commercial evidence is absent, stale, inconsistent, or synthetic for a live channel."""
+    """Validate the stored offer against current commercial and source records.
+
+    Synthetic observations are eligible only on local_test; other observations
+    must be at most 90 seconds old. Each line must retain its snapshot, active
+    source/page, price, valid pack quantity and sufficient available stock, with
+    no discontinued product. Raise DomainError before approval/dispatch on any
+    mismatch. This check neither reserves stock nor mutates/reprices an offer;
+    the caller must require a new reviewed revision when evidence changed.
+    """
     source = conn.execute(
         "select * from luma.snapshots where id=%s and company_id=%s",
         (quote["snapshot_id"], quote["company_id"]),

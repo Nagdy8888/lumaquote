@@ -14,7 +14,16 @@ from .schemas import DraftInput
 
 
 def draft(conn, member, user, cid, body: DraftInput):
-    """Validate an expected conversation version and authoritative products, then create a new immutable quotation revision."""
+    """Create a reviewable revision from scoped authoritative records, not client prices.
+
+    Lock the conversation, reject an obsolete expected version, resolve all
+    products/current sources and require one commercial snapshot. Deterministic
+    rules validate money, stock, packs and the supplied member's discount role.
+    The new canonical content captures reviewed customer labels and its hash;
+    previous revisions and affected queued intents are superseded/blocked in
+    this transaction. Return the latest persisted quote. The caller supplies a
+    verified member and owns transaction commit; no approval or send occurs here.
+    """
     company = member["company_id"]
     current = conversation(conn, company, cid, lock=True)
     if current["version"] != body.expected_version:

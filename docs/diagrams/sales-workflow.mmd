@@ -1,0 +1,13 @@
+flowchart TD
+  accTitle: LumaQuote request-to-reviewed-offer workflow
+  accDescr: Local test requests become clarified requirements, supported unapproved offers, exact staff decisions and revalidated local delivery. Ambiguity and takeover remain human participation points.
+  Intake["Local text, voice or label photo"] --> Explicit{"SKU and quantity confirmed?"}
+  Explicit -->|No| Clarify["Ask customer or involve staff"]
+  Clarify --> Explicit
+  Explicit -->|Yes| Evidence["Check catalog, price and observed stock"]
+  Evidence --> Draft["Create immutable offer revision"]
+  Draft --> Staff{"Salesperson decision"}
+  Staff -->|Revise or reject| Clarify
+  Staff -->|Approve exact revision| Check["Recheck authority and current evidence"]
+  Check --> Result["Record local delivery or a visible block"]
+  %% Real WhatsApp sending is intentionally not represented as implemented.

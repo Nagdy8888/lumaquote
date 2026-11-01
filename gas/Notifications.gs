@@ -33,4 +33,15 @@ function notifySupplierEdit(event) {
     throw new Error('Supplier sync notification was not accepted; periodic reconciliation remains required.');
   }
   PropertiesService.getScriptProperties().setProperty('LUMA_LAST_CALLBACK_AT', new Date().toISOString());
+  synchronizeSupplierWorkbook();
+}
+
+/** Send one signed test hint without changing any cell; success proves receipt only, not completed synchronization. */
+function verifySupplierCallback() {
+  var config = configuration_();
+  var book = SpreadsheetApp.openById(config.spreadsheetId);
+  var products = book.getSheetByName('Products');
+  if (!products) throw new Error('Initialize the Products tab before testing the callback.');
+  notifySupplierEdit({ source: book, range: products.getRange('A1') });
+  console.log('Signed callback accepted. Sheet snapshot synchronization is a separate operation.');
 }

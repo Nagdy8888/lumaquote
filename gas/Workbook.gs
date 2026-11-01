@@ -45,4 +45,19 @@ function initializeSyntheticWorkbook(spreadsheetId) {
     sheet.autoResizeColumns(1,tabs[name][0].length);
   });
   book.setSpreadsheetTimeZone('Africa/Cairo');
+  SpreadsheetApp.flush();
+  inspectSupplierWorkbook();
+}
+
+/** Log the configured workbook destination and tab sizes without exposing cell contents or private properties. */
+function inspectSupplierWorkbook() {
+  var id = PropertiesService.getScriptProperties().getProperty('LUMA_SPREADSHEET_ID');
+  if (!id) throw new Error('LUMA_SPREADSHEET_ID is missing in Script Properties.');
+  var book = SpreadsheetApp.openById(id);
+  console.log('Configured workbook: ' + book.getUrl());
+  ['Products', 'Prices', 'Inventory', 'Policies', 'Quote Register'].forEach(function reportTab_(name) {
+    /** Report only tab presence and occupied dimensions to diagnose skipped initialization safely. */
+    var sheet = book.getSheetByName(name);
+    console.log(name + ': ' + (sheet ? sheet.getLastRow() + ' rows, ' + sheet.getLastColumn() + ' columns' : 'MISSING'));
+  });
 }

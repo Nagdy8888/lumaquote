@@ -4,7 +4,7 @@ from langgraph.types import Command, interrupt
 from luma.core.database import database
 from luma.core.errors import DomainError
 from luma.features.catalog.retrieval import candidate_question, search_catalog
-from luma.features.catalog.schemas import CatalogSearch
+from luma.features.catalog.schemas import CatalogHit, CatalogSearch
 from luma.features.conversations.repository import conversation
 from luma.features.conversations.service import add_message
 from luma.features.quotations.drafting import draft as create_draft
@@ -23,7 +23,14 @@ def ask(state):
         if current["owner"] != "agent":
             raise DomainError("Automation paused.")
         assert_request_version(current, state)
-        if not state.get("extraction", {}).get("lines"):
+        proposed = [CatalogHit.model_validate(value) for value in state.get("catalog_candidates", [])[:5]]
+        verified = []
+        for hit in proposed:
+            current_hits = search_catalog(conn, state["company_id"], CatalogSearch(query=hit.sku))
+            if current_hits and current_hits[0] == hit:
+                verified.append(hit)
+        question = candidate_question(verified) or question
+        if not proposed and not state.get("extraction", {}).get("lines"):
             latest = conn.execute(
                 "select body from luma.messages where company_id=%s and conversation_id=%s and actor='customer' order by created_at desc,id desc limit 1",
                 (state["company_id"], state["conversation_id"]),

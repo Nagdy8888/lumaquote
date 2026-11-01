@@ -1,0 +1,19 @@
+flowchart TD
+  accTitle: Conservative catalog discovery and final candidate recheck
+  accDescr: Explicit constraints and codes are preserved. Lexical lookup precedes optional admitted semantic search. Current records are rechecked before a safe clarification question; similarity never selects an approved commercial line.
+  Need["Missing explicit product lines"] --> Parse["Parse exact codes and positive specs"]
+  Parse --> Safe{"Unambiguous supported query?"}
+  Safe -->|No| Generic["Safe clarification or staff review"]
+  Safe -->|Yes| Lexical["Exact-first then lexical current evidence"]
+  Lexical --> Hits{"Candidates found?"}
+  Hits -->|Yes| Recheck["Exact recheck source, version, page and content"]
+  Hits -->|No| Eligible{"Paid fallback allowed?"}
+  Eligible -->|No| Generic
+  Eligible -->|Yes| Embed["Recheck owner/version; reserve and embed query"]
+  Embed --> Semantic["Current tenant cache; same specs; bounded cosine distance"]
+  Embed -. Unavailable or uncertain .-> Generic
+  Semantic --> Recheck
+  Recheck -->|Validated candidates| Question["Fixed cited suggestions and written selection request"]
+  Recheck -->|No current match| Generic
+  %% Final prices, stock and action authority are owned by backend business rules.
+  %% Paid eligibility requires no explicit code, enabled AI and current vectors.

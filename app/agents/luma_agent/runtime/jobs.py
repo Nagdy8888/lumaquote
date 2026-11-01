@@ -2,13 +2,14 @@
 
 from luma.core.database import database
 
+from .recovery import recover_expired
+
 
 def claim_job():
     """Claim the next conversation-serialized job while enforcing the two-worker global capacity."""
     with database(worker=True) as conn:
         conn.execute("select pg_advisory_xact_lock(hashtextextended('luma:worker-capacity',0))")
-        conn.execute("""update luma.jobs set status='failed',error_code='worker_interrupted'
-            where status='running' and lease_until<now()""")
+        recover_expired(conn)
         active = conn.execute("select count(*) n from luma.jobs where status='running'").fetchone()["n"]
         if active >= 2:
             return None

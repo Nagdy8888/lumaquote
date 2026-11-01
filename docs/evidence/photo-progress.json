@@ -1,0 +1,64 @@
+{
+  "scope": "Working-tree photo intake and shared media lifecycle; full local regression passed before the separate interrupted-job recovery addition",
+  "revision": "photo-intake-2026-10-29-progress",
+  "environment": "Local isolated Supabase/Auth/Storage, restricted Docker parser, native worker; synthetic inputs only",
+  "checks": [
+    {
+      "command": "npm run verify:full",
+      "result": "passed",
+      "coverage": "117 Python tests passed, 3 paid canaries skipped, 5 UI tests passed, separate browser passed, lint/docs/types/build passed; new interrupted-job recovery requires separate follow-up"
+    },
+    {
+      "command": "npm run test:browser",
+      "result": "passed",
+      "count": 1,
+      "seconds": 51.87,
+      "coverage": "Private voice/photo preview, revisions, takeover/reply, stale edits, approval/local delivery, API restart, desktop/portrait Axe zero violations and no horizontal overflow"
+    },
+    {
+      "command": "pytest tests/integration/test_voice_intake.py",
+      "result": "passed",
+      "count": 6
+    },
+    {
+      "command": "pytest tests/integration/test_photo_intake.py",
+      "result": "passed",
+      "count": 4
+    },
+    {
+      "command": "npm run typecheck",
+      "result": "passed"
+    },
+    {
+      "command": "npm run check:frontend",
+      "result": "passed"
+    },
+    {
+      "command": "npm run test:ui",
+      "result": "passed",
+      "count": 5
+    }
+  ],
+  "live_canary": {
+    "model": "gpt-6-luna",
+    "data": "Generated synthetic supplier label",
+    "result": "Visible DL-001 read; fields unconfirmed; no approval/send",
+    "estimated_usd": "0.000131",
+    "actual_billing": "not retrieved"
+  },
+  "not_run": [
+    "Frozen photo/voice evaluation and holdout"
+  ],
+  "invariants": [
+    "Private typed previews; normalized JPEG cannot be served as audio.",
+    "Actual 5 MB byte cap, content decode, scoped idempotency and conversation precondition.",
+    "Unknown provider outcome keeps reservation and does not call provider again on the same record.",
+    "Label readings remain unconfirmed and create no approval or dispatch authority."
+  ],
+  "limits": [
+    "One clean synthetic canary is not accuracy evidence for real photographs.",
+    "Semantic embeddings are unfinished.",
+    "Bounded interrupted-job recovery has separate targeted tests; heartbeat/retry UI and retention remain unfinished.",
+    "LangSmith quota blocks live export."
+  ]
+}

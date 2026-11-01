@@ -10,9 +10,9 @@ def assert_request_version(current, state):
 
 
 def assert_job(conn, state):
-    """Reject side effects when the persisted job no longer holds the matching live fenced lease."""
+    """Reject stale leases and hold a shared row lock so recovery cannot fence a transaction mid-effect."""
     row = conn.execute(
-        "select 1 from luma.jobs where id=%s and fence=%s and status='running' and lease_until>now()",
+        "select 1 from luma.jobs where id=%s and fence=%s and status='running' and lease_until>now() for share",
         (state["job_id"], state["fence"]),
     ).fetchone()
     if not row:

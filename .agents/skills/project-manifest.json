@@ -33,8 +33,8 @@
     "plan-quotation-app": {
       "origin": "project-authored",
       "files": {
-        "references/agent-organization.md": "cf958c9f3c106db5e60a85e586679ed292d71f8a9304ffd38416e8f04b30fbb1",
-        "SKILL.md": "9f0dcf1629bd779ea61cb964e9ec45f087151a198a2f90600fe7ad89111d846c"
+        "SKILL.md": "f731d7f983f454b2ca41ebb6f1527a7263cd488a42c21559c215c137b5619427",
+        "references/agent-organization.md": "cf958c9f3c106db5e60a85e586679ed292d71f8a9304ffd38416e8f04b30fbb1"
       },
       "source_archive": "../skill-source-archives/user-supplied-2026-10-29",
       "adaptation": "Project-specific integration; original notices preserved in non-active archive"
@@ -95,13 +95,13 @@
     "verify-quotation-release": {
       "origin": "project-authored",
       "files": {
-        "SKILL.md": "68010f51c20ec43a021c0bfc07ad66b0464352f8b97f55836f02eae334cea2cc"
+        "SKILL.md": "4c2082e12982d730c31f3cf5abbcf5b177e331de36a5c69acdc649a4ef2380d0"
       }
     },
     "review-quotation-code": {
       "origin": "project-authored",
       "files": {
-        "SKILL.md": "720a2c1b81228055a652f677533e04f7aa2da1dd93401a955f3e2522a2beee0d"
+        "SKILL.md": "48e0d38d439f5b1ed6f35279590b090c0a53c7aaf5326ee5d94a505fa2eab4f6"
       }
     },
     "impeccable": {
@@ -199,10 +199,12 @@
       "source_archive": "../skill-source-archives/user-supplied-2026-10-29",
       "adaptation": "Project-specific integration; original notices preserved in non-active archive",
       "files": {
+        "SKILL.md": "819a9df94868d7c8ea12d79d0b2d3ccfa92b1f6ca5cc0dfed6b570a65f7a581f",
         "assets/decision-prompts.md": "0cb25d821d08f33ace44fda3a3652e81f35c3cb3a3b6377b31938f7cec7f0c2c",
         "assets/runbook-prompts.md": "617aca9d71ce01cf8e33430ac8156097be23d5c0926ca57f8340cb7a0d00d215",
+        "references/deep-documentation.md": "2026c94cbb4500bacec089783b311875efc3f4200c8d8ff6bcab94be375e71cf",
         "references/document-patterns.md": "f001e619c1f0e99a022ac303ffe3b5cef7747d47926b1ce13c690ba5905b7b05",
-        "SKILL.md": "18c7fb0f11fbefe1cd40104a48abda1fd8774c89b5c74a841ff4cdadf82871c4"
+        "references/visual-documentation.md": "135ac9f8ddfe97170e160e7113f0a0a84f250461fe0a34d7e8d9ae6a554044bb"
       }
     },
     "contribution-workflow": {
@@ -222,6 +224,23 @@
         "references/feature-boundaries.md": "150c9d4e7cb3dab7b4d670e0010728c0a012019e2f3dd48d93485b8da3442494",
         "SKILL.md": "051fc39e961b1335a2b32dc6e1a0060379c59a4c558fd0bd0a79e234ad8b332f"
       }
+    },
+    "mermaid-diagrams": {
+      "origin": "upstream-adapted",
+      "source": "https://github.com/softaworks/agent-toolkit",
+      "commit": "3027f20f3181758385a1bb8c022d4041dfb4de84",
+      "files": {
+        "README.md": "e2f7f6e8d4415c57368cf0492eb98b12be18526f963383a9e64dcb741eb602de",
+        "SKILL.md": "79e3101fa5ee4875d4b8a37c64f5080638fcf38cf6552c35079f3295b469563c",
+        "references/advanced-features.md": "397203a6a72bccf6beea7a891c31007660e57396acfda84f22dcfb4c07cbe0fa",
+        "references/architecture-diagrams.md": "117bc72208e20dacb355d007b444dce7433f174a0ba9b76ab0a3361b8d580706",
+        "references/c4-diagrams.md": "c062263f8101f5da78c6202b000b79848b1f3d0a7fb4a88fdd777ec1a87e9c22",
+        "references/class-diagrams.md": "732e32676c397b4f8b08a48c67fa08d26572ba9fbf9bd5251dec44d4d31a133d",
+        "references/erd-diagrams.md": "b5fe268baecce3de92c97627fc9b558df42be87c17d9d6e7577bfa35185b1216",
+        "references/flowcharts.md": "e5716f510c94e3474c1db9f166ff2481194f20c10602df0b3a5c6091d25301bd",
+        "references/sequence-diagrams.md": "9c016fd7c51f7f9d155ca156fb19649bdcf56c98a76fc8572a2b3d54098a1fef"
+      },
+      "adaptation": "Project-local Mermaid guidance; application rules and documentation own claims, rendering and quality gates."
     }
   }
 }

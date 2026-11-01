@@ -1,0 +1,26 @@
+sequenceDiagram
+  accTitle: Authenticated mutation, repeat submission and version checks
+  accDescr: The server verifies staff identity and current company membership, applies admission and scopes an operation key. Identical replay returns the stored result while new input must pass current business version checks.
+  participant UI as Staff client
+  participant API as Feature route
+  participant Auth as Supabase Auth
+  participant DB as Restricted transaction
+  UI->>API: Bearer plus operation UUID and command
+  API->>Auth: Verify session with bounded timeout
+  Auth-->>API: Verified user identity or denial
+  API->>DB: Set identity, resolve active company, apply admission
+  API->>DB: Lock company, principal, action and operation key
+  alt Identical previously recorded command
+    DB-->>API: Stored canonical response
+    API-->>UI: Identical operation result
+  else Same key with different payload
+    API-->>UI: 409 operation conflict
+  else New command
+    API->>DB: Lock resource, validate scope, authority and expected version
+    alt Current command is eligible
+      API->>DB: Commit business writes and replay response together
+      API-->>UI: Canonical result
+    else State or authority changed
+      API-->>UI: Safe denial, review current state
+    end
+  end

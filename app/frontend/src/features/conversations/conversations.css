@@ -411,9 +411,11 @@
   }
 }
 
-.voice-note-upload { padding: 16px 24px; border-top: 1px solid var(--border); display: grid; gap: 10px; }
-.voice-note-upload label { font-weight: 600; font-size: 13px; }
-.voice-note-upload p, .message-media-status { font-size: 12px; color: var(--muted-foreground); }
-.voice-note-upload > button { justify-self: start; }
-.voice-note-playback { margin-top: 10px; }
-.voice-note-playback audio { width: 100%; max-width: 320px; }
+.media-upload { padding: 16px 24px; border-top: 1px solid var(--border); display: grid; gap: 10px; }
+.media-upload label { font-weight: 600; font-size: 13px; }
+.media-upload p, .message-media-status { font-size: 12px; color: var(--muted-foreground); }
+.media-upload > button { justify-self: start; }
+.media-preview { margin-top: 10px; }
+.media-preview audio { width: 100%; max-width: 320px; }
+
+.media-preview img { display: block; max-width: 100%; max-height: 220px; object-fit: contain; border-radius: 8px; }

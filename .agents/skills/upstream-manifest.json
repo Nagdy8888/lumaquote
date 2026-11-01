@@ -344,6 +344,26 @@
       "files": {
         "SKILL.md": "6f16ba0969d0327ad4a097d97f30aa0b1daac6141a57ca8d9fd1dd6caa1d5b9e"
       }
+    },
+    "mermaid-diagrams": {
+      "source": "https://github.com/softaworks/agent-toolkit",
+      "commit": "3027f20f3181758385a1bb8c022d4041dfb4de84",
+      "upstream_path": "skills/mermaid-diagrams",
+      "archived": false,
+      "root_license": "_licenses/softaworks--agent-toolkit--3027f20f3181--LICENSE",
+      "root_license_sha256": "4b4447da5344f8b2d3a8a19ba8366d1ac7a24d9ab4690bd04576dc772ddf8321",
+      "files": {
+        "README.md": "e2f7f6e8d4415c57368cf0492eb98b12be18526f963383a9e64dcb741eb602de",
+        "SKILL.md": "79bca3c767a821a28aa7d83a9673010b2066afa4889923ea5946153c8967e824",
+        "references/advanced-features.md": "5b816a153915de49ccae229a70103e724f68c3fc8b7a5b38f67a59f973af37bc",
+        "references/architecture-diagrams.md": "117bc72208e20dacb355d007b444dce7433f174a0ba9b76ab0a3361b8d580706",
+        "references/c4-diagrams.md": "28e73813c730721995aab4084b913459687a8065f28e2a5e8ef7a94cd8116fd9",
+        "references/class-diagrams.md": "5eba3606f37be8409843826901f0c846a1bd4796e2e9145c787d4e5ba1646ce3",
+        "references/erd-diagrams.md": "639ee58f4925e0721fc3a2c70fd083ec256fe861baa62a56d039c01315fc58ff",
+        "references/flowcharts.md": "73b599797659ced9211ab947e3d4aee4f3ef2bfb4c1aefcfd6537276d2a21f96",
+        "references/sequence-diagrams.md": "11900f082d21c7e3fc0addcd2bf50689a1c36a5af806207942a2f772cb5e2b3b"
+      },
+      "local_adaptation": "Added project integration routing; original SKILL.md retained in .agents/skill-source-archives/mermaid-diagrams-3027f20f3181; local documentation line endings/trailing whitespace normalized before commit, original upstream hashes retained."
     }
   },
   "selection_updated_on": "2026-10-29"

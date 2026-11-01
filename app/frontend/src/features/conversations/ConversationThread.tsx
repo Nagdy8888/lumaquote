@@ -5,8 +5,8 @@ import { Button } from "@/shared/ui/button";
 
 import { Status } from "@/shared/ui/status";
 import { useConversationAction } from "./api";
-import { VoiceNoteUpload } from "./VoiceNoteUpload";
-import { VoiceNotePlayback } from "./VoiceNotePlayback";
+import { MediaUpload } from "./MediaUpload";
+import { MediaPreview } from "./MediaPreview";
 import { ConversationComposer } from "./ConversationComposer";
 import { Alert, AlertTitle, AlertDescription } from "@/shared/ui/alert";
 
@@ -119,13 +119,18 @@ export function ConversationThread({
               )}
             </div>
             <p>{message.body}</p>
-            {message.kind === "audio" && message.media_status && (
-              <span className="message-media-status">
-                Audio: {message.media_status.replaceAll("_", " ")}
-              </span>
-            )}
+            {["audio", "image"].includes(message.kind) &&
+              message.media_status && (
+                <span className="message-media-status">
+                  {message.kind === "image" ? "Photo" : "Audio"}:{" "}
+                  {message.media_status.replaceAll("_", " ")}
+                </span>
+              )}
             {message.audio_available && !capture && (
-              <VoiceNotePlayback id={message.id} />
+              <MediaPreview id={message.id} kind="audio" />
+            )}
+            {message.image_available && !capture && (
+              <MediaPreview id={message.id} kind="image" />
             )}
             <div className="message-time">
               <time>
@@ -158,7 +163,7 @@ export function ConversationThread({
           ))}
       </div>
       {conversation.channel === "local_test" && !capture && (
-        <VoiceNoteUpload id={conversation.id} version={conversation.version} />
+        <MediaUpload id={conversation.id} version={conversation.version} />
       )}
       <ConversationComposer conversation={conversation} />
     </section>

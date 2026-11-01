@@ -121,6 +121,7 @@ class MessageView(BaseModel):
     outbound: bool = False
     media_status: str | None = None
     audio_available: bool = False
+    image_available: bool = False
 
 
 class DeliveryView(BaseModel):

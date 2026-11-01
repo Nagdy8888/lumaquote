@@ -13,17 +13,18 @@ function dispatchFixture(company) {
 }
 
 /** Normalize only the fixture company's queued voice note in a fresh native worker with paid inference disabled. */
-function processVoiceFixture(company) {
+function processMediaFixture(company, kind="audio") {
+  const jobKind = kind === "audio" ? "transcribe" : "read_photo";
   const code = `import sys
 from luma.core.database import database
-from luma_agent.runtime.audio import process_audio
+from luma_agent.runtime.media import process_media
 from luma_agent.runtime.jobs import finish_job
 with database(worker=True) as conn:
-    job=conn.execute("update luma.jobs set status='running',fence=fence+1,lease_until=now()+interval '120 seconds' where company_id=%s and kind='transcribe' and status='queued' returning *",(sys.argv[1],)).fetchone()
+    job=conn.execute("update luma.jobs set status='running',fence=fence+1,lease_until=now()+interval '120 seconds' where company_id=%s and kind=%s and status='queued' returning *",(sys.argv[1],sys.argv[2])).fetchone()
 assert job
-process_audio(job)
+process_media(job,sys.argv[3])
 finish_job(job,'done')`;
-  const result=spawnSync(process.execPath,[path.resolve('scripts/python.cjs'),'-c',code,company],
+  const result=spawnSync(process.execPath,[path.resolve('scripts/python.cjs'),'-c',code,company,jobKind,kind],
     {cwd:path.resolve('.'),encoding:'utf8',timeout:25000,windowsHide:true,env:{...process.env,ENABLE_PAID_AI:'false',LANGSMITH_TRACING:'false'}});
   if(result.status!==0)throw new Error('The isolated voice processor did not complete.');
 }
@@ -76,9 +77,18 @@ async function main() {
     await page.getByLabel('Test customer voice note', {exact:true}).setInputFiles({name:'synthetic.wav',mimeType:'audio/wav',buffer:syntheticVoice()});
     await page.getByRole('button',{name:'Upload test voice note',exact:true}).click();
     await expect(page.locator('.message-list').getByText('Voice note awaiting processing.',{exact:true})).toBeVisible();
-    processVoiceFixture(configuration.company_id);
+    processMediaFixture(configuration.company_id);
     await page.getByRole('button',{name:'Listen to voice note',exact:true}).click({timeout:15000});
     await expect(page.getByLabel('Voice note audio',{exact:true})).toHaveAttribute('src',/^blob:/);
+    await page.getByRole('radio',{name:'Product-label photo attachment',exact:true}).click();
+    await page.getByLabel('Test customer product-label photo',{exact:true}).setInputFiles(path.resolve('tests/fixtures/media/synthetic-label.png'));
+    await page.getByRole('button',{name:'Upload test label photo',exact:true}).click();
+    await expect(page.locator('.message-list').getByText('Product-label photo awaiting processing.',{exact:true})).toBeVisible();
+    processMediaFixture(configuration.company_id,'image');
+    await page.getByRole('button',{name:'View label photo',exact:true}).click({timeout:15000});
+    await expect(page.getByAltText('Unconfirmed product-label photo',{exact:true})).toHaveAttribute('src',/^blob:/);
+    await page.screenshot({path:'.local/photo-intake-desktop.png',fullPage:true});
+
     await page.getByLabel('Choose catalog product', { exact: true }).selectOption(configuration.product_id);
     await page.getByRole('button', { name: 'Add selected product' }).click();
     await page.getByLabel('Quantity for DL-001', { exact: true }).fill('3');

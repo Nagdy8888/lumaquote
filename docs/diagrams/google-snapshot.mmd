@@ -1,0 +1,29 @@
+sequenceDiagram
+  accTitle: Signed GAS full snapshot and atomic backend observation
+  accDescr: Apps Script reads bounded tables under its script lock and verifies a stable double read. The gateway authenticates exact bytes and validates mapping, replay, complete records and catalog support before one database commit. Rejected snapshots never refresh freshness.
+  participant GAS as Authorized Apps Script
+  participant Sheet as Selected workbook
+  participant API as Signed callback gateway
+  participant DB as PostgreSQL
+  opt Human edit hint
+    GAS->>API: Signed invalidation envelope
+    API->>DB: Persist receipt and coalesced refresh signal
+    API-->>GAS: 202 pending, not imported
+  end
+  GAS->>GAS: Acquire script lock
+  GAS->>Sheet: Read four bounded value-only tables twice
+  Sheet-->>GAS: Complete records or unstable-read failure
+  GAS->>API: HMAC signed full snapshot and observation time
+  API->>API: Check signature, mapping, timestamp and schema
+  API->>DB: Company lock, receipt/order/rate checks
+  API->>DB: Validate complete SKU set and catalog-supported specs
+  alt Duplicate identical envelope
+    API-->>GAS: 202 duplicate, no repeated import
+  else Current valid snapshot
+    API->>DB: Commit observation, commercial records, sync state and receipt
+    API-->>GAS: 202 validated
+  else Invalid, stale or unavailable
+    API-->>GAS: Safe denial, freshness unchanged
+  end
+  GAS->>GAS: Release script lock
+  Note over GAS,DB: Timer scheduling is approximate, Drive export is unfinished.

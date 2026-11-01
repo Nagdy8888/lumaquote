@@ -284,6 +284,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/conversations/{cid}/image": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Upload Image
+         * @description Accept at most 5 MB of actual bytes; decoding and label reading run later in a durable bounded job.
+         */
+        post: operations["upload_image_api_conversations__cid__image_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/media/{mid}/audio": {
         parameters: {
             query?: never;
@@ -296,6 +316,26 @@ export interface paths {
          * @description Stream only the authorized sandbox-normalized WAV; never disclose a private Storage URL or arbitrary original.
          */
         get: operations["audio_playback_api_media__mid__audio_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/media/{mid}/image": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Image Preview
+         * @description Stream only an authorized sandbox-normalized JPEG; original metadata and private Storage paths stay server-side.
+         */
+        get: operations["image_preview_api_media__mid__image_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -604,6 +644,11 @@ export interface components {
              * @default false
              */
             audio_available: boolean;
+            /**
+             * Image Available
+             * @default false
+             */
+            image_available: boolean;
         };
         /**
          * Ownership
@@ -1328,7 +1373,72 @@ export interface operations {
             };
         };
     };
+    upload_image_api_conversations__cid__image_post: {
+        parameters: {
+            query?: never;
+            header: {
+                "Idempotency-Key": string;
+                "Expected-Version": number;
+            };
+            path: {
+                cid: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     audio_playback_api_media__mid__audio_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                mid: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    image_preview_api_media__mid__image_get: {
         parameters: {
             query?: never;
             header?: never;

@@ -97,7 +97,7 @@
     {
       "id": "B16",
       "status": "Planned",
-      "reason": "Estimated reservations exist but paid model/media paths, concurrent last-budget and uncertain-usage recovery remain to verify.",
+      "reason": "Shared estimated reservations, child-operation run caps and lost-response retention have actual local DB tests; simultaneous last-budget callers and the full release boundary still need verification. See semantic-progress.json and recovery tests; no actual-billing claim.",
       "evidence": []
     },
     {
@@ -139,7 +139,7 @@
     {
       "id": "B23",
       "status": "Planned",
-      "reason": "Durable jobs/outbox and fences exist; lease reclaim/crash/dead-letter/unknown-submission recovery need stronger evidence.",
+      "reason": "Bounded expired-job reconciliation fences old workers, retains unknown usage and exposes pending media interruption; real two-connection locking tests pass. Heartbeats, reconciliation UI and external unknown-send recovery remain unfinished.",
       "evidence": []
     },
     {
@@ -157,7 +157,7 @@
     {
       "id": "B26",
       "status": "Planned",
-      "reason": "Private original sources and exact SKU lookup exist; hybrid retrieval, source replacement, insufficient evidence, and ACL changes remain.",
+      "reason": "Exact/lexical retrieval and version-bound semantic SQL exclude stale, retired and cross-tenant evidence in local DB tests. Paid embedding quality and frozen recall evaluation remain pending.",
       "evidence": []
     },
     {
@@ -229,7 +229,7 @@
     {
       "id": "B38",
       "status": "Planned",
-      "reason": "clasp source push is verified but Google execution is blocked. Meta/Google/OpenAI contracts, OAuth scope and live checks remain.",
+      "reason": "Apps Script-only Google integration is approved; concurrent GAS evidence records its own live limits. Synthetic Responses/voice/photo and embedding plumbing canaries passed; live full-graph semantic quality, Meta integration and complete provider contracts remain pending.",
       "evidence": []
     },
     {

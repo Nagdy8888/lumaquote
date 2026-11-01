@@ -1,28 +1,7 @@
 """Exact-code-first PostgreSQL evidence retrieval, with conservative explicit specification filters."""
 
-import re
-
+from .criteria import query_constraints
 from .schemas import CatalogHit, CatalogSearch
-
-NOISE = {
-    "please",
-    "quote",
-    "need",
-    "needs",
-    "looking",
-    "want",
-    "would",
-    "like",
-    "give",
-    "some",
-    "lights",
-    "lighting",
-    "product",
-    "products",
-    "supplier",
-    "synthetic",
-    "test",
-}
 
 
 def search_catalog(conn, company, request: CatalogSearch) -> list[CatalogHit]:
@@ -34,32 +13,16 @@ def search_catalog(conn, company, request: CatalogSearch) -> list[CatalogHit]:
     meaning. No embedding distance or retrieved prose determines money, stock,
     compatibility or action authorization.
     """
-    query = request.query
-    if re.search(r"\b(not|except|avoid|without|instead)\b", query, re.I):
+    criteria = query_constraints(request)
+    if criteria is None:
         return []
-    codes = list(dict.fromkeys(re.findall(r"\b[A-Z]{2}-\d{3}\b", query.upper())))
-    watts = {int(v) for v in re.findall(r"\b(\d{1,4})\s*(?:w|watts?)\b", query, re.I)}
-    temperatures = {int(v) for v in re.findall(r"\b(\d{4,5})\s*k\b", query, re.I)}
-    ratings = set(re.findall(r"\bIP[0-6][0-9]\b", query.upper()))
-    if len(watts) > 1 or len(temperatures) > 1 or len(ratings) > 1:
-        return []
-    power = request.watts if request.watts is not None else next(iter(watts), None)
-    cct = request.cct if request.cct is not None else next(iter(temperatures), None)
-    rating = request.ip_rating or next(iter(ratings), None)
-    if (
-        (watts and power not in watts)
-        or (temperatures and cct not in temperatures)
-        or (ratings and rating not in ratings)
-    ):
-        return []
-    words = list(
-        dict.fromkeys(
-            word.lower() for word in re.findall(r"\b[a-zA-Z]{3,30}\b", query) if word.lower() not in NOISE
-        )
-    )[:24]
-    if not codes and not words and power is None and cct is None and rating is None:
-        return []
-    lexical = " OR ".join(words)
+    codes, lexical, power, cct, rating = (
+        criteria.codes,
+        criteria.lexical,
+        criteria.watts,
+        criteria.cct,
+        criteria.ip_rating,
+    )
     rows = conn.execute(
         """with q as (select websearch_to_tsquery('english',%s) terms)
         select p.id as product_id,p.sku,p.name,p.description,p.watts,p.cct,p.ip_rating,
@@ -71,7 +34,20 @@ def search_catalog(conn, company, request: CatalogSearch) -> list[CatalogHit]:
         and (%s::integer is null or p.watts=%s) and (%s::integer is null or p.cct=%s)
         and (%s::text is null or p.ip_rating=%s)
         order by ts_rank_cd(to_tsvector('english',p.sku||' '||p.name||' '||p.family||' '||p.description),q.terms) desc,p.sku limit 5""",
-        (lexical, company, codes, codes, codes, not bool(words), power, power, cct, cct, rating, rating),
+        (
+            lexical,
+            company,
+            codes,
+            codes,
+            codes,
+            criteria.browse_specs,
+            power,
+            power,
+            cct,
+            cct,
+            rating,
+            rating,
+        ),
     ).fetchall()
     return [CatalogHit.model_validate(row) for row in rows]
 

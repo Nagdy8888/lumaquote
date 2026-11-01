@@ -14,7 +14,15 @@ from .schemas import Decision
 
 
 def decide(conn, member, user, cid, body: Decision):
-    """Bind authorized staff approval to the exact current revision and recipient, atomically recording dispatch intent."""
+    """Record a staff decision on the still-current immutable revision.
+
+    Conversation-before-quote locking serializes edits/takeover. Reject stale or
+    expired review; rejection records needs-staff state without approving a send.
+    Approval additionally requires agent ownership and fresh commercial evidence,
+    then writes the approver/hash/recipient binding, quotation outbox intent and
+    review-only job atomically. Return decision/quote identity, not a delivery
+    receipt. Final dispatch reauthorizes the approver and current evidence again.
+    """
     company = member["company_id"]
     current = conversation(conn, company, cid, lock=True)
     quote = latest_quote(conn, company, cid, lock=True)

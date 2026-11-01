@@ -1,0 +1,42 @@
+{
+  "scope": "Deep documentation audit of the current working tree, not an application release",
+  "date": "2026-10-29",
+  "guides": [
+    "docs/reference/AGENT_RUNTIME.md",
+    "docs/reference/BACKEND.md",
+    "docs/reference/CATALOG.md",
+    "docs/reference/CONFIGURATION.md",
+    "docs/reference/DATA_MODEL.md",
+    "docs/reference/FRONTEND.md",
+    "docs/reference/GOOGLE_SYNC.md",
+    "docs/reference/MEDIA.md",
+    "docs/reference/TOOLING_AND_TESTS.md"
+  ],
+  "adjacent_contracts_expanded": {
+    "python_definitions": 17,
+    "typescript_components_or_hooks": 3
+  },
+  "verified": {
+    "python_executable_asts_unchanged": 80,
+    "local_links_and_anchors": 125,
+    "api_json_examples_parsed": 3,
+    "markdown_fences": "balanced",
+    "docs_encoding": "UTF-8",
+    "existing_json_artifacts": "parsed"
+  },
+  "source_review": [
+    "Core identity, transactions, admission, operations and storage",
+    "Conversation participation, canonical quotation rules, approvals and dispatch",
+    "Graph state, nodes, checkpoints, leases, spending, media, index and expiry recovery",
+    "Private frontend state, queries/mutations, documents/media, 3D and capture boundaries",
+    "Every versioned migration and development/test script family",
+    "GAS HMAC/replay, full snapshot validation and publication"
+  ],
+  "limits": [
+    "No new runtime/provider/browser verification was performed for documentation-only changes.",
+    "Historical application checks remain in their original evidence artifacts.",
+    "Navigation coverage and presence of docstrings do not prove implementation correctness.",
+    "Approved implementation and testing scope is preserved; phase 3 remains unfinished.",
+    "Concurrent integration work was documented without account actions or deployment."
+  ]
+}

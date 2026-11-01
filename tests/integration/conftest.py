@@ -156,6 +156,7 @@ def environment(monkeypatch):
                 "messages",
                 "quotes",
                 "conversations",
+                "catalog_embeddings",
                 "products",
                 "sources",
                 "snapshots",

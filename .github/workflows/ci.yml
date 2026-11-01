@@ -25,6 +25,9 @@ jobs:
       - run: npm run lint:python
       - run: npm run check:architecture
       - run: npm run check:frontend
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:diagrams
+      - run: npm run diagrams:check
       - run: npm run typecheck
       - run: npm run test:unit
       - run: npm run test:ui

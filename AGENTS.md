@@ -1,5 +1,93 @@
 # Project implementation rules
 
+## Read at the start of every prompt
+
+These rules apply to every Codex prompt and all work in this repository, including
+continuations, resumed sessions, and small edits. At the start of each turn, read
+this root `AGENTS.md` and any applicable nested `AGENTS.md` before acting. Do not
+rely only on a previous turn's copy. Carry these requirements through handoffs and
+context compaction. This file governs this project, not unrelated workspaces.
+
+## Documentation after every step or file change
+
+Use the project-documentation skill at
+`.agents/skills/project-documentation/SKILL.md` for every task that changes files
+or completes an implementation/setup/verification step. Read its instructions
+and relevant references before the first such step in each turn.
+
+After each completed step or coherent file-change group, update documentation
+before starting the next step. Do not postpone documentation until the end of a
+phase, commit, or conversation. This covers code, tests, scripts, GAS, migrations,
+configuration, assets, dependencies, and documentation files themselves.
+
+- Update the affected inline contracts and existing setup/reference/runbook docs
+  whenever behavior, structure, configuration, or operating instructions change.
+- Append a concise entry to `docs/WORK_LOG.md` recording the step, changed paths,
+  purpose, actual verification results, and remaining gaps or required account
+  actions. Record failures and unrun checks honestly. For private configuration,
+  record only the purpose and safe variable names, never values or credentials.
+- Keep `docs/IMPLEMENTATION_PLAN.md` and its approved scope intact; update existing
+  progress items only when supported by implementation and verification. Preserve
+  `docs/TESTING_PLAN.md` requirements. Put account-dependent follow-up actions in
+  `docs/MORNING_ACTIONS.md` and evidence in the existing evidence location.
+- Include documentation-only changes in the same work-log entry as the step they
+  describe. Updating the log does not require another recursive log entry.
+- Before reporting a step complete, review the changed-file list for documentation
+  coverage and run applicable architecture/documentation checks plus relevant
+  feature checks. A passing check does not replace reviewing the docs themselves.
+
+For a read-only answer with no completed operational step or file changes, no
+work-log entry is required; still read and follow this file for that prompt.
+
+## Required documentation depth
+
+Documentation is part of implementation acceptance. A work-log entry, file list,
+generated schema, passing docstring check or one-line purpose comment alone does
+not satisfy the user's requirement for deep documentation.
+
+Before changing an existing subsystem, read its relevant implementation reference
+through `docs/README.md` and verify it against source. For each changed behavior,
+document the affected contracts as applicable: actors and authority; module/call
+flow; meaningful inputs, outputs and units; state transitions; database writes and
+transaction/lock boundaries; identity/version/idempotency rules; resource and cost
+limits; external effects; failures, uncertainty and recovery; configuration and
+operation; tests, actual evidence and remaining gaps. Explain why an important
+invariant exists and what callers must preserve when extending the implementation.
+
+Keep function/class contracts adjacent to definitions and cross-module explanations
+in the focused `docs/reference/` guides linked from the documentation index. Update
+existing guides rather than creating competing explanations. Extend or split a
+guide when responsibilities require it; there is no mandatory page or line count.
+A small change updates its relevant contract, not every unrelated guide.
+
+Review documentation against all affected new, changed, renamed and deleted paths
+before reporting completion or making a phase commit. Validate links/examples and
+run applicable inline/architecture checks. A documentation-only change should use
+appropriate static/contract checks; do not report historical runtime tests as rerun
+or spend on live providers merely to validate prose. Follow the detailed standard
+in `.agents/skills/project-documentation/references/deep-documentation.md`.
+
+## Maintained diagrams and professional visual documentation
+
+Use the installed `mermaid-diagrams` skill with project-documentation when
+documenting architecture, relationships, nontrivial workflows or state changes.
+Maintain the affected diagrams alongside code; do not substitute diagrams for
+meaningful inline contracts or detailed prose.
+
+Canonical sources live in `docs/diagrams/*.mmd`, with catalogued code bindings,
+owned guide embeds and generated SVG previews. Keep views focused, labels readable,
+contrast clear and titles/descriptions accessible. Draw actual relationships;
+label optional, planned, unverified and local-only paths explicitly. Exclude
+credentials, private URLs and customer data.
+
+Before completion or commit, run the diagram tests, render changed sources and
+verify `npm run diagrams:check`. Inspect actual rendered output for readability,
+clipping, stray nodes and misleading arrows; syntax success and file hashes alone
+are insufficient. Source, embeds and assets must agree. Use the local renderer;
+do not upload project data or install global tooling as a side effect. Small
+unrelated prose changes do not require a decorative diagram. The documentation
+skill's visual standard defines the detailed workflow.
+
 ## Layout and responsibilities
 
 - `app/backend/luma/core`: configuration, identity, database, storage, admission,

@@ -3,6 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "diagrams:render": "node scripts/diagrams/index.cjs render",
+    "diagrams:check": "node scripts/diagrams/index.cjs check",
+    "test:diagrams": "node --test scripts/diagrams/catalog.test.cjs",
     "db:start": "node scripts/start-local-supabase.cjs",
     "db:stop": "supabase stop",
     "db:status": "supabase status",
@@ -30,6 +33,7 @@
   },
   "devDependencies": {
     "@google/clasp": "3.4.1",
+    "mermaid": "11.17.2",
     "supabase": "2.122.0",
     "typescript": "5.9.3"
   },

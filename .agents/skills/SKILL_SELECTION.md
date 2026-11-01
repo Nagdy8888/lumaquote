@@ -168,3 +168,11 @@ That manifest also records a local hash baseline for the unchanged existing
 `impeccable` skill, whose upstream provenance was not present in the old manifest.
 Upstream license files are preserved. This selection makes no claim that the
 application is implemented, tested with clients, or production ready.
+
+## Maintained technical diagrams
+
+`mermaid-diagrams` supplies local diagram syntax/type guidance from the pinned
+softaworks/agent-toolkit source, with MIT notice and provenance retained.
+`project-documentation` remains the owner of app claims, depth, prose, local
+rendering/freshness and visual review. Canonical sources, code bindings and SVG
+previews live in docs/diagrams; root rules require relevant views to stay current.

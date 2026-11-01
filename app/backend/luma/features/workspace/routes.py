@@ -34,7 +34,9 @@ def workspace(user: Staff):
             if config.whatsapp_token.get_secret_value()
             else "not_connected",
             "google": "configured_unverified"
-            if config.google_refresh_token.get_secret_value()
+            if config.google_sheet_id
+            and config.google_company_id == str(member["company_id"])
+            and config.google_callback_secret.get_secret_value()
             else "not_connected",
             "langsmith": "configured_unverified"
             if config.langsmith_tracing and config.langsmith_api_key.get_secret_value()

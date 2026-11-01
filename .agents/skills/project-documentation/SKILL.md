@@ -1,14 +1,26 @@
 ---
 name: project-documentation
-description: Write or update project documentation, architecture decisions, setup guides, runbooks, and release notes. Use for documentation tasks and documentation changes required by implemented behavior.
+description: Maintain deep implementation references, inline contracts, setup guides, runbooks, and evidence for this project. Required for every repository file-changing task and completed implementation, setup, or verification step, as well as explicit documentation requests.
 license: Proprietary - original supplied notices retained in the source archive.
 ---
 
 # Project Documentation
 
-Inspect existing documents and conventions before adding another file. Preserve approved plans and evidence. Documentation size should match the change; a routine implementation does not require an RFC, onboarding program, or directory tree.
+Inspect root/applicable AGENTS.md, the documentation index and affected source before editing. Preserve approved plans, evidence and unrelated changes. Documentation is part of the implementation step, not a later phase. Pure read-only answers without a completed operational step do not require a work-log entry.
 
-Read [document patterns](references/document-patterns.md) for the requested artifact.
+Read [the deep documentation standard](references/deep-documentation.md) before the first file-changing or completed operational step in each turn. Read [document patterns](references/document-patterns.md) for the requested artifact. Apply depth to the affected contracts; a small change does not require new guides, an RFC or a fixed amount of prose.
+
+## Required working loop
+
+- Read the affected implementation reference through `docs/README.md`; verify its claims against actual source, schemas and configuration.
+- Include meaningful adjacent contracts and the relevant focused `docs/reference/` explanation with each coherent change. A log, generated schema or one-line purpose label cannot replace them.
+- Update affected setup/API/runbook/test guidance and append the actual step, changed paths, purpose, verification and gaps to `docs/WORK_LOG.md` before the next step. The entry covers its documentation changes too; do not log recursively.
+- Before reporting completion or a phase commit, review all affected new/changed/renamed/deleted paths for documentation coverage and validate links, examples and applicable inline/architecture contracts. A passing presence check does not prove the prose is accurate or sufficiently deep.
+- Keep prior runtime evidence dated. For prose/comment-only changes, use appropriate static/contract checks and evidence of unchanged behavior when useful; do not invent a runtime rerun or invoke paid providers solely for documentation validation.
+
+## Professional visual documentation
+
+For architecture, relationships, nontrivial workflows and states, apply [mermaid-diagrams](../mermaid-diagrams/SKILL.md) and read [the visual documentation standard](references/visual-documentation.md). Maintain the relevant canonical sources, exact embeds and readable SVG previews with the code. Run diagram tests/render/freshness checks and inspect actual output; a syntactically valid diagram can still be misleading or unreadable. Keep this skill responsible for app claims/prose/evidence and Mermaid responsible for diagram syntax, without duplicating their policies.
 
 ## Ownership
 - README is an entry point linking to setup, the actual workflow, and evidence.
@@ -23,4 +35,3 @@ Use real commands, URLs, owners, package versions, and observed results. Mark un
 Do not copy secrets, populated environment files, private audio URLs, or raw traces. Clearly separate synthetic evaluation, local checks, sandbox integrations, and real pilots.
 Update affected docs in the implementation task without automatically publishing, committing, or rewriting unrelated material. Validate relative links and meaningful command examples.
 Use [contribution-workflow](../contribution-workflow/SKILL.md) for requested PR/release operations and [verify-engineering-coverage](../verify-engineering-coverage/SKILL.md) for evidence-backed readiness.
-

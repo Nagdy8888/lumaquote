@@ -1,0 +1,19 @@
+sequenceDiagram
+  accTitle: Fenced expiry recovery without blind replay
+  accDescr: A recovery sweep skips a transaction holding a job lock. Once an expired job can be locked, it is fenced and failed, uncertain usage and pending media remain visible and the old worker cannot finish it again.
+  participant W as Original worker
+  participant DB as PostgreSQL
+  participant R as Later claim and recovery
+  W->>DB: Validate live fence, hold shared lock during effect transaction
+  R->>DB: Select expired rows for update skip locked
+  DB-->>R: Skip any locked active transaction
+  W->>DB: Commit or connection closes
+  Note over W,R: Provider work occurs outside short database effect transactions.
+  R->>DB: Lock expired eligible job in bounded sweep
+  R->>DB: Increment fence, mark failed, clear lease
+  R->>DB: Reserved usage becomes unknown
+  R->>DB: Expose pending media interruption or staff recovery message
+  R->>DB: Append job.interrupted audit and commit
+  W->>DB: Attempt publication or finish with old fence
+  DB-->>W: Reject side effect or leave recovered status unchanged
+  Note over W,R: No automatic provider retry, refund or heartbeat is implied.

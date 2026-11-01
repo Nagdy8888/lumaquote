@@ -1,6 +1,11 @@
 # LumaQuote testing plan
 
-Status: planned; application tests and their runners are not implemented yet.
+Status: requirements retained; test runners and substantial local coverage are
+implemented. Current results and remaining gates are recorded in WORK_LOG.md
+and docs/evidence artifacts; this plan does not itself certify completion.
+The [tooling and test map](reference/TOOLING_AND_TESTS.md) explains actual commands,
+fixture isolation, each test family's assertions and what existing evidence can
+and cannot prove. Requirements below remain unchanged.
 This document adds testing requirements to the agreed application plan. It keeps
 the English commercial-lighting workflow, premium LinkedIn presentation, approved
 stack, local-first release, and selective Docker decisions intact.

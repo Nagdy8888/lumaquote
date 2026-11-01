@@ -1,0 +1,50 @@
+{
+  "scope": "Working-tree version-bound pgvector repository, guarded index and agent clarification; deterministic DB tests plus a real synthetic provider plumbing canary",
+  "revision": "semantic-progress-2026-10-29",
+  "environment": "Isolated local Supabase PostgreSQL/Auth with restricted runtime roles",
+  "checks": [
+    {
+      "command": "pytest tests/integration/test_semantic_catalog.py tests/integration/test_budget_reservations.py tests/integration/test_photo_intake.py tests/integration/test_graph_restart.py -q",
+      "result": "passed",
+      "count": 22,
+      "seconds": 76.56
+    },
+    {
+      "command": "pytest tests/integration/test_catalog_index.py -q",
+      "result": "passed",
+      "count": 2,
+      "seconds": 2.07
+    },
+    {
+      "command": "pytest tests/integration/test_agent_retrieval.py -q",
+      "result": "passed",
+      "count": 4,
+      "seconds": 6.47,
+      "provider": "fake boundary; real DB/node/outbox"
+    }
+  ],
+  "verified": [
+    "Migration applied through the guarded local bootstrap without data reset.",
+    "Exact SKU precedence, explicit specifications, current tenant/source/version/page/content, retirement and distance ceiling.",
+    "Changed-input publication rejection and stale-cache exclusion.",
+    "Primary and query embedding operations share one run allowance; duplicates cannot reserve again.",
+    "Simulated lost index response keeps unknown consumption and blocks another batch.",
+    "Fresh-process graph restarts pass with paid AI disabled."
+  ],
+  "not_verified": [
+    "Live full-graph semantic fallback with natural-language queries; node boundary checks use deterministic fake provider vectors.",
+    "Semantic retrieval accuracy, calibrated thresholds or frozen holdout results.",
+    "Provider-billed cost; ledger amounts are estimates.",
+    "Whole phase 3 completion or production readiness."
+  ],
+  "live_canary": {
+    "model": "text-embedding-3-small",
+    "dimensions": 1536,
+    "indexed_synthetic_records": 3,
+    "index_estimated_usd": "0.0000018",
+    "query_estimated_usd": "6E-7",
+    "actual_billing": "not retrieved",
+    "result": "Real provider/index/query SQL roundtrip passed with unchanged synthetic descriptive evidence",
+    "limitation": "Query vector embeds the same evidence text; this is plumbing validation, not natural-language recall or holdout accuracy. No quote, approval or send is created."
+  }
+}

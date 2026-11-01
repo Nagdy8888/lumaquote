@@ -3,7 +3,14 @@ import type { ConversationDetail } from "@/shared/api/types";
 
 export type EditableLine = { product_id: string; quantity: number };
 
-/** Preserve unsaved commercial edits across remote updates and bind saving to the version observed when editing began. */
+/**
+ * Own local commercial edits separately from the immutable server quotation.
+ * The first edit captures quote identity/conversation version. Polling cannot
+ * overwrite dirty fields or advance that save precondition; conflict is reported
+ * until confirmed save or explicit discard. Amounts remain input strings and
+ * reviewed totals come from the backend. Callers must markSaved only after the
+ * mutation and canonical cache reconciliation complete.
+ */
 export function useQuotationDraft(detail: ConversationDetail) {
   const { quote, conversation } = detail;
   const [lines, setLines] = useState<EditableLine[]>(

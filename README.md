@@ -6,6 +6,39 @@ evidence, accurate quotations, and a salesperson's decision before delivery.
 English interface and fictional supplier records. Business impact is a pilot
 hypothesis, not a claim about an existing client.
 
+## Workflow at a glance
+
+### LumaQuote request-to-reviewed-offer workflow
+
+Implemented local-test workflow; live WhatsApp delivery remains pending. See the surrounding contract for details and limitations.
+
+<!-- diagram:sales-workflow:start -->
+![LumaQuote request-to-reviewed-offer workflow](docs/diagrams/rendered/sales-workflow.svg)
+
+[Open full-size SVG](docs/diagrams/rendered/sales-workflow.svg) · [Editable Mermaid](docs/diagrams/sales-workflow.mmd)
+
+<details>
+<summary>Mermaid source</summary>
+
+```mermaid
+flowchart TD
+  accTitle: LumaQuote request-to-reviewed-offer workflow
+  accDescr: Local test requests become clarified requirements, supported unapproved offers, exact staff decisions and revalidated local delivery. Ambiguity and takeover remain human participation points.
+  Intake["Local text, voice or label photo"] --> Explicit{"SKU and quantity confirmed?"}
+  Explicit -->|No| Clarify["Ask customer or involve staff"]
+  Clarify --> Explicit
+  Explicit -->|Yes| Evidence["Check catalog, price and observed stock"]
+  Evidence --> Draft["Create immutable offer revision"]
+  Draft --> Staff{"Salesperson decision"}
+  Staff -->|Revise or reject| Clarify
+  Staff -->|Approve exact revision| Check["Recheck authority and current evidence"]
+  Check --> Result["Record local delivery or a visible block"]
+  %% Real WhatsApp sending is intentionally not represented as implemented.
+```
+
+</details>
+<!-- diagram:sales-workflow:end -->
+
 ## Run locally
 
 Requires Node 20.20+ (CI uses Node 22), Python 3.12, and Docker Desktop for local
@@ -42,7 +75,7 @@ in the Windows command wrapper. Stop Supabase with `npm run db:stop`; data remai
 - `app/frontend/src/app`: application composition; features own their UI and queries.
 - `app/frontend/src/shared`: documented UI primitives, Auth, and generated API contracts.
 - `app/agents/luma_agent`: graph state, individual nodes, budget/lease controls, and native worker.
-- `app/backend/integrations/apps-script`: versioned Google Apps Script source, managed with clasp.
+- `gas`: [versioned Google Apps Script source and setup guide](gas/README.md), managed with clasp.
 - `supabase/migrations`, `tests`, and `docs`: schema, verification, and project evidence.
 
 Every authored function/class has an inline contract. Checks enforce documentation
@@ -74,11 +107,21 @@ OpenAI calls are disabled by default until intentionally enabled. Local exact-SK
 preparation is a labeled offline baseline, not evidence of live model behavior.
 Usage amounts are estimates/reservations, never provider invoices.
 
+## Documentation
+
+Use the [documentation index](docs/README.md) to find the architecture, operator
+workflows, API contracts, local recovery instructions, verification evidence and
+file-group documentation ownership. The [work log](docs/WORK_LOG.md) records each
+coherent implementation/verification step and its remaining gaps.
+
 ## Status and next actions
 
 Read the [implementation tracker](docs/IMPLEMENTATION_PLAN.md),
 [testing plan](docs/TESTING_PLAN.md), [morning actions](docs/MORNING_ACTIONS.md),
 [local database details](LOCAL_DEVELOPMENT.md), and [visual system](DESIGN.md).
+The [work log](docs/WORK_LOG.md) records changes and verification from this chat;
+[GAS progress evidence](docs/evidence/google-gas-progress.json) separates local
+tests from live Google callback results and pending synchronization.
 Configuration, local tests, live provider calls, and client validation are reported
 separately. This project is not yet a production release.
 

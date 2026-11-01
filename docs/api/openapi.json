@@ -737,11 +737,119 @@
         }
       }
     },
+    "/api/conversations/{cid}/image": {
+      "post": {
+        "summary": "Upload Image",
+        "description": "Accept at most 5 MB of actual bytes; decoding and label reading run later in a durable bounded job.",
+        "operationId": "upload_image_api_conversations__cid__image_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "cid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Cid"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Idempotency-Key"
+            }
+          },
+          {
+            "name": "Expected-Version",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "title": "Expected-Version"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/media/{mid}/audio": {
       "get": {
         "summary": "Audio Playback",
         "description": "Stream only the authorized sandbox-normalized WAV; never disclose a private Storage URL or arbitrary original.",
         "operationId": "audio_playback_api_media__mid__audio_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "mid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Mid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/media/{mid}/image": {
+      "get": {
+        "summary": "Image Preview",
+        "description": "Stream only an authorized sandbox-normalized JPEG; original metadata and private Storage paths stay server-side.",
+        "operationId": "image_preview_api_media__mid__image_get",
         "security": [
           {
             "HTTPBearer": []
@@ -1383,6 +1491,11 @@
           "audio_available": {
             "type": "boolean",
             "title": "Audio Available",
+            "default": false
+          },
+          "image_available": {
+            "type": "boolean",
+            "title": "Image Available",
             "default": false
           }
         },

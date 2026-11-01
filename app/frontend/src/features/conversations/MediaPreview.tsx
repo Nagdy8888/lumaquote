@@ -2,8 +2,20 @@ import { useEffect, useRef, useState } from "react";
 import { documentUrl } from "@/shared/api/client";
 import { Button } from "@/shared/ui/button";
 
-/** Load private normalized audio only on staff request; revoke temporary capabilities on navigation or replacement. */
-export function VoiceNotePlayback({ id }: { id: string }) {
+/**
+ * Fetch a normalized private attachment only after an explicit staff request.
+ * The API authorizes message/kind and returns bytes; no Storage URL is exposed.
+ * This owner revokes blob capabilities on replacement/unmount, including a fetch
+ * that resolves after navigation. Preview availability does not establish that
+ * its transcript/label fields are confirmed or safe to quote.
+ */
+export function MediaPreview({
+  id,
+  kind,
+}: {
+  id: string;
+  kind: "audio" | "image";
+}) {
   const [url, setUrl] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState("");
@@ -35,7 +47,7 @@ export function VoiceNotePlayback({ id }: { id: string }) {
     setPending(true);
     setError("");
     try {
-      const value = await documentUrl(`/media/${id}/audio`);
+      const value = await documentUrl(`/media/${id}/${kind}`);
       if (mounted.current) setUrl(value);
       else URL.revokeObjectURL(value);
     } catch (failure) {
@@ -43,21 +55,25 @@ export function VoiceNotePlayback({ id }: { id: string }) {
         setError(
           failure instanceof Error
             ? failure.message
-            : "Audio could not be loaded.",
+            : "Attachment could not be loaded.",
         );
     } finally {
       if (mounted.current) setPending(false);
     }
   }
   return (
-    <div className="voice-note-playback">
+    <div className="media-preview">
       {url ? (
-        <audio
-          controls
-          preload="metadata"
-          src={url}
-          aria-label="Voice note audio"
-        />
+        kind === "image" ? (
+          <img src={url} alt="Unconfirmed product-label photo" />
+        ) : (
+          <audio
+            controls
+            preload="metadata"
+            src={url}
+            aria-label="Voice note audio"
+          />
+        )
       ) : (
         <Button
           type="button"
@@ -66,7 +82,11 @@ export function VoiceNotePlayback({ id }: { id: string }) {
           disabled={pending}
           onClick={load}
         >
-          {pending ? "Loading audio…" : "Listen to voice note"}
+          {pending
+            ? "Loading attachment…"
+            : kind === "image"
+              ? "View label photo"
+              : "Listen to voice note"}
         </Button>
       )}
       {error && (

@@ -14,14 +14,14 @@ def media_record(conn, company, cid, mid):
         (company, cid, mid),
     ).fetchone()
     if not row:
-        raise DomainError("Voice note not found.", 404)
+        raise DomainError("Attachment not found.", 404)
     return row
 
 
 def complete_media(
     conn, company, cid, mid, *, status, text, normalized_path=None, metadata=None, error_code=None
 ):
-    """Publish a linked transcript/failure without confirming extracted values or granting outbound authority.
+    """Publish a linked voice transcript, label reading or failure without confirming fields or granting outbound authority.
 
     A transcript superseded by a newer customer reply cannot overwrite its request
     status. Staff ownership still permits internal transcription, but suppresses

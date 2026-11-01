@@ -1,0 +1,55 @@
+{
+  "date": "2026-11-01",
+  "scope": "Current working-tree app diagrams and durable documentation policy; not application release readiness",
+  "source_skill": {
+    "repository": "https://github.com/softaworks/agent-toolkit",
+    "commit": "3027f20f3181758385a1bb8c022d4041dfb4de84",
+    "path": "skills/mermaid-diagrams",
+    "license": "MIT",
+    "local_integration": "Local rules, source-backed claims and renderer ownership added; original instructions/license/provenance retained"
+  },
+  "renderer": {
+    "package": "mermaid",
+    "version": "11.17.2",
+    "runtime": "existing local Playwright Chromium",
+    "network": "external browser requests blocked"
+  },
+  "diagram_count": 15,
+  "checks": [
+    {
+      "command": "npm run test:diagrams",
+      "result": "passed",
+      "count": 4
+    },
+    {
+      "command": "npm run diagrams:render",
+      "result": "passed",
+      "count": 15
+    },
+    {
+      "command": "npm run diagrams:check",
+      "result": "passed",
+      "count": 15
+    },
+    {
+      "check": "Actual stored SVG tamper negative check",
+      "result": "passed; nonzero gate rejection and original restored"
+    },
+    {
+      "check": "Manual visual inspection of all view families and corrected final topology/draft/retrieval outputs",
+      "result": "completed"
+    }
+  ],
+  "corrections": [
+    "Sequence message semicolons caused syntax failure and were removed.",
+    "A state-label separator rendered stray states despite parse success; corrected and regression-tested.",
+    "Crowded workflow ER split into offer and conversation views.",
+    "Code/renderer bindings normalize CRLF/LF for cross-platform verification."
+  ],
+  "limits": [
+    "Remote CI is pending the requested commit/push.",
+    "Visual review and file hashes do not prove all application behavior.",
+    "No new paid-provider calls were made for diagram verification.",
+    "The low Mermaid/KaTeX advisory path and pre-existing clasp advisory are not represented as fixed."
+  ]
+}

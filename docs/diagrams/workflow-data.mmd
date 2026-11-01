@@ -1,0 +1,29 @@
+erDiagram
+  accTitle: Offer revisions and exact approval relationships
+  accDescr: A company owns conversations with immutable revisions. An approval binds a quote to an Auth user, and an outbox row may reference that quote. Quote line JSON and checkpoint thread IDs are not foreign keys.
+  companies ||--o{ conversations : scopes
+  conversations ||--o{ quotes : versions
+  conversations ||--o{ outbox : dispatches
+  quotes ||--o| approvals : reviewed_by
+  auth_users ||--o{ approvals : authorizes
+  quotes |o--o{ outbox : may_reference
+  conversations {
+    uuid id PK
+    integer version
+    text owner
+  }
+  quotes {
+    uuid id PK
+    integer revision
+    text content_hash
+  }
+  approvals {
+    uuid quote_id FK,UK
+    uuid approver FK
+    text recipient
+  }
+  outbox {
+    uuid id PK
+    text action_key UK
+    text status
+  }

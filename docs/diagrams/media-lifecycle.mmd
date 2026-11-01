@@ -1,0 +1,20 @@
+stateDiagram-v2
+  accTitle: Attachment processing states and human confirmation boundary
+  accDescr: Accepted local media is queued, processed and normalized privately. Disabled or uncertain inference needs staff. A ready transcript or label is still unconfirmed. Interrupted active work becomes unknown rather than being replayed.
+  [*] --> queued: Accepted with durable media job
+  queued --> processing: Current fenced worker
+  processing --> rejected: Parser rejects or is unavailable
+  processing --> needs_staff: Paid disabled or admission denied
+  processing --> needs_staff: Reading uncertain or unusable
+  processing --> ready: Usable unconfirmed reading
+  processing --> unknown: Interrupted provider or publication
+  queued --> unknown: Expired active job before row advancement
+  note right of ready
+    Ready is not SKU/quantity confirmation.
+    Written confirmation and exact staff
+    review remain separate gates.
+  end note
+  note left of unknown
+    Retain uncertain allowance.
+    Staff review; no blind retry.
+  end note

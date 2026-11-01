@@ -32,11 +32,8 @@ class Settings(BaseSettings):
     whatsapp_company_id: str = ""
     whatsapp_test_recipients: str = ""
     google_sheet_id: str = ""
-    google_client_id: str = ""
-    google_client_secret: SecretStr = SecretStr("")
-    google_refresh_token: SecretStr = SecretStr("")
-    google_drive_folder_id: str = ""
     google_callback_secret: SecretStr = SecretStr("")
+    google_company_id: str = ""
     total_budget: float = 25
     daily_budget: float = 5
     reservation: float = 0.25

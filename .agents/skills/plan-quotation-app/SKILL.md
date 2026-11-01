@@ -30,6 +30,8 @@ Do not send CLI product feedback, publish traces/datasets, or run remote install
 Distinguish configured tracing from a trace verified in the intended project. Distinguish token-derived cost estimates from provider-billed cost.
 
 ## Working method
+Before implementation, read the affected guide through `docs/README.md` and apply [project-documentation](../project-documentation/SKILL.md), including its deep documentation standard. Keep adjacent contracts and affected focused references current after every coherent step; a work-log entry or one-line purpose comment alone is insufficient. Root AGENTS.md defines the canonical requirement and completion checks.
+
 Use [agent organization](references/agent-organization.md) for Python orchestration/adapters, [react-feature-structure](../react-feature-structure/SKILL.md) for frontend ownership, and [project-documentation](../project-documentation/SKILL.md) for needed specifications/decisions. These incorporate the supplied conventions without replacing the approved stack.
 Resolve routine choices using the approved scope, state consequential assumptions, and ask only for missing information that changes security, cost, persistence, or public behavior. Define observable success criteria and keep changes focused; do not impose arbitrary line-count, commit-count, or documentation gates.
 For substantial features and security-sensitive changes, apply [verify-engineering-coverage](../verify-engineering-coverage/SKILL.md). Assess overlooked concepts against the actual scope, carry gaps into the existing plan, and require implementation plus current behavioral evidence before claiming coverage.

@@ -1,0 +1,15 @@
+stateDiagram-v2
+  accTitle: Local quotation edits and server conflict handling
+  accDescr: The first edit captures the server quote and conversation version. Polling cannot overwrite dirty input or silently update its precondition. A conflict requires deliberate review, discard or a confirmed new save.
+  [*] --> Pristine: Load canonical revision
+  Pristine --> Pristine: Reconcile new server revision
+  Pristine --> Editing: First edit captures base quote/version
+  Editing --> Editing: Continue editing with original precondition
+  Editing --> Conflict: Poll observes different quote/version
+  Editing --> Saving: Save with captured precondition
+  Conflict --> Saving: Explicit attempt retains original precondition
+  Saving --> Conflict: 409 preserves local values
+  Saving --> Editing: Other failure retains local draft
+  Saving --> Pristine: Confirmed save and cache reconciliation
+  Conflict --> Pristine: Explicit discard and load latest
+  Editing --> Pristine: Explicit discard

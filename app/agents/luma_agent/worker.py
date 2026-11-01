@@ -11,6 +11,7 @@ from .runtime.audio import process_audio
 from .runtime.conversations import process_conversation
 from .runtime.delivery import deliver_one
 from .runtime.jobs import claim_job, finish_job
+from .runtime.media import process_media
 
 logger = logging.getLogger("luma.worker")
 
@@ -25,6 +26,8 @@ def tick():
                 process_conversation(job)
             elif job["kind"] == "transcribe":
                 process_audio(job)
+            elif job["kind"] == "read_photo":
+                process_media(job, "image")
             else:
                 raise DomainError("This integration job is not enabled yet.")
             finish_job(job, "done")

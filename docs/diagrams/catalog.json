@@ -1,0 +1,205 @@
+{
+  "version": 1,
+  "diagrams": [
+    {
+      "id": "sales-workflow",
+      "title": "LumaQuote request-to-reviewed-offer workflow",
+      "scope": "Implemented local-test workflow; live WhatsApp delivery remains pending",
+      "embeds": [
+        "README.md"
+      ],
+      "bindings": [
+        "app/backend/luma/features/conversations/participation.py",
+        "app/backend/luma/features/quotations/approval.py",
+        "app/agents/luma_agent/runtime/delivery.py"
+      ]
+    },
+    {
+      "id": "system-boundaries",
+      "title": "Native processes, private infrastructure and optional providers",
+      "scope": "Current process topology; Google and provider configuration do not establish live verification",
+      "embeds": [
+        "docs/ARCHITECTURE.md"
+      ],
+      "bindings": [
+        "app/backend/luma/main.py",
+        "app/backend/luma/google_gateway.py",
+        "app/agents/luma_agent/worker.py",
+        "app/backend/luma/features/media/sandbox.py"
+      ]
+    },
+    {
+      "id": "quotation-approval",
+      "title": "Canonical quotation, exact approval and final dispatch checks",
+      "scope": "Actual transaction sequence and implemented local-channel delivery",
+      "embeds": [
+        "docs/reference/BACKEND.md"
+      ],
+      "bindings": [
+        "app/backend/luma/features/quotations/drafting.py",
+        "app/backend/luma/features/quotations/approval.py",
+        "app/backend/luma/features/quotations/freshness.py",
+        "app/agents/luma_agent/runtime/delivery.py"
+      ]
+    },
+    {
+      "id": "staff-operation",
+      "title": "Staff identity, idempotency and optimistic mutation protocol",
+      "scope": "New mutation versus identical replay; no bearer values shown",
+      "embeds": [
+        "docs/api/README.md"
+      ],
+      "bindings": [
+        "app/backend/luma/core/http.py",
+        "app/backend/luma/core/database.py",
+        "app/backend/luma/core/idempotency.py",
+        "app/backend/luma/features/quotations/routes.py"
+      ]
+    },
+    {
+      "id": "evidence-data",
+      "title": "Catalog, commercial snapshot and current embedding relationships",
+      "scope": "Selected actual SQL foreign keys; legacy product vector is unused",
+      "embeds": [
+        "docs/reference/DATA_MODEL.md"
+      ],
+      "bindings": [
+        "supabase/migrations/20261029010000_quotation_domain.sql",
+        "supabase/migrations/20261029131000_versioned_embeddings.sql"
+      ]
+    },
+    {
+      "id": "workflow-data",
+      "title": "Offer revisions, approvals and outbound intent relationships",
+      "scope": "Selected actual SQL relationships; JSON line references and checkpoint thread keys are not foreign keys",
+      "embeds": [
+        "docs/reference/DATA_MODEL.md"
+      ],
+      "bindings": [
+        "supabase/migrations/20261029010000_quotation_domain.sql",
+        "supabase/migrations/20261029100000_immutable_quotation_content.sql"
+      ]
+    },
+    {
+      "id": "conversation-data",
+      "title": "Exact message, attachment and durable conversation work relationships",
+      "scope": "Actual company/conversation/message foreign-key bindings",
+      "embeds": [
+        "docs/reference/DATA_MODEL.md"
+      ],
+      "bindings": [
+        "supabase/migrations/20261029010000_quotation_domain.sql",
+        "supabase/migrations/20261029110000_voice_intake.sql",
+        "supabase/migrations/20261029111000_media_message_binding.sql"
+      ]
+    },
+    {
+      "id": "agent-graph",
+      "title": "Durable extraction, clarification and staff-review graph",
+      "scope": "Current StateGraph; nodes do not dispatch messages",
+      "embeds": [
+        "docs/reference/AGENT_RUNTIME.md"
+      ],
+      "bindings": [
+        "app/agents/luma_agent/graph.py",
+        "app/agents/luma_agent/nodes/workflow.py",
+        "app/agents/luma_agent/runtime/conversations.py"
+      ]
+    },
+    {
+      "id": "job-recovery",
+      "title": "Expired-job fencing and conservative uncertainty recovery",
+      "scope": "Bounded expiry reconciliation; no heartbeat or automatic provider replay",
+      "embeds": [
+        "docs/reference/AGENT_RUNTIME.md"
+      ],
+      "bindings": [
+        "app/agents/luma_agent/lease.py",
+        "app/agents/luma_agent/runtime/jobs.py",
+        "app/agents/luma_agent/runtime/recovery.py"
+      ]
+    },
+    {
+      "id": "estimated-allowance",
+      "title": "Shared estimated allowance and unknown provider outcomes",
+      "scope": "Internal estimates, not a provider-enforced invoice cap",
+      "embeds": [
+        "docs/reference/AGENT_RUNTIME.md"
+      ],
+      "bindings": [
+        "app/agents/luma_agent/budget.py",
+        "app/agents/luma_agent/nodes/retrieval.py",
+        "app/agents/luma_agent/runtime/media.py"
+      ]
+    },
+    {
+      "id": "media-lifecycle",
+      "title": "Private attachment processing and unconfirmed media states",
+      "scope": "Staff-operated local intake; ready readings are not commercial confirmation",
+      "embeds": [
+        "docs/reference/MEDIA.md"
+      ],
+      "bindings": [
+        "app/backend/luma/features/media/intake.py",
+        "app/backend/luma/features/media/persistence.py",
+        "app/agents/luma_agent/runtime/media.py",
+        "app/agents/luma_agent/runtime/recovery.py"
+      ]
+    },
+    {
+      "id": "catalog-retrieval",
+      "title": "Exact and lexical lookup before admitted semantic fallback",
+      "scope": "Suggestions only; source recheck precedes clarification publication",
+      "embeds": [
+        "docs/reference/CATALOG.md"
+      ],
+      "bindings": [
+        "app/backend/luma/features/catalog/criteria.py",
+        "app/backend/luma/features/catalog/retrieval.py",
+        "app/backend/luma/features/catalog/semantic.py",
+        "app/agents/luma_agent/nodes/retrieval.py",
+        "app/agents/luma_agent/nodes/workflow.py"
+      ]
+    },
+    {
+      "id": "frontend-draft",
+      "title": "Unsaved quotation edits survive polling and conflicts",
+      "scope": "Local draft state is separate from the immutable server offer",
+      "embeds": [
+        "docs/reference/FRONTEND.md"
+      ],
+      "bindings": [
+        "app/frontend/src/features/quotations/useQuotationDraft.ts",
+        "app/frontend/src/features/quotations/QuotationPanel.tsx",
+        "app/frontend/src/features/conversations/api.ts"
+      ]
+    },
+    {
+      "id": "google-snapshot",
+      "title": "Signed Apps Script snapshot validation and atomic publication",
+      "scope": "Implemented GAS transport; live timer and complete account verification remain separate",
+      "embeds": [
+        "docs/reference/GOOGLE_SYNC.md"
+      ],
+      "bindings": [
+        "gas/Synchronization.gs",
+        "app/backend/luma/features/google_sync/callbacks.py",
+        "app/backend/luma/features/google_sync/snapshots.py",
+        "app/backend/luma/features/google_sync/validation.py"
+      ]
+    },
+    {
+      "id": "verification-scope",
+      "title": "Offline, local integration and explicit live evidence boundaries",
+      "scope": "Actual runner/CI responsibilities, not a claim that every gate passed in this task",
+      "embeds": [
+        "docs/reference/TOOLING_AND_TESTS.md"
+      ],
+      "bindings": [
+        "scripts/verify.cjs",
+        ".github/workflows/ci.yml",
+        "tests/integration/test_browser_workflow.py"
+      ]
+    }
+  ]
+}

@@ -3,6 +3,7 @@ from typing import Literal
 from langgraph.graph import END, START, StateGraph
 
 from .nodes.extraction import extract
+from .nodes.retrieval import retrieve
 from .nodes.workflow import ask, clarify, prepare, review
 from .state import AgentState
 
@@ -17,12 +18,14 @@ def build_graph(checkpointer):
     return (
         StateGraph(AgentState)
         .add_node("extract", extract)
+        .add_node("retrieve", retrieve)
         .add_node("ask", ask)
         .add_node("clarify", clarify)
         .add_node("prepare", prepare)
         .add_node("review", review)
         .add_edge(START, "extract")
-        .add_conditional_edges("extract", route)
+        .add_edge("extract", "retrieve")
+        .add_conditional_edges("retrieve", route)
         .add_edge("ask", "clarify")
         .add_edge("prepare", "review")
         .add_edge("review", END)

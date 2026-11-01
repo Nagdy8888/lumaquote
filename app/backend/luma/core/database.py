@@ -8,7 +8,14 @@ from .config import settings
 
 @contextmanager
 def database(user_id: str | None = None, *, worker: bool = False):
-    """Yield a transactional restricted-role connection; attach the verified staff identity for RLS when provided."""
+    """Yield one dict-row transaction using the staff or trusted worker DSN.
+
+    ``user_id`` must already come from Auth verification; attaching it only sets
+    the RLS claim, not membership authority. Normal context exit commits and an
+    exception rolls back through psycopg. The caller owns business scope/locks;
+    this helper never selects a company or retries failed transactions. Worker
+    connections have broader policies and must remain outside browser access.
+    """
     config = settings()
     dsn = config.luma_worker_database_url if worker else config.luma_api_database_url
     if not dsn.get_secret_value():

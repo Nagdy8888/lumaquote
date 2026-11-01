@@ -1,4 +1,4 @@
-"""Private local-test voice intake, independent of provider processing and HTTP."""
+"""Private local-test media intake, independent of provider processing and HTTP."""
 
 from uuid import uuid4
 
@@ -18,28 +18,33 @@ def authorize_upload(conn, company, cid):
     return current
 
 
-def accept_audio(conn, member, user, cid, expected_version, data):
-    """Persist one opaque private original and queue bounded transcription, invalidating earlier offers atomically.
+def accept_media(conn, member, user, cid, expected_version, data, *, kind):
+    """Persist one opaque private original and queue bounded media processing, invalidating earlier offers atomically.
 
     The caller holds the operation's idempotency lock. Storage failure rolls back
     business effects; interrupted pre-commit uploads may leave a private orphan
     for retention cleanup, never a dispatched message or approved quotation.
     """
+    if kind not in ("audio", "image"):
+        raise DomainError("Unsupported media kind.", 422)
+    label, maximum, job_kind = (
+        ("Voice note", 10, "transcribe") if kind == "audio" else ("Product-label photo", 5, "read_photo")
+    )
     company = member["company_id"]
     current = authorize_upload(conn, company, cid)
     if current["version"] != expected_version:
-        raise DomainError("The conversation changed. Review it before uploading this voice note.")
-    if not data or len(data) > 10 * 1024 * 1024:
-        raise DomainError("Voice notes must be nonempty and no larger than 10 MB.", 413)
+        raise DomainError("The conversation changed. Review it before uploading this attachment.")
+    if not data or len(data) > maximum * 1024 * 1024:
+        raise DomainError(f"{label} must be nonempty and no larger than {maximum} MB.", 413)
     rate_limit(conn, f"conversation:{cid}", 6)
     path = f"{company}/media/{uuid4()}/original"
     put_file(path, data, "application/octet-stream")
     message = add_message(
-        conn, company, cid, "customer", "Voice note awaiting processing.", kind="audio", object_path=path
+        conn, company, cid, "customer", f"{label} awaiting processing.", kind=kind, object_path=path
     )
     conn.execute(
-        "insert into luma.media(message_id,company_id,conversation_id,original_path) values(%s,%s,%s,%s)",
-        (message, company, cid, path),
+        "insert into luma.media(message_id,company_id,conversation_id,original_path,kind) values(%s,%s,%s,%s,%s)",
+        (message, company, cid, path, kind),
     )
     conn.execute(
         "update luma.quotes set status='superseded' where conversation_id=%s and status in ('review','approved')",
@@ -52,6 +57,11 @@ def accept_audio(conn, member, user, cid, expected_version, data):
     conn.execute(
         "update luma.conversations set last_customer_at=now(),status='processing_media' where id=%s", (cid,)
     )
-    enqueue(conn, company, cid, kind="transcribe", payload={"message_id": str(message)})
-    audit(conn, company, user, "media.audio_received", message)
+    enqueue(conn, company, cid, kind=job_kind, payload={"message_id": str(message)})
+    audit(conn, company, user, f"media.{kind}_received", message)
     return {"message_id": str(message), "status": "queued"}
+
+
+def accept_audio(conn, member, user, cid, expected_version, data):
+    """Preserve the voice intake interface while sharing immutable original, revision invalidation and job admission with photos."""
+    return accept_media(conn, member, user, cid, expected_version, data, kind="audio")
