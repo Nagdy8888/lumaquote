@@ -106,6 +106,11 @@ mocked provider responses or a library installation. Account actions belong in
 
 ## Current verification boundaries
 
+The [November 1 written-confirmation evidence](evidence/written-confirmation-2026-11-01.json)
+records the current-turn safety slice: complete written-order provenance, 40
+controlled development policy cases, real graph denial/resume and a full local
+regression. Its modality labels are not audio/vision accuracy or a frozen holdout.
+
 Phases 1 and 2 have committed evidence. Voice/resume and lexical catalog work have
 separate progress commits/evidence; phase 3 remains unfinished. Photo API/provider
 tests, updated browser workflow and full regression have passed locally.

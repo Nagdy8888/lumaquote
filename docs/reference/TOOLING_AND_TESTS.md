@@ -125,6 +125,12 @@ failure; do not infer the fixture is a universal crash-proof garbage collector.
   pack/availability and authorization boundaries, including property-based cases.
 - `test_requirement_policy.py`: fixed safe clarification and explicit written
   media confirmation, including ambiguous/duplicate consequential fields.
+- `test_written_requests.py`: 40 separately labeled development policy cases
+  (20 text/12 voice-policy/8 photo-policy), independent evaluator-only oracle,
+  generated positive/negated numeric boundaries and malformed/oversized/list
+  limits. The controlled extraction output is intentionally not trusted; media
+  observations are text substitutes, never measured transcription/vision quality.
+  See [the fixture contract](../../tests/fixtures/requirement-policy/README.md).
 - `test_trace_privacy.py`: explicit outcome allowlist with canaries at the fake
   export seam; it does not establish successful live LangSmith export.
 - `test_embedding_contracts.py`: vector shape/value validation, shared conservative
@@ -138,6 +144,13 @@ failure; do not infer the fixture is a universal crash-proof garbage collector.
 
 Small tests isolate deterministic policy. They do not replace real SQL constraints,
 provider contracts, actual browser behavior or a commercial pilot.
+
+The development confirmation corpus is a regression boundary, not the frozen
+80-case release evaluation or its 60/20 split. `fields_confirmed` means only that
+the complete latest written order agrees with the untrusted extracted fields.
+It cannot be counted as retrieval recall, quotation workflow success, approval
+or delivery accuracy. Corpus files/oracles stay outside runtime ingestion and
+provider traces. Paid inference, noisy media and the holdout remain unrun.
 
 ## Integration coverage by responsibility
 
@@ -153,6 +166,13 @@ provider contracts, actual browser behavior or a commercial pilot.
   author/ownership reauthorization.
 - `test_graph_restart.py`: durable customer/staff interrupts through independent
   native processes, duplicate-work silence, media confirmation and cited choices.
+- `test_written_confirmation.py`: cancelled/negated/conditional/alternative latest
+  turns remain at a persisted customer interrupt; a complete restatement resumes
+  in another process into exact-line staff review without approval/send intent.
+  Also checks replacement of earlier orders, well-formed false provider fields
+  through real reservation/graph seams, and oversized stored input before primary
+  provider admission. Fake Responses output is explicitly isolated from inference
+  quality; normal tests cannot authorize paid provider execution.
 - `test_media_sandbox.py`: actual offline container decode/rejection for native PDF,
   image and overlong/corrupt media. These require Docker, not provider inference.
 - `test_voice_intake.py`, `test_photo_intake.py`: raw upload/size/precondition/replay,
@@ -229,6 +249,13 @@ test collection may have a different skip/count total.
 [The November 1 commit checkpoint](../evidence/commit-checkpoint-2026-11-01.json)
 records the later full gate: 124 Python tests, four skipped paid canaries, five UI
 tests, a separate browser run, four diagram tooling tests and 15 checked views.
+
+[Written-confirmation evidence](../evidence/written-confirmation-2026-11-01.json)
+records the later current-turn safety slice on November 1: 190 Python tests,
+four skipped paid canaries, five UI tests, the separate browser, build, inline
+contracts and all 15 diagrams passed. The 40-case development policy actions
+and 15 focused graph/restart checks have separate scope/denominators in that
+artifact; neither is a frozen 80-case media result or real-provider accuracy.
 
 GitHub CI runs Ubuntu Node 22/Python 3.12 with static checks, unit/UI tests and build.
 It does not start the local Supabase/sandbox/browser suite or authorize live

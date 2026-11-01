@@ -94,6 +94,12 @@ Early manual-flow tests do not establish live WhatsApp, model, or Google executi
 
 ## Phase 3 progress (not complete)
 
+The current-turn confirmation boundary now requires a complete positive written
+order matching all model fields for text, voice and photo requests. Forty
+development policy specifications (20 text/12 voice-policy/8 photo-policy) cover
+controlled adversarial output; they are not the frozen 80-case media evaluation.
+Broader recognition/holdout quality and external acceptance gates remain open.
+
 Voice upload, restricted decoding, private playback, and budget-reserved English
 transcription are implemented. Opt-in synthetic live canaries passed for Responses
 and transcription. Consequential fields require explicit written confirmation;

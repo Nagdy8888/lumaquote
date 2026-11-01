@@ -1,4 +1,3 @@
-import re
 from decimal import Decimal
 
 from langsmith import tracing_context
@@ -12,20 +11,35 @@ from ..budget import reserve
 from ..lease import assert_job
 from ..requirements import clarification_for
 from ..schemas import Extraction, RequestedLine
+from ..written_requests import parse_written_request
 
 
 def baseline_extract(text):
-    """Explicit offline exact-SKU baseline, never presented as a live model result."""
-    matches = re.findall(r"\b(\d{1,5})\s+([A-Z]{2}-\d{3})\b", text.upper())
+    """Read only complete positive written orders with the shared bounded grammar.
+
+    Unsupported prose, negation, pack units and duplicate/oversized lines produce an
+    empty uncertain result rather than substring matches or validation crashes.
+    This is an explicit offline baseline, not live model reasoning or approval.
+    """
+    matches = parse_written_request(text)
     return Extraction(
-        lines=[RequestedLine(sku=sku, quantity=int(qty)) for qty, sku in matches],
+        lines=[RequestedLine(sku=sku, quantity=quantity) for sku, quantity in matches or []],
         clarification=None if matches else "Which product model (SKU) and quantity do you need?",
         uncertain_critical_fields=not bool(matches),
     )
 
 
 def extract(state):
-    """Read authorized customer context, reserve paid work when enabled, and return validated requirements or clarification."""
+    """Extract the latest authorized customer turn, then independently confirm written fields.
+
+    Lease/owner checks and paid reservation precede provider work. Context is the
+    full latest body (at most 16000 chars), never a truncated suffix or an earlier
+    order concatenated with a cancellation. Incomplete corrections ask for a full
+    current order. The last 12 message kinds determine whether the media-specific
+    question applies; media cannot confirm itself. Model output stays untrusted
+    until the deterministic whole-message gate. Usage settlement and uncertain
+    failures retain their existing separate transaction boundary.
+    """
     config = settings()
     with database(worker=True) as conn:
         assert_job(conn, state)
@@ -36,11 +50,16 @@ def extract(state):
             "select id,body,kind from luma.messages where conversation_id=%s and actor='customer' order by created_at desc,id desc limit 12",
             (state["conversation_id"],),
         ).fetchall()
-        text = "\n".join(m["body"] for m in reversed(messages))[-16000:]
+        text = messages[0]["body"] if messages else ""
         media = any(m["kind"] in ("audio", "image") for m in messages)
-        if media and messages and messages[0]["kind"] == "text":
-            # Explicit written confirmation supersedes earlier media guesses.
-            text = messages[0]["body"][-16000:]
+        if len(text) > 16000:
+            # Never discard a negation/condition before checking the full request.
+            return {
+                "customer_message_id": str(messages[0]["id"]),
+                "observed_version": current["version"],
+                "extraction": baseline_extract("").model_dump(),
+                "clarification": clarification_for(baseline_extract(""), messages, media=media),
+            }
         if config.enable_paid_ai:
             if config.openai_model != "gpt-6-luna":
                 raise DomainError(

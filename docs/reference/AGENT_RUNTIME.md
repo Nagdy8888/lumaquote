@@ -17,8 +17,8 @@ checkpoint or resume command is never an approval credential.
 ```mermaid
 flowchart TD
   accTitle: Durable LumaQuote agent graph
-  accDescr: Extraction feeds current evidence retrieval. Missing requirements create a durable clarification intent and customer interrupt. Confirmed explicit lines call the backend draft service and pause for a persisted staff decision when a quote exists. No graph node sends a message.
-  Start(["Trusted conversation job"]) --> Extract["extract: explicit requirements"]
+  accDescr: Extraction reads only the latest customer turn and independently checks a complete positive written order against model fields. Unconfirmed, negated or missing requirements create a durable clarification intent and customer interrupt. Confirmed explicit lines call the backend draft service and pause for a persisted staff decision when a quote exists. No graph node sends a message.
+  Start(["Trusted conversation job"]) --> Extract["extract: latest turn + written-field gate"]
   Extract --> Retrieve["retrieve: current evidence candidates"]
   Retrieve --> Question{"Clarification required?"}
   Question -->|Yes| Ask["ask: persist reply intent"]
@@ -55,11 +55,12 @@ secret-free merely because private files and credentials are stored elsewhere.
 
 ## Extraction and consequential-field confirmation
 
-`nodes/extraction.extract` validates the job lease and agent ownership, reads up
-to 12 newest customer messages and bounds joined context to the final 16,000
-characters. Staff notes are not customer requirements. When prior media exists
-and the latest customer message is text, that latest text is the confirmation
-context rather than silently mixing in earlier media guesses.
+`nodes/extraction.extract` validates the job lease and agent ownership and reads
+up to 12 newest customer messages. Only the newest complete body is extraction
+context. Staff notes and earlier orders cannot supply missing fields to a newer
+cancellation or incomplete correction. A body over 16,000 characters asks for a
+restatement before primary extraction reservation: taking a suffix could erase a negation.
+The recent message kinds determine whether the media-specific question applies.
 
 With paid AI disabled, `baseline_extract` recognizes the explicit quantity/SKU
 form such as `3 DL-001`. This is an offline baseline with limited grammar, not a
@@ -71,11 +72,36 @@ uncertain consumption unknown on failure.
 
 `requirements.clarification_for` replaces model-authored commercial prose with
 fixed questions. Missing/uncertain fields, invalid model syntax or duplicate SKUs
-ask for clarification. When media is involved, the newest message must be text and
-its explicit `(SKU, quantity)` pairs must exactly match the extracted pairs.
-`yes`, a label reading alone, or an inferred quantity cannot pass this gate.
-This establishes explicit request fields; product support, price and availability
-remain downstream checks.
+ask for clarification. For **every** modality, the newest message must be text
+and its complete written order must exactly match all extracted `(SKU, quantity)`
+pairs. Order of distinct lines is immaterial; missing/extra or repeated lines are
+not. A well-formed provider result alone cannot establish customer intent.
+
+`written_requests.parse_written_request` is the independent deterministic seam:
+it accepts 1-20 unique pairs with ASCII counts 1..10000 and the existing
+two-letter/three-digit SKU shape. An optional `Please quote`, `Confirm`, `Order`,
+`I need` or `We need` prefix and optional `unit(s)`, `pcs` or `piece(s)` labels are
+allowed. Separate lines with comma, semicolon, `and` or newline; case and harmless
+whitespace are normalized. For example, `Please quote 3 DL-001 and 2 PN-002.`
+is an explicit complete request. It does not accept packs as individual units.
+
+The **whole** message must match. `Do not quote 3 DL-001`, `3 DL-001 or 4 PN-002`,
+quoted examples, JSON/instructions and conditional orders therefore cannot be
+reduced to their positive-looking substrings. `yes`, media alone and model-inferred
+fields cannot pass. This deliberately narrow confirmation language asks natural
+language customers for a complete restatement when interpretation is necessary;
+it is not a general English intent detector. Corrections must repeat the complete
+current order; earlier text is never silently merged. Staff can take over and
+draft manually. This gate establishes explicit request fields only; product
+support, pack size, price, stock, approval and dispatch remain backend checks.
+
+The development policy corpus has 40 controlled specifications, with an
+evaluator-only oracle outside runtime ingestion. Its text/media-label actions
+test this boundary, not provider recognition or the release holdout. Generated
+boundary cases also verify that malformed quantities/oversized lists clarify
+instead of causing structured-output validation errors. See
+[tooling and tests](TOOLING_AND_TESTS.md#unit-and-component-coverage) for execution
+and the separate persisted graph regression scope.
 
 `nodes/retrieval.retrieve` acts only when clarification is needed and no explicit
 lines exist. It checks the live lease, observed version and owner; searches exact/

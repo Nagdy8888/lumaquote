@@ -91,7 +91,7 @@ stateDiagram-v2
   queued --> unknown: Expired active job before row advancement
   note right of ready
     Ready is not SKU/quantity confirmation.
-    Written confirmation and exact staff
+    Complete positive written order and staff
     review remain separate gates.
   end note
   note left of unknown
@@ -155,8 +155,12 @@ It avoids overwriting the workflow status of a newer customer turn. A ready
 reading can enqueue an agent job only when the agent owns the conversation;
 staff takeover suppresses automatic graph admission.
 
-The extraction gate requires a later explicit written SKU/quantity match. For
-example, `Confirm 3 DL-001` can establish those fields; `yes` cannot. The frontend
+The extraction gate requires a later complete positive written SKU/quantity order
+matching all extracted lines. For example, `Confirm 3 DL-001` can establish those
+fields; `yes`, `Do not quote 3 DL-001` or a conditional request cannot. The whole
+latest text is parsed using the bounded grammar documented in
+[agent runtime](AGENT_RUNTIME.md#extraction-and-consequential-field-confirmation),
+not a substring scan of transcripts or old turns. The frontend
 allows staff to prepare a manual draft, but delivery still needs exact staff
 review. A provider's observed SKU array is never an authorization tool.
 

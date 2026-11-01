@@ -54,6 +54,15 @@ When enabled, bounded structured OpenAI extraction is still untrusted input.
 Missing or uncertain consequential fields produce fixed safe questions rather
 than model-authored commercial promises.
 
+For automatic draft preparation, confirm the **complete current order** in text,
+for example `Please quote 3 DL-001 and 2 PN-002.` The agent verifies all written
+pairs independently of model extraction. Plain `3 DL-001`, `Confirm 3 DL-001`
+and separate lines are accepted. Cancellation, alternatives, conditional wording,
+pack-to-unit conversions or partial corrections ask for a restatement; earlier
+orders are not silently combined with a newer message. Staff can take over when
+the request needs interpretation. This confirmation permits draft preparation;
+it does not replace staff approval of the resulting quotation.
+
 An unknown-SKU customer can receive up to five descriptive catalog candidates.
 Lookup prefers exact codes, uses explicit watt/CCT/IP constraints, excludes
 retired evidence and returns original-page/source-version provenance. Candidates
@@ -78,7 +87,7 @@ one reserved transcription or label-reading attempt. Photo readings preserve
 visible text/uncertainty and do not infer identity from product appearance.
 
 Media alone, or a generic **yes**, cannot confirm consequential SKU/quantity
-fields. The current gate requires matching written values such as `3 DL-001`.
+fields. The gate requires a complete positive written order such as `3 DL-001`.
 Human staff can still prepare a manual draft; final delivery needs exact review.
 
 Voice, photo API and synthetic provider canaries have local evidence. The photo

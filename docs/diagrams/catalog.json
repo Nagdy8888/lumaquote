@@ -102,6 +102,9 @@
       ],
       "bindings": [
         "app/agents/luma_agent/graph.py",
+        "app/agents/luma_agent/nodes/extraction.py",
+        "app/agents/luma_agent/requirements.py",
+        "app/agents/luma_agent/written_requests.py",
         "app/agents/luma_agent/nodes/workflow.py",
         "app/agents/luma_agent/runtime/conversations.py"
       ]

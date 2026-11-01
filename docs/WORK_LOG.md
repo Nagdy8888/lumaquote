@@ -675,3 +675,63 @@ these entries were logged during the original steps or freshly rerun today.
 - Full verify:full rerun passed every gate: lint, architecture/inline docs, frontend checks, four diagram tests, all 15 diagram renders/freshness checks, typecheck, 124 Python tests (four paid canaries skipped and browser deselected), five UI tests, separate native browser and build. Python completed in 187.80 seconds under the bounded integration allowance.
 - Added commit-checkpoint-2026-11-01.json with actual command results, the initial timeout/resolution and remaining phase/integration limits. Updated the tracker/test reference without checking off an incomplete phase. Corrected dated LangSmith wording rather than claiming the October quota state is verified in November; regenerated that diagram below.
 - Reviewed the staged scope, credentials/path patterns, skill provenance, documentation links and normalized code fingerprints. Intended private remote is Nagdy8888/lumaquote on main; the requested commit and push follow without deployment or history rewrite.
+
+### 2026-11-01 - Continued the confirmation safety boundary
+
+- Read the plan, test requirements, affected runtime/media/source contracts and evaluation/security skills. Source review found that substring matching accepted a negated quantity/SKU and text-only structured output had no independent customer-field check. A first command-line reproduction failed because PowerShell split the Python string; it did not establish a runtime result.
+- Added `app/agents/luma_agent/written_requests.py` with a bounded whole-message positive-order grammar. Updated requirement policy and extraction to require the complete latest written order for all modalities, reject unsupported/negated/conditional wording, and avoid concatenating old requests or truncating away a leading qualification. Oversized requests clarify before primary extraction admission; ordinary incomplete requests still follow the existing paid extraction policy when explicitly enabled.
+- Updated adjacent contracts and runtime/media/operator guides with accepted examples, complete-restatement behavior, model-versus-customer authority and downstream business checks. Development adversarial fixtures, persisted-graph regressions and diagram refresh are next; no successful verification, frozen 80-case result, provider spend or phase completion is claimed yet. The existing broader engineering ledger remains unresolved, particularly prompt injection/untrusted output and human approval coverage.
+
+### 2026-11-01 - Added an independent development confirmation corpus
+
+- Added 40 synthetic controlled policy inputs and a separate evaluator-only oracle under `tests/fixtures/requirement-policy` (20 text, 12 voice-policy, 8 photo-policy). Expected actions are hand-specified business decisions; no LLM judge or answer key enters runtime tools, ingestion or traces. The ignored construction helper produced the files successfully.
+- Added `tests/unit/test_written_requests.py` to compare actual clarification decisions, ensure complete/nonduplicated case IDs and denominators, generate numeric/negation invariants and reject malformed/overlong/duplicate/21-line inputs without crashing the offline extractor. Bounded the parser repetition and separated horizontal/newline delimiters to avoid broad overlapping whitespace scans.
+- Documented fixture ownership, accepted grammar, test meaning and limitations in the fixture README and affected runtime/test references. These are development policy specifications with controlled media text, not the planned 80-case dataset, audio/vision accuracy or a holdout claim. Tests and persisted-graph proof are pending below.
+
+### 2026-11-01 - Unit policy gate passed; persisted-workflow regressions added
+
+- Ran the written-request and existing requirement-policy suites: 71 tests passed in 2.52 seconds. This includes all 40 manually labeled cases plus generated numeric/negation invariants and strict limits. No provider/database calls were made by that unit run.
+- Added `tests/integration/test_written_confirmation.py` for current-turn cancellation/negation/conditions/alternatives, independent-process resume after a complete restatement, latest-order replacement, false structured provider fields at the real reservation/graph seam and oversized stored body handling. Read actual quotation status/schema before asserting staff `review` and company-scoped approvals.
+- Updated the focused tooling reference. Integration execution is pending; the simulated provider has zero synthetic tokens and cannot contact OpenAI. No full-suite, live-media, holdout or milestone-completion claim is made.
+
+### 2026-11-01 - Confirmation diagrams and progress aligned
+
+- Updated the existing agent graph label/description and media state note to show the complete positive written-order gate. Bound the graph view to its extraction/policy/parser modules so future changes cannot silently leave stale assets. No new graph node or approval authority was invented.
+- Recorded the development corpus as limited progress in the existing implementation tracker without changing approved scope or checking incomplete milestones. Focused Ruff passed and ordinary local Supabase startup succeeded without reset or data changes. Rendering and real-database regressions run next; static diagrams do not establish runtime outcomes.
+
+### 2026-11-01 - Updated confirmation views rendered and inspected
+
+- Four diagram-tooling tests passed and all 15 canonical views rendered with their source/code fingerprints and exact guide embeds. Inspected the actual updated agent/media PNGs: complete-order wording is readable, state/graph edges preserve existing authority and no extra execution node was introduced.
+- Persisted-workflow tests are still running in the isolated local tenant environment; no result is inferred from the completed unit/diagram checks. Paid canaries and frozen evaluation remain unrun.
+
+### 2026-11-01 - Real confirmation/restart boundary passed
+
+- The targeted new written-confirmation plus existing graph-restart suites passed all 15 tests in 96.83 seconds against local Supabase. Verified no draft/approval/quotation outbox from negated/cancelled/conditional/alternative requests, replacement rather than merging of old order lines, durable clarification/resume in another process and staff-review-only corrected totals.
+- Well-formed false provider outputs were supplied only at the OpenAI client seam; real leases, allowance reservations, checkpoints and domain services were exercised. Zero simulated tokens settled, with no external call. Oversized stored input clarified without primary provider reservation. A read-only database activity check found no blocked active transaction during the run.
+- Reviewed source, test expectations and affected guide/diagram contracts. The development corpus remains separate from runtime data and the release holdout. Full local regression is next; no larger phase completion is claimed.
+
+### 2026-11-01 - Scoped engineering evidence reviewed
+
+- Reassessed the affected existing B25 (untrusted model/tool input) and B27 (human participation/approval) reasons against the new actual tests. Both remain Planned for the whole release; no partial regression was promoted to complete security coverage. Other release concepts and approved test requirements are preserved.
+- Clarified the baseline extractor's adjacent contract to distinguish unsupported pack units from supported explicit individual-unit labels. This is a docstring-only correction; the full regression is running. Refreshed diagram fingerprints follow because that view is source-bound.
+
+### 2026-11-01 - Documentation/static review passed before publication
+
+- Validated 39 affected local links, UTF-8/JSON/fences and inline docstrings for all 16 authored/changed definitions in the current source/test inventory. Manually checked the complete-order examples and limits against parser branches and real quote states; presence checks alone are not the documentation review.
+- Re-rendered all 15 diagrams after the docstring fingerprint change. Existing ledger validation passed with 40 Planned / 2 NotApplicable. Scoped whitespace review passed and verified private remote `Nagdy8888/lumaquote` has no divergence from the local parent. Full integration/browser/build verification remains running; push/remote CI are not yet claimed.
+
+### 2026-11-01 - Complete written-order safety slice verified locally
+
+- Full `npm run verify:full` passed: lint, architecture/inline docs (81 Python modules), frontend checks/types, four diagram tests/all 15 views, 190 Python tests (four paid canaries skipped, one browser deselected), five UI tests, the separate native browser (52.30 seconds) and production build. Python pytest completed in 234.71 seconds. No paid provider calls were enabled.
+- Added `docs/evidence/written-confirmation-2026-11-01.json` with source/fixture fingerprints, package versions, exact gate summaries, 40 independently checked development policy actions and explicit limits. Linked it from the documentation index and tooling reference. Text outcomes were 5 confirm/15 clarify, voice-policy 3/9 and photo-policy 2/6; confirmation grants no commercial approval/send authority.
+- Retained original SVG bytes for three unchanged source/code-bound ER diagrams rather than committing incidental regenerated identifiers; changed agent/media views and their fingerprints remain current. Final link/inline/diagram/staged-secret review follows before the authorized feature-slice commit/push. Phase 3, realistic media/holdout evaluation, live integrations and release-wide safeguards remain unfinished; no deployment is included.
+
+### 2026-11-01 - Final feature-slice documentation checks passed
+
+- After the evidence/index updates, validated 69 local documentation links plus all 16 changed/authored function contracts; the architecture check passed for 81 app modules and all 15 maintained diagrams passed read-only freshness/render checks. Reviewed all affected code, test fixtures, oracle, operator/reference prose, ledger reasons and source-bound diagram changes together.
+- The approved implementation/testing milestones remain intact. The contribution check found no custom `core.hooksPath` (Git reports an unset value with exit 1); this is not a failed project gate or a hook bypass. Staging/credential review, the descriptive commit and push/remote CI follow.
+
+### 2026-11-01 - Staged confirmation checkpoint reviewed
+
+- Reviewed all 23 staged files: whitespace, high-confidence credential/private-file checks and evidence fingerprints against the actual staged Git blobs passed. No populated environment/account files or unrelated source changes are included; there is no active default pre-commit hook to bypass.
+- The feature-slice commit preserves deep references, inline contracts, development fixtures/oracle, updated Mermaid/SVG views and actual local evidence together. Publication is an implementation progress checkpoint, not acceptance of the unfinished agent/media, integration or release milestones. Git commit/push and remote CI outcome are reported through their actual resulting history/checks.

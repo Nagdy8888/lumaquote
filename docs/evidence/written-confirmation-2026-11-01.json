@@ -1,0 +1,186 @@
+{
+  "recorded_on": "2026-11-01",
+  "scope": "Complete current written-order safety slice; not phase 3 completion or release readiness",
+  "environment": "Native Windows Python 3.12, isolated local Supabase 55322, local offline media sandbox and Chromium",
+  "snapshot": {
+    "base_commit": "7caa88c0ee6587523cd785be729b566d85b76c0c",
+    "kind": "working-tree source fingerprints; final Git commit supplied by publication history",
+    "sha256": {
+      "app/agents/luma_agent/written_requests.py": "f7ba5157d5d5ac6e00951d7e06c64916aaca2ec12a61a1054c5025ed71a921bf",
+      "app/agents/luma_agent/requirements.py": "0e9fcad3b3b0bf3d8b48a7168d1d2b796ca673dd11b163b85e273d2672371831",
+      "app/agents/luma_agent/nodes/extraction.py": "3738521b56212e0d84f7b248bc09974f9227e07641b6a1c5ab9922895c6f83e8",
+      "tests/fixtures/requirement-policy/inputs.json": "b06e547e1fc413b62e8416433384acc6f42d3e79e20cbf9b64f905198c192b04",
+      "tests/fixtures/requirement-policy/oracle.json": "d6b2acda38db6af0bb70947bc88e0b5265fbb0419ed120128199e588406486bd",
+      "tests/unit/test_written_requests.py": "a23ffc75c712f951c84efc4ab885d8add9fbb9a222724f26024d2ae4a659d070",
+      "tests/integration/test_written_confirmation.py": "5a8a518d9c37c0b27c94808c82111180bbecf5bf4a9bf2eec3d0b1d04702be2e"
+    },
+    "packages": {
+      "langgraph": "1.2.18",
+      "pydantic": "2.14.1",
+      "pytest": "9.2.0",
+      "hypothesis": "6.170.13"
+    }
+  },
+  "development_policy_corpus": {
+    "data": "40 synthetic hand-specified development cases; controlled untrusted extraction and media text observations",
+    "grading": "Independent expected actions; deterministic comparison, no LLM judge",
+    "outcomes": {
+      "text": {
+        "cases": 20,
+        "fields_confirmed": 5,
+        "clarify": 15
+      },
+      "voice": {
+        "cases": 12,
+        "clarify": 9,
+        "fields_confirmed": 3
+      },
+      "photo": {
+        "cases": 8,
+        "clarify": 6,
+        "fields_confirmed": 2
+      }
+    },
+    "meaning": "fields_confirmed permits only downstream business validation/draft preparation; never approval/send authority",
+    "not_measured": [
+      "transcription accuracy",
+      "photo recognition",
+      "retrieval recall",
+      "workflow success",
+      "holdout accuracy"
+    ],
+    "failures": 0
+  },
+  "focused_checks": [
+    {
+      "command": "node scripts/python.cjs -m pytest tests/unit/test_written_requests.py tests/unit/test_requirement_policy.py -q --tb=short",
+      "status": "Passed",
+      "tests": 71,
+      "seconds": 2.52
+    },
+    {
+      "command": "node scripts/python.cjs -m pytest tests/integration/test_written_confirmation.py tests/integration/test_graph_restart.py -q --tb=short",
+      "status": "Passed",
+      "tests": 15,
+      "seconds": 96.83
+    }
+  ],
+  "full_local_gate": {
+    "command": "npm run verify:full",
+    "results": [
+      {
+        "command": "npm run lint:python",
+        "status": "Passed",
+        "seconds": 0.43,
+        "timeout_seconds": 180,
+        "error_code": null,
+        "local_log": ".local/checks/lint-python.log"
+      },
+      {
+        "command": "npm run check:architecture",
+        "status": "Passed",
+        "seconds": 0.79,
+        "timeout_seconds": 180,
+        "error_code": null,
+        "local_log": ".local/checks/check-architecture.log"
+      },
+      {
+        "command": "npm run check:frontend",
+        "status": "Passed",
+        "seconds": 1.61,
+        "timeout_seconds": 180,
+        "error_code": null,
+        "local_log": ".local/checks/check-frontend.log"
+      },
+      {
+        "command": "npm run test:diagrams",
+        "status": "Passed",
+        "seconds": 0.45,
+        "timeout_seconds": 180,
+        "error_code": null,
+        "local_log": ".local/checks/test-diagrams.log"
+      },
+      {
+        "command": "npm run diagrams:check",
+        "status": "Passed",
+        "seconds": 2.89,
+        "timeout_seconds": 180,
+        "error_code": null,
+        "local_log": ".local/checks/diagrams-check.log"
+      },
+      {
+        "command": "npm run typecheck",
+        "status": "Passed",
+        "seconds": 6.46,
+        "timeout_seconds": 180,
+        "error_code": null,
+        "local_log": ".local/checks/typecheck.log"
+      },
+      {
+        "command": "npm run test:python",
+        "status": "Passed",
+        "seconds": 236.74,
+        "timeout_seconds": 420,
+        "error_code": null,
+        "local_log": ".local/checks/test-python.log"
+      },
+      {
+        "command": "npm run test:ui",
+        "status": "Passed",
+        "seconds": 26.22,
+        "timeout_seconds": 180,
+        "error_code": null,
+        "local_log": ".local/checks/test-ui.log"
+      },
+      {
+        "command": "npm run test:browser",
+        "status": "Passed",
+        "seconds": 55.27,
+        "timeout_seconds": 180,
+        "error_code": null,
+        "local_log": ".local/checks/test-browser.log"
+      },
+      {
+        "command": "npm run build",
+        "status": "Passed",
+        "seconds": 9.43,
+        "timeout_seconds": 180,
+        "error_code": null,
+        "local_log": ".local/checks/build.log"
+      }
+    ],
+    "python_tests": {
+      "passed": 190,
+      "paid_canaries_skipped": 4,
+      "browser_deselected_for_separate_gate": 1
+    },
+    "ui_tests": 5,
+    "separate_browser": "Passed",
+    "diagram_tests": 4,
+    "maintained_diagrams": 15
+  },
+  "documentation": {
+    "local_links_checked_before_final_evidence_link": 39,
+    "authored_changed_definitions_with_docstrings": 16,
+    "visual_review": [
+      "agent-graph PNG",
+      "media-lifecycle PNG"
+    ],
+    "guides": [
+      "docs/reference/AGENT_RUNTIME.md",
+      "docs/reference/MEDIA.md",
+      "docs/reference/TOOLING_AND_TESTS.md",
+      "docs/WORKFLOWS.md"
+    ],
+    "engineering_ledger": "Structurally valid; 40 Planned / 2 NotApplicable; no whole-release coverage claim"
+  },
+  "external_calls": "None; paid canaries disabled. Fake Responses client tested real local reservation/graph seams with zero simulated tokens.",
+  "publication": "Commit/push/remote CI tracked separately after this local verification snapshot; no deployment.",
+  "remaining_gaps": [
+    "Narrow confirmation grammar asks for a complete restatement instead of interpreting free-form corrections, conditions or pack quantities.",
+    "Frozen 80-case 60/20-by-family media evaluation and realistic noisy/unclear recordings remain unimplemented; this corpus is development-only.",
+    "Real OpenAI accuracy and live LangSmith export not reverified during this slice.",
+    "Live WhatsApp and complete Google snapshot/timer/Drive acceptance remain separate open work.",
+    "Release-wide authorization, retention, restore, outage and engineering ledger gates remain unresolved."
+  ]
+}

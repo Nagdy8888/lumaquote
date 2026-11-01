@@ -88,14 +88,17 @@
       "height": 896.5
     },
     "agent-graph": {
-      "source_sha256": "21439f3949a728139eb7915dd4c64d95e06592b6333e6c01c96df66f47d55f28",
+      "source_sha256": "f22fccff7709bd0f28de3b45f72b4e40c58856b1f846abecb83e835e9a5e5e50",
       "renderer_sha256": "44f5712d92cb37910338d84507da5b3e04fe9603fb0fe445335fa85ef56cffb5",
       "bindings": {
         "app/agents/luma_agent/graph.py": "abeeb7b15c98a65aa7d9e62a83800399d9cf21e18a599dd2df5a0d08123acba4",
+        "app/agents/luma_agent/nodes/extraction.py": "3738521b56212e0d84f7b248bc09974f9227e07641b6a1c5ab9922895c6f83e8",
+        "app/agents/luma_agent/requirements.py": "0e9fcad3b3b0bf3d8b48a7168d1d2b796ca673dd11b163b85e273d2672371831",
+        "app/agents/luma_agent/written_requests.py": "f7ba5157d5d5ac6e00951d7e06c64916aaca2ec12a61a1054c5025ed71a921bf",
         "app/agents/luma_agent/nodes/workflow.py": "dee6ab481414d0add4fe4745d31569ed7b4d1bd7ff1a6e4208bc1c59d8a16064",
         "app/agents/luma_agent/runtime/conversations.py": "538aaaf97bab720c695455349621914c026621a08f9b2c20e9355cf03306f189"
       },
-      "svg_sha256": "a6059d8afd5dbc1d1a2e423b3843d4e1315b7c38f9e8b025af6fc512ae946865",
+      "svg_sha256": "6dc0e015ef54e345bb8c6747ce46039866dd1e46913a736273595fb04a50d1d9",
       "width": 685.62,
       "height": 888.34
     },
@@ -124,7 +127,7 @@
       "height": 1588.5
     },
     "media-lifecycle": {
-      "source_sha256": "9c884e59c82201668f754730543a3c730230260f8a6a4cbdc61facb12c0e254a",
+      "source_sha256": "e3343813f99feda36855562ad8a00fdb7fde01cec1c26b30e615b1a2133be8ab",
       "renderer_sha256": "44f5712d92cb37910338d84507da5b3e04fe9603fb0fe445335fa85ef56cffb5",
       "bindings": {
         "app/backend/luma/features/media/intake.py": "a206588dcc278cd0d027dcfd49ffdaeb27262c06b133ca849e77f5ffbedede7f",
@@ -132,7 +135,7 @@
         "app/agents/luma_agent/runtime/media.py": "2491f1eed267ccd8a39c92d67bcadabd5fd09aa04afcb8552a0da8c84e7020c6",
         "app/agents/luma_agent/runtime/recovery.py": "3c51108e0b3c6277eaa6a0746114a43d0938775b101f94c021f937ea96f8e0e7"
       },
-      "svg_sha256": "9d8e8dd092e2f102d7b920b9d173bf92adef0ed92a5420c8d145bf6d2267b156",
+      "svg_sha256": "6c50b921de52eff98351681cc278e843cfd6055199b2be9be4b72061f75e0d82",
       "width": 1317.98,
       "height": 693.8
     },
