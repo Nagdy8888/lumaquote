@@ -84,10 +84,15 @@ is not a WhatsApp delivery claim.
 
 ## Paid evaluation decisions
 
-The OpenAI key was stopped for evaluation on 2026-11-02 at your request, so nothing below has run.
-Each item needs your explicit go-ahead because it spends estimated USD (the development run cost about 0.013):
+The OpenAI key was stopped for evaluation on 2026-11-02 at your request. Later that day you
+authorized the development re-run only; the freeze and holdout still wait for your confirmation
+that the agent is final. Each item needs your explicit go-ahead because it spends estimated USD
+(the first development run cost about 0.013):
 
-- [ ] Re-measure the development split after the null-SKU candidate fix (`LUMA_RUN_LIVE_EVAL=1`).
+- [x] Re-measure the development split after the null-SKU candidate fix (`LUMA_RUN_LIVE_EVAL=1`).
+  Authorized by you on 2026-11-02 and run as `dev-run-2`; results are in the work log.
+- [ ] Planned before the freeze (decided 2026-11-02): relabel some existing scenarios as
+  descriptive/retrieval requests so Recall@5 rests on more than three holdout cases.
 - [ ] When you are ready to stop changing the agent: `node scripts/python.cjs scripts/freeze_evaluation.py --write`,
   then run the holdout once with `LUMA_EVAL_SPLIT=holdout LUMA_EVAL_CONFIRM_HOLDOUT=spend-the-holdout-once`
   and summarize it with `scripts/summarize_agent_run.py --split holdout`. It cannot be repeated.
@@ -152,7 +157,8 @@ zero `google_sync_state` rows, so full live synchronization remains unverified.
 Manual edit notifications have been verified. GAS-only full-snapshot import and
 one-minute reconciliation are now implemented with local HTTP/database tests;
 live snapshot acceptance and timer execution remain pending that installer run.
-Drive export is unfinished. The tunnel/gateway must stay running; a changed tunnel URL requires a
+Drive export is implemented and locally tested but has not run in Google (see the
+Drive steps above). The tunnel/gateway must stay running; a changed tunnel URL requires a
 Script Property update. Gateway startup: `node scripts/python.cjs -m uvicorn
 luma.google_gateway:app --host 127.0.0.1 --port 8002 --no-access-log`.
 Tunnel startup: `ngrok http 8002 --inspect=false`; do not tunnel the staff API.
