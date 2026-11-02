@@ -192,6 +192,21 @@
       ]
     },
     {
+      "id": "drive-export",
+      "title": "Pull-based Drive export of an approved quotation PDF",
+      "scope": "Backend protocol locally tested with a Python stand-in; Apps Script run in Google and live Drive storage are unverified",
+      "embeds": [
+        "docs/reference/GOOGLE_SYNC.md"
+      ],
+      "bindings": [
+        "gas/Exports.gs",
+        "app/backend/luma/features/google_sync/exports.py",
+        "app/backend/luma/features/quotations/approval.py",
+        "app/backend/luma/features/quotations/documents.py",
+        "supabase/migrations/20261102000000_drive_exports.sql"
+      ]
+    },
+    {
       "id": "verification-scope",
       "title": "Offline, local integration and explicit live evidence boundaries",
       "scope": "Actual runner/CI responsibilities, not a claim that every gate passed in this task",
@@ -202,6 +217,22 @@
         "scripts/verify.cjs",
         ".github/workflows/ci.yml",
         "tests/integration/test_browser_workflow.py"
+      ]
+    },
+    {
+      "id": "whatsapp-channel",
+      "title": "WhatsApp webhook ingress and gated egress",
+      "scope": "Verified with a mock Graph transport only; no Meta account, tunnel or phone delivery has been exercised",
+      "embeds": [
+        "docs/reference/WHATSAPP.md"
+      ],
+      "bindings": [
+        "app/backend/luma/features/messaging/webhook.py",
+        "app/backend/luma/features/messaging/inbound.py",
+        "app/backend/luma/features/messaging/outbound.py",
+        "app/backend/luma/features/messaging/whatsapp_client.py",
+        "app/agents/luma_agent/runtime/delivery.py",
+        "supabase/migrations/20261102010000_whatsapp_inbox.sql"
       ]
     }
   ]

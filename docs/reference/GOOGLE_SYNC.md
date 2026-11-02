@@ -47,7 +47,7 @@ sequenceDiagram
     API-->>GAS: Safe denial, freshness unchanged
   end
   GAS->>GAS: Release script lock
-  Note over GAS,DB: Timer scheduling is approximate, Drive export is unfinished.
+  Note over GAS,DB: Timer scheduling is approximate, Drive export is the separate drive-export view.
 ```
 
 </details>
@@ -83,8 +83,11 @@ it authenticates exact callback bytes with the configured shared HMAC secret.
   workbook/tab, sends an invalidation hint and then attempts a complete snapshot.
 - `Synchronization.gs`: reads complete bounded tables twice, rejects unstable
   reads, signs a full snapshot and manages the owned approximate one-minute timer.
-- `appsscript.json`: V8, Africa/Cairo timezone and Sheets/script-trigger/external-
-  request scopes. Drive access/export is not implemented by declaring these scopes.
+- `Exports.gs`: pull-based Drive export poller (see the Drive export section). It
+  needs the added `drive` scope and a private folder id in `LUMA_DRIVE_FOLDER_ID`.
+- `appsscript.json`: V8, Africa/Cairo timezone and Sheets, Drive, script-trigger and
+  external-request scopes. Declaring a scope does not authorize it: the user must
+  re-authorize the script after this change, and no Drive copy has been made live.
 
 `scripts/google.cjs` wraps selected clasp operations using the ignored `.clasp.json`
 project mapping, fixed argument arrays and bounded execution. `google:push` manages
@@ -162,6 +165,100 @@ content is never rewritten. At approval/dispatch the quotation's snapshot must
 still match product records and be fresh enough, so changed data invalidates old
 finalization even without directly editing each historical quote row.
 
+## Drive export of approved quotations
+
+Apps Script cannot be called by the backend (no public web app is deployed), so
+exports are pulled. Approval (`quotations/approval.queue_drive_export`) inserts one
+`luma.drive_exports` row in the approval transaction, keyed by the immutable quote id
+(unique per company and quote, so a repeat or retry can never export different
+content under that row). The export is independent of delivery: a stalled or failed
+export never changes the quotation, approval or outbox, and Drive availability can
+never block approval. Rejected drafts and unapproved revisions are never queued; each
+approved revision exports once.
+
+### Pull-based Drive export of an approved quotation PDF
+
+Backend protocol locally tested with a Python stand-in; Apps Script run in Google and live Drive storage are unverified. See the surrounding contract for details and limitations.
+
+<!-- diagram:drive-export:start -->
+![Pull-based Drive export of an approved quotation PDF](../diagrams/rendered/drive-export.svg)
+
+[Open full-size SVG](../diagrams/rendered/drive-export.svg) · [Editable Mermaid](../diagrams/drive-export.mmd)
+
+<details>
+<summary>Mermaid source</summary>
+
+```mermaid
+sequenceDiagram
+  accTitle: Pull-based Drive export of an approved quotation PDF
+  accDescr: Approval queues one export row beside, not inside, customer delivery. Apps Script polls the signed gateway, receives the canonical stored PDF with a pinned digest and a claim token, files it in a private Drive folder, reads the copy back and reports its digest. The backend marks the export done only when the digest equals the canonical one; otherwise it retries up to five attempts and then blocks. Live Google execution is unverified.
+  participant Staff as Authorized salesperson
+  participant DB as PostgreSQL
+  participant GAS as Authorized Apps Script
+  participant API as Signed callback gateway
+  participant Store as Private PDF storage
+  participant Drive as Private Drive folder
+  Staff->>DB: Approve exact revision
+  DB->>DB: Same transaction queues one export per quote
+  Note over DB: Delivery and export are independent
+  loop One-minute trigger, local stand-in tested only
+    GAS->>API: Signed claim envelope
+    API->>DB: Company lock, nonce check, lease oldest eligible row
+    API->>Store: Read or once-create canonical PDF
+    API->>DB: Pin SHA-256 and size, issue claim token
+    API-->>GAS: Filename, digest, token and PDF bytes
+    GAS->>Drive: File PDF, or reuse file with this export id
+    GAS->>Drive: Read copy back and hash it
+    GAS->>API: Signed receipt with observed digest
+    alt Digest and size equal the pinned values, token current
+      API->>DB: Mark done with Drive file id
+    else Mismatch or reported failure
+      API->>DB: Queue retry, block after five attempts
+    else Stale claim token
+      API-->>GAS: 409, nothing changes
+    end
+  end
+```
+
+</details>
+<!-- diagram:drive-export:end -->
+
+Protocol (both routes are on the signed gateway, same HMAC/mapping/five-minute/nonce
+envelope as snapshots, bodies bounded to 1 KiB and 2 KiB):
+
+1. `POST /callbacks/google/exports/claim` (`drive_export_claim`). Under the company
+   advisory lock the backend records the nonce (an identical replay is a 409 because a
+   claim is not idempotent), blocks expired leases already at five attempts, then leases
+   the oldest queued row, or one whose five-minute lease expired, with fewer than five
+   attempts. It reads or once-creates the canonical private PDF through
+   `quotations.documents.stored_quotation_pdf`, the same non-overwriting stored object
+   the staff preview and customer attachment use, so all three are byte-identical. The
+   SHA-256 and size are pinned on first claim; a later difference blocks the row as
+   `pdf_changed` rather than shipping changed bytes. The response carries a fresh claim
+   token, filename, digest, size and the base64 PDF (5 MiB cap, else blocked
+   `pdf_too_large`). A lost response just lets the lease lapse for the next poll.
+2. Apps Script verifies the decoded bytes against the digest, files the PDF in the
+   private folder (reusing an earlier file with the same name whose description is the
+   export id, so a lost receipt never duplicates), reads the Drive copy back and
+   `POST /callbacks/google/exports/receipt` (`drive_export_receipt`) with `stored`,
+   the Drive file id, the digest it observed and the size, or `failed` with a code.
+3. The backend accepts `stored` only from the current claim token and only when digest
+   and size equal the pinned canonical values. A mismatch is recorded as
+   `digest_mismatch`, answers 422 and takes the retry path (the failure and its state
+   are committed before the error is raised). A reported failure also retries: status
+   returns to `queued` until the fifth attempt, then `blocked`. An identical `stored`
+   replay after completion is idempotent; a different file id is a 409. Stale tokens
+   are a 409, so a slow first holder cannot overwrite a reclaimed export.
+
+Scheduling is the one-minute `exportApprovedQuotations` trigger from
+`installDriveExport` (up to three exports per run under a script lock). Receipt
+acceptance proves the Drive copy matched the digest, not that anyone can open it.
+
+Not covered: no staff UI shows export state or retries a blocked row (use the table and
+audit events `drive_export.done|failed|blocked`), the poller's Drive calls have only run
+in a Python stand-in, and the live Google run, folder sharing and tunnel are account
+actions in `docs/MORNING_ACTIONS.md`.
+
 ## Trigger/reconciliation limitations
 
 Manual edit triggers cover allowed human edits; API edits may not fire them.
@@ -176,8 +273,9 @@ Failed pushes update safe script status properties and leave backend freshness
 unchanged; the next eligible trigger reads again. URL changes require updating the
 callback property and keeping the intended gateway/tunnel alive.
 
-Drive canonical-PDF export, independent export retry, Quote Register automatic
-writes and complete live full-snapshot/timer evidence remain unfinished. Existing
+Quote Register automatic writes and complete live full-snapshot/timer and Drive
+export evidence remain unfinished (the backend export protocol is implemented and
+locally tested; see above). Existing
 comment text in the edit handler about backend fetching is older than the GAS-only
 push design; actual calls send the snapshot from GAS. Follow code and this
 contract rather than inferring an unimplemented backend Google fetcher.

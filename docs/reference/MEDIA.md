@@ -25,6 +25,10 @@ nonempty bytes/size and the conversation-turn limit, uploads an opaque private
 original, inserts the customer message/media row, supersedes review/approved
 offers, blocks queued sends and creates the appropriate transcribe/read_photo
 job. The acceptance response is `message_id` plus queued status, not a reading.
+`intake.store_media` holds the shared part (size bounds, the conversation-turn limit, immutable
+storage, supersession, job admission, optional provider-id deduplication) so a verified, allow-listed
+WhatsApp sender enters through the same path after the restricted Graph fetch; only `accept_media`
+applies the staff upload's local-test and expected-version checks.
 
 Business rows commit atomically, but object Storage is external to that transaction.
 A failure after upload can leave an orphan private original. No automatic orphan

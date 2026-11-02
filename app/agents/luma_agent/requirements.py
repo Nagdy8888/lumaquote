@@ -37,3 +37,16 @@ def clarification_for(result: Extraction, messages: list[dict], *, media: bool) 
     if confirmed is None or sorted(confirmed) != sorted(requested):
         return question
     return None
+
+
+def has_explicit_lines(extraction: dict | None) -> bool:
+    """Report whether untrusted extraction names at least one SKU, ignoring empty placeholder lines.
+
+    The structured model returns a single line with null `sku` and `quantity` for a
+    purely descriptive request (observed on every sampled descriptive input). Such a
+    placeholder is not an explicit order line: treating it as one suppressed catalog
+    candidate suggestions for exactly the customers who need them. Only a line with a
+    non-empty SKU counts. This is a discovery gate, not confirmation: a SKU here still
+    needs the written-order gate, catalog support and staff approval.
+    """
+    return any(line.get("sku") for line in (extraction or {}).get("lines", []))

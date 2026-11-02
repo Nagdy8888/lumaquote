@@ -25,6 +25,8 @@ sources and [catalog.json](catalog.json) are the maintained source of truth.
 - [Catalog discovery](rendered/catalog-retrieval.svg).
 - [Frontend draft conflicts](rendered/frontend-draft.svg).
 - [Signed GAS snapshots](rendered/google-snapshot.svg).
+- [Drive export of approved PDFs](rendered/drive-export.svg).
+- [WhatsApp ingress and gated egress](rendered/whatsapp-channel.svg).
 - [Verification scopes](rendered/verification-scope.svg).
 
 ER edges show selected actual SQL relationships, not invented foreign keys to

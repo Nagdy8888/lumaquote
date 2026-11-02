@@ -6,9 +6,9 @@
       "source_sha256": "9892d1a38004cec98de30edc11ea37d0d7b759e4b64327a65c1a6833f8a2ac3c",
       "renderer_sha256": "44f5712d92cb37910338d84507da5b3e04fe9603fb0fe445335fa85ef56cffb5",
       "bindings": {
-        "app/backend/luma/features/conversations/participation.py": "2deed297e4320b2f49f8a0555c0d2eaa8cebe7bfcaffac25145de85edabf2394",
-        "app/backend/luma/features/quotations/approval.py": "5e91eebdb1dd73d30fee17a8d47655ab05fa6aa8f54c95122356824c7d21488c",
-        "app/agents/luma_agent/runtime/delivery.py": "25cb7c31f8c0fb8b7a5de979c96e3d7e1fbda8f4132298fbc75c3e0c30f516fc"
+        "app/backend/luma/features/conversations/participation.py": "35d0c2e3015c4850123e1d207e9afe82d8387854c9ede3546884be17eb852787",
+        "app/backend/luma/features/quotations/approval.py": "7c0e9aae44860f37dc0cf70cf618aaa67130c8f699c8b934fe66195194696eac",
+        "app/agents/luma_agent/runtime/delivery.py": "5ef5a31ecb1e2425cf0faecf51f53a0dd9ecd2c8fb931983b6bd5d1e396307b0"
       },
       "svg_sha256": "85e98566624044c3c5994086fd4aafa854ff91a4d849541865fc7eb10121e0b8",
       "width": 585.07,
@@ -19,8 +19,8 @@
       "renderer_sha256": "44f5712d92cb37910338d84507da5b3e04fe9603fb0fe445335fa85ef56cffb5",
       "bindings": {
         "app/backend/luma/main.py": "107cf687c60f77edba9f7bb8c5e40d27556aab8ba68cfcb61787bce51591ebdf",
-        "app/backend/luma/google_gateway.py": "ae1acd68ac279770a003fefa8bc9b6ef4b24d5393019b4c364c4781f73d58868",
-        "app/agents/luma_agent/worker.py": "152eb0751a5f961a2c273f41c9492512ce06cf3d58d3ff27e4db26c7cbb36c0d",
+        "app/backend/luma/google_gateway.py": "f0889d8747a7ed4705bb1666149e4ff31e24c338051cdca05d1686ef3364207d",
+        "app/agents/luma_agent/worker.py": "0590d3899a34342f7aeafd247ef48438cd0a4ec81a6036abec1baf84b5fd9c5e",
         "app/backend/luma/features/media/sandbox.py": "06cb6f35183a0cc5953e5d23cf65202f99e845470985a11adffe8a98d72f531a"
       },
       "svg_sha256": "89b959fa1a8c83b42450a39077a80712d029d6a322c26c17638df61168febfb7",
@@ -28,17 +28,17 @@
       "height": 462.59
     },
     "quotation-approval": {
-      "source_sha256": "5633dda5c2a6755d43c1ce21113c0310cd7aeacadbe4d01567aeac703432ca39",
+      "source_sha256": "1e4dc0ee1512ff0cab8b6faf288ff4ca359696d1c0f03d17496f2b800cc0d330",
       "renderer_sha256": "44f5712d92cb37910338d84507da5b3e04fe9603fb0fe445335fa85ef56cffb5",
       "bindings": {
         "app/backend/luma/features/quotations/drafting.py": "fcca81e6dc59406df22dceb0c996b5c7126ab9af6370ffdc047f43a556ea6e06",
-        "app/backend/luma/features/quotations/approval.py": "5e91eebdb1dd73d30fee17a8d47655ab05fa6aa8f54c95122356824c7d21488c",
+        "app/backend/luma/features/quotations/approval.py": "7c0e9aae44860f37dc0cf70cf618aaa67130c8f699c8b934fe66195194696eac",
         "app/backend/luma/features/quotations/freshness.py": "5abe5087d39a2d680e505fc0bc30e89a76636bb5413ece09acdf9f8cc7035c2b",
-        "app/agents/luma_agent/runtime/delivery.py": "25cb7c31f8c0fb8b7a5de979c96e3d7e1fbda8f4132298fbc75c3e0c30f516fc"
+        "app/agents/luma_agent/runtime/delivery.py": "5ef5a31ecb1e2425cf0faecf51f53a0dd9ecd2c8fb931983b6bd5d1e396307b0"
       },
-      "svg_sha256": "4fb12809f47e88288df126693c7dbd891541f45e98ea003af6e7e59cef7bc4fa",
+      "svg_sha256": "b1d5ed35527a869bba394dd4bbbf2db5dc240a383e9e74412c245543052b33ce",
       "width": 852,
-      "height": 1150
+      "height": 1307
     },
     "staff-operation": {
       "source_sha256": "3a6c35ec599535fc8e8d1b3bb2cdb1337ffc45b4339292baefefa7fabe9863bd",
@@ -47,7 +47,7 @@
         "app/backend/luma/core/http.py": "c45c3e933802b914f84e04e7bac5c7530440a5adf647ce34daefe3aa0209b101",
         "app/backend/luma/core/database.py": "cb484e8c146a1aadd9453bad2cdc2ae0900229c3eb7ac1050d7b03987065850b",
         "app/backend/luma/core/idempotency.py": "e489b6c162716f4cc659f7030e4b59d46c89fe7fe44519f9fc83470a994d0055",
-        "app/backend/luma/features/quotations/routes.py": "afeb801f407b3641ce373f103b369f7e31635ddbb4bcb63a2c9eedad15011284"
+        "app/backend/luma/features/quotations/routes.py": "1b5303c7b6aa4a3d24d2e902a87beec83e980ee4a1ab07943d77ff7b34f06d86"
       },
       "svg_sha256": "2fdcb18dc5c3243cd4a933b2bcb846c086db3911466633a0390a31ed69d3247d",
       "width": 851,
@@ -60,7 +60,7 @@
         "supabase/migrations/20261029010000_quotation_domain.sql": "65b37c4e9358aa488174bf842b52c1100b2e83a44170c1b862fc9f25a75b2db6",
         "supabase/migrations/20261029131000_versioned_embeddings.sql": "71b6e35515d12ad5f116019b330790f6fdf00f4fc6162b38054b98b245f57e17"
       },
-      "svg_sha256": "49202eaf701f9cb066c89fe05eff467613a2431fb7a79ed1a2362a0f989b65ba",
+      "svg_sha256": "ac3d63ff663c6090268ac5ca47d2510e083d72e60a811e69cc9e370a14ca63ee",
       "width": 842.09,
       "height": 998.25
     },
@@ -71,7 +71,7 @@
         "supabase/migrations/20261029010000_quotation_domain.sql": "65b37c4e9358aa488174bf842b52c1100b2e83a44170c1b862fc9f25a75b2db6",
         "supabase/migrations/20261029100000_immutable_quotation_content.sql": "acd5b9a206ff4a23277a00499cfa6941217096edcbec3ba5c66db07d3e21078a"
       },
-      "svg_sha256": "d99d3969686fb4d3522166160ad55d043f426ad55a2fa042841220e751b2be7b",
+      "svg_sha256": "305d6ced48d0bb1dbec2397a1f7cdf3141217afc11580d059b78166c904c37ff",
       "width": 729.36,
       "height": 825
     },
@@ -83,7 +83,7 @@
         "supabase/migrations/20261029110000_voice_intake.sql": "60b4f99ab5d0ea74677e5c2522807539222a31cd5a3e8aae2dabf5850031bde0",
         "supabase/migrations/20261029111000_media_message_binding.sql": "369cc2db1bd77d42a170d32f2e1d2269207cf7c7c1b53b140ce489ea72140e52"
       },
-      "svg_sha256": "dbbb9c5d93109001d3cd0331ff44d6ac92e2a3244520ba1ef84728d269a5e0e5",
+      "svg_sha256": "983e67c278f287051a081c62630e5c7598eff5232108ad64b05c566ed1d35a46",
       "width": 846.89,
       "height": 896.5
     },
@@ -93,12 +93,12 @@
       "bindings": {
         "app/agents/luma_agent/graph.py": "abeeb7b15c98a65aa7d9e62a83800399d9cf21e18a599dd2df5a0d08123acba4",
         "app/agents/luma_agent/nodes/extraction.py": "3738521b56212e0d84f7b248bc09974f9227e07641b6a1c5ab9922895c6f83e8",
-        "app/agents/luma_agent/requirements.py": "0e9fcad3b3b0bf3d8b48a7168d1d2b796ca673dd11b163b85e273d2672371831",
+        "app/agents/luma_agent/requirements.py": "64a2485f616272ee87c5e400317ef80bfbec9da150f9a1c94e34f384ec5a9aa4",
         "app/agents/luma_agent/written_requests.py": "f7ba5157d5d5ac6e00951d7e06c64916aaca2ec12a61a1054c5025ed71a921bf",
-        "app/agents/luma_agent/nodes/workflow.py": "dee6ab481414d0add4fe4745d31569ed7b4d1bd7ff1a6e4208bc1c59d8a16064",
+        "app/agents/luma_agent/nodes/workflow.py": "9301dff61ad428af7b2b7f4c3ddc4aaca61313cb33470f6ebfe7f76e2560cbd2",
         "app/agents/luma_agent/runtime/conversations.py": "538aaaf97bab720c695455349621914c026621a08f9b2c20e9355cf03306f189"
       },
-      "svg_sha256": "6dc0e015ef54e345bb8c6747ce46039866dd1e46913a736273595fb04a50d1d9",
+      "svg_sha256": "e4acd1550c685633a19905c1289a6049aa46ccb9220f2286d5b126e7a15e92b6",
       "width": 685.62,
       "height": 888.34
     },
@@ -119,7 +119,7 @@
       "renderer_sha256": "44f5712d92cb37910338d84507da5b3e04fe9603fb0fe445335fa85ef56cffb5",
       "bindings": {
         "app/agents/luma_agent/budget.py": "ab690b19c8f702c36c50d0b6661ff5f3ac9a9505bf179a27c1c3f31a9ad14fbd",
-        "app/agents/luma_agent/nodes/retrieval.py": "6200893b444b8b07f7379352cd6ade73500aaa833e5e1ba37d823306ff04bbdd",
+        "app/agents/luma_agent/nodes/retrieval.py": "ba9b10da4b94e6acf5520e0c2bfc74bd4b9f818b48decdd58a4e39c7d673f9f2",
         "app/agents/luma_agent/runtime/media.py": "2491f1eed267ccd8a39c92d67bcadabd5fd09aa04afcb8552a0da8c84e7020c6"
       },
       "svg_sha256": "13419c7d97f350e29b7ec7d9208e7a467c716073a918fc816cd15be7fc9d3c18",
@@ -130,12 +130,12 @@
       "source_sha256": "e3343813f99feda36855562ad8a00fdb7fde01cec1c26b30e615b1a2133be8ab",
       "renderer_sha256": "44f5712d92cb37910338d84507da5b3e04fe9603fb0fe445335fa85ef56cffb5",
       "bindings": {
-        "app/backend/luma/features/media/intake.py": "a206588dcc278cd0d027dcfd49ffdaeb27262c06b133ca849e77f5ffbedede7f",
+        "app/backend/luma/features/media/intake.py": "31af8288f6361ae889aed6d23fb918fbf409eb49078c599f37aed2ea34298be2",
         "app/backend/luma/features/media/persistence.py": "83ec7b76df1740fa0757dc8c3588087f3c0456fa6e7096abad65722566fe01cd",
         "app/agents/luma_agent/runtime/media.py": "2491f1eed267ccd8a39c92d67bcadabd5fd09aa04afcb8552a0da8c84e7020c6",
         "app/agents/luma_agent/runtime/recovery.py": "3c51108e0b3c6277eaa6a0746114a43d0938775b101f94c021f937ea96f8e0e7"
       },
-      "svg_sha256": "6c50b921de52eff98351681cc278e843cfd6055199b2be9be4b72061f75e0d82",
+      "svg_sha256": "a4edb1c6bf38708732bcbc13e227840e42df321e85f1fba39c5b72561034d32f",
       "width": 1317.98,
       "height": 693.8
     },
@@ -146,8 +146,8 @@
         "app/backend/luma/features/catalog/criteria.py": "8ff40b1474a902f08cd0b97efe46a315e00c385122b26d1e675efbfa63e1f4d5",
         "app/backend/luma/features/catalog/retrieval.py": "594f4b24652e4e423b467b91c3038900de0ce563c83da9b21e692f42726ea050",
         "app/backend/luma/features/catalog/semantic.py": "c21c6f91f26e90fe8dd79fd6b14dae32ec637c49905a70e44bf777be4d5b08b6",
-        "app/agents/luma_agent/nodes/retrieval.py": "6200893b444b8b07f7379352cd6ade73500aaa833e5e1ba37d823306ff04bbdd",
-        "app/agents/luma_agent/nodes/workflow.py": "dee6ab481414d0add4fe4745d31569ed7b4d1bd7ff1a6e4208bc1c59d8a16064"
+        "app/agents/luma_agent/nodes/retrieval.py": "ba9b10da4b94e6acf5520e0c2bfc74bd4b9f818b48decdd58a4e39c7d673f9f2",
+        "app/agents/luma_agent/nodes/workflow.py": "9301dff61ad428af7b2b7f4c3ddc4aaca61313cb33470f6ebfe7f76e2560cbd2"
       },
       "svg_sha256": "cc4c6f8c3fa85f34099b9d42927ef9f880910d6bb5b11c466fc71b97d35115cc",
       "width": 713.14,
@@ -166,7 +166,7 @@
       "height": 510
     },
     "google-snapshot": {
-      "source_sha256": "46f22398e384414d49836a08a5ff0b89bc4660929776174cdbcfe2e9025a0b9a",
+      "source_sha256": "7a53d325a6e85f23904246db9f450b5c162c20a194cf0351a8274bb0d0f019ab",
       "renderer_sha256": "44f5712d92cb37910338d84507da5b3e04fe9603fb0fe445335fa85ef56cffb5",
       "bindings": {
         "gas/Synchronization.gs": "23a574e0601e29919c4049f0d4d89934791d05ef844c2f6d663120874a7ed960",
@@ -174,9 +174,23 @@
         "app/backend/luma/features/google_sync/snapshots.py": "193684fd8accdd99b103118f0c69c90f0ed6a8e4de411469cf9d5f28aa512f2d",
         "app/backend/luma/features/google_sync/validation.py": "b33ebd2b8954c94d12b4c722590ba24c9f7c0fa6c8e871bc776ff17cc3aee04b"
       },
-      "svg_sha256": "f40f8adb801744d5fb38528d398b1d0fa2964c2e161c379ec17bc0e08461b350",
+      "svg_sha256": "e408212bede4fcd200429ec794715f4155c87f782d5c8a1510608502f9d268db",
       "width": 853,
       "height": 1235
+    },
+    "drive-export": {
+      "source_sha256": "2793759d907aa7a5217cfc797d3e9dc3299adb79457268ad6fbfd5b63dc7b1da",
+      "renderer_sha256": "44f5712d92cb37910338d84507da5b3e04fe9603fb0fe445335fa85ef56cffb5",
+      "bindings": {
+        "gas/Exports.gs": "2c38dca8151174d3d6552654ac3e0364d51ce1e77d980bb6fc001676543c6d3e",
+        "app/backend/luma/features/google_sync/exports.py": "65d42214dbeede271a778b3b4b09006c9a878b5cd4de1961542d3f1901954b64",
+        "app/backend/luma/features/quotations/approval.py": "7c0e9aae44860f37dc0cf70cf618aaa67130c8f699c8b934fe66195194696eac",
+        "app/backend/luma/features/quotations/documents.py": "59ce06a1c7308b3ddd7cc7ee12d64fef761467f47dd183c7743689e74af15a24",
+        "supabase/migrations/20261102000000_drive_exports.sql": "43837378d3f8c8ebe7dc9482a4a847b2a1fae1a5dca9a36522fd1f0c960362e9"
+      },
+      "svg_sha256": "30b63085b65b24d2ca48e989b391912b56571830626cd9fa3981c354221206ca",
+      "width": 1250,
+      "height": 1067
     },
     "verification-scope": {
       "source_sha256": "be956f144ace65443cfa25a0c78cef4a679efacfc79dfdcaf359ec9851e13b72",
@@ -189,6 +203,21 @@
       "svg_sha256": "3c591c779462d62157e954afef78837d9235c05e38e44b758e3ff58590c0078f",
       "width": 1776.52,
       "height": 361.8
+    },
+    "whatsapp-channel": {
+      "source_sha256": "47b4192f04c6836aaa817dc00ee147645c1cb5b5b5f93a8e8a4772503e5f786b",
+      "renderer_sha256": "44f5712d92cb37910338d84507da5b3e04fe9603fb0fe445335fa85ef56cffb5",
+      "bindings": {
+        "app/backend/luma/features/messaging/webhook.py": "5ac40f4ee854fc8bc7e0f524324265cff14ff9250a566aa19588b75f1a5d647a",
+        "app/backend/luma/features/messaging/inbound.py": "3a7245149cd469a74872d3b088a862b927ef75b378f851985ae6a5c075fb7a1d",
+        "app/backend/luma/features/messaging/outbound.py": "485e37a056f9455335aba6c175639b44807e32706b8b3956ef36f872802e8194",
+        "app/backend/luma/features/messaging/whatsapp_client.py": "83d917bf8e5a3a52a05713cc4455ecfdfb2fd0108b2b49187e6d0bb0da36fdeb",
+        "app/agents/luma_agent/runtime/delivery.py": "5ef5a31ecb1e2425cf0faecf51f53a0dd9ecd2c8fb931983b6bd5d1e396307b0",
+        "supabase/migrations/20261102010000_whatsapp_inbox.sql": "0804cc9c5596b4fb3b19bb3dbc074d09ff5ac21bd6bbb0bb27ee8a77e52d2047"
+      },
+      "svg_sha256": "e948a982956e557af4e8be6af62a1eb2d85a08770697d9e142cf6d6b704ba07e",
+      "width": 1063,
+      "height": 1453
     }
   }
 }

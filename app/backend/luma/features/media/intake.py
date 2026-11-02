@@ -27,21 +27,42 @@ def accept_media(conn, member, user, cid, expected_version, data, *, kind):
     """
     if kind not in ("audio", "image"):
         raise DomainError("Unsupported media kind.", 422)
-    label, maximum, job_kind = (
-        ("Voice note", 10, "transcribe") if kind == "audio" else ("Product-label photo", 5, "read_photo")
-    )
     company = member["company_id"]
     current = authorize_upload(conn, company, cid)
     if current["version"] != expected_version:
         raise DomainError("The conversation changed. Review it before uploading this attachment.")
+    return store_media(conn, company, user, cid, data, kind=kind)
+
+
+def store_media(conn, company, actor, cid, data, *, kind, provider_id=None):
+    """Store an already-authorized original, supersede affected offers and queue processing in this transaction.
+
+    Callers establish who may attach media (a staff upload to a local-test thread or a
+    verified, allow-listed WhatsApp sender) and hold the conversation lock. This applies the
+    shared size bounds, the per-conversation rate limit, immutable storage, revision
+    invalidation and job admission. `provider_id` deduplicates a re-delivered provider
+    message: a repeat returns None without storing anything again.
+    """
+    label, maximum, job_kind = (
+        ("Voice note", 10, "transcribe") if kind == "audio" else ("Product-label photo", 5, "read_photo")
+    )
     if not data or len(data) > maximum * 1024 * 1024:
         raise DomainError(f"{label} must be nonempty and no larger than {maximum} MB.", 413)
     rate_limit(conn, f"conversation:{cid}", 6)
     path = f"{company}/media/{uuid4()}/original"
     put_file(path, data, "application/octet-stream")
     message = add_message(
-        conn, company, cid, "customer", f"{label} awaiting processing.", kind=kind, object_path=path
+        conn,
+        company,
+        cid,
+        "customer",
+        f"{label} awaiting processing.",
+        kind=kind,
+        object_path=path,
+        provider_id=provider_id,
     )
+    if message is None:
+        return None
     conn.execute(
         "insert into luma.media(message_id,company_id,conversation_id,original_path,kind) values(%s,%s,%s,%s,%s)",
         (message, company, cid, path, kind),
@@ -58,7 +79,7 @@ def accept_media(conn, member, user, cid, expected_version, data, *, kind):
         "update luma.conversations set last_customer_at=now(),status='processing_media' where id=%s", (cid,)
     )
     enqueue(conn, company, cid, kind=job_kind, payload={"message_id": str(message)})
-    audit(conn, company, user, f"media.{kind}_received", message)
+    audit(conn, company, actor, f"media.{kind}_received", message)
     return {"message_id": str(message), "status": "queued"}
 
 

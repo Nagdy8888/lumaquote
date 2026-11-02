@@ -7,6 +7,8 @@ from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib.units import mm
 from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
 
+from luma.core.storage import get_file, put_file
+
 
 def quotation_pdf(quote: dict) -> bytes:
     """Render the persisted canonical revision as a readable PDF; never recalculate prices during document generation."""
@@ -81,3 +83,22 @@ def quotation_pdf(quote: dict) -> bytes:
         author="LumaQuote",
     ).build(story)
     return output.getvalue()
+
+
+def stored_quotation_pdf(quote: dict) -> bytes:
+    """Return the one canonical private PDF for an immutable quotation row, creating it on first use.
+
+    The object path is derived from the row's own company and id, never from a
+    caller-supplied path. Storage creation is non-overwriting, so the staff
+    preview, the customer attachment and the Drive export all read identical
+    bytes even when two requests race to create it; the stored copy always wins
+    over a locally rendered one. Storage failures propagate: no unverified
+    substitute document is ever returned.
+    """
+    path = f"{quote['company_id']}/quotes/{quote['id']}.pdf"
+    content = get_file(path)
+    if content is None:
+        content = quotation_pdf(quote)
+        put_file(path, content, "application/pdf")
+        content = get_file(path) or content
+    return content

@@ -22,14 +22,19 @@ def record_note(conn, member, user, cid, body: TextInput):
     return detail(conn, member["company_id"], cid)
 
 
-def record_customer_reply(conn, member, user, cid, body: TextInput):
-    """Accept only a staff-operated local-test reply, supersede affected offers, and enqueue permitted preparation atomically."""
-    company = member["company_id"]
-    current = conversation(conn, company, cid, lock=True)
-    if current["channel"] != "local_test":
-        raise DomainError("Simulated customer replies are only available in the local test channel.", 403)
+def accept_customer_text(conn, company, current, text, *, provider_id=None):
+    """Append one customer text to a locked conversation, supersede affected offers and enqueue permitted automation.
+
+    Shared by the staff-operated local-test reply and the verified WhatsApp ingress, so both
+    invalidate old approvals/queued sends identically. The caller holds the conversation lock
+    and has authorized the sender. A `provider_id` already seen returns False with no effect
+    (provider redelivery); otherwise True. Under staff ownership the message is recorded and
+    the conversation marked for staff, but no agent job is queued.
+    """
+    cid = current["id"]
     rate_limit(conn, f"conversation:{cid}", 6)
-    add_message(conn, company, cid, "customer", body.text)
+    if add_message(conn, company, cid, "customer", text, provider_id=provider_id) is None:
+        return False
     conn.execute(
         "update luma.conversations set last_customer_at=now(),status=%s where id=%s",
         ("new" if current["owner"] == "agent" else "needs_staff", cid),
@@ -44,6 +49,16 @@ def record_customer_reply(conn, member, user, cid, body: TextInput):
     )
     if current["owner"] == "agent":
         enqueue(conn, company, cid)
+    return True
+
+
+def record_customer_reply(conn, member, user, cid, body: TextInput):
+    """Accept only a staff-operated local-test reply, supersede affected offers, and enqueue permitted preparation atomically."""
+    company = member["company_id"]
+    current = conversation(conn, company, cid, lock=True)
+    if current["channel"] != "local_test":
+        raise DomainError("Simulated customer replies are only available in the local test channel.", 403)
+    accept_customer_text(conn, company, current, body.text)
     audit(conn, company, user, "customer.test_reply_added", cid)
     return detail(conn, company, cid)
 

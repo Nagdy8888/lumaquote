@@ -59,3 +59,21 @@ def test_model_quantity_is_a_strict_integer(quantity):
     """Transport coercion cannot turn booleans or strings into consequential unit counts."""
     with pytest.raises(ValidationError):
         extracted(quantity=quantity)
+
+
+@pytest.mark.parametrize(
+    ("extraction", "expected"),
+    [
+        (None, False),
+        ({"lines": []}, False),
+        ({"lines": [{"sku": None, "quantity": None}]}, False),
+        ({"lines": [{"sku": "", "quantity": 2}]}, False),
+        ({"lines": [{"sku": None, "quantity": None}, {"sku": "DL-001", "quantity": None}]}, True),
+        ({"lines": [{"sku": "DL-001", "quantity": 3}]}, True),
+    ],
+)
+def test_empty_placeholder_lines_do_not_suppress_candidate_discovery(extraction, expected):
+    """The model's null-SKU placeholder for descriptive requests is not an explicit order line."""
+    from luma_agent.requirements import has_explicit_lines
+
+    assert has_explicit_lines(extraction) is expected

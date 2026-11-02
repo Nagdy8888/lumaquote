@@ -5,6 +5,7 @@ import logging
 import time
 
 from luma.core.errors import DomainError
+from luma.features.messaging.inbound import process_next as process_inbox
 
 from .observability import trace_outcome
 from .runtime.audio import process_audio
@@ -17,7 +18,7 @@ logger = logging.getLogger("luma.worker")
 
 
 def tick():
-    """Run one claimed graph job and one dispatch, recording safe failure codes without provider payloads."""
+    """Run one claimed graph job, one dispatch and one inbound WhatsApp event, recording safe failure codes without provider payloads."""
     job = claim_job()
     if job:
         outcome = "done"
@@ -40,7 +41,8 @@ def tick():
         except Exception as error:
             logger.warning("Trace export unavailable: %s", type(error).__name__)
     dispatched = deliver_one()
-    return bool(job) or dispatched
+    received = process_inbox()
+    return bool(job) or dispatched or received
 
 
 def main():

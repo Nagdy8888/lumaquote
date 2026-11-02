@@ -223,6 +223,14 @@ different content. Old receipt cleanup happens during receiver processing.
 `google_refresh_signals` coalesces pending invalidation per company. It records a
 need to refresh, not proof that any Sheet data has been imported.
 
+`drive_exports` (migration 13) holds one row per (company, quote), created by approval in
+the same transaction as the approval and outbox intent. Status is `queued`, `claimed`
+(`claim_token`, five-minute `lease_until`, `attempts` 0-5), `done` or `blocked`. The canonical
+PDF's `pdf_sha256`/`pdf_size` are pinned at first claim; `done` requires a `drive_file_id` and
+digest (table check). It foreign-keys the immutable quote row, so a retry can never export other
+content. The staff role may insert/select under the membership policy, the worker role
+select/insert/update; neither may delete. See [Google synchronization](GOOGLE_SYNC.md).
+
 `google_sync_state` identifies the current validated commercial snapshot,
 observation, digest and source-table payload. These integration tables are
 worker-only; staff/browser grants do not expose their raw payloads. Snapshot
@@ -264,6 +272,9 @@ The ordered files introduce:
 10. `20261029123000`: Google full-snapshot persistence and restricted import grants.
 11. `20261029130000`: photo kind/read_photo jobs.
 12. `20261029131000`: operation-scoped usage and current-evidence embeddings.
+13. `20261102000000`: `drive_exports`, one Drive copy per approved quotation revision.
+14. `20261102010000`: durable WhatsApp inbox state (`kind`, `status`, `attempts`, `error_code`, `lease_until`) on `luma.inbox`.
+15. `20261102020000`: `luma.media.purged_at`, stamped when runtime media objects are deleted by retention.
 
 `npm run setup` invokes the guarded bootstrap at `127.0.0.1:55322`. It checks both
 `public.luma_migrations` and the Supabase CLI migration ledger before applying a
@@ -288,8 +299,30 @@ Application retention must eventually account for business rows, checkpoints,
 private objects, vector caches, integration receipts, external traces and backups.
 
 The approved retention targets are seven days for runtime media, 90 days for
-business/checkpoint/audit data and seven days for backups. They are requirements,
-not implemented deletion guarantees or a demonstrated restore. Routine Docker
+business/checkpoint/audit data and seven days for backups. `scripts/retention.py` implements
+the first two as an **operator command** (dry run by default; `--execute` deletes; explicit
+company; local database only; nothing schedules it):
+
+- Media older than seven days: private original and normalized objects are deleted and the row
+  gets `purged_at` (preview routes and `audio_available`/`image_available` then report it gone).
+  Its transcript or label reading stays as business data. A rerun is a no-op.
+- A conversation idle for more than 90 days is deleted children first (Drive exports, approvals,
+  outbox, jobs, media rows, messages, quotes, the conversation), together with its idempotency
+  responses (they embed the conversation), quote PDFs, media objects and LangGraph checkpoint thread.
+  Conversations with queued/running jobs, queued/submitting sends or queued/claimed Drive exports are
+  skipped and counted. Audit events and WhatsApp inbox rows older than 90 days are deleted.
+- Preserved deliberately: `luma.usage` (budget and spend accounting; opaque ids and amounts only) and
+  catalog, snapshots and sources (commercial reference data).
+- Not covered: Drive copies of exported quotations, provider-side copies (OpenAI, LangSmith, Meta,
+  Google), database backups and the Docker volume. Tested in `tests/integration/test_retention.py`.
+
+`scripts/backup_restore_drill.py` demonstrates the backup side on this machine: it dumps the
+`luma` and `public` (checkpoint) schemas, restores into a scratch database, compares per-company row
+counts, content hashes and checkpoint counts, round-trips the company's Storage objects, then removes
+every artifact (so no seven-day backup obligation is created). Evidence:
+[backup-restore-drill-2026-11-02.json](../evidence/backup-restore-drill-2026-11-02.json) (populated
+isolated tenant: identical, restore about 0.3 s for a 115 KB dump). Limits: Supabase Auth is stubbed
+with user ids only, no volume snapshot or point-in-time recovery, no scheduled backup, local only. Routine Docker
 stop/start preserves volumes; this task does not authorize a reset or deletion.
 
 ## Exact conversation and attachment binding

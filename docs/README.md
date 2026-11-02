@@ -52,12 +52,15 @@ reference for the module you are changing:
   capabilities, 3D fallback and capture/accessibility limits.
 - [Google synchronization](reference/GOOGLE_SYNC.md): GAS ownership, HMAC/envelopes,
   receipt replay, complete schema validation, atomic publication and timer limits.
+- [WhatsApp channel](reference/WHATSAPP.md): signed webhook ingress, sender allowlist,
+  restricted media fetch, three-phase gated sending, uncertain outcomes, monotonic receipts
+  and the (mock-only) proof boundary.
 - [Configuration and operation](reference/CONFIGURATION.md): actual safe variable
   inventory/defaults, precedence/cache behavior, process/port ownership and private
   generated files.
 - [Tooling and tests](reference/TOOLING_AND_TESTS.md): development scripts/test
   families, fixture preservation, gate commands, browser assertions, live opt-ins,
-  CI scope and evidence interpretation.
+  CI scope and evidence interpretation, including the [80-scenario evaluation set](../tests/fixtures/evaluation/README.md) and what its offline baseline does not prove.
 
 For example, to change photo processing, read MEDIA for its state/resource
 contract, AGENT_RUNTIME for lease/allowance ownership, DATA_MODEL for durable

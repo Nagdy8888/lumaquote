@@ -1,0 +1,420 @@
+{
+  "e001-t0.wav": {
+    "kind": "audio",
+    "seconds": 4.83,
+    "voice": "Microsoft David Desktop",
+    "degradations": [
+      "background noise at 0.25 of the speech peak with 90 Hz hum"
+    ],
+    "sha256": "60ff1949f0fd67e070351eed224afaa27e36192ef61598f1d79412c46c1445ca"
+  },
+  "e003-t0.png": {
+    "kind": "image",
+    "size": [
+      960,
+      640
+    ],
+    "degradations": [
+      "printed label",
+      "slight defocus",
+      "rotation 1.4 degrees and sensor grain"
+    ],
+    "sha256": "8a2817538285b0307bd7717d7a8bc38b7c337d558cc2fbcb3ad48628ba6cf14d"
+  },
+  "e007-t0.wav": {
+    "kind": "audio",
+    "seconds": 5.28,
+    "voice": "Microsoft Zira Desktop",
+    "degradations": [
+      "none (clean synthetic speech)"
+    ],
+    "sha256": "d31615c19c612bd61d32b815995f6c5117944090fabd0605b199d52ea9848a9a"
+  },
+  "e008-t0.png": {
+    "kind": "image",
+    "size": [
+      960,
+      640
+    ],
+    "degradations": [
+      "printed label",
+      "rotation 1.9 degrees and sensor grain"
+    ],
+    "sha256": "213a7585a131e690ada058b2bd83d4106109b342954c63170067c3e9d480daac"
+  },
+  "e010-t0.wav": {
+    "kind": "audio",
+    "seconds": 5.62,
+    "voice": "Microsoft Zira Desktop",
+    "degradations": [
+      "none (clean synthetic speech)"
+    ],
+    "sha256": "ad86721dff643d0d3b32d0244bb392c8cbe352aba5715090db172df45dfb9fed"
+  },
+  "e012-t0.png": {
+    "kind": "image",
+    "size": [
+      960,
+      640
+    ],
+    "degradations": [
+      "printed label",
+      "faded printing",
+      "rotation 3.8 degrees and sensor grain"
+    ],
+    "sha256": "389690415a22eb852bcc593af1af462a5944828a5bb96f27a57781f8068f3750"
+  },
+  "e015-t0.wav": {
+    "kind": "audio",
+    "seconds": 10.83,
+    "voice": "Microsoft David Desktop",
+    "degradations": [
+      "background noise at 0.25 of the speech peak with 90 Hz hum"
+    ],
+    "sha256": "00aadf76ac1c904556e7c2c2bb1a2b6add325e99d41192b83a5a9a5cf15d7865"
+  },
+  "e017-t0.png": {
+    "kind": "image",
+    "size": [
+      960,
+      640
+    ],
+    "degradations": [
+      "two labels in one frame",
+      "rotation -2.6 degrees and sensor grain"
+    ],
+    "sha256": "f0dca6c1f7e6126caa8c29b5a93579390e8dd92418ec602c826972201c9763b0"
+  },
+  "e018-t0.wav": {
+    "kind": "audio",
+    "seconds": 4.26,
+    "voice": "Microsoft David Desktop",
+    "degradations": [
+      "8 kHz telephone band with line noise"
+    ],
+    "sha256": "ac0f2de340e7009f6e8af1e5b3ee1568f7491737337e7bb34089007c90e6dae6"
+  },
+  "e021-t0.png": {
+    "kind": "image",
+    "size": [
+      960,
+      640
+    ],
+    "degradations": [
+      "first model struck through, second handwritten",
+      "slight defocus",
+      "rotation -2.3 degrees and sensor grain"
+    ],
+    "sha256": "8f1fa5603cbbcf24d11c460a50c928fd4d3b92fcda955b176413e5482cd040d7"
+  },
+  "e023-t0.png": {
+    "kind": "image",
+    "size": [
+      960,
+      640
+    ],
+    "degradations": [
+      "printed label",
+      "rotation 2.3 degrees and sensor grain"
+    ],
+    "sha256": "56806328e8c72afa1cc827bb23ba6628bc86e2a39c60ecdf6d5f1eb121897fc3"
+  },
+  "e025-t0.wav": {
+    "kind": "audio",
+    "seconds": 5.57,
+    "voice": "Microsoft Zira Desktop",
+    "degradations": [
+      "none (clean synthetic speech)"
+    ],
+    "sha256": "04f5dd0d46e51f3a0ce1b8dcab0ab57c31f178a2d9e5987ae5b6c7b163486dad"
+  },
+  "e029-t0.png": {
+    "kind": "image",
+    "size": [
+      960,
+      640
+    ],
+    "degradations": [
+      "printed label",
+      "rotation 3.4 degrees and sensor grain"
+    ],
+    "sha256": "58528e49cbb4c73a4c23224ac4cbc8ef1c625b9c6cd23e3b3812bb41ef80ec8c"
+  },
+  "e032-t0.wav": {
+    "kind": "audio",
+    "seconds": 5.42,
+    "voice": "Microsoft Zira Desktop",
+    "degradations": [
+      "none (clean synthetic speech)"
+    ],
+    "sha256": "457214afd76339bd33d18678b8e30d9505de4bdd4993ab72daf16a57e67d321c"
+  },
+  "e033-t0.png": {
+    "kind": "image",
+    "size": [
+      960,
+      640
+    ],
+    "degradations": [
+      "carton/pallet label on cardboard",
+      "slight defocus",
+      "rotation -1.8 degrees and sensor grain"
+    ],
+    "sha256": "97af2774f04416ed62fa870c4c2e36444920c7739554a02084ab075d3ed7deab"
+  },
+  "e034-t0.png": {
+    "kind": "image",
+    "size": [
+      960,
+      640
+    ],
+    "degradations": [
+      "handwritten label",
+      "rotation 1.6 degrees and sensor grain"
+    ],
+    "sha256": "c81955d77ceff975034ca434e4bd0213d075aa967127cde5c4b443cab600ba69"
+  },
+  "e036-t0.png": {
+    "kind": "image",
+    "size": [
+      960,
+      640
+    ],
+    "degradations": [
+      "printed label",
+      "sticker over one character",
+      "specular glare",
+      "slight defocus",
+      "rotation -1.2 degrees and sensor grain"
+    ],
+    "sha256": "4680277a71369a411d52a48a20e59ca8baf70361daa0e47da770742d30603aa9"
+  },
+  "e040-t0.wav": {
+    "kind": "audio",
+    "seconds": 3.34,
+    "voice": "Microsoft Zira Desktop",
+    "degradations": [
+      "background noise at 0.9 of the speech peak with 90 Hz hum"
+    ],
+    "sha256": "0cabd026d08d2613583a001fe0975c54da5da40b545b1ccc7660abe95c196511"
+  },
+  "e041-t0.png": {
+    "kind": "image",
+    "size": [
+      960,
+      640
+    ],
+    "degradations": [
+      "ceiling tiles and a luminaire, no printed text",
+      "rotation 3.3 degrees and sensor grain"
+    ],
+    "sha256": "169271af5dc6308e77f8a45c3b25323e880a715a9ea232b20a2d22a4b72c3f05"
+  },
+  "e043-t0.wav": {
+    "kind": "audio",
+    "seconds": 8.66,
+    "voice": "Microsoft Zira Desktop",
+    "degradations": [
+      "background noise at 0.25 of the speech peak with 90 Hz hum"
+    ],
+    "sha256": "66fbcb2e7ddd0a09ea4b3cfe4a90d1a8b8374ca8aec6c9aaf7ee3d8406c2bcb6"
+  },
+  "e046-t0.png": {
+    "kind": "image",
+    "size": [
+      960,
+      640
+    ],
+    "degradations": [
+      "printed label",
+      "rotation -3.8 degrees and sensor grain"
+    ],
+    "sha256": "6f64a04f3c046bac760cfeb14752294dc29a870ad0054b77ef09bcd0a3cf047a"
+  },
+  "e047-t0.wav": {
+    "kind": "audio",
+    "seconds": 4.54,
+    "voice": "Microsoft David Desktop",
+    "degradations": [
+      "none (clean synthetic speech)"
+    ],
+    "sha256": "fe966a1024589a122a5af91c55ce63f7a4a9cbe827292b73ac479d4ec1b2d480"
+  },
+  "e050-t0.wav": {
+    "kind": "audio",
+    "seconds": 3.01,
+    "voice": "Microsoft Zira Desktop",
+    "degradations": [
+      "none (clean synthetic speech)"
+    ],
+    "sha256": "5aa008752d567049211f9d3720249d4b3432093fd56f85c27c4d1064a32a9079"
+  },
+  "e051-t0.wav": {
+    "kind": "audio",
+    "seconds": 3.38,
+    "voice": "Microsoft Zira Desktop",
+    "degradations": [
+      "background noise at 0.25 of the speech peak with 90 Hz hum"
+    ],
+    "sha256": "6f3c7f04f8de2840c505d52694eafd127240f06394915c160a9a98fe04a95185"
+  },
+  "e052-t0.wav": {
+    "kind": "audio",
+    "seconds": 4.24,
+    "voice": "Microsoft David Desktop",
+    "degradations": [
+      "none (clean synthetic speech)"
+    ],
+    "sha256": "9bc55d06eb02c81a474e07347f95401d80e41b7a781e2ef153079155f1c6105f"
+  },
+  "e053-t0.wav": {
+    "kind": "audio",
+    "seconds": 4.32,
+    "voice": "Microsoft Zira Desktop",
+    "degradations": [
+      "none (clean synthetic speech)"
+    ],
+    "sha256": "973dc259e686cf0a3e12203ff34426d15fbd4961eab89e9e0c164d4313fa6205"
+  },
+  "e055-t0.png": {
+    "kind": "image",
+    "size": [
+      960,
+      640
+    ],
+    "degradations": [
+      "printed label",
+      "slight defocus",
+      "rotation -0.9 degrees and sensor grain"
+    ],
+    "sha256": "b5bd9826497517710c76e72a2392db2d497c34ef0a4b963185aeb6de3a10abae"
+  },
+  "e056-t0.wav": {
+    "kind": "audio",
+    "seconds": 7.75,
+    "voice": "Microsoft Zira Desktop",
+    "degradations": [
+      "background noise at 0.25 of the speech peak with 90 Hz hum"
+    ],
+    "sha256": "25676caf940e7711d5e85e7b898b1b3b2a4dcf37c83f08e86d1edf53cfc9ff4e"
+  },
+  "e057-t0.wav": {
+    "kind": "audio",
+    "seconds": 4.11,
+    "voice": "Microsoft David Desktop",
+    "degradations": [
+      "none (clean synthetic speech)"
+    ],
+    "sha256": "8f388edafe1cbc8fed5b4fa5563d762683b82f048933f936a92a6c50e6588f87"
+  },
+  "e058-t0.wav": {
+    "kind": "audio",
+    "seconds": 5.18,
+    "voice": "Microsoft Zira Desktop",
+    "degradations": [
+      "none (clean synthetic speech)"
+    ],
+    "sha256": "ee0a8ad51e375a55baec3f958fdd64382c80d622eae6686a5e510e7b8d612668"
+  },
+  "e059-t0.wav": {
+    "kind": "audio",
+    "seconds": 4.21,
+    "voice": "Microsoft Zira Desktop",
+    "degradations": [
+      "background noise at 0.25 of the speech peak with 90 Hz hum"
+    ],
+    "sha256": "1a70eb484427abd1b93988216cb2ac4b0e13448db60ca1fde812ecbb70d2a8fd"
+  },
+  "e061-t0.wav": {
+    "kind": "audio",
+    "seconds": 3.81,
+    "voice": "Microsoft David Desktop",
+    "degradations": [
+      "none (clean synthetic speech)"
+    ],
+    "sha256": "6d98bcaf3ce4c077722ce29be901c61dd3c245735b6b0bddbef721b0f1197725"
+  },
+  "e063-t0.wav": {
+    "kind": "audio",
+    "seconds": 7.94,
+    "voice": "Microsoft Zira Desktop",
+    "degradations": [
+      "none (clean synthetic speech)"
+    ],
+    "sha256": "d30654b520fa1ef9a86a148bd442fe3cd9b072a5a354a8dbae8e05349e828b59"
+  },
+  "e064-t0.png": {
+    "kind": "image",
+    "size": [
+      960,
+      640
+    ],
+    "degradations": [
+      "specification plate",
+      "rotation -1.8 degrees and sensor grain"
+    ],
+    "sha256": "716fd92dab834b9207038247ac30b149f6b4847c1e327d145524a6c166562a53"
+  },
+  "e067-t0.wav": {
+    "kind": "audio",
+    "seconds": 4.59,
+    "voice": "Microsoft David Desktop",
+    "degradations": [
+      "background noise at 0.25 of the speech peak with 90 Hz hum"
+    ],
+    "sha256": "d39e9dd2809a83f3cd4433ac69920ef6b38fe8674668c0014a66717cde30042a"
+  },
+  "e068-t0.wav": {
+    "kind": "audio",
+    "seconds": 4.71,
+    "voice": "Microsoft David Desktop",
+    "degradations": [
+      "none (clean synthetic speech)"
+    ],
+    "sha256": "b62269b5903f16bf5b5d014e49513301ac8178977331d2b8656e2a5521570238"
+  },
+  "e071-t0.png": {
+    "kind": "image",
+    "size": [
+      960,
+      640
+    ],
+    "degradations": [
+      "carton/pallet label on cardboard",
+      "rotation -3.6 degrees and sensor grain"
+    ],
+    "sha256": "27000e887edc92edd1e5e8ed237de3807b548bbd3f9ca5e1b45ede3c2331423f"
+  },
+  "e074-t0.wav": {
+    "kind": "audio",
+    "seconds": 5.75,
+    "voice": "Microsoft David Desktop",
+    "degradations": [
+      "overlapping second speaker",
+      "overdriven and hard clipped"
+    ],
+    "sha256": "29d69a49f913d16b35770e41f551d377047460c19b52e56c4f1d1db4ee6300e8"
+  },
+  "e075-t0.wav": {
+    "kind": "audio",
+    "seconds": 4.55,
+    "voice": "Microsoft Zira Desktop",
+    "degradations": [
+      "none (clean synthetic speech)"
+    ],
+    "sha256": "bc882d75937ddafcace4060feb567c9b62f33a1f49b70800aba878759065948c"
+  },
+  "e080-t0.png": {
+    "kind": "image",
+    "size": [
+      960,
+      640
+    ],
+    "degradations": [
+      "specification plate",
+      "slight defocus",
+      "rotation 0.6 degrees and sensor grain"
+    ],
+    "sha256": "3838cae03c67c8511a0719a3d34fa2ddf0766475dc199ae75b91f43cb79c1593"
+  }
+}

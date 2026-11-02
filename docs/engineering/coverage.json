@@ -78,9 +78,24 @@
     },
     {
       "id": "B13",
-      "status": "Planned",
-      "reason": "Provider media and future outbound adapter destination allowlists/redirect handling are not implemented and tested yet.",
-      "evidence": []
+      "status": "Covered",
+      "reason": "Inbound WhatsApp media is fetched only after the metadata URL is HTTPS on a Meta host (lookalike, plain-HTTP and foreign hosts refused before the bearer token is attached), redirects are refused, type and size are bounded and the body is streamed with a cap; the Graph host and endpoints are fixed. Verified with a mock transport and unit cases, and mutation (removing the host check) failed the matching tests. Limits: real Meta media URLs and redirects, and the OpenAI/LangSmith SDK destinations (fixed by their clients/config) were not exercised against hostile endpoints.",
+      "evidence": [
+        {
+          "kind": "code",
+          "path": "app/backend/luma/features/messaging/whatsapp_client.py",
+          "result": "observed",
+          "revision": "implementation-working-tree",
+          "environment": "local-windows"
+        },
+        {
+          "kind": "test",
+          "path": "docs/evidence/checkpoint-2026-11-02.json",
+          "result": "passed",
+          "revision": "implementation-working-tree",
+          "environment": "local-windows"
+        }
+      ]
     },
     {
       "id": "B14",
@@ -145,8 +160,23 @@
     {
       "id": "B24",
       "status": "Planned",
-      "reason": "Meta and Google callback verification, durable batching/deduplication and receipt ordering still need implementation and tests.",
-      "evidence": []
+      "reason": "Meta webhook handshake, raw-byte signature, bounds, durable deduplicated ingress and monotonic receipt ordering are implemented and tested with a mock transport, and the Google export protocol is replay-protected; Meta and Google acceptance of real payloads, tunnel reachability and live receipts remain unverified.",
+      "evidence": [
+        {
+          "kind": "code",
+          "path": "app/backend/luma/features/messaging/webhook.py",
+          "result": "observed",
+          "revision": "implementation-working-tree",
+          "environment": "local-windows"
+        },
+        {
+          "kind": "test",
+          "path": "docs/evidence/checkpoint-2026-11-02.json",
+          "result": "passed",
+          "revision": "implementation-working-tree",
+          "environment": "local-windows"
+        }
+      ]
     },
     {
       "id": "B25",
@@ -210,15 +240,52 @@
     },
     {
       "id": "B35",
-      "status": "Planned",
-      "reason": "An isolated database/private-file restore and measured local recovery have not yet been implemented and demonstrated.",
-      "evidence": []
+      "status": "Covered",
+      "reason": "scripts/backup_restore_drill.py dumps the luma and public (checkpoint) schemas, restores into a scratch database, compares per-company row counts, content hashes and checkpoint counts, round-trips the Storage objects and removes every artifact; a populated isolated tenant restored identically in about 0.3 s. Limits: logical dump only (no volume snapshot or point-in-time recovery), Supabase Auth stubbed with user ids, local only, not scheduled, and no seven-day backup retention exists because the drill keeps no backup.",
+      "evidence": [
+        {
+          "kind": "code",
+          "path": "scripts/backup_restore_drill.py",
+          "result": "observed",
+          "revision": "implementation-working-tree",
+          "environment": "local-windows"
+        },
+        {
+          "kind": "runtime",
+          "path": "docs/evidence/backup-restore-drill-2026-11-02.json",
+          "result": "passed",
+          "revision": "implementation-working-tree",
+          "environment": "local-windows"
+        },
+        {
+          "kind": "test",
+          "path": "docs/evidence/checkpoint-2026-11-02.json",
+          "result": "passed",
+          "revision": "implementation-working-tree",
+          "environment": "local-windows"
+        }
+      ]
     },
     {
       "id": "B36",
       "status": "Planned",
-      "reason": "The agreed retention policy is documented but deletion across private media, vectors, checkpoints, exports and backups remains unfinished.",
-      "evidence": []
+      "reason": "scripts/retention.py deletes runtime media after seven days and idle conversations, checkpoints, objects, audit and inbox rows after 90 days (tested). Still open: nothing schedules it, Drive copies and provider-side copies are not deleted, backups are not aged, and customer phone numbers need an explicit policy review.",
+      "evidence": [
+        {
+          "kind": "code",
+          "path": "scripts/retention.py",
+          "result": "observed",
+          "revision": "implementation-working-tree",
+          "environment": "local-windows"
+        },
+        {
+          "kind": "test",
+          "path": "docs/evidence/checkpoint-2026-11-02.json",
+          "result": "passed",
+          "revision": "implementation-working-tree",
+          "environment": "local-windows"
+        }
+      ]
     },
     {
       "id": "B37",

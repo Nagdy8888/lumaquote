@@ -119,6 +119,10 @@ sources are excluded; outdated source/pages, changed prices and invalid pack qua
 Generated development queries are reported separately from the frozen 80-case
 suite. Paid semantic fallback and broader synonym/ambiguity evaluation remain pending.
 
+Evaluation progress (nothing checked): the 80 scenarios (40 text/24 voice/16 photo; 60 development/20 holdout split by family), an evaluator-only answer key, 40 synthetic voice/photo assets, a validator, an offline baseline and an opt-in paid agent harness are in `tests/fixtures/evaluation/`. One paid development-only agent run (60 scenarios) scored 59/60 under the final oracle rule with zero unsupported lines or unauthorized sends; it found and led to a fix for a candidate-suggestion bug that was not re-measured because paid calls were stopped. No holdout run, freeze record, human recordings, real photos or pooled target assessment exists. See [the fixture README](../tests/fixtures/evaluation/README.md).
+
+Phase 4 progress (nothing checked): the Drive export protocol (`gas/Exports.gs`, signed claim/receipt, digest-pinned retry) and the WhatsApp adapter (signed webhook, allowlisted ingress, restricted media fetch, three-phase gated sending, monotonic receipts) are implemented and locally tested with a Python stand-in and a mock Graph transport. Neither has run against Google Drive or Meta; see [Google synchronization](reference/GOOGLE_SYNC.md), [WhatsApp channel](reference/WHATSAPP.md) and [morning actions](MORNING_ACTIONS.md) for the live steps.
+
 Photo intake progress: private image uploads now share bounded media processing
 with voice notes; normalized previews and literal unconfirmed label readings are
 implemented. Local provider-boundary tests and a synthetic vision canary passed.

@@ -40,9 +40,14 @@ are distinct; do not assume one fixes the other.
 - [ ] Run `installSupplierSynchronization` in the refreshed Apps Script editor.
   This validates the first full snapshot and installs a one-minute reconciliation
   trigger. Verify a persisted `google_sync_state` row and subsequent timer refresh.
-- [ ] GAS Drive export remains to be implemented and verified. Choose its private
-  folder through Script Properties when that adapter is ready; no backend OAuth
-  credentials should be collected for it.
+- [ ] GAS Drive export is implemented (`gas/Exports.gs`) and its backend protocol is locally
+  tested, but it has not run in Google. To verify it live: (a) run `npm run google:push`;
+  (b) create a private Drive folder (do not share it) and set Script Property
+  `LUMA_DRIVE_FOLDER_ID`; (c) run `installDriveExport` in the editor and approve the new
+  Drive permission; (d) keep the callback tunnel to the gateway (port 8002) running;
+  (e) approve a synthetic quotation in the app. Within about a minute the PDF should
+  appear in the folder and `luma.drive_exports` should show `done` with a `drive_file_id`.
+  No backend OAuth credentials are needed. The callback URL must still end `/callbacks/google`.
 
 Use `npm run google:status` and `npm run google:push` to manage the linked source.
 The ignored `.clasp.json` holds this machine's project mapping. Do not paste OAuth
@@ -57,18 +62,25 @@ commercial evidence continues to block finalization.
 
 ## WhatsApp test connection
 
-Meta account actions will require your app/test-number settings, authorized test
-recipient, and webhook registration. Credentials go only into ignored `.env`.
-The exact variable names and callback setup will be documented with the adapter.
-Until verified, the UI must show the connection as unverified or disconnected;
-local test delivery is not a WhatsApp delivery claim.
+The WhatsApp adapter is implemented and verified only against a mock Graph transport
+(see `docs/reference/WHATSAPP.md`). Real messaging needs your Meta account:
 
-Current local configuration check found all of these missing:
-`WHATSAPP_TOKEN`, `WHATSAPP_APP_SECRET`, `WHATSAPP_VERIFY_TOKEN`,
-`WHATSAPP_PHONE_ID`, `WHATSAPP_COMPANY_ID`, and `WHATSAPP_TEST_RECIPIENTS`.
-Enter credentials only in the ignored backend environment file, never chat.
-Meta adapter/webhook implementation remains a separate unfinished plan item;
-account setup alone will not establish live messaging.
+- [ ] In the Meta developer app, add the WhatsApp product, use the free developer test number,
+  and add your own phone as an authorized test recipient.
+- [ ] Put these in the ignored `.env.local` (never chat): `WHATSAPP_TOKEN`, `WHATSAPP_APP_SECRET`,
+  `WHATSAPP_VERIFY_TOKEN` (any long random string you choose), `WHATSAPP_PHONE_ID` (the test number's
+  phone number id), `WHATSAPP_COMPANY_ID` (the seeded company id), `WHATSAPP_TEST_RECIPIENTS` (your
+  number, digits only), and `ENABLE_LIVE_WHATSAPP=true` only when you want real sends.
+- [ ] Confirm `WHATSAPP_GRAPH_VERSION` against Meta's current changelog (default `v26.0`).
+- [ ] Start the signed gateway (`luma.google_gateway:app`, port 8002) behind a tunnel and register
+  `https://<tunnel>/webhooks/whatsapp` as the callback with your verify token; subscribe to
+  `messages`. Do not tunnel the staff API (8001), Supabase or Studio.
+- [ ] Send a text from your phone; check it appears as a conversation. Reply from the app and
+  confirm delivery and read receipts update the outbox. A quotation also needs a real, fresh
+  Google snapshot (synthetic records cannot reach WhatsApp by design).
+
+Until you do this, the UI must keep showing the connection as unverified and local-test delivery
+is not a WhatsApp delivery claim.
 
 ## Evidence limits
 
@@ -77,6 +89,8 @@ measured employee savings, or production readiness is claimed. Configured
 LangSmith/OpenAI credentials must be distinguished from live verified traces/calls.
 
 ## LangSmith account limit
+
+**Update 2026-11-02:** the allowance is available again. One metadata-only export (`trace_outcome`, opaque synthetic job id and status `done`) succeeded, and the run `quotation.workflow` was read back from the project with only `{job_id}` inputs and `{status: done}` outputs. This verifies the export path for that one run, not a sustained quota or raw-trace quality. The earlier October 29 text follows for history.
 
 The metadata-only trace export was attempted on October 29 and rejected with
 HTTP 429: monthly unique traces usage limit exceeded. No successful live trace

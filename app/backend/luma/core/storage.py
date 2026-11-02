@@ -31,3 +31,26 @@ def get_file(path: str) -> bytes | None:
             return None
         response.raise_for_status()
         return response.content
+
+
+def delete_files(company: str, paths: list[str]) -> int:
+    """Delete private objects belonging to one company; every path must start with that company's prefix.
+
+    Used only by the operator retention tool. The prefix check is a guard against a bug selecting
+    another tenant's object, not an authorization mechanism. Missing objects are not an error, so a
+    repeated or interrupted purge can simply be run again. Returns the number of paths requested.
+    """
+    if not paths:
+        return 0
+    if any(not path.startswith(f"{company}/") or ".." in path for path in paths):
+        raise ValueError("Refusing to delete objects outside the company prefix.")
+    with httpx.Client(timeout=30) as client:
+        for start in range(0, len(paths), 100):
+            response = client.request(
+                "DELETE",
+                f"{settings().supabase_url}/storage/v1/object/luma-private",
+                headers=storage_headers(),
+                json={"prefixes": paths[start : start + 100]},
+            )
+            response.raise_for_status()
+    return len(paths)

@@ -1,0 +1,36 @@
+sequenceDiagram
+  accTitle: WhatsApp webhook ingress and gated egress
+  accDescr: Meta posts a signed event to the gateway, which stores it in the inbox and acknowledges. The worker later maps an allow-listed sender to one conversation, fetches media only from Meta hosts, and queues the normal agent job. For egress the dispatcher rechecks ownership and approval, applies the live gate, recipient allowlist and 24-hour window, commits a submitting marker, makes one Graph call outside any transaction, and records submitted, failed or unknown. Receipts only advance state. Everything shown is verified with a mock Graph transport, not Meta.
+  participant Meta as Meta Cloud API
+  participant GW as Signed gateway
+  participant DB as PostgreSQL inbox and outbox
+  participant W as Worker
+  participant Cust as Customer phone
+  Meta->>GW: POST event with X-Hub-Signature-256
+  GW->>GW: Verify HMAC over raw bytes and phone id
+  GW->>DB: Store event once by provider id
+  GW-->>Meta: 200 accepted
+  W->>DB: Claim inbox row under a lease
+  alt Sender not on the test allowlist
+    W->>DB: Mark ignored, nothing created
+  else Allowed text or media
+    W->>Meta: Fetch media from a Meta host only
+    W->>DB: Conversation, message, supersede open offers, queue agent job
+  end
+  W->>DB: Dispatcher locks conversation and rechecks owner and approval
+  alt Gates fail, live mode off, recipient not allowed or window closed
+    W->>DB: Mark outbox blocked with a code
+  else Permitted
+    W->>DB: Commit submitting marker
+    W->>Meta: One Graph call, PDF uploaded first for a quotation
+    alt Accepted
+      W->>DB: Record submitted and message id
+    else Timeout or 5xx
+      W->>DB: Record unknown, never retried
+    else Definite rejection
+      W->>DB: Record failed with code
+    end
+  end
+  Meta->>GW: Signed receipts sent, delivered, read
+  W->>DB: Advance state only forward
+  Meta-->>Cust: Delivery is outside this system's proof

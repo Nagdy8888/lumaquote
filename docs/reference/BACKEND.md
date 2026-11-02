@@ -35,16 +35,18 @@ sequenceDiagram
   alt Rejected
     API->>DB: Record rejection and review-only job
   else Approved with current ownership and evidence
-    API->>DB: Commit exact approval plus quotation outbox intent
+    API->>DB: Commit exact approval, quotation outbox intent and one Drive export row
     W->>DB: Lock conversation before queued outbox
     W->>DB: Recheck author, approval, recipient, expiry and snapshot
     alt Eligible local-test intent
       W->>DB: Commit local message and local_delivered together
-    else Ineligible or nonlocal channel
+    else WhatsApp channel, gated and mock-tested only
+      W->>DB: Gates, one Graph call, then submitted, failed or unknown
+    else Ineligible channel
       W->>DB: Record blocked outcome
     end
   end
-  Note over Staff,W: Approval queues work. It is not a provider delivery receipt.
+  Note over Staff,W: Approval queues work. It is not a provider delivery receipt, and the Drive export is independent of delivery.
 ```
 
 </details>
@@ -134,8 +136,11 @@ changes:
 - `record_note`: internal staff message and audit only. It does not create an
   outbound intent or change the customer's requested products.
 - `record_customer_reply`: staff-operated simulation restricted to `local_test`.
-  It records customer activity, supersedes review/approved quotes, blocks queued
-  sends and enqueues preparation only when ownership permits automation.
+  It delegates to `accept_customer_text`, which records customer activity (deduplicated by an
+  optional provider id), supersedes review/approved quotes, blocks queued sends and enqueues
+  preparation only when ownership permits automation. The verified WhatsApp ingress calls the same
+  function, so both channels invalidate old decisions identically; see
+  [WhatsApp channel](WHATSAPP.md).
 - `change_ownership`: requires `expected_version`. Takeover blocks queued
   non-staff intents. Resume blocks queued staff-origin replies and can enqueue
   preparation. Neither operation fabricates a quotation approval.

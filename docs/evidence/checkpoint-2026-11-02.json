@@ -1,0 +1,120 @@
+{
+  "date": "2026-11-02",
+  "timezone": "Africa/Cairo",
+  "scope": "Checkpoint of the evaluation set and media assets, Drive export protocol, WhatsApp adapter (mock Graph), retention tool and backup/restore drill, with deep documentation and maintained diagrams",
+  "parent_commit": "6a587b3",
+  "phase_completion": false,
+  "environment": "Native Windows app/test processes, isolated local Supabase and Docker, Chromium; paid AI disabled for every gate command; no Meta, Google Drive or provider account used by these checks",
+  "commands": [
+    {
+      "command": "npm run lint:python",
+      "status": "Passed",
+      "seconds": 0.38,
+      "timeout_seconds": 180,
+      "error_code": null,
+      "local_log": ".local/checks/lint-python.log"
+    },
+    {
+      "command": "npm run check:architecture",
+      "status": "Passed",
+      "seconds": 0.44,
+      "timeout_seconds": 180,
+      "error_code": null,
+      "local_log": ".local/checks/check-architecture.log"
+    },
+    {
+      "command": "npm run check:frontend",
+      "status": "Passed",
+      "seconds": 0.8,
+      "timeout_seconds": 180,
+      "error_code": null,
+      "local_log": ".local/checks/check-frontend.log"
+    },
+    {
+      "command": "npm run test:diagrams",
+      "status": "Passed",
+      "seconds": 0.48,
+      "timeout_seconds": 180,
+      "error_code": null,
+      "local_log": ".local/checks/test-diagrams.log"
+    },
+    {
+      "command": "npm run diagrams:check",
+      "status": "Passed",
+      "seconds": 2.6,
+      "timeout_seconds": 180,
+      "error_code": null,
+      "local_log": ".local/checks/diagrams-check.log"
+    },
+    {
+      "command": "npm run typecheck",
+      "status": "Passed",
+      "seconds": 4.24,
+      "timeout_seconds": 180,
+      "error_code": null,
+      "local_log": ".local/checks/typecheck.log"
+    },
+    {
+      "command": "npm run test:python",
+      "status": "Passed",
+      "seconds": 343.05,
+      "timeout_seconds": 420,
+      "error_code": null,
+      "local_log": ".local/checks/test-python.log"
+    },
+    {
+      "command": "npm run test:ui",
+      "status": "Passed",
+      "seconds": 3.73,
+      "timeout_seconds": 180,
+      "error_code": null,
+      "local_log": ".local/checks/test-ui.log"
+    },
+    {
+      "command": "npm run test:browser",
+      "status": "Passed",
+      "seconds": 47.13,
+      "timeout_seconds": 180,
+      "error_code": null,
+      "local_log": ".local/checks/test-browser.log"
+    },
+    {
+      "command": "npm run build",
+      "status": "Passed",
+      "seconds": 5.46,
+      "timeout_seconds": 180,
+      "error_code": null,
+      "local_log": ".local/checks/build.log"
+    }
+  ],
+  "python_result": "283 passed, 64 skipped (60 opt-in live evaluation scenarios and 4 paid canaries), 1 deselected, 341.34 s inside the 343.05 s command",
+  "ui_result": "5 passed",
+  "browser_result": "1 passed (native Chromium workflow)",
+  "new_verification": {
+    "unit": {
+      "test_evaluation_dataset.py": 15,
+      "test_channel_contracts.py": 22,
+      "test_requirement_policy.py (has_explicit_lines cases added)": "passed"
+    },
+    "integration": {
+      "test_drive_exports.py": 6,
+      "test_whatsapp.py": 21,
+      "test_retention.py": 3,
+      "test_backup_restore.py": 1
+    },
+    "mutation_checks": "Removing the WhatsApp recipient allowlist, webhook signature check or media-host check each failed the matching test; the three files were restored and the suite re-run (21 passed).",
+    "backup_restore_drill": "docs/evidence/backup-restore-drill-2026-11-02.json: restore exit code 0, database and object round trip identical, scratch database removed"
+  },
+  "paid_runs": {
+    "development_agent_run": "docs/evidence/evaluation-development-agent-2026-11-02.json (one run, 60 development scenarios, estimated USD 0.013, app estimate not billing)",
+    "holdout": "not run",
+    "after_user_request_not_to_use_the_key": "no paid call"
+  },
+  "limits": [
+    "WhatsApp and Drive export are verified only against a mock Graph transport and a Python stand-in; no Meta or Google call was made",
+    "Evaluation assets are synthetic text-to-speech and drawn images; the holdout, freeze record and pooled targets are untouched",
+    "The null-SKU candidate-discovery fix has unit tests but was not re-measured with the model",
+    "Retention is an operator command and nothing schedules it; backups, Drive copies and provider-side data are not covered",
+    "No plan milestone is checked and no phase is complete"
+  ]
+}

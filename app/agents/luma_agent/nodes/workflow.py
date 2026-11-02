@@ -12,6 +12,7 @@ from luma.features.quotations.schemas import DraftInput, Selection
 from psycopg.types.json import Jsonb
 
 from ..lease import assert_job, assert_request_version
+from ..requirements import has_explicit_lines
 
 
 def ask(state):
@@ -30,7 +31,7 @@ def ask(state):
             if current_hits and current_hits[0] == hit:
                 verified.append(hit)
         question = candidate_question(verified) or question
-        if not proposed and not state.get("extraction", {}).get("lines"):
+        if not proposed and not has_explicit_lines(state.get("extraction")):
             latest = conn.execute(
                 "select body from luma.messages where company_id=%s and conversation_id=%s and actor='customer' order by created_at desc,id desc limit 1",
                 (state["company_id"], state["conversation_id"]),

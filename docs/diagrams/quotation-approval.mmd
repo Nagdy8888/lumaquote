@@ -15,13 +15,15 @@ sequenceDiagram
   alt Rejected
     API->>DB: Record rejection and review-only job
   else Approved with current ownership and evidence
-    API->>DB: Commit exact approval plus quotation outbox intent
+    API->>DB: Commit exact approval, quotation outbox intent and one Drive export row
     W->>DB: Lock conversation before queued outbox
     W->>DB: Recheck author, approval, recipient, expiry and snapshot
     alt Eligible local-test intent
       W->>DB: Commit local message and local_delivered together
-    else Ineligible or nonlocal channel
+    else WhatsApp channel, gated and mock-tested only
+      W->>DB: Gates, one Graph call, then submitted, failed or unknown
+    else Ineligible channel
       W->>DB: Record blocked outcome
     end
   end
-  Note over Staff,W: Approval queues work. It is not a provider delivery receipt.
+  Note over Staff,W: Approval queues work. It is not a provider delivery receipt, and the Drive export is independent of delivery.

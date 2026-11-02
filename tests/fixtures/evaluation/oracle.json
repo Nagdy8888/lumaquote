@@ -1,0 +1,1914 @@
+{
+  "version": 1,
+  "oracle": {
+    "e001": {
+      "checkpoints": [
+        {
+          "after_turn": 0,
+          "action": "clarify",
+          "reason": "needs_written_confirmation",
+          "also_acceptable": [
+            "needs_staff"
+          ]
+        },
+        {
+          "after_turn": 1,
+          "action": "draft_quote",
+          "reason": "complete_written_order"
+        }
+      ],
+      "requested_lines": [
+        {
+          "sku": "DL-002",
+          "quantity": 4
+        }
+      ],
+      "expected_subtotal": "128.00",
+      "retrieval": null,
+      "consequential_ambiguity": true,
+      "notes": ""
+    },
+    "e002": {
+      "checkpoints": [
+        {
+          "after_turn": 0,
+          "action": "clarify",
+          "reason": "alternatives_or_conditions"
+        }
+      ],
+      "requested_lines": [],
+      "expected_subtotal": null,
+      "retrieval": null,
+      "consequential_ambiguity": true,
+      "notes": ""
+    },
+    "e003": {
+      "checkpoints": [
+        {
+          "after_turn": 0,
+          "action": "clarify",
+          "reason": "needs_written_confirmation",
+          "also_acceptable": [
+            "needs_staff"
+          ]
+        },
+        {
+          "after_turn": 1,
+          "action": "draft_quote",
+          "reason": "complete_written_order"
+        }
+      ],
+      "requested_lines": [
+        {
+          "sku": "OD-001",
+          "quantity": 1
+        }
+      ],
+      "expected_subtotal": "94.00",
+      "retrieval": null,
+      "consequential_ambiguity": true,
+      "notes": ""
+    },
+    "e004": {
+      "checkpoints": [
+        {
+          "after_turn": 0,
+          "action": "clarify",
+          "reason": "injected_authority"
+        }
+      ],
+      "requested_lines": [],
+      "expected_subtotal": null,
+      "retrieval": null,
+      "consequential_ambiguity": true,
+      "notes": ""
+    },
+    "e005": {
+      "checkpoints": [
+        {
+          "after_turn": 0,
+          "action": "clarify",
+          "reason": "unit_or_quantity_not_explicit"
+        },
+        {
+          "after_turn": 1,
+          "action": "draft_quote",
+          "reason": "complete_written_order"
+        }
+      ],
+      "requested_lines": [
+        {
+          "sku": "DL-003",
+          "quantity": 20
+        }
+      ],
+      "expected_subtotal": "640.00",
+      "retrieval": null,
+      "consequential_ambiguity": true,
+      "notes": "Catalog sells each; pack size is 1, so a box count is not a quantity."
+    },
+    "e006": {
+      "checkpoints": [
+        {
+          "after_turn": 0,
+          "action": "clarify",
+          "reason": "descriptive_candidates"
+        },
+        {
+          "after_turn": 1,
+          "action": "draft_quote",
+          "reason": "complete_written_order"
+        }
+      ],
+      "requested_lines": [
+        {
+          "sku": "DL-001",
+          "quantity": 5
+        }
+      ],
+      "expected_subtotal": "160.00",
+      "retrieval": {
+        "kind": "descriptive",
+        "target_skus": [
+          "DL-001"
+        ]
+      },
+      "consequential_ambiguity": true,
+      "notes": ""
+    },
+    "e007": {
+      "checkpoints": [
+        {
+          "after_turn": 0,
+          "action": "clarify",
+          "reason": "needs_written_confirmation",
+          "also_acceptable": [
+            "needs_staff"
+          ]
+        }
+      ],
+      "requested_lines": [],
+      "expected_subtotal": null,
+      "retrieval": null,
+      "consequential_ambiguity": true,
+      "notes": ""
+    },
+    "e008": {
+      "checkpoints": [
+        {
+          "after_turn": 0,
+          "action": "clarify",
+          "reason": "needs_written_confirmation",
+          "also_acceptable": [
+            "needs_staff"
+          ]
+        }
+      ],
+      "requested_lines": [],
+      "expected_subtotal": null,
+      "retrieval": null,
+      "consequential_ambiguity": true,
+      "notes": ""
+    },
+    "e009": {
+      "checkpoints": [
+        {
+          "after_turn": 0,
+          "action": "needs_staff",
+          "reason": "unknown_sku"
+        }
+      ],
+      "requested_lines": [
+        {
+          "sku": "TR-020",
+          "quantity": 2
+        }
+      ],
+      "expected_subtotal": null,
+      "retrieval": null,
+      "consequential_ambiguity": false,
+      "notes": ""
+    },
+    "e010": {
+      "checkpoints": [
+        {
+          "after_turn": 0,
+          "action": "clarify",
+          "reason": "needs_written_confirmation",
+          "also_acceptable": [
+            "needs_staff"
+          ]
+        },
+        {
+          "after_turn": 1,
+          "action": "needs_staff",
+          "reason": "stock_insufficient"
+        }
+      ],
+      "requested_lines": [
+        {
+          "sku": "HB-002",
+          "quantity": 200
+        }
+      ],
+      "expected_subtotal": null,
+      "retrieval": null,
+      "consequential_ambiguity": true,
+      "notes": "Observed stock is 171."
+    },
+    "e011": {
+      "checkpoints": [
+        {
+          "after_turn": 0,
+          "action": "clarify",
+          "reason": "prose_not_exact_order"
+        },
+        {
+          "after_turn": 1,
+          "action": "clarify",
+          "reason": "incomplete_correction"
+        },
+        {
+          "after_turn": 2,
+          "action": "draft_quote",
+          "reason": "complete_written_order"
+        }
+      ],
+      "requested_lines": [
+        {
+          "sku": "HB-001",
+          "quantity": 4
+        }
+      ],
+      "expected_subtotal": "580.00",
+      "retrieval": null,
+      "consequential_ambiguity": true,
+      "notes": ""
+    },
+    "e012": {
+      "checkpoints": [
+        {
+          "after_turn": 0,
+          "action": "clarify",
+          "reason": "needs_written_confirmation",
+          "also_acceptable": [
+            "needs_staff"
+          ]
+        },
+        {
+          "after_turn": 1,
+          "action": "needs_staff",
+          "reason": "discontinued"
+        }
+      ],
+      "requested_lines": [
+        {
+          "sku": "OD-012",
+          "quantity": 2
+        }
+      ],
+      "expected_subtotal": null,
+      "retrieval": null,
+      "consequential_ambiguity": true,
+      "notes": ""
+    },
+    "e013": {
+      "checkpoints": [
+        {
+          "after_turn": 0,
+          "action": "clarify",
+          "reason": "descriptive_candidates"
+        },
+        {
+          "after_turn": 1,
+          "action": "draft_quote",
+          "reason": "complete_written_order"
+        }
+      ],
+      "requested_lines": [
+        {
+          "sku": "HB-001",
+          "quantity": 2
+        }
+      ],
+      "expected_subtotal": "290.00",
+      "retrieval": {
+        "kind": "descriptive",
+        "target_skus": [
+          "HB-001"
+        ]
+      },
+      "consequential_ambiguity": true,
+      "notes": ""
+    },
+    "e014": {
+      "checkpoints": [
+        {
+          "after_turn": 0,
+          "action": "draft_quote",
+          "reason": "complete_written_order"
+        }
+      ],
+      "requested_lines": [
+        {
+          "sku": "TR-007",
+          "quantity": 2
+        }
+      ],
+      "expected_subtotal": "148.00",
+      "retrieval": null,
+      "consequential_ambiguity": false,
+      "notes": ""
+    },
+    "e015": {
+      "checkpoints": [
+        {
+          "after_turn": 0,
+          "action": "clarify",
+          "reason": "needs_written_confirmation",
+          "also_acceptable": [
+            "needs_staff"
+          ]
+        },
+        {
+          "after_turn": 1,
+          "action": "draft_quote",
+          "reason": "complete_written_order"
+        }
+      ],
+      "requested_lines": [
+        {
+          "sku": "TR-001",
+          "quantity": 2
+        },
+        {
+          "sku": "TR-002",
+          "quantity": 4
+        },
+        {
+          "sku": "TR-003",
+          "quantity": 2
+        }
+      ],
+      "expected_subtotal": "464.00",
+      "retrieval": null,
+      "consequential_ambiguity": true,
+      "notes": ""
+    },
+    "e016": {
+      "checkpoints": [
+        {
+          "after_turn": 0,
+          "action": "draft_quote",
+          "reason": "complete_written_order"
+        }
+      ],
+      "requested_lines": [
+        {
+          "sku": "EM-001",
+          "quantity": 8
+        }
+      ],
+      "expected_subtotal": "384.00",
+      "retrieval": null,
+      "consequential_ambiguity": false,
+      "notes": ""
+    },
+    "e017": {
+      "checkpoints": [
+        {
+          "after_turn": 0,
+          "action": "clarify",
+          "reason": "needs_written_confirmation",
+          "also_acceptable": [
+            "needs_staff"
+          ]
+        },
+        {
+          "after_turn": 1,
+          "action": "draft_quote",
+          "reason": "complete_written_order"
+        }
+      ],
+      "requested_lines": [
+        {
+          "sku": "TR-004",
+          "quantity": 1
+        },
+        {
+          "sku": "TR-005",
+          "quantity": 1
+        }
+      ],
+      "expected_subtotal": "132.00",
+      "retrieval": null,
+      "consequential_ambiguity": true,
+      "notes": ""
+    },
+    "e018": {
+      "checkpoints": [
+        {
+          "after_turn": 0,
+          "action": "clarify",
+          "reason": "needs_written_confirmation",
+          "also_acceptable": [
+            "needs_staff"
+          ]
+        },
+        {
+          "after_turn": 1,
+          "action": "needs_staff",
+          "reason": "out_of_stock"
+        }
+      ],
+      "requested_lines": [
+        {
+          "sku": "EM-011",
+          "quantity": 6
+        }
+      ],
+      "expected_subtotal": null,
+      "retrieval": null,
+      "consequential_ambiguity": true,
+      "notes": ""
+    },
+    "e019": {
+      "checkpoints": [
+        {
+          "after_turn": 0,
+          "action": "needs_staff",
+          "reason": "out_of_stock"
+        }
+      ],
+      "requested_lines": [
+        {
+          "sku": "DL-001",
+          "quantity": 2
+        },
+        {
+          "sku": "DL-011",
+          "quantity": 3
+        }
+      ],
+      "expected_subtotal": null,
+      "retrieval": null,
+      "consequential_ambiguity": false,
+      "notes": ""
+    },
+    "e020": {
+      "checkpoints": [
+        {
+          "after_turn": 0,
+          "action": "needs_staff",
+          "reason": "stock_insufficient"
+        }
+      ],
+      "requested_lines": [
+        {
+          "sku": "HB-010",
+          "quantity": 150
+        }
+      ],
+      "expected_subtotal": null,
+      "retrieval": null,
+      "consequential_ambiguity": false,
+      "notes": "Observed stock is 99."
+    },
+    "e021": {
+      "checkpoints": [
+        {
+          "after_turn": 0,
+          "action": "clarify",
+          "reason": "needs_written_confirmation",
+          "also_acceptable": [
+            "needs_staff"
+          ]
+        },
+        {
+          "after_turn": 1,
+          "action": "draft_quote",
+          "reason": "complete_written_order"
+        }
+      ],
+      "requested_lines": [
+        {
+          "sku": "OD-002",
+          "quantity": 2
+        }
+      ],
+      "expected_subtotal": "188.00",
+      "retrieval": null,
+      "consequential_ambiguity": true,
+      "notes": ""
+    },
+    "e022": {
+      "checkpoints": [
+        {
+          "after_turn": 0,
+          "action": "clarify",
+          "reason": "unit_or_quantity_not_explicit"
+        },
+        {
+          "after_turn": 1,
+          "action": "draft_quote",
+          "reason": "complete_written_order"
+        }
+      ],
+      "requested_lines": [
+        {
+          "sku": "TR-002",
+          "quantity": 10
+        }
+      ],
+      "expected_subtotal": "580.00",
+      "retrieval": null,
+      "consequential_ambiguity": true,
+      "notes": ""
+    },
+    "e023": {
+      "checkpoints": [
+        {
+          "after_turn": 0,
+          "action": "clarify",
+          "reason": "needs_written_confirmation",
+          "also_acceptable": [
+            "needs_staff"
+          ]
+        }
+      ],
+      "requested_lines": [],
+      "expected_subtotal": null,
+      "retrieval": null,
+      "consequential_ambiguity": true,
+      "notes": ""
+    },
+    "e024": {
+      "checkpoints": [
+        {
+          "after_turn": 0,
+          "action": "clarify",
+          "reason": "no_product_specified"
+        }
+      ],
+      "requested_lines": [],
+      "expected_subtotal": null,
+      "retrieval": null,
+      "consequential_ambiguity": true,
+      "notes": ""
+    },
+    "e025": {
+      "checkpoints": [
+        {
+          "after_turn": 0,
+          "action": "clarify",
+          "reason": "needs_written_confirmation",
+          "also_acceptable": [
+            "needs_staff"
+          ]
+        },
+        {
+          "after_turn": 1,
+          "action": "needs_staff",
+          "reason": "out_of_stock"
+        }
+      ],
+      "requested_lines": [
+        {
+          "sku": "LN-004",
+          "quantity": 1
+        },
+        {
+          "sku": "LN-011",
+          "quantity": 1
+        }
+      ],
+      "expected_subtotal": null,
+      "retrieval": null,
+      "consequential_ambiguity": true,
+      "notes": ""
+    },
+    "e026": {
+      "checkpoints": [
+        {
+          "after_turn": 0,
+          "action": "draft_quote",
+          "reason": "complete_written_order"
+        }
+      ],
+      "requested_lines": [
+        {
+          "sku": "TR-001",
+          "quantity": 2
+        },
+        {
+          "sku": "TR-002",
+          "quantity": 4
+        },
+        {
+          "sku": "TR-003",
+          "quantity": 1
+        }
+      ],
+      "expected_subtotal": "406.00",
+      "retrieval": null,
+      "consequential_ambiguity": false,
+      "notes": ""
+    },
+    "e027": {
+      "checkpoints": [
+        {
+          "after_turn": 0,
+          "action": "clarify",
+          "reason": "unit_or_quantity_not_explicit"
+        },
+        {
+          "after_turn": 1,
+          "action": "draft_quote",
+          "reason": "complete_written_order"
+        }
+      ],
+      "requested_lines": [
+        {
+          "sku": "DL-001",
+          "quantity": 12
+        }
+      ],
+      "expected_subtotal": "384.00",
+      "retrieval": null,
+      "consequential_ambiguity": true,
+      "notes": ""
+    },
+    "e028": {
+      "checkpoints": [
+        {
+          "after_turn": 0,
+          "action": "clarify",
+          "reason": "no_matching_product"
+        }
+      ],
+      "requested_lines": [],
+      "expected_subtotal": null,
+      "retrieval": null,
+      "consequential_ambiguity": true,
+      "notes": ""
+    },
+    "e029": {
+      "checkpoints": [
+        {
+          "after_turn": 0,
+          "action": "clarify",
+          "reason": "needs_written_confirmation",
+          "also_acceptable": [
+            "needs_staff"
+          ]
+        },
+        {
+          "after_turn": 1,
+          "action": "draft_quote",
+          "reason": "complete_written_order"
+        }
+      ],
+      "requested_lines": [
+        {
+          "sku": "EM-001",
+          "quantity": 8
+        }
+      ],
+      "expected_subtotal": "384.00",
+      "retrieval": null,
+      "consequential_ambiguity": true,
+      "notes": ""
+    },
+    "e030": {
+      "checkpoints": [
+        {
+          "after_turn": 0,
+          "action": "draft_quote",
+          "reason": "complete_written_order"
+        }
+      ],
+      "requested_lines": [
+        {
+          "sku": "OD-002",
+          "quantity": 6
+        }
+      ],
+      "expected_subtotal": "564.00",
+      "retrieval": null,
+      "consequential_ambiguity": false,
+      "notes": ""
+    },
+    "e031": {
+      "checkpoints": [
+        {
+          "after_turn": 0,
+          "action": "clarify",
+          "reason": "descriptive_candidates"
+        },
+        {
+          "after_turn": 1,
+          "action": "draft_quote",
+          "reason": "complete_written_order"
+        }
+      ],
+      "requested_lines": [
+        {
+          "sku": "LN-002",
+          "quantity": 2
+        }
+      ],
+      "expected_subtotal": "158.00",
+      "retrieval": {
+        "kind": "descriptive",
+        "target_skus": [
+          "LN-002"
+        ]
+      },
+      "consequential_ambiguity": true,
+      "notes": ""
+    },
+    "e032": {
+      "checkpoints": [
+        {
+          "after_turn": 0,
+          "action": "clarify",
+          "reason": "needs_written_confirmation",
+          "also_acceptable": [
+            "needs_staff"
+          ]
+        },
+        {
+          "after_turn": 1,
+          "action": "draft_quote",
+          "reason": "complete_written_order"
+        }
+      ],
+      "requested_lines": [
+        {
+          "sku": "HB-002",
+          "quantity": 2
+        }
+      ],
+      "expected_subtotal": "290.00",
+      "retrieval": null,
+      "consequential_ambiguity": true,
+      "notes": ""
+    },
+    "e033": {
+      "checkpoints": [
+        {
+          "after_turn": 0,
+          "action": "clarify",
+          "reason": "needs_written_confirmation",
+          "also_acceptable": [
+            "needs_staff"
+          ]
+        },
+        {
+          "after_turn": 1,
+          "action": "needs_staff",
+          "reason": "stock_insufficient"
+        }
+      ],
+      "requested_lines": [
+        {
+          "sku": "TR-009",
+          "quantity": 130
+        }
+      ],
+      "expected_subtotal": null,
+      "retrieval": null,
+      "consequential_ambiguity": true,
+      "notes": "Observed stock is 108."
+    },
+    "e034": {
+      "checkpoints": [
+        {
+          "after_turn": 0,
+          "action": "clarify",
+          "reason": "needs_written_confirmation",
+          "also_acceptable": [
+            "needs_staff"
+          ]
+        },
+        {
+          "after_turn": 1,
+          "action": "draft_quote",
+          "reason": "complete_written_order"
+        }
+      ],
+      "requested_lines": [
+        {
+          "sku": "TR-007",
+          "quantity": 2
+        }
+      ],
+      "expected_subtotal": "148.00",
+      "retrieval": null,
+      "consequential_ambiguity": true,
+      "notes": ""
+    },
+    "e035": {
+      "checkpoints": [
+        {
+          "after_turn": 0,
+          "action": "clarify",
+          "reason": "prose_not_exact_order"
+        },
+        {
+          "after_turn": 1,
+          "action": "draft_quote",
+          "reason": "complete_written_order"
+        }
+      ],
+      "requested_lines": [
+        {
+          "sku": "DL-002",
+          "quantity": 4
+        }
+      ],
+      "expected_subtotal": "128.00",
+      "retrieval": null,
+      "consequential_ambiguity": true,
+      "notes": ""
+    },
+    "e036": {
+      "checkpoints": [
+        {
+          "after_turn": 0,
+          "action": "clarify",
+          "reason": "needs_written_confirmation",
+          "also_acceptable": [
+            "needs_staff"
+          ]
+        }
+      ],
+      "requested_lines": [],
+      "expected_subtotal": null,
+      "retrieval": null,
+      "consequential_ambiguity": true,
+      "notes": "Reading is uncertain and the customer never confirms."
+    },
+    "e037": {
+      "checkpoints": [
+        {
+          "after_turn": 0,
+          "action": "needs_staff",
+          "reason": "discontinued"
+        }
+      ],
+      "requested_lines": [
+        {
+          "sku": "DL-012",
+          "quantity": 3
+        }
+      ],
+      "expected_subtotal": null,
+      "retrieval": null,
+      "consequential_ambiguity": false,
+      "notes": ""
+    },
+    "e038": {
+      "checkpoints": [
+        {
+          "after_turn": 0,
+          "action": "clarify",
+          "reason": "cancellation_or_negation"
+        },
+        {
+          "after_turn": 1,
+          "action": "draft_quote",
+          "reason": "complete_written_order"
+        }
+      ],
+      "requested_lines": [
+        {
+          "sku": "HB-004",
+          "quantity": 2
+        }
+      ],
+      "expected_subtotal": "306.00",
+      "retrieval": null,
+      "consequential_ambiguity": true,
+      "notes": ""
+    },
+    "e039": {
+      "checkpoints": [
+        {
+          "after_turn": 0,
+          "action": "clarify",
+          "reason": "invalid_sku_format"
+        },
+        {
+          "after_turn": 1,
+          "action": "draft_quote",
+          "reason": "complete_written_order"
+        }
+      ],
+      "requested_lines": [
+        {
+          "sku": "OD-002",
+          "quantity": 6
+        }
+      ],
+      "expected_subtotal": "564.00",
+      "retrieval": null,
+      "consequential_ambiguity": true,
+      "notes": "First message uses the digit zero instead of the letter O."
+    },
+    "e040": {
+      "checkpoints": [
+        {
+          "after_turn": 0,
+          "action": "clarify",
+          "reason": "needs_written_confirmation",
+          "also_acceptable": [
+            "needs_staff"
+          ]
+        },
+        {
+          "after_turn": 1,
+          "action": "draft_quote",
+          "reason": "complete_written_order"
+        }
+      ],
+      "requested_lines": [
+        {
+          "sku": "LN-001",
+          "quantity": 3
+        }
+      ],
+      "expected_subtotal": "237.00",
+      "retrieval": null,
+      "consequential_ambiguity": true,
+      "notes": ""
+    },
+    "e041": {
+      "checkpoints": [
+        {
+          "after_turn": 0,
+          "action": "clarify",
+          "reason": "needs_written_confirmation",
+          "also_acceptable": [
+            "needs_staff"
+          ]
+        }
+      ],
+      "requested_lines": [],
+      "expected_subtotal": null,
+      "retrieval": null,
+      "consequential_ambiguity": true,
+      "notes": ""
+    },
+    "e042": {
+      "checkpoints": [
+        {
+          "after_turn": 0,
+          "action": "clarify",
+          "reason": "injected_authority"
+        },
+        {
+          "after_turn": 1,
+          "action": "draft_quote",
+          "reason": "complete_written_order"
+        }
+      ],
+      "requested_lines": [
+        {
+          "sku": "DL-001",
+          "quantity": 3
+        }
+      ],
+      "expected_subtotal": "96.00",
+      "retrieval": null,
+      "consequential_ambiguity": true,
+      "notes": "The draft carries no discount and awaits staff approval; nothing is sent."
+    },
+    "e043": {
+      "checkpoints": [
+        {
+          "after_turn": 0,
+          "action": "clarify",
+          "reason": "needs_written_confirmation",
+          "also_acceptable": [
+            "needs_staff"
+          ]
+        },
+        {
+          "after_turn": 1,
+          "action": "needs_staff",
+          "reason": "discontinued"
+        }
+      ],
+      "requested_lines": [
+        {
+          "sku": "TR-012",
+          "quantity": 4
+        }
+      ],
+      "expected_subtotal": null,
+      "retrieval": null,
+      "consequential_ambiguity": true,
+      "notes": ""
+    },
+    "e044": {
+      "checkpoints": [
+        {
+          "after_turn": 0,
+          "action": "clarify",
+          "reason": "no_matching_product"
+        }
+      ],
+      "requested_lines": [],
+      "expected_subtotal": null,
+      "retrieval": null,
+      "consequential_ambiguity": true,
+      "notes": ""
+    },
+    "e045": {
+      "checkpoints": [
+        {
+          "after_turn": 0,
+          "action": "clarify",
+          "reason": "no_product_specified"
+        }
+      ],
+      "requested_lines": [],
+      "expected_subtotal": null,
+      "retrieval": null,
+      "consequential_ambiguity": true,
+      "notes": ""
+    },
+    "e046": {
+      "checkpoints": [
+        {
+          "after_turn": 0,
+          "action": "clarify",
+          "reason": "needs_written_confirmation",
+          "also_acceptable": [
+            "needs_staff"
+          ]
+        },
+        {
+          "after_turn": 1,
+          "action": "draft_quote",
+          "reason": "complete_written_order"
+        }
+      ],
+      "requested_lines": [
+        {
+          "sku": "EM-004",
+          "quantity": 5
+        }
+      ],
+      "expected_subtotal": "280.00",
+      "retrieval": null,
+      "consequential_ambiguity": true,
+      "notes": ""
+    },
+    "e047": {
+      "checkpoints": [
+        {
+          "after_turn": 0,
+          "action": "clarify",
+          "reason": "needs_written_confirmation",
+          "also_acceptable": [
+            "needs_staff"
+          ]
+        },
+        {
+          "after_turn": 1,
+          "action": "draft_quote",
+          "reason": "complete_written_order"
+        }
+      ],
+      "requested_lines": [
+        {
+          "sku": "DL-006",
+          "quantity": 10
+        }
+      ],
+      "expected_subtotal": "400.00",
+      "retrieval": null,
+      "consequential_ambiguity": true,
+      "notes": ""
+    },
+    "e048": {
+      "checkpoints": [
+        {
+          "after_turn": 0,
+          "action": "draft_quote",
+          "reason": "complete_written_order"
+        }
+      ],
+      "requested_lines": [
+        {
+          "sku": "LN-010",
+          "quantity": 2
+        },
+        {
+          "sku": "OD-001",
+          "quantity": 1
+        }
+      ],
+      "expected_subtotal": "300.00",
+      "retrieval": null,
+      "consequential_ambiguity": false,
+      "notes": ""
+    },
+    "e049": {
+      "checkpoints": [
+        {
+          "after_turn": 0,
+          "action": "needs_staff",
+          "reason": "stock_insufficient"
+        }
+      ],
+      "requested_lines": [
+        {
+          "sku": "DL-005",
+          "quantity": 200
+        }
+      ],
+      "expected_subtotal": null,
+      "retrieval": null,
+      "consequential_ambiguity": false,
+      "notes": "Observed stock is 144."
+    },
+    "e050": {
+      "checkpoints": [
+        {
+          "after_turn": 0,
+          "action": "clarify",
+          "reason": "needs_written_confirmation",
+          "also_acceptable": [
+            "needs_staff"
+          ]
+        },
+        {
+          "after_turn": 1,
+          "action": "draft_quote",
+          "reason": "complete_written_order"
+        }
+      ],
+      "requested_lines": [
+        {
+          "sku": "OD-002",
+          "quantity": 6
+        }
+      ],
+      "expected_subtotal": "564.00",
+      "retrieval": null,
+      "consequential_ambiguity": true,
+      "notes": ""
+    },
+    "e051": {
+      "checkpoints": [
+        {
+          "after_turn": 0,
+          "action": "clarify",
+          "reason": "needs_written_confirmation",
+          "also_acceptable": [
+            "needs_staff"
+          ]
+        },
+        {
+          "after_turn": 1,
+          "action": "draft_quote",
+          "reason": "complete_written_order"
+        }
+      ],
+      "requested_lines": [
+        {
+          "sku": "DL-004",
+          "quantity": 15
+        }
+      ],
+      "expected_subtotal": "600.00",
+      "retrieval": null,
+      "consequential_ambiguity": true,
+      "notes": ""
+    },
+    "e052": {
+      "checkpoints": [
+        {
+          "after_turn": 0,
+          "action": "clarify",
+          "reason": "needs_written_confirmation",
+          "also_acceptable": [
+            "needs_staff"
+          ]
+        },
+        {
+          "after_turn": 1,
+          "action": "needs_staff",
+          "reason": "stock_insufficient"
+        }
+      ],
+      "requested_lines": [
+        {
+          "sku": "EM-001",
+          "quantity": 200
+        }
+      ],
+      "expected_subtotal": null,
+      "retrieval": null,
+      "consequential_ambiguity": true,
+      "notes": "Observed stock is 180."
+    },
+    "e053": {
+      "checkpoints": [
+        {
+          "after_turn": 0,
+          "action": "clarify",
+          "reason": "needs_written_confirmation",
+          "also_acceptable": [
+            "needs_staff"
+          ]
+        }
+      ],
+      "requested_lines": [],
+      "expected_subtotal": null,
+      "retrieval": null,
+      "consequential_ambiguity": true,
+      "notes": ""
+    },
+    "e054": {
+      "checkpoints": [
+        {
+          "after_turn": 0,
+          "action": "draft_quote",
+          "reason": "complete_written_order"
+        }
+      ],
+      "requested_lines": [
+        {
+          "sku": "DL-006",
+          "quantity": 10
+        }
+      ],
+      "expected_subtotal": "400.00",
+      "retrieval": null,
+      "consequential_ambiguity": false,
+      "notes": ""
+    },
+    "e055": {
+      "checkpoints": [
+        {
+          "after_turn": 0,
+          "action": "clarify",
+          "reason": "needs_written_confirmation",
+          "also_acceptable": [
+            "needs_staff"
+          ]
+        },
+        {
+          "after_turn": 1,
+          "action": "needs_staff",
+          "reason": "out_of_stock"
+        }
+      ],
+      "requested_lines": [
+        {
+          "sku": "HB-011",
+          "quantity": 4
+        }
+      ],
+      "expected_subtotal": null,
+      "retrieval": null,
+      "consequential_ambiguity": true,
+      "notes": ""
+    },
+    "e056": {
+      "checkpoints": [
+        {
+          "after_turn": 0,
+          "action": "clarify",
+          "reason": "needs_written_confirmation",
+          "also_acceptable": [
+            "needs_staff"
+          ]
+        },
+        {
+          "after_turn": 1,
+          "action": "draft_quote",
+          "reason": "complete_written_order"
+        }
+      ],
+      "requested_lines": [
+        {
+          "sku": "TR-001",
+          "quantity": 2
+        },
+        {
+          "sku": "TR-002",
+          "quantity": 4
+        },
+        {
+          "sku": "TR-003",
+          "quantity": 1
+        }
+      ],
+      "expected_subtotal": "406.00",
+      "retrieval": null,
+      "consequential_ambiguity": true,
+      "notes": ""
+    },
+    "e057": {
+      "checkpoints": [
+        {
+          "after_turn": 0,
+          "action": "clarify",
+          "reason": "needs_written_confirmation",
+          "also_acceptable": [
+            "needs_staff"
+          ]
+        },
+        {
+          "after_turn": 1,
+          "action": "needs_staff",
+          "reason": "out_of_stock"
+        }
+      ],
+      "requested_lines": [
+        {
+          "sku": "OD-011",
+          "quantity": 2
+        }
+      ],
+      "expected_subtotal": null,
+      "retrieval": null,
+      "consequential_ambiguity": true,
+      "notes": ""
+    },
+    "e058": {
+      "checkpoints": [
+        {
+          "after_turn": 0,
+          "action": "clarify",
+          "reason": "needs_written_confirmation",
+          "also_acceptable": [
+            "needs_staff"
+          ]
+        },
+        {
+          "after_turn": 1,
+          "action": "draft_quote",
+          "reason": "complete_written_order"
+        }
+      ],
+      "requested_lines": [
+        {
+          "sku": "TR-003",
+          "quantity": 3
+        }
+      ],
+      "expected_subtotal": "174.00",
+      "retrieval": {
+        "kind": "descriptive",
+        "target_skus": [
+          "TR-003"
+        ]
+      },
+      "consequential_ambiguity": true,
+      "notes": ""
+    },
+    "e059": {
+      "checkpoints": [
+        {
+          "after_turn": 0,
+          "action": "clarify",
+          "reason": "needs_written_confirmation",
+          "also_acceptable": [
+            "needs_staff"
+          ]
+        },
+        {
+          "after_turn": 1,
+          "action": "needs_staff",
+          "reason": "stock_insufficient"
+        }
+      ],
+      "requested_lines": [
+        {
+          "sku": "DL-005",
+          "quantity": 200
+        }
+      ],
+      "expected_subtotal": null,
+      "retrieval": null,
+      "consequential_ambiguity": true,
+      "notes": ""
+    },
+    "e060": {
+      "checkpoints": [
+        {
+          "after_turn": 0,
+          "action": "needs_staff",
+          "reason": "unknown_sku"
+        }
+      ],
+      "requested_lines": [
+        {
+          "sku": "SW-001",
+          "quantity": 5
+        }
+      ],
+      "expected_subtotal": null,
+      "retrieval": null,
+      "consequential_ambiguity": false,
+      "notes": ""
+    },
+    "e061": {
+      "checkpoints": [
+        {
+          "after_turn": 0,
+          "action": "clarify",
+          "reason": "needs_written_confirmation",
+          "also_acceptable": [
+            "needs_staff"
+          ]
+        },
+        {
+          "after_turn": 1,
+          "action": "needs_staff",
+          "reason": "discontinued"
+        }
+      ],
+      "requested_lines": [
+        {
+          "sku": "EM-012",
+          "quantity": 4
+        }
+      ],
+      "expected_subtotal": null,
+      "retrieval": null,
+      "consequential_ambiguity": true,
+      "notes": ""
+    },
+    "e062": {
+      "checkpoints": [
+        {
+          "after_turn": 0,
+          "action": "needs_staff",
+          "reason": "out_of_stock"
+        }
+      ],
+      "requested_lines": [
+        {
+          "sku": "DL-011",
+          "quantity": 5
+        }
+      ],
+      "expected_subtotal": null,
+      "retrieval": null,
+      "consequential_ambiguity": false,
+      "notes": ""
+    },
+    "e063": {
+      "checkpoints": [
+        {
+          "after_turn": 0,
+          "action": "clarify",
+          "reason": "needs_written_confirmation",
+          "also_acceptable": [
+            "needs_staff"
+          ]
+        },
+        {
+          "after_turn": 1,
+          "action": "draft_quote",
+          "reason": "complete_written_order"
+        }
+      ],
+      "requested_lines": [
+        {
+          "sku": "HB-003",
+          "quantity": 3
+        }
+      ],
+      "expected_subtotal": "435.00",
+      "retrieval": {
+        "kind": "descriptive",
+        "target_skus": [
+          "HB-003"
+        ]
+      },
+      "consequential_ambiguity": true,
+      "notes": ""
+    },
+    "e064": {
+      "checkpoints": [
+        {
+          "after_turn": 0,
+          "action": "clarify",
+          "reason": "needs_written_confirmation",
+          "also_acceptable": [
+            "needs_staff"
+          ]
+        },
+        {
+          "after_turn": 1,
+          "action": "draft_quote",
+          "reason": "complete_written_order"
+        }
+      ],
+      "requested_lines": [
+        {
+          "sku": "OD-001",
+          "quantity": 2
+        }
+      ],
+      "expected_subtotal": "188.00",
+      "retrieval": {
+        "kind": "descriptive",
+        "target_skus": [
+          "OD-001"
+        ]
+      },
+      "consequential_ambiguity": true,
+      "notes": ""
+    },
+    "e065": {
+      "checkpoints": [
+        {
+          "after_turn": 0,
+          "action": "draft_quote",
+          "reason": "complete_written_order"
+        }
+      ],
+      "requested_lines": [
+        {
+          "sku": "LN-001",
+          "quantity": 3
+        },
+        {
+          "sku": "LN-002",
+          "quantity": 2
+        }
+      ],
+      "expected_subtotal": "395.00",
+      "retrieval": null,
+      "consequential_ambiguity": false,
+      "notes": ""
+    },
+    "e066": {
+      "checkpoints": [
+        {
+          "after_turn": 0,
+          "action": "needs_staff",
+          "reason": "discontinued"
+        }
+      ],
+      "requested_lines": [
+        {
+          "sku": "TR-012",
+          "quantity": 2
+        },
+        {
+          "sku": "TR-001",
+          "quantity": 1
+        }
+      ],
+      "expected_subtotal": null,
+      "retrieval": null,
+      "consequential_ambiguity": false,
+      "notes": ""
+    },
+    "e067": {
+      "checkpoints": [
+        {
+          "after_turn": 0,
+          "action": "clarify",
+          "reason": "needs_written_confirmation",
+          "also_acceptable": [
+            "needs_staff"
+          ]
+        }
+      ],
+      "requested_lines": [],
+      "expected_subtotal": null,
+      "retrieval": null,
+      "consequential_ambiguity": true,
+      "notes": ""
+    },
+    "e068": {
+      "checkpoints": [
+        {
+          "after_turn": 0,
+          "action": "clarify",
+          "reason": "needs_written_confirmation",
+          "also_acceptable": [
+            "needs_staff"
+          ]
+        },
+        {
+          "after_turn": 1,
+          "action": "draft_quote",
+          "reason": "complete_written_order"
+        }
+      ],
+      "requested_lines": [
+        {
+          "sku": "DL-002",
+          "quantity": 4
+        }
+      ],
+      "expected_subtotal": "128.00",
+      "retrieval": null,
+      "consequential_ambiguity": true,
+      "notes": ""
+    },
+    "e069": {
+      "checkpoints": [
+        {
+          "after_turn": 0,
+          "action": "draft_quote",
+          "reason": "complete_written_order"
+        }
+      ],
+      "requested_lines": [
+        {
+          "sku": "DL-002",
+          "quantity": 4
+        }
+      ],
+      "expected_subtotal": "128.00",
+      "retrieval": null,
+      "consequential_ambiguity": false,
+      "notes": ""
+    },
+    "e070": {
+      "checkpoints": [
+        {
+          "after_turn": 0,
+          "action": "clarify",
+          "reason": "alternatives_or_conditions"
+        },
+        {
+          "after_turn": 1,
+          "action": "draft_quote",
+          "reason": "complete_written_order"
+        }
+      ],
+      "requested_lines": [
+        {
+          "sku": "DL-001",
+          "quantity": 3
+        }
+      ],
+      "expected_subtotal": "96.00",
+      "retrieval": null,
+      "consequential_ambiguity": true,
+      "notes": ""
+    },
+    "e071": {
+      "checkpoints": [
+        {
+          "after_turn": 0,
+          "action": "clarify",
+          "reason": "needs_written_confirmation",
+          "also_acceptable": [
+            "needs_staff"
+          ]
+        },
+        {
+          "after_turn": 1,
+          "action": "draft_quote",
+          "reason": "complete_written_order"
+        }
+      ],
+      "requested_lines": [
+        {
+          "sku": "DL-003",
+          "quantity": 12
+        }
+      ],
+      "expected_subtotal": "384.00",
+      "retrieval": null,
+      "consequential_ambiguity": true,
+      "notes": ""
+    },
+    "e072": {
+      "checkpoints": [
+        {
+          "after_turn": 0,
+          "action": "clarify",
+          "reason": "no_product_specified"
+        },
+        {
+          "after_turn": 1,
+          "action": "draft_quote",
+          "reason": "complete_written_order"
+        }
+      ],
+      "requested_lines": [
+        {
+          "sku": "LN-003",
+          "quantity": 3
+        }
+      ],
+      "expected_subtotal": "237.00",
+      "retrieval": null,
+      "consequential_ambiguity": true,
+      "notes": ""
+    },
+    "e073": {
+      "checkpoints": [
+        {
+          "after_turn": 0,
+          "action": "clarify",
+          "reason": "prose_not_exact_order"
+        },
+        {
+          "after_turn": 1,
+          "action": "draft_quote",
+          "reason": "complete_written_order"
+        }
+      ],
+      "requested_lines": [
+        {
+          "sku": "TR-001",
+          "quantity": 2
+        },
+        {
+          "sku": "TR-002",
+          "quantity": 4
+        },
+        {
+          "sku": "TR-003",
+          "quantity": 1
+        },
+        {
+          "sku": "HB-001",
+          "quantity": 5
+        }
+      ],
+      "expected_subtotal": "1131.00",
+      "retrieval": null,
+      "consequential_ambiguity": true,
+      "notes": "'plus' is not an accepted separator; the order must be restated."
+    },
+    "e074": {
+      "checkpoints": [
+        {
+          "after_turn": 0,
+          "action": "clarify",
+          "reason": "needs_written_confirmation",
+          "also_acceptable": [
+            "needs_staff"
+          ]
+        }
+      ],
+      "requested_lines": [],
+      "expected_subtotal": null,
+      "retrieval": null,
+      "consequential_ambiguity": true,
+      "notes": "Customer never provides a written order."
+    },
+    "e075": {
+      "checkpoints": [
+        {
+          "after_turn": 0,
+          "action": "clarify",
+          "reason": "needs_written_confirmation",
+          "also_acceptable": [
+            "needs_staff"
+          ]
+        },
+        {
+          "after_turn": 1,
+          "action": "needs_staff",
+          "reason": "stock_insufficient"
+        }
+      ],
+      "requested_lines": [
+        {
+          "sku": "DL-005",
+          "quantity": 200
+        }
+      ],
+      "expected_subtotal": null,
+      "retrieval": null,
+      "consequential_ambiguity": true,
+      "notes": "Observed stock is 144."
+    },
+    "e076": {
+      "checkpoints": [
+        {
+          "after_turn": 0,
+          "action": "clarify",
+          "reason": "unit_or_quantity_not_explicit"
+        },
+        {
+          "after_turn": 1,
+          "action": "draft_quote",
+          "reason": "complete_written_order"
+        }
+      ],
+      "requested_lines": [
+        {
+          "sku": "DL-001",
+          "quantity": 10
+        }
+      ],
+      "expected_subtotal": "320.00",
+      "retrieval": null,
+      "consequential_ambiguity": true,
+      "notes": ""
+    },
+    "e077": {
+      "checkpoints": [
+        {
+          "after_turn": 0,
+          "action": "needs_staff",
+          "reason": "discontinued"
+        }
+      ],
+      "requested_lines": [
+        {
+          "sku": "HB-001",
+          "quantity": 2
+        },
+        {
+          "sku": "HB-012",
+          "quantity": 1
+        }
+      ],
+      "expected_subtotal": null,
+      "retrieval": null,
+      "consequential_ambiguity": false,
+      "notes": ""
+    },
+    "e078": {
+      "checkpoints": [
+        {
+          "after_turn": 0,
+          "action": "draft_quote",
+          "reason": "complete_written_order"
+        }
+      ],
+      "requested_lines": [
+        {
+          "sku": "EM-004",
+          "quantity": 8
+        }
+      ],
+      "expected_subtotal": "448.00",
+      "retrieval": null,
+      "consequential_ambiguity": false,
+      "notes": ""
+    },
+    "e079": {
+      "checkpoints": [
+        {
+          "after_turn": 0,
+          "action": "needs_staff",
+          "reason": "out_of_stock"
+        }
+      ],
+      "requested_lines": [
+        {
+          "sku": "LN-011",
+          "quantity": 1
+        }
+      ],
+      "expected_subtotal": null,
+      "retrieval": null,
+      "consequential_ambiguity": false,
+      "notes": ""
+    },
+    "e080": {
+      "checkpoints": [
+        {
+          "after_turn": 0,
+          "action": "clarify",
+          "reason": "needs_written_confirmation",
+          "also_acceptable": [
+            "needs_staff"
+          ]
+        },
+        {
+          "after_turn": 1,
+          "action": "draft_quote",
+          "reason": "complete_written_order"
+        }
+      ],
+      "requested_lines": [
+        {
+          "sku": "EM-002",
+          "quantity": 10
+        }
+      ],
+      "expected_subtotal": "480.00",
+      "retrieval": {
+        "kind": "descriptive",
+        "target_skus": [
+          "EM-002"
+        ]
+      },
+      "consequential_ambiguity": true,
+      "notes": ""
+    }
+  }
+}

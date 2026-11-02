@@ -1,0 +1,54 @@
+{
+  "company": "2738eae8-025e-4039-ac39-d2e4cd9e42b6",
+  "started": "2026-11-02T17:17:53.059093+00:00",
+  "source": {
+    "rows": {
+      "conversations": 3,
+      "messages": 5,
+      "quotes": 2,
+      "approvals": 1,
+      "outbox": 1,
+      "jobs": 5,
+      "media": 1,
+      "drive_exports": 1,
+      "products": 3,
+      "audit": 7
+    },
+    "content_sha256": "672c1c1d0951970466ae91b7b93e3ed70287dd93edba3fb7184164c0bea78b91",
+    "checkpoint_rows": {
+      "checkpoints": 5,
+      "checkpoint_blobs": 3,
+      "checkpoint_writes": 16
+    }
+  },
+  "objects": 2,
+  "dump_seconds": 0.14,
+  "dump_bytes": 117552,
+  "restore_seconds": 0.35,
+  "restore_exit_code": 0,
+  "restore_stderr_head": "",
+  "restored": {
+    "rows": {
+      "conversations": 3,
+      "messages": 5,
+      "quotes": 2,
+      "approvals": 1,
+      "outbox": 1,
+      "jobs": 5,
+      "media": 1,
+      "drive_exports": 1,
+      "products": 3,
+      "audit": 7
+    },
+    "content_sha256": "672c1c1d0951970466ae91b7b93e3ed70287dd93edba3fb7184164c0bea78b91",
+    "checkpoint_rows": {
+      "checkpoints": 5,
+      "checkpoint_blobs": 3,
+      "checkpoint_writes": 16
+    }
+  },
+  "database_identical": true,
+  "objects_round_trip_identical": true,
+  "scratch_database_removed": true,
+  "finished": "2026-11-02T17:17:56.595268+00:00"
+}

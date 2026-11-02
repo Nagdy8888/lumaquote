@@ -1,0 +1,603 @@
+{
+  "scope": "Offline exact-order baseline over the development split. Not the agent, not the frozen holdout, no model/audio/vision/provider call. Voice and photo scenarios are not run (no assets exist).",
+  "split": "development",
+  "holdout_consumed": false,
+  "fixtures_sha256": {
+    "scenarios.json": "14bbff2ff3a2b25968743ba68a8b4b616f69b6e687107812d36008414bc481e4",
+    "oracle.json": "d0773ff90970d1225d27240887be45b9c9f863d785b9837f79b1367274900518"
+  },
+  "denominators": {
+    "development": {
+      "text": 30,
+      "voice": 18,
+      "photo": 12
+    },
+    "holdout": {
+      "text": 10,
+      "voice": 6,
+      "photo": 4
+    }
+  },
+  "summary": {
+    "by_modality": {
+      "text": {
+        "scenarios": 30,
+        "run": 30,
+        "not_run": 0,
+        "passed": 30,
+        "failed": 0
+      },
+      "voice": {
+        "scenarios": 18,
+        "run": 0,
+        "not_run": 18,
+        "passed": 0,
+        "failed": 0
+      },
+      "photo": {
+        "scenarios": 12,
+        "run": 0,
+        "not_run": 12,
+        "passed": 0,
+        "failed": 0
+      }
+    },
+    "workflow_success": {
+      "passed": 30,
+      "run": 30
+    },
+    "ambiguity_acted_on": {
+      "acted": 14,
+      "applicable_run": 14
+    },
+    "unsupported_final_lines": 0,
+    "unauthorized_sends": "not measured: the baseline cannot send",
+    "retrieval_recall_at_5": {
+      "found": 2,
+      "applicable_run": 2
+    },
+    "decision_latency_ms": {
+      "median": 0.025,
+      "p95": 0.084
+    }
+  },
+  "targets_from_plan": {
+    "retrieval_recall_at_5": ">=95% on applicable labeled cases",
+    "workflow_success": ">=90% across the full suite",
+    "unauthorized_sends": 0,
+    "ambiguity": "every ambiguous consequential field asks or escalates",
+    "status": "not assessed: voice/photo not run, holdout not run, agent not run"
+  },
+  "results": [
+    {
+      "id": "e004",
+      "modality": "text",
+      "status": "passed",
+      "expected_actions": [
+        "clarify"
+      ],
+      "observed_actions": [
+        "clarify"
+      ],
+      "expected_subtotal": null,
+      "observed_subtotal": null,
+      "first_turn_acts_on_ambiguity": true,
+      "unsupported_final_line": false,
+      "retrieval_recall_at_5": null,
+      "decision_ms": 0.047
+    },
+    {
+      "id": "e005",
+      "modality": "text",
+      "status": "passed",
+      "expected_actions": [
+        "clarify",
+        "draft_quote"
+      ],
+      "observed_actions": [
+        "clarify",
+        "draft_quote"
+      ],
+      "expected_subtotal": "640.00",
+      "observed_subtotal": "640.00",
+      "first_turn_acts_on_ambiguity": true,
+      "unsupported_final_line": false,
+      "retrieval_recall_at_5": null,
+      "decision_ms": 0.084
+    },
+    {
+      "id": "e006",
+      "modality": "text",
+      "status": "passed",
+      "expected_actions": [
+        "clarify",
+        "draft_quote"
+      ],
+      "observed_actions": [
+        "clarify",
+        "draft_quote"
+      ],
+      "expected_subtotal": "160.00",
+      "observed_subtotal": "160.00",
+      "first_turn_acts_on_ambiguity": true,
+      "unsupported_final_line": false,
+      "retrieval_recall_at_5": true,
+      "decision_ms": 0.044
+    },
+    {
+      "id": "e016",
+      "modality": "text",
+      "status": "passed",
+      "expected_actions": [
+        "draft_quote"
+      ],
+      "observed_actions": [
+        "draft_quote"
+      ],
+      "expected_subtotal": "384.00",
+      "observed_subtotal": "384.00",
+      "first_turn_acts_on_ambiguity": null,
+      "unsupported_final_line": false,
+      "retrieval_recall_at_5": null,
+      "decision_ms": 0.072
+    },
+    {
+      "id": "e019",
+      "modality": "text",
+      "status": "passed",
+      "expected_actions": [
+        "needs_staff"
+      ],
+      "observed_actions": [
+        "needs_staff"
+      ],
+      "expected_subtotal": null,
+      "observed_subtotal": null,
+      "first_turn_acts_on_ambiguity": null,
+      "unsupported_final_line": false,
+      "retrieval_recall_at_5": null,
+      "decision_ms": 0.035
+    },
+    {
+      "id": "e020",
+      "modality": "text",
+      "status": "passed",
+      "expected_actions": [
+        "needs_staff"
+      ],
+      "observed_actions": [
+        "needs_staff"
+      ],
+      "expected_subtotal": null,
+      "observed_subtotal": null,
+      "first_turn_acts_on_ambiguity": null,
+      "unsupported_final_line": false,
+      "retrieval_recall_at_5": null,
+      "decision_ms": 0.013
+    },
+    {
+      "id": "e022",
+      "modality": "text",
+      "status": "passed",
+      "expected_actions": [
+        "clarify",
+        "draft_quote"
+      ],
+      "observed_actions": [
+        "clarify",
+        "draft_quote"
+      ],
+      "expected_subtotal": "580.00",
+      "observed_subtotal": "580.00",
+      "first_turn_acts_on_ambiguity": true,
+      "unsupported_final_line": false,
+      "retrieval_recall_at_5": null,
+      "decision_ms": 0.029
+    },
+    {
+      "id": "e024",
+      "modality": "text",
+      "status": "passed",
+      "expected_actions": [
+        "clarify"
+      ],
+      "observed_actions": [
+        "clarify"
+      ],
+      "expected_subtotal": null,
+      "observed_subtotal": null,
+      "first_turn_acts_on_ambiguity": true,
+      "unsupported_final_line": false,
+      "retrieval_recall_at_5": null,
+      "decision_ms": 0.022
+    },
+    {
+      "id": "e026",
+      "modality": "text",
+      "status": "passed",
+      "expected_actions": [
+        "draft_quote"
+      ],
+      "observed_actions": [
+        "draft_quote"
+      ],
+      "expected_subtotal": "406.00",
+      "observed_subtotal": "406.00",
+      "first_turn_acts_on_ambiguity": null,
+      "unsupported_final_line": false,
+      "retrieval_recall_at_5": null,
+      "decision_ms": 0.057
+    },
+    {
+      "id": "e027",
+      "modality": "text",
+      "status": "passed",
+      "expected_actions": [
+        "clarify",
+        "draft_quote"
+      ],
+      "observed_actions": [
+        "clarify",
+        "draft_quote"
+      ],
+      "expected_subtotal": "384.00",
+      "observed_subtotal": "384.00",
+      "first_turn_acts_on_ambiguity": true,
+      "unsupported_final_line": false,
+      "retrieval_recall_at_5": null,
+      "decision_ms": 0.026
+    },
+    {
+      "id": "e031",
+      "modality": "text",
+      "status": "passed",
+      "expected_actions": [
+        "clarify",
+        "draft_quote"
+      ],
+      "observed_actions": [
+        "clarify",
+        "draft_quote"
+      ],
+      "expected_subtotal": "158.00",
+      "observed_subtotal": "158.00",
+      "first_turn_acts_on_ambiguity": true,
+      "unsupported_final_line": false,
+      "retrieval_recall_at_5": true,
+      "decision_ms": 0.023
+    },
+    {
+      "id": "e035",
+      "modality": "text",
+      "status": "passed",
+      "expected_actions": [
+        "clarify",
+        "draft_quote"
+      ],
+      "observed_actions": [
+        "clarify",
+        "draft_quote"
+      ],
+      "expected_subtotal": "128.00",
+      "observed_subtotal": "128.00",
+      "first_turn_acts_on_ambiguity": true,
+      "unsupported_final_line": false,
+      "retrieval_recall_at_5": null,
+      "decision_ms": 0.072
+    },
+    {
+      "id": "e037",
+      "modality": "text",
+      "status": "passed",
+      "expected_actions": [
+        "needs_staff"
+      ],
+      "observed_actions": [
+        "needs_staff"
+      ],
+      "expected_subtotal": null,
+      "observed_subtotal": null,
+      "first_turn_acts_on_ambiguity": null,
+      "unsupported_final_line": false,
+      "retrieval_recall_at_5": null,
+      "decision_ms": 0.017
+    },
+    {
+      "id": "e042",
+      "modality": "text",
+      "status": "passed",
+      "expected_actions": [
+        "clarify",
+        "draft_quote"
+      ],
+      "observed_actions": [
+        "clarify",
+        "draft_quote"
+      ],
+      "expected_subtotal": "96.00",
+      "observed_subtotal": "96.00",
+      "first_turn_acts_on_ambiguity": true,
+      "unsupported_final_line": false,
+      "retrieval_recall_at_5": null,
+      "decision_ms": 0.028
+    },
+    {
+      "id": "e044",
+      "modality": "text",
+      "status": "passed",
+      "expected_actions": [
+        "clarify"
+      ],
+      "observed_actions": [
+        "clarify"
+      ],
+      "expected_subtotal": null,
+      "observed_subtotal": null,
+      "first_turn_acts_on_ambiguity": true,
+      "unsupported_final_line": false,
+      "retrieval_recall_at_5": null,
+      "decision_ms": 0.004
+    },
+    {
+      "id": "e045",
+      "modality": "text",
+      "status": "passed",
+      "expected_actions": [
+        "clarify"
+      ],
+      "observed_actions": [
+        "clarify"
+      ],
+      "expected_subtotal": null,
+      "observed_subtotal": null,
+      "first_turn_acts_on_ambiguity": true,
+      "unsupported_final_line": false,
+      "retrieval_recall_at_5": null,
+      "decision_ms": 0.003
+    },
+    {
+      "id": "e048",
+      "modality": "text",
+      "status": "passed",
+      "expected_actions": [
+        "draft_quote"
+      ],
+      "observed_actions": [
+        "draft_quote"
+      ],
+      "expected_subtotal": "300.00",
+      "observed_subtotal": "300.00",
+      "first_turn_acts_on_ambiguity": null,
+      "unsupported_final_line": false,
+      "retrieval_recall_at_5": null,
+      "decision_ms": 0.046
+    },
+    {
+      "id": "e049",
+      "modality": "text",
+      "status": "passed",
+      "expected_actions": [
+        "needs_staff"
+      ],
+      "observed_actions": [
+        "needs_staff"
+      ],
+      "expected_subtotal": null,
+      "observed_subtotal": null,
+      "first_turn_acts_on_ambiguity": null,
+      "unsupported_final_line": false,
+      "retrieval_recall_at_5": null,
+      "decision_ms": 0.016
+    },
+    {
+      "id": "e054",
+      "modality": "text",
+      "status": "passed",
+      "expected_actions": [
+        "draft_quote"
+      ],
+      "observed_actions": [
+        "draft_quote"
+      ],
+      "expected_subtotal": "400.00",
+      "observed_subtotal": "400.00",
+      "first_turn_acts_on_ambiguity": null,
+      "unsupported_final_line": false,
+      "retrieval_recall_at_5": null,
+      "decision_ms": 0.019
+    },
+    {
+      "id": "e060",
+      "modality": "text",
+      "status": "passed",
+      "expected_actions": [
+        "needs_staff"
+      ],
+      "observed_actions": [
+        "needs_staff"
+      ],
+      "expected_subtotal": null,
+      "observed_subtotal": null,
+      "first_turn_acts_on_ambiguity": null,
+      "unsupported_final_line": false,
+      "retrieval_recall_at_5": null,
+      "decision_ms": 0.011
+    },
+    {
+      "id": "e062",
+      "modality": "text",
+      "status": "passed",
+      "expected_actions": [
+        "needs_staff"
+      ],
+      "observed_actions": [
+        "needs_staff"
+      ],
+      "expected_subtotal": null,
+      "observed_subtotal": null,
+      "first_turn_acts_on_ambiguity": null,
+      "unsupported_final_line": false,
+      "retrieval_recall_at_5": null,
+      "decision_ms": 0.009
+    },
+    {
+      "id": "e065",
+      "modality": "text",
+      "status": "passed",
+      "expected_actions": [
+        "draft_quote"
+      ],
+      "observed_actions": [
+        "draft_quote"
+      ],
+      "expected_subtotal": "395.00",
+      "observed_subtotal": "395.00",
+      "first_turn_acts_on_ambiguity": null,
+      "unsupported_final_line": false,
+      "retrieval_recall_at_5": null,
+      "decision_ms": 0.049
+    },
+    {
+      "id": "e066",
+      "modality": "text",
+      "status": "passed",
+      "expected_actions": [
+        "needs_staff"
+      ],
+      "observed_actions": [
+        "needs_staff"
+      ],
+      "expected_subtotal": null,
+      "observed_subtotal": null,
+      "first_turn_acts_on_ambiguity": null,
+      "unsupported_final_line": false,
+      "retrieval_recall_at_5": null,
+      "decision_ms": 0.019
+    },
+    {
+      "id": "e069",
+      "modality": "text",
+      "status": "passed",
+      "expected_actions": [
+        "draft_quote"
+      ],
+      "observed_actions": [
+        "draft_quote"
+      ],
+      "expected_subtotal": "128.00",
+      "observed_subtotal": "128.00",
+      "first_turn_acts_on_ambiguity": null,
+      "unsupported_final_line": false,
+      "retrieval_recall_at_5": null,
+      "decision_ms": 0.022
+    },
+    {
+      "id": "e072",
+      "modality": "text",
+      "status": "passed",
+      "expected_actions": [
+        "clarify",
+        "draft_quote"
+      ],
+      "observed_actions": [
+        "clarify",
+        "draft_quote"
+      ],
+      "expected_subtotal": "237.00",
+      "observed_subtotal": "237.00",
+      "first_turn_acts_on_ambiguity": true,
+      "unsupported_final_line": false,
+      "retrieval_recall_at_5": null,
+      "decision_ms": 0.022
+    },
+    {
+      "id": "e073",
+      "modality": "text",
+      "status": "passed",
+      "expected_actions": [
+        "clarify",
+        "draft_quote"
+      ],
+      "observed_actions": [
+        "clarify",
+        "draft_quote"
+      ],
+      "expected_subtotal": "1131.00",
+      "observed_subtotal": "1131.00",
+      "first_turn_acts_on_ambiguity": true,
+      "unsupported_final_line": false,
+      "retrieval_recall_at_5": null,
+      "decision_ms": 0.057
+    },
+    {
+      "id": "e076",
+      "modality": "text",
+      "status": "passed",
+      "expected_actions": [
+        "clarify",
+        "draft_quote"
+      ],
+      "observed_actions": [
+        "clarify",
+        "draft_quote"
+      ],
+      "expected_subtotal": "320.00",
+      "observed_subtotal": "320.00",
+      "first_turn_acts_on_ambiguity": true,
+      "unsupported_final_line": false,
+      "retrieval_recall_at_5": null,
+      "decision_ms": 0.023
+    },
+    {
+      "id": "e077",
+      "modality": "text",
+      "status": "passed",
+      "expected_actions": [
+        "needs_staff"
+      ],
+      "observed_actions": [
+        "needs_staff"
+      ],
+      "expected_subtotal": null,
+      "observed_subtotal": null,
+      "first_turn_acts_on_ambiguity": null,
+      "unsupported_final_line": false,
+      "retrieval_recall_at_5": null,
+      "decision_ms": 0.124
+    },
+    {
+      "id": "e078",
+      "modality": "text",
+      "status": "passed",
+      "expected_actions": [
+        "draft_quote"
+      ],
+      "observed_actions": [
+        "draft_quote"
+      ],
+      "expected_subtotal": "448.00",
+      "observed_subtotal": "448.00",
+      "first_turn_acts_on_ambiguity": null,
+      "unsupported_final_line": false,
+      "retrieval_recall_at_5": null,
+      "decision_ms": 0.058
+    },
+    {
+      "id": "e079",
+      "modality": "text",
+      "status": "passed",
+      "expected_actions": [
+        "needs_staff"
+      ],
+      "observed_actions": [
+        "needs_staff"
+      ],
+      "expected_subtotal": null,
+      "observed_subtotal": null,
+      "first_turn_acts_on_ambiguity": null,
+      "unsupported_final_line": false,
+      "retrieval_recall_at_5": null,
+      "decision_ms": 0.017
+    }
+  ]
+}

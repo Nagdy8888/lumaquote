@@ -55,6 +55,36 @@ flowchart LR
 - `scripts/index_catalog.py`: explicit stable-run paid synthetic index operation.
   `scripts/evaluate_catalog.py`: read-only generated lexical development baseline.
   Their limits and result meanings are in [catalog retrieval](CATALOG.md).
+- `scripts/evaluation_dataset.py` and `scripts/evaluate_scenarios.py`: the 80-scenario
+  evaluation set's loader/validator and an offline baseline runner. The validator
+  re-derives catalog support and subtotals from an independent restatement of the
+  seeded catalog, checks 40/24/16 modality and 60/20 split counts, that no family
+  crosses the holdout boundary and that media turns never confirm a field. The
+  runner is read-only against the isolated local database, runs only the 30
+  development text scenarios through the written-order grammar, confirmation gate
+  and the `prepare` supported/unsupported rule, and writes per-modality run/not-run
+  denominators. It cannot select the holdout (no freeze record exists yet) and
+  never calls a provider. Contract: [fixture README](../../tests/fixtures/evaluation/README.md).
+- `scripts/generate_evaluation_media.py`: deterministic synthetic assets for the 80-scenario
+  set: 24 System.Speech (David/Zira, en-US) utterances with declared degradations (noise,
+  8 kHz telephone band, clipping, overlapping speaker, rate) and 16 Pillow-drawn labels, plates,
+  cartons and scene photos with declared defects (glare, sticker, blur, fading, handwriting,
+  strike-through), plus `media/MANIFEST.json` (hashes and generation steps, no outcomes). This is
+  synthetic TTS and drawn imagery, not human speech or camera captures. Windows only.
+- `tests/integration/test_live_evaluation.py` + `scripts/summarize_agent_run.py`: **opt-in paid**
+  (`LUMA_RUN_LIVE_EVAL=1`; `LUMA_EVAL_IDS`, `LUMA_EVAL_RUN`, `LUMA_EVAL_MAX_USD` default 3) agent run of
+  the development scenarios through the real API, media upload, transcription/vision/Responses,
+  graph and jobs, in an isolated tenant seeded with the 72-model catalog. Staff approval and
+  delivery are never run. It records measurements, not assertions, and cannot select the holdout.
+  It must not be run without the user's go-ahead for paid calls; routine gates skip it.
+- `scripts/retention.py`: operator retention (7-day runtime media, 90-day business data); dry run
+  unless `--execute`; see [data model](DATA_MODEL.md#checkpoints-retention-and-preservation).
+  `scripts/backup_restore_drill.py`: dump, scratch restore, comparison and object round trip.
+  Both refuse any target but the local database and need an explicit company id.
+- `scripts/retention.py`: operator retention (7-day runtime media, 90-day business data); dry run
+  unless `--execute`; see [data model](DATA_MODEL.md#checkpoints-retention-and-preservation).
+  `scripts/backup_restore_drill.py`: dump, scratch restore, comparison and object round trip.
+  Both refuse any target but the local database and need an explicit company id.
 - `scripts/check_architecture.py`: Python AST check for authored function/class
   docstrings and core/backend/agent import direction. Deterministic rules cannot
   import transport, persistence or provider modules. It currently scans app Python,
@@ -131,6 +161,13 @@ failure; do not infer the fixture is a universal crash-proof garbage collector.
   limits. The controlled extraction output is intentionally not trusted; media
   observations are text substitutes, never measured transcription/vision quality.
   See [the fixture contract](../../tests/fixtures/requirement-policy/README.md).
+- `test_evaluation_dataset.py`: the committed 80-scenario set is valid (counts,
+  family-level split, opaque inputs with no answers, media never confirming, catalog
+  family table equal to `luma.setup.bootstrap`) and the validator rejects a wrong
+  subtotal, a quote for unsupported stock, a family crossing the boundary, media
+  advancing past clarification and a missing oracle entry. It also scans `app/`,
+  `gas/` and `supabase/` to ensure nothing reads the fixtures. It proves dataset
+  coherence only; no voice/photo asset exists and no agent is run.
 - `test_trace_privacy.py`: explicit outcome allowlist with canaries at the fake
   export seam; it does not establish successful live LangSmith export.
 - `test_embedding_contracts.py`: vector shape/value validation, shared conservative
@@ -151,6 +188,24 @@ the complete latest written order agrees with the untrusted extracted fields.
 It cannot be counted as retrieval recall, quotation workflow success, approval
 or delivery accuracy. Corpus files/oracles stay outside runtime ingestion and
 provider traces. Paid inference, noisy media and the holdout remain unrun.
+
+The separate 80-scenario set (`tests/fixtures/evaluation/`) is the planned release
+suite's dataset. It is authored from the product policy, so the offline baseline passing
+all 30 development text scenarios ([dated evidence](../evidence/evaluation-development-baseline-2026-11-02.json))
+shows policy/dataset agreement, not agent quality. One oracle defect (a "plus" separator the
+grammar rejects) was found by that first run and corrected.
+
+One paid development run of the real agent over all 60 development scenarios (30 text, 18
+voice, 12 photo; synthetic assets) is recorded in
+[the agent evidence](../evidence/evaluation-development-agent-2026-11-02.json): 59/60 under the
+final oracle rule, 53/60 exact primary action, 44/44 ambiguous first turns acted on, zero
+unsupported lines, zero unauthorized sends, 2/4 labeled retrieval cases offered the target,
+estimated spend USD 0.013 (app estimate, not billing). The one failure is a model flake that read
+"1 OD-001" as quantity unknown. The run also showed the model returns a null-SKU placeholder line
+for descriptive requests, which suppressed candidate suggestions; that bug is fixed
+(`requirements.has_explicit_lines`) with unit tests but not re-measured because paid calls were
+stopped. Not done: any holdout run, human speech or real photos, the plan's pooled targets (they
+need the holdout), and a measured agent-versus-baseline comparison beyond the text subset.
 
 ## Integration coverage by responsibility
 
@@ -173,6 +228,43 @@ provider traces. Paid inference, noisy media and the holdout remain unrun.
   through real reservation/graph seams, and oversized stored input before primary
   provider admission. Fake Responses output is explicitly isolated from inference
   quality; normal tests cannot authorize paid provider execution.
+- `test_hostile_content.py`: nine hostile strings (instruction override, SQL,
+  script, tsquery operators, zero-width/fullwidth lookalikes, tool-call imitation,
+  oversized padding) are published as audio and image customer messages (18 cases)
+  and run through the real graph in a fresh worker process. Asserts approvals,
+  quotes, commercial outbox rows and product prices are unchanged, the graph stays
+  at a customer clarification, and every reply is a fixed template that does not
+  echo the hostile text. A separate case makes the provider seam raise an exception
+  containing customer-phone and credential-shaped canaries, then runs the real
+  `worker.tick()`: logs and job/usage/audit/outbox/system-message rows hold only
+  the exception type, and usage stays `unknown`. Offline; the media reading is
+  injected as persisted text, so it proves the downstream trust boundary, not
+  model resistance, real transcription accuracy or LangSmith payload content
+  (the trace allowlist is covered by `tests/unit/test_trace_privacy.py`).
+  Scope limit found by mutation: no hostile body is a valid written order, so this
+  file does not guard the rule that media cannot confirm itself. That rule is owned
+  by `tests/unit/test_requirement_policy.py::test_media_alone_cannot_confirm_itself`
+  (and `test_graph_restart.py`); removing the `kind == "text"` check in
+  `requirements.clarification_for` left this file green but failed that unit test.
+- `test_drive_exports.py`: Drive export protocol on real PostgreSQL/private Storage with a Python
+  stand-in that signs exactly like `gas/Exports.gs`: nothing is exported before approval or for a
+  rejected draft; the claimed bytes equal the staff PDF; forged/stale/cross-company/replayed/
+  oversized envelopes are rejected; stale tokens and wrong digest or size cannot complete an
+  export (a mismatch retries and commits its failure state); failures retry to five attempts then
+  block; expired leases are reclaimed; a changed canonical digest blocks instead of shipping. It
+  does not prove the Apps Script runs in Google or that Drive stores the file.
+- `test_whatsapp.py`: 21 tests of the WhatsApp channel on real PostgreSQL/Storage with a mock Graph
+  transport (handshake, raw-byte signature and bounds, redelivery, sender allowlist, thread reuse and
+  supersession, safe media fetch and four hostile-metadata cases, streamed oversize/redirect, single
+  submission, four failure classes, all gates, monotonic receipts, early receipt, exact PDF bytes).
+  Mutation checks removing the allowlist, signature and media-host checks each failed the matching test.
+  It never contacts Meta; see [WhatsApp channel](WHATSAPP.md) for what is unproven.
+- `test_retention.py`: dry run changes nothing; media under 7 days is kept and older media is deleted
+  once with the row stamped and text kept; 100-day-idle conversations vanish with every child row,
+  quote PDF, idempotency response and checkpoint thread while fresh and unfinished ones survive;
+  unknown company and cross-tenant object paths are refused. `test_backup_restore.py`: a populated
+  tenant (approved quote and PDF, uploaded audio, graph checkpoint) restores identically from a dump
+  and its objects round-trip. Requires docker and the local Supabase container.
 - `test_media_sandbox.py`: actual offline container decode/rejection for native PDF,
   image and overlong/corrupt media. These require Docker, not provider inference.
 - `test_voice_intake.py`, `test_photo_intake.py`: raw upload/size/precondition/replay,

@@ -104,7 +104,12 @@ instead of causing structured-output validation errors. See
 and the separate persisted graph regression scope.
 
 `nodes/retrieval.retrieve` acts only when clarification is needed and no explicit
-lines exist. It checks the live lease, observed version and owner; searches exact/
+lines exist. "Explicit" means at least one extracted line with a non-empty SKU
+(`requirements.has_explicit_lines`): for a purely descriptive request the structured model
+returns one placeholder line with null `sku` and `quantity` (seen on every sampled descriptive
+input), and counting that as an order line used to suppress candidate suggestions. The same
+helper gates the `ask` node's fallback search. This is a discovery gate only; confirmation
+still requires the written-order gate and nothing here selects a line. It checks the live lease, observed version and owner; searches exact/
 lexical evidence first; then optionally attempts semantic fallback. Before its
 paid reservation it locks/rechecks the conversation again. See
 [catalog retrieval](CATALOG.md) for cache and paid-call details.

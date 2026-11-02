@@ -13,8 +13,11 @@ setup guide so operating instructions have one primary home.
 
 ## Source responsibilities
 
-- `appsscript.json`: V8 runtime, Cairo timezone, Sheets/trigger/HTTP scopes. Drive
-  access is not currently requested because the export adapter is unfinished.
+- `appsscript.json`: V8 runtime, Cairo timezone, Sheets, Drive, trigger and HTTP scopes.
+  The Drive scope was added for `Exports.gs`; re-authorize the script after pushing it.
+- `Exports.gs`: polls the backend for approved quotation PDFs, files each in the private
+  folder, reads the copy back and reports its SHA-256 (protocol in
+  [Google synchronization](../docs/reference/GOOGLE_SYNC.md)).
 - `Configuration.gs`: required Script Properties, HTTPS callback destination,
   and SHA-256 HMAC signing of exact UTF-8 request bytes.
 - `Workbook.gs`: non-destructive synthetic initializer and safe workbook/tab
@@ -43,6 +46,9 @@ contains this machine's callback values. Never put the secret in source or chat.
    and installs an owned one-minute trigger. The installer requires an idle script;
    if another synchronization is running, wait for it to finish and run again.
 4. Manually edit Inventory, then verify backend stock and a fresh sync observation.
+5. For Drive copies: create a private Drive folder, set Script Property
+   `LUMA_DRIVE_FOLDER_ID` to its id, run `installDriveExport` (it asks for the new Drive
+   permission and installs an owned one-minute trigger). Do not share the folder publicly.
 
 The backend validates exact headers, unique/matching SKU sets, catalog-backed
 specifications, USD decimal prices, effective dates, stock, pack size and approved
@@ -136,6 +142,7 @@ See [progress evidence](../docs/evidence/google-gas-progress.json) and
 ## Evidence limits
 
 Edit-trigger delivery is live verified. Full snapshot import is locally verified;
-its live editor/timer runs are pending. Drive export is not implemented yet. It
-will use GAS authorization and a private configured folder, not backend OAuth or
-public sharing. No WhatsApp delivery or whole-phase completion is claimed.
+its live editor/timer runs are pending. Drive export is implemented in `Exports.gs` and
+the backend protocol is locally tested with a Python stand-in (digest identity, replay,
+lease and retry), but the script has not run in Google and no Drive file was created. It
+uses GAS authorization and a private configured folder, not backend OAuth or public sharing. No WhatsApp delivery or whole-phase completion is claimed.

@@ -31,6 +31,7 @@ class Settings(BaseSettings):
     whatsapp_phone_id: str = ""
     whatsapp_company_id: str = ""
     whatsapp_test_recipients: str = ""
+    whatsapp_graph_version: str = "v26.0"
     google_sheet_id: str = ""
     google_callback_secret: SecretStr = SecretStr("")
     google_company_id: str = ""

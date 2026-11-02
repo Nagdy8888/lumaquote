@@ -13,6 +13,7 @@ from luma.features.conversations.repository import conversation
 from ..adapters.embeddings import embed_texts, validate_embedding_provider
 from ..budget import reserve
 from ..lease import assert_job, assert_request_version
+from ..requirements import has_explicit_lines
 
 
 def retrieve(state):
@@ -27,7 +28,7 @@ def retrieve(state):
     select a final quotation line or grant approval; ask rechecks each hit again.
     """
     empty = {"catalog_candidates": [], "retrieval_status": "not_needed"}
-    if not state.get("clarification") or state.get("extraction", {}).get("lines"):
+    if not state.get("clarification") or has_explicit_lines(state.get("extraction")):
         return empty
     config = settings()
     with database(worker=True) as conn:

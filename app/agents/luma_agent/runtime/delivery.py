@@ -6,6 +6,7 @@ from luma.core.errors import DomainError
 from luma.features.conversations.repository import conversation
 from luma.features.conversations.service import add_message
 from luma.features.messaging.authorization import authorize_outbound
+from luma.features.messaging.outbound import begin, record, submit
 
 
 def deliver_one(company_id=None):
@@ -41,9 +42,16 @@ def deliver_one(company_id=None):
         ).fetchone()
         if item is None:
             return False
+        plan = None
         try:
             current, quote = authorize_outbound(conn, item)
-            if current["channel"] != "local_test":
+            if current["channel"] == "whatsapp":
+                # Authorized and gated under the conversation lock; the network call
+                # happens after this transaction commits (see messaging.outbound).
+                plan = begin(conn, item, current, quote)
+                if plan is None:
+                    return True
+            elif current["channel"] != "local_test":
                 conn.execute(
                     "update luma.outbox set status='blocked',error_code='live_adapter_not_enabled',updated_at=now() where id=%s",
                     (item["id"],),
@@ -57,31 +65,42 @@ def deliver_one(company_id=None):
             )
             audit(conn, item["company_id"], "worker", "delivery.blocked", item["id"])
             return True
-        text = (
-            item["payload"].get("text")
-            if not quote
-            else f"{quote['number']}, revision {quote['revision']}, is available in the local test channel. Total USD {quote['content']['total']}."
-        )
-        # Message identity is tied to the outbox intent; one database transaction
-        # contains the local-channel effect and completion.
-        provider_id = f"local:{item['id']}"
-        add_message(
-            conn,
-            item["company_id"],
-            item["conversation_id"],
-            "staff" if item["payload"].get("origin") == "staff" else "assistant",
-            text,
-            kind="document" if quote else "text",
-            provider_id=provider_id,
-        )
+        if plan is None:
+            return _deliver_local(conn, item, quote)
+    result = submit(plan)
+    with database(worker=True) as conn:
+        conversation(conn, item["company_id"], item["conversation_id"], lock=True)
+        record(conn, plan, result)
+    return True
+
+
+def _deliver_local(conn, item, quote):
+    """Apply the local-test channel effect and completion in the caller's transaction; True when handled."""
+    text = (
+        item["payload"].get("text")
+        if not quote
+        else f"{quote['number']}, revision {quote['revision']}, is available in the local test channel. Total USD {quote['content']['total']}."
+    )
+    # Message identity is tied to the outbox intent; one database transaction
+    # contains the local-channel effect and completion.
+    provider_id = f"local:{item['id']}"
+    add_message(
+        conn,
+        item["company_id"],
+        item["conversation_id"],
+        "staff" if item["payload"].get("origin") == "staff" else "assistant",
+        text,
+        kind="document" if quote else "text",
+        provider_id=provider_id,
+    )
+    conn.execute(
+        "update luma.outbox set status='local_delivered',provider_id=%s,updated_at=now() where id=%s",
+        (provider_id, item["id"]),
+    )
+    if quote:
         conn.execute(
-            "update luma.outbox set status='local_delivered',provider_id=%s,updated_at=now() where id=%s",
-            (provider_id, item["id"]),
+            "update luma.conversations set status='quoted',updated_at=now() where id=%s",
+            (item["conversation_id"],),
         )
-        if quote:
-            conn.execute(
-                "update luma.conversations set status='quoted',updated_at=now() where id=%s",
-                (item["conversation_id"],),
-            )
-        audit(conn, item["company_id"], "worker", "delivery.local_delivered", item["id"])
-        return True
+    audit(conn, item["company_id"], "worker", "delivery.local_delivered", item["id"])
+    return True

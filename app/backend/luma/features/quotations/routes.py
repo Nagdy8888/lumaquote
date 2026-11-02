@@ -9,10 +9,9 @@ from luma.core.errors import DomainError
 from luma.core.http import OperationKey, Staff
 from luma.core.idempotency import operation
 from luma.core.identity import membership
-from luma.core.storage import get_file, put_file
 
 from .approval import decide
-from .documents import quotation_pdf
+from .documents import stored_quotation_pdf
 from .drafting import draft as create_draft
 from .schemas import Decision, DraftInput
 
@@ -63,14 +62,8 @@ def pdf(qid: UUID, user: Staff):
         ).fetchone()
         if not row:
             raise DomainError("Quotation not found.", 404)
-        path = f"{member['company_id']}/quotes/{qid}.pdf"
-        content = get_file(path)
-        if content is None:
-            content = quotation_pdf(row)
-            put_file(path, content, "application/pdf")
-            content = get_file(path) or content
         return Response(
-            content,
+            stored_quotation_pdf(row),
             media_type="application/pdf",
             headers={"Content-Disposition": f'inline; filename="{row["number"]}-r{row["revision"]}.pdf"'},
         )

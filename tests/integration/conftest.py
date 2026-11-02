@@ -154,6 +154,7 @@ def environment(monkeypatch):
                 "inbox",
                 "media",
                 "messages",
+                "drive_exports",
                 "quotes",
                 "conversations",
                 "catalog_embeddings",

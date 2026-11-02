@@ -1,0 +1,29 @@
+sequenceDiagram
+  accTitle: Pull-based Drive export of an approved quotation PDF
+  accDescr: Approval queues one export row beside, not inside, customer delivery. Apps Script polls the signed gateway, receives the canonical stored PDF with a pinned digest and a claim token, files it in a private Drive folder, reads the copy back and reports its digest. The backend marks the export done only when the digest equals the canonical one; otherwise it retries up to five attempts and then blocks. Live Google execution is unverified.
+  participant Staff as Authorized salesperson
+  participant DB as PostgreSQL
+  participant GAS as Authorized Apps Script
+  participant API as Signed callback gateway
+  participant Store as Private PDF storage
+  participant Drive as Private Drive folder
+  Staff->>DB: Approve exact revision
+  DB->>DB: Same transaction queues one export per quote
+  Note over DB: Delivery and export are independent
+  loop One-minute trigger, local stand-in tested only
+    GAS->>API: Signed claim envelope
+    API->>DB: Company lock, nonce check, lease oldest eligible row
+    API->>Store: Read or once-create canonical PDF
+    API->>DB: Pin SHA-256 and size, issue claim token
+    API-->>GAS: Filename, digest, token and PDF bytes
+    GAS->>Drive: File PDF, or reuse file with this export id
+    GAS->>Drive: Read copy back and hash it
+    GAS->>API: Signed receipt with observed digest
+    alt Digest and size equal the pinned values, token current
+      API->>DB: Mark done with Drive file id
+    else Mismatch or reported failure
+      API->>DB: Queue retry, block after five attempts
+    else Stale claim token
+      API-->>GAS: 409, nothing changes
+    end
+  end

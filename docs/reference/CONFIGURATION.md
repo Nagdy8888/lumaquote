@@ -80,11 +80,14 @@ project, retrying indefinitely or claiming configured means verified.
 
 ## Messaging and Google configuration
 
-`WHATSAPP_TOKEN`, `WHATSAPP_APP_SECRET`, `WHATSAPP_VERIFY_TOKEN`,
-`WHATSAPP_PHONE_ID`, `WHATSAPP_COMPANY_ID` and `WHATSAPP_TEST_RECIPIENTS` are
-reserved backend integration settings. `ENABLE_LIVE_WHATSAPP` defaults false.
-The current runtime still blocks nonlocal dispatch; these fields do not create a
-working adapter, verified webhook, free-message entitlement or authorized recipient.
+`WHATSAPP_TOKEN`, `WHATSAPP_APP_SECRET` and `WHATSAPP_VERIFY_TOKEN` are backend-only secrets.
+`WHATSAPP_PHONE_ID` and `WHATSAPP_COMPANY_ID` bind the one receiving number to one tenant (the
+webhook refuses everything until all five are set). `WHATSAPP_TEST_RECIPIENTS` is the comma-separated
+allowlist gating inbound senders and outbound recipients; empty admits nobody. `WHATSAPP_GRAPH_VERSION`
+defaults to `v26.0` and must be confirmed at live setup. `ENABLE_LIVE_WHATSAPP` defaults false and
+is the master gate for real sending. The adapter is implemented but verified only against a mock
+Graph transport; see [WhatsApp channel](WHATSAPP.md). These fields do not create a free-message
+entitlement or an authorized recipient.
 
 `GOOGLE_SHEET_ID`, `GOOGLE_COMPANY_ID` and `GOOGLE_CALLBACK_SECRET` bind the signed
 receiver to one approved workbook/company. The secret is backend-only and must

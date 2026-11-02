@@ -13,6 +13,20 @@ from .repository import latest_quote
 from .schemas import Decision
 
 
+def queue_drive_export(conn, company, quote) -> None:
+    """Queue one Drive copy of an approved revision inside the approval transaction; repeats are ignored.
+
+    The unique (company, quote) key makes this idempotent. It only records work for
+    the Google Apps Script poller, so Drive availability can never fail or delay
+    approval and customer delivery.
+    """
+    conn.execute(
+        """insert into luma.drive_exports(id,company_id,quote_id,revision) values(%s,%s,%s,%s)
+        on conflict(company_id,quote_id) do nothing""",
+        (uuid4(), company, quote["id"], quote["revision"]),
+    )
+
+
 def decide(conn, member, user, cid, body: Decision):
     """Record a staff decision on the still-current immutable revision.
 
@@ -64,6 +78,7 @@ def decide(conn, member, user, cid, body: Decision):
             f"quotation:{quote['id']}",
         ),
     )
+    queue_drive_export(conn, company, quote)
     enqueue(conn, company, cid, payload={"review_only": True})
     audit(conn, company, user, "quotation.approved", quote["id"], revision=quote["revision"])
     return {"status": "approved", "quote_id": quote["id"], "delivery": "queued"}
