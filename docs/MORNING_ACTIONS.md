@@ -82,6 +82,18 @@ The WhatsApp adapter is implemented and verified only against a mock Graph trans
 Until you do this, the UI must keep showing the connection as unverified and local-test delivery
 is not a WhatsApp delivery claim.
 
+## Paid evaluation decisions
+
+The OpenAI key was stopped for evaluation on 2026-11-02 at your request, so nothing below has run.
+Each item needs your explicit go-ahead because it spends estimated USD (the development run cost about 0.013):
+
+- [ ] Re-measure the development split after the null-SKU candidate fix (`LUMA_RUN_LIVE_EVAL=1`).
+- [ ] When you are ready to stop changing the agent: `node scripts/python.cjs scripts/freeze_evaluation.py --write`,
+  then run the holdout once with `LUMA_EVAL_SPLIT=holdout LUMA_EVAL_CONFIRM_HOLDOUT=spend-the-holdout-once`
+  and summarize it with `scripts/summarize_agent_run.py --split holdout`. It cannot be repeated.
+- [ ] Optional: record real human voice notes and take real label photos to replace or supplement the
+  synthetic assets, which cannot support claims about human speech or camera images.
+
 ## Evidence limits
 
 Synthetic supplier records are explicitly labeled. No real client relationship,

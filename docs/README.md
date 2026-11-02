@@ -16,6 +16,8 @@ remain intact; progress reports describe observed snapshots rather than release 
   generated development queries and unfinished release gates.
 - **Continue the implementation:** [implementation tracker](IMPLEMENTATION_PLAN.md),
   [work log](WORK_LOG.md) and [account actions](MORNING_ACTIONS.md).
+- **Record the walkthrough:** the truthful [showcase shot list](SHOWCASE_SHOT_LIST.md) (what is real,
+  local-substitute or must not be claimed) with verified screenshots under `evidence/screenshots/`.
 - **Work on UI:** [design system](../DESIGN.md) and [UI direction](UI_DIRECTION.md).
 - **Work on providers:** [OpenAI contracts](PROVIDER_CONTRACTS.md). The working-tree
   Google Apps Script source/setup guide is `gas/README.md`; Google status is

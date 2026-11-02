@@ -239,3 +239,21 @@ def test_rejected_or_revised_quotes_are_not_exported_and_each_revision_exports_o
     env["files"].append(f"{env['company']}/quotes/{second['id']}.pdf")
     approve(env, cid, revision=second["revision"])
     assert [(row["revision"], row["status"]) for row in exports(env)] == [(second["revision"], "queued")]
+
+
+def test_concurrent_pollers_cannot_claim_the_same_export(environment, poller):
+    """Several simultaneous claims for one queued export yield exactly one lease and one attempt."""
+    from concurrent.futures import ThreadPoolExecutor
+
+    env = environment
+    approved_quote(env)
+    with ThreadPoolExecutor(max_workers=6) as pool:
+        results = list(pool.map(lambda _: poller.claim().json(), range(6)))
+    leased = [r["export"] for r in results if r["export"]]
+    assert len(leased) == 1
+    [row] = exports(env)
+    assert (row["status"], row["attempts"], str(row["claim_token"])) == (
+        "claimed",
+        1,
+        leased[0]["claim_token"],
+    )

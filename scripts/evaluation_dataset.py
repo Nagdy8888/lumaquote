@@ -286,3 +286,70 @@ def validate(scenarios: list[dict], oracle: dict) -> list[str]:
             problems = _check_outcome(item, entry, catalog) + _check_retrieval(item, entry, catalog)
         errors += problems
     return errors
+
+
+FREEZE_FILE = FIXTURES / "freeze.json"
+FROZEN_GLOBS = (
+    "app/agents/luma_agent/**/*.py",
+    "app/backend/luma/features/catalog/*.py",
+    "app/backend/luma/features/media/*.py",
+    "app/backend/luma/features/quotations/drafting.py",
+    "app/backend/luma/features/quotations/rules.py",
+)
+FROZEN_FIXTURES = ("scenarios.json", "oracle.json", "media/MANIFEST.json")
+
+
+def freeze_fingerprints() -> dict:
+    """Hash everything a holdout result depends on: fixtures, agent/retrieval code and model configuration.
+
+    The code set is the agent runtime, catalog retrieval, media handling and the deterministic
+    drafting rules, so any prompt, node, threshold or parser change alters it. Model names and the
+    allowance come from settings because a different model is a different system under test.
+    """
+    from luma.core.config import settings
+
+    config = settings()
+    code = {}
+    for pattern in FROZEN_GLOBS:
+        for path in sorted(ROOT.glob(pattern)):
+            if "__pycache__" not in path.parts:
+                code[path.relative_to(ROOT).as_posix()] = hashlib.sha256(path.read_bytes()).hexdigest()
+    return {
+        "fixtures": {
+            name: hashlib.sha256((FIXTURES / name).read_bytes()).hexdigest() for name in FROZEN_FIXTURES
+        },
+        "code": code,
+        "model_configuration": {
+            "openai_model": config.openai_model,
+            "transcription_model": config.transcription_model,
+            "embedding_model": config.embedding_model,
+            "reservation": config.reservation,
+        },
+    }
+
+
+def load_freeze() -> dict | None:
+    """Return the committed freeze record, or None when the holdout has not been frozen."""
+    return json.loads(FREEZE_FILE.read_text(encoding="utf-8")) if FREEZE_FILE.is_file() else None
+
+
+def freeze_problems(record: dict | None, current: dict) -> list[str]:
+    """List why a holdout run is not allowed: missing freeze, drifted fixtures/code/config, or a spent holdout.
+
+    The holdout is one-shot. Any recorded run means its result may have influenced later changes,
+    so a new claim needs new reserved cases (docs/TESTING_PLAN.md section 9), never a rerun.
+    """
+    if record is None:
+        return ["no freeze record exists"]
+    problems = []
+    for section in ("fixtures", "code", "model_configuration"):
+        if record.get(section) != current[section]:
+            changed = sorted(
+                key
+                for key in set(record.get(section, {})) | set(current[section])
+                if record.get(section, {}).get(key) != current[section].get(key)
+            )
+            problems.append(f"{section} changed since the freeze: {', '.join(changed[:6]) or 'structure'}")
+    if record.get("holdout_runs"):
+        problems.append("the holdout was already consumed by a recorded run")
+    return problems

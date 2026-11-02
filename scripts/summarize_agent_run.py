@@ -105,7 +105,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--run", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
-    parser.add_argument("--split", choices=["development"], default="development")
+    parser.add_argument("--split", choices=["development", "holdout"], default="development")
     parser.add_argument("--note", default="")
     args = parser.parse_args()
     scenarios, oracle = dataset.load()
@@ -114,7 +114,7 @@ def main() -> int:
     }
     report = {
         "split": args.split,
-        "holdout_consumed": False,
+        "holdout_consumed": args.split == "holdout",
         "fixtures_sha256": dataset.fingerprints(),
         "denominators": dataset.denominators(scenarios),
         "note": args.note,

@@ -175,3 +175,25 @@ def test_validator_rejects_a_draft_alternative_and_alternatives_on_text(loaded):
     text = next(s for s in scenarios if s["modality"] == "text")
     oracle[text["id"]]["checkpoints"][0]["also_acceptable"] = ["needs_staff"]
     assert any("only unreliable media" in error for error in dataset.validate(scenarios, oracle))
+
+
+def test_freeze_blocks_the_holdout_until_pinned_unchanged_and_unspent(monkeypatch, tmp_path):
+    """No freeze, a changed file or config, or a recorded run each forbid a holdout run."""
+    current = dataset.freeze_fingerprints()
+    assert set(current) == {"fixtures", "code", "model_configuration"} and current["code"]
+    assert any(path.startswith("app/agents/luma_agent/nodes/") for path in current["code"])
+    assert dataset.freeze_problems(None, current) == ["no freeze record exists"]
+    record = {**copy.deepcopy(current), "holdout_runs": []}
+    assert dataset.freeze_problems(record, current) == []
+    drifted = copy.deepcopy(current)
+    changed = next(iter(drifted["code"]))
+    drifted["code"][changed] = "0" * 64
+    assert any("code changed" in p and changed in p for p in dataset.freeze_problems(record, drifted))
+    drifted = copy.deepcopy(current)
+    drifted["model_configuration"]["openai_model"] = "another-model"
+    assert any("model_configuration" in p for p in dataset.freeze_problems(record, drifted))
+    drifted = copy.deepcopy(current)
+    drifted["fixtures"]["oracle.json"] = "1" * 64
+    assert any("oracle.json" in p for p in dataset.freeze_problems(record, drifted))
+    spent = {**record, "holdout_runs": [{"run": "x"}]}
+    assert any("already consumed" in p for p in dataset.freeze_problems(spent, current))

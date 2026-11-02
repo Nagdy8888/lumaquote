@@ -555,3 +555,36 @@ def test_approved_quotation_is_sent_as_the_exact_canonical_pdf(environment, grap
     )
     [row] = [r for r in outbox(environment, cid) if r["kind"] == "quotation"]
     assert row["status"] == "submitted" and get_detail(environment, cid)["conversation"]["status"] == "quoted"
+
+
+def test_concurrent_duplicate_webhooks_and_workers_process_each_event_once(environment, graph):
+    """Eight simultaneous identical deliveries store one row; two workers drain distinct rows exactly once."""
+    from concurrent.futures import ThreadPoolExecutor
+
+    same = envelope(messages=[text("Please quote 3 DL-001.", wamid="wamid.race")])
+    with ThreadPoolExecutor(max_workers=8) as pool:
+        replies = list(pool.map(lambda _: deliver_webhook(same).json(), range(8)))
+    assert sum(r["new"] for r in replies) == 1
+    more = [text(f"3 DL-00{n}", wamid=f"wamid.race{n}") for n in (2, 3, 4)]
+    deliver_webhook(envelope(messages=more))
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        list(pool.map(lambda _: drain(), range(2)))
+    conversation = conversation_for(environment)
+    ids = [
+        m["provider_id"]
+        for m in rows(
+            environment, "select provider_id from luma.messages where conversation_id=%s", conversation["id"]
+        )
+    ]
+    assert sorted(ids) == sorted(["wamid.race", "wamid.race2", "wamid.race3", "wamid.race4"])
+    states = rows(
+        environment, "select status,attempts from luma.inbox where company_id=%s", environment["company"]
+    )
+    assert {r["status"] for r in states} <= {"done", "queued"} and all(r["attempts"] <= 2 for r in states)
+    drain()
+    assert {
+        r["status"]
+        for r in rows(
+            environment, "select status from luma.inbox where company_id=%s", environment["company"]
+        )
+    } == {"done"}

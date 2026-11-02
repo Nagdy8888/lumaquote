@@ -85,6 +85,10 @@ flowchart LR
   unless `--execute`; see [data model](DATA_MODEL.md#checkpoints-retention-and-preservation).
   `scripts/backup_restore_drill.py`: dump, scratch restore, comparison and object round trip.
   Both refuse any target but the local database and need an explicit company id.
+- `scripts/freeze_evaluation.py`: `--write` pins fixtures, agent/retrieval/media/drafting code and
+  model configuration in `tests/fixtures/evaluation/freeze.json`; `--check` reports drift. The paid
+  harness runs the holdout only with a matching freeze, no recorded earlier run and an explicit
+  confirmation, then records the run (one-shot). No freeze has been written yet.
 - `scripts/check_architecture.py`: Python AST check for authored function/class
   docstrings and core/backend/agent import direction. Deterministic rules cannot
   import transport, persistence or provider modules. It currently scans app Python,

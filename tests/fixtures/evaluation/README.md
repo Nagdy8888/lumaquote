@@ -68,7 +68,14 @@ They follow the product's documented policy, not a model's opinion:
   holdout answers are visible in this repository. Keep them out of prompt, code and
   threshold tuning. If a holdout result drives any change, that holdout is spent and
   a new reserved set is required (`docs/TESTING_PLAN.md` section 9).
-- No holdout run has been made, and both runners refuse to select it.
+- No holdout run has been made. The offline runner cannot select it. The paid harness can only after
+  `scripts/freeze_evaluation.py --write` has recorded a freeze (`freeze.json`: hashes of the
+  fixtures, the agent/retrieval/media/drafting code and the model configuration), the tree still
+  matches it (`--check`), no earlier holdout run is recorded and `LUMA_EVAL_CONFIRM_HOLDOUT=spend-the-holdout-once`
+  is set. A run is appended to the freeze record, so the holdout is strictly one-shot; a refreeze is
+  refused afterwards. No freeze exists yet, deliberately: freezing is the moment code and prompts stop
+  changing. These are honesty controls against accidental reuse, not tamper-proofing (the record is a
+  committed file).
 - The first paid agent run (development only, 60 scenarios, run 1 of 1) scored 59/60 under the
   final rule (53/60 exact primary action). Its single failure is a model flake on "1 OD-001"
   (quantity read as unknown). It also exposed a null-SKU placeholder bug in candidate discovery,

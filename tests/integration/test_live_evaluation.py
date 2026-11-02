@@ -6,7 +6,7 @@ transcription/vision/Responses calls through the budget reservation path, the
 persisted LangGraph and the durable job lifecycle. Staff approval and delivery are
 never run, so nothing can be sent. The test records measurements; it does not fail
 because an agent outcome differs from the answer key (that is a result). It only
-fails for harness errors. Only the development split can be selected here.
+fails for harness errors. The development split is the default. The holdout (`LUMA_EVAL_SPLIT=holdout`) runs only when a freeze record pins the current fixtures, agent code and model configuration, no earlier holdout run is recorded and `LUMA_EVAL_CONFIRM_HOLDOUT` is set; it is one-shot and the run is recorded in the freeze file.
 """
 
 import json
@@ -14,6 +14,7 @@ import os
 import re
 import sys
 import time
+from datetime import UTC, datetime
 from pathlib import Path
 from uuid import uuid4
 
@@ -41,12 +42,48 @@ pytestmark = pytest.mark.skipif(
 )
 
 SCENARIOS, ORACLE = dataset.load()
+SPLIT = os.environ.get("LUMA_EVAL_SPLIT", "development")
+HOLDOUT_CONFIRMATION = "spend-the-holdout-once"
+HOLDOUT_BLOCKERS = (
+    dataset.freeze_problems(dataset.load_freeze(), dataset.freeze_fingerprints())
+    + (
+        []
+        if os.environ.get("LUMA_EVAL_CONFIRM_HOLDOUT") == HOLDOUT_CONFIRMATION
+        else ["confirmation not given"]
+    )
+    if SPLIT == "holdout"
+    else []
+)
 SELECTED = [
     item
     for item in SCENARIOS
-    if item["split"] == "development"
+    if item["split"] == SPLIT
+    and not HOLDOUT_BLOCKERS
     and (not os.environ.get("LUMA_EVAL_IDS") or item["id"] in os.environ["LUMA_EVAL_IDS"].split(","))
 ]
+
+
+@pytest.fixture(scope="module", autouse=True)
+def record_holdout_consumption():
+    """After a holdout run (even a partial one) append it to the freeze record so it cannot be repeated."""
+    yield
+    if SPLIT == "holdout" and SELECTED:
+        record = dataset.load_freeze()
+        record["holdout_runs"].append(
+            {
+                "run": os.environ.get("LUMA_EVAL_RUN", "unnamed"),
+                "finished": datetime.now(UTC).isoformat(),
+                "scenarios": len(SELECTED),
+            }
+        )
+        dataset.FREEZE_FILE.write_text(json.dumps(record, indent=2) + "\n", encoding="utf-8")
+
+
+def test_holdout_is_refused_unless_frozen_unspent_and_confirmed():
+    """A holdout selection with any blocker runs nothing and fails loudly with the reasons."""
+    assert not HOLDOUT_BLOCKERS, "Holdout refused: " + "; ".join(HOLDOUT_BLOCKERS)
+
+
 RUN_DIR = Path(".local/evaluation-runs") / os.environ.get("LUMA_EVAL_RUN", "unnamed")
 MAX_USD = float(os.environ.get("LUMA_EVAL_MAX_USD", "3.00"))
 
