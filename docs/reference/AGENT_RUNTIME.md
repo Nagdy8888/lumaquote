@@ -66,7 +66,8 @@ With paid AI disabled, `baseline_extract` recognizes the explicit quantity/SKU
 form such as `3 DL-001`. This is an offline baseline with limited grammar, not a
 substitute claim of live model reasoning. With paid AI enabled, extraction uses
 the configured `gpt-6-luna`, bounded structured output, 45-second timeout, zero SDK
-retries, storage disabled and automatic raw tracing disabled. It reserves before
+retries and provider storage disabled; inside a worker job trace the call is
+recorded with masked inputs and outputs (see trace privacy below). It reserves before
 the provider call, settles from token-derived estimates on success and marks
 uncertain consumption unknown on failure.
 
@@ -305,14 +306,61 @@ the atomic local channel only. External receipts/reconciliation remain unfinishe
 
 ## Trace privacy and debugging
 
-Automatic graph/model tracing is disabled around invocations. The explicit
-`observability.trace_outcome` root export allows only a validated opaque job UUID
-and done/blocked/failed status. It excludes prompts, customer labels, phones,
-transcripts, documents, URLs, nested tool data and credentials. Export failure is
-optional and logged by safe exception class without stopping quotation work.
+Decision D24 (2026-11-03) replaced the earlier opaque-only export: LangSmith now
+receives **full detail with masking**, so the owner can see what the agent read, what
+each model call received and returned, and how the graph moved.
 
-The observed LangSmith monthly trace-limit rejection remains an account blocker;
-configured keys or local fake-client privacy tests do not establish a successful
-live export. Diagnose with job/audit/status records and existing redacted evidence,
-not by enabling unrestricted raw traces. See
-[tooling and test evidence](TOOLING_AND_TESTS.md) for exact scenarios and gaps.
+**What is traced** (`app/agents/luma_agent/observability.py`), only when
+`LANGSMITH_TRACING=true` and `LANGSMITH_API_KEY` are set:
+
+| Run | Type | Inputs | Outputs |
+|---|---|---|---|
+| `luma.job.<kind>` (root, one per worker job) | chain | job id, kind, company id, conversation id, job payload | `outcome` (`done`/`blocked`/`failed`), `error` class |
+| LangGraph steps (`extract`, `retrieve`, `prepare`, ... and the graph itself) | chain | graph state passed to the step | state update returned by the step |
+| `openai.responses.extraction` | llm | model, instructions, the customer's latest message | parsed extraction (SKU/quantity lines, clarification, uncertainty), token usage |
+| `openai.responses.label_reading` | llm | model, instructions, request text, image as a byte count | parsed label reading, token usage |
+| `openai.audio.transcription` | llm | model, file description (name, bytes, seconds), languages | transcript text, detected languages |
+| `openai.embeddings` | llm | model, input texts | vector count, dimensions, token usage (vectors are not exported) |
+
+**Call flow.** `worker.tick` claims a job and enters `job_trace(job)`, which sets the
+LangSmith tracing context (`enabled=True`, the masked client, the project) and opens the
+root run. Everything inside inherits that context: LangChain's tracer takes its client and
+parent from it (`langchain_core.tracers.context._get_tracer_kwargs`), and the adapters open
+`model_call(...)` child runs. After the job finishes, `finish(run, outcome, error)` records
+the outcome and `flush()` sends buffered runs. Graph runtimes and adapters wrap their work in
+`masked_or_off()`: inside a masked job trace it changes nothing; anywhere else (tests, the
+evaluation harness, scripts) it forces tracing off, so an environment variable can never
+cause unmasked automatic tracing through LangChain's default client.
+
+**Masking** happens inside the client (`hide_inputs`, `hide_outputs`, `hide_metadata` all
+call `observability.mask`), so every run, including LangGraph's own, is masked before it
+leaves the process:
+
+- every configured `SecretStr` value (OpenAI, LangSmith, WhatsApp, Google callback and
+  database secrets) is replaced literally by `[secret]`;
+- API-key formats (`sk-`, `lsv2_`, Meta `EAA...`, Google `AIza...`), bearer tokens, JWTs,
+  `sha256=` signatures and `token=` / `signature=` / `api_key=` style URL parameters become `[secret]`;
+- phone numbers in `+` international form, 10-15 consecutive digits (WhatsApp ids) and common
+  local forms starting with 0 become `[phone]`;
+- raw bytes and base64 `data:` URLs become a size note, so audio and images never leave the machine.
+
+Message text, transcripts, label readings, retrieval results and quotation content are
+kept on purpose. Limits: masking is pattern-based (a phone number spelled out in words is
+not caught); customer names are not masked (they are needed to read conversations); trace
+content lives in LangSmith's cloud under the project's retention, which this app does not
+control (see the retention notes in [data model](DATA_MODEL.md)).
+
+**Failures.** Export problems are logged by exception class only and never change a job's
+outcome. If LangSmith is unreachable or over quota, quotation work continues untraced.
+
+**Tests and evidence.** `tests/unit/test_trace_masking.py` (18 tests) checks the masking
+rules, that business content (SKUs, quantities, prices, dates, ids) stays readable, that
+bytes and data URLs are dropped, and that a real `langsmith.Client` with a fake HTTP session
+sends a root run, a real LangGraph step and a model-call run with content but without the
+planted secret and phone. With masking disabled in memory that test fails (negative check,
+2026-11-03). `tests/integration/test_trace_canary.py` is the opt-in live proof
+(`LUMA_RUN_TRACE_CANARY=1`): one paid synthetic job, read back from LangSmith. On 2026-11-03 it
+passed with 8 runs (`luma.job.agent`, `LangGraph`, `extract`, `openai.responses.extraction`,
+`route`, `retrieve`, `ask`, `clarify`), content visible and the planted secret and phone masked
+([evidence](../evidence/langsmith-trace-canary-2026-11-03.json)). Only the agent job path was
+proven live; media and embedding spans are covered by the fake-session unit tests.

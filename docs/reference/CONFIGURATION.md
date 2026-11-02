@@ -67,16 +67,19 @@ boundary. See [catalog operation](CATALOG.md).
 ## Tracing policy
 
 `LANGSMITH_API_KEY`, `LANGSMITH_PROJECT` and `LANGSMITH_ENDPOINT` configure the
-optional outcome exporter. The Settings default project is quotation-assistant
+optional masked job tracing (decision D24). The Settings default project is quotation-assistant
 and endpoint is the LangSmith API. `LANGSMITH_TRACING` defaults false in Settings;
 the minimal example explicitly opts it to true, but a key and available account
 allowance are still required for export.
 
-The app disables automatic raw graph/provider tracing and explicitly exports
-only the allowlisted opaque job/status summary. Do not enable unreviewed raw
-traces to debug a missing export. The observed monthly quota failure is recorded
-in [morning actions](../MORNING_ACTIONS.md); it is not solved by inventing a new
-project, retrying indefinitely or claiming configured means verified.
+When enabled, each worker job is exported as one masked trace with full inputs
+and outputs of its graph steps and model calls; secrets, tokens, signatures and
+phone numbers are masked and media bytes are dropped. Outside the worker (tests,
+harness, scripts) tracing is forced off regardless of `LANGSMITH_TRACING`. Contract,
+masking rules and limits: [agent runtime: trace privacy](AGENT_RUNTIME.md#trace-privacy-and-debugging).
+Quota or network failures are logged by class and never stop quotation work; they are
+not solved by inventing a new project, retrying indefinitely or claiming configured
+means verified.
 
 ## Messaging and Google configuration
 

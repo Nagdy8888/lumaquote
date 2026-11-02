@@ -25,7 +25,8 @@
         "app/backend/luma/main.py",
         "app/backend/luma/google_gateway.py",
         "app/agents/luma_agent/worker.py",
-        "app/backend/luma/features/media/sandbox.py"
+        "app/backend/luma/features/media/sandbox.py",
+        "app/agents/luma_agent/observability.py"
       ]
     },
     {

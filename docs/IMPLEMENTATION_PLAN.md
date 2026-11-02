@@ -135,13 +135,14 @@ Implemented and locally tested:
   [recovery evidence](evidence/media-retrieval-recovery.json)).
 - Hostile transcript/label text and failure-path secret canaries pass through the real graph.
 - Opt-in synthetic live canaries passed for Responses, transcription, vision and embeddings.
-  LangSmith export was rejected with HTTP 429 on October 29; on November 2 one
-  metadata-only run was exported and read back from the project.
+  LangSmith export was rejected with HTTP 429 on October 29; since November 3 each worker job
+  is exported as one masked full-detail trace (decision D24).
 
 Open before the remaining items can be checked:
 
-- Item 2: nested trace-redaction check with synthetic PII/secret canaries on the
-  exported trace, not only local payloads.
+- Item 2: done 2026-11-03 for the agent job path: masked full-detail tracing (D24) with a
+  live trace read back from LangSmith ([evidence](evidence/langsmith-trace-canary-2026-11-03.json)).
+  Transcription/label-reading spans are verified only with a fake HTTP session.
 - Items 3-4: broader synonym/ambiguity retrieval evaluation (the development re-run
   after the null-SKU fix is done, see phase 6; e064 still misses its target).
 - Item 2: reservations and limits are implemented; the per-endpoint rate evidence is

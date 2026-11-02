@@ -152,7 +152,7 @@ after actual timeout evidence; it does not disable a test or change its assertio
 
 `tests/integration/conftest.py` creates a real local Auth principal, membership,
 synthetic tenant, source, snapshot and three products. It guards port 55322 and
-sets paid AI/raw tracing off by default. Credential-bearing fixture repr is
+sets paid AI and tracing off by default. Credential-bearing fixture repr is
 redacted. Tests can opt into a specifically controlled provider seam or live
 canary, but service/admin fixtures are not evidence of browser permissions.
 
@@ -187,8 +187,11 @@ failure; do not infer the fixture is a universal crash-proof garbage collector.
   advancing past clarification and a missing oracle entry. It also scans `app/`,
   `gas/` and `supabase/` to ensure nothing reads the fixtures. It proves dataset
   coherence only; no voice/photo asset exists and no agent is run.
-- `test_trace_privacy.py`: explicit outcome allowlist with canaries at the fake
-  export seam; it does not establish successful live LangSmith export.
+- `test_trace_masking.py` (replaced `test_trace_privacy.py` on 2026-11-03, decision D24):
+  masking rules, kept business content, dropped media, and a real `langsmith.Client` with a
+  fake HTTP session exporting a root, a LangGraph step and a model call without the planted
+  secret/phone; tracing forced off outside a job trace. Live proof: opt-in
+  `tests/integration/test_trace_canary.py` (`LUMA_RUN_TRACE_CANARY=1`).
 - `test_embedding_contracts.py`: vector shape/value validation, shared conservative
   constraints and provider index correlation without network/database calls.
 - `test_catalog_questions.py`: malicious descriptive/catalog prose cannot become
@@ -353,7 +356,7 @@ plumbing only. No quote, approval or send is created by that canary.
 
 Preserve estimated usage versus provider billing. Do not add together a local
 reservation, token estimate and a prior canary as if it were an invoice total.
-LangSmith export remains limited by the observed account quota.
+LangSmith export depends on the account's trace allowance; see the trace canary evidence.
 
 ## Historical checkpoint and remaining gates
 

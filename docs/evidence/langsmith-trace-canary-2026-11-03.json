@@ -1,0 +1,30 @@
+{
+  "date": "2026-11-03",
+  "commit": "f5989f9 plus uncommitted tracing change",
+  "label": "live",
+  "command": "LUMA_RUN_TRACE_CANARY=1 node scripts/python.cjs -m pytest tests/integration/test_trace_canary.py",
+  "result": "passed",
+  "scope": "One synthetic agent job (decision D24) run as the worker runs it, with a real OpenAI Responses call and LangSmith export, then read back from the LangSmith project. Synthetic data only; no message was sent to a real customer.",
+  "trace": {
+    "project": "quotation-assistant",
+    "trace_id": "01a19e8c-6edd-73bb-b3c7-990ce4ef4101",
+    "runs": 8,
+    "run_names": ["luma.job.agent", "LangGraph", "extract", "openai.responses.extraction", "route", "retrieve", "ask", "clarify"]
+  },
+  "assertions": [
+    "job root, LangGraph steps and the OpenAI extraction call are present",
+    "customer text (DL-001) and the outcome 'done' are visible in exported inputs/outputs",
+    "the planted fake secret and fictional phone number appear nowhere in the exported runs",
+    "[secret] and [phone] placeholders appear",
+    "no quotation delivery was created (a local clarification reply was queued, as designed)"
+  ],
+  "runs_attempted": [
+    {"attempt": 1, "status": "Failed", "reason": "test assertion error: expected no delivery at all, but the agent correctly queued a local clarification reply; every trace assertion before it passed"},
+    {"attempt": 2, "status": "Passed", "reason": "assertion corrected to 'no quotation delivery'"}
+  ],
+  "cost": "two small Responses calls (one per attempt); app estimate well under USD 0.01, not provider billing",
+  "limits": [
+    "Only the agent job path was proven live; transcription, label-reading and embedding spans are covered by unit tests with a fake HTTP session, not by a live trace.",
+    "list_runs() is deprecated in langsmith 0.14.14 (removal after 2027-01-31); the test should move to client.runs.query() before then."
+  ]
+}

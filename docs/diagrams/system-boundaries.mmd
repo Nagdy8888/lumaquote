@@ -1,6 +1,6 @@
 flowchart TB
   accTitle: LumaQuote process and trust boundaries
-  accDescr: Staff uses native React and FastAPI. A native worker shares local private business storage and runs an offline parser. A separate signed gateway accepts GAS snapshots. OpenAI and outcome tracing remain optional, with no live WhatsApp sender shown.
+  accDescr: Staff uses native React and FastAPI. A native worker shares local private business storage and runs an offline parser. A separate signed gateway accepts GAS snapshots. OpenAI and masked LangSmith job tracing are optional, with no live WhatsApp sender shown.
   Staff["Salesperson"] --> UI["React staff workspace"]
   UI -->|Sign-in| Auth["Supabase Auth :55321"]
   UI -->|Bearer requests| API["Native staff API :8001"]
@@ -8,7 +8,7 @@ flowchart TB
   Worker["Native Python worker"] -->|Durable jobs and private bytes| Data
   Worker --> Parser["Offline parser container"]
   Worker -. Optional inference .-> OpenAI["Reserved OpenAI calls"]
-  Worker -. Optional outcome only .-> Traces["LangSmith: live export unverified"]
+  Worker -. Opt-in masked job traces .-> Traces["LangSmith: full detail, secrets and phones masked"]
   GAS["Authorized Apps Script"] -->|Signed full tables| Gateway["Native callback gateway :8002"]
   Gateway -->|Validated snapshot| Data
   %% This process-level view is complemented by exact Auth checks in staff-operation.

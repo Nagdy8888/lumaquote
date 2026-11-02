@@ -117,7 +117,8 @@ records, more than 500 records, a record over 8,000 UTF-8 bytes or more than
 incremental ingestion platform.
 
 `adapters/embeddings.embed_texts` fixes `text-embedding-3-small`, 1536 float
-dimensions, 35-second timeout and zero SDK retries. It disables raw tracing,
+dimensions, 35-second timeout and zero SDK retries. Inside a job trace it records the
+input texts and vector count (masked), never vectors; elsewhere tracing is off. It
 checks nonempty bounded inputs, correlates returned response indices to inputs
 and rejects missing/duplicate indices or invalid vectors. The calculated amount
 uses the rate recorded in [provider contracts](../PROVIDER_CONTRACTS.md).

@@ -2,7 +2,6 @@
 
 from langgraph.checkpoint.postgres import PostgresSaver
 from langgraph.types import Command
-from langsmith import tracing_context
 from luma.core.config import settings
 from luma.core.database import database
 from luma.core.errors import DomainError
@@ -10,6 +9,7 @@ from luma.features.conversations.repository import conversation
 from luma.features.quotations.repository import latest_quote
 
 from ..graph import build_graph
+from ..observability import masked_or_off
 
 
 def process_conversation(job):
@@ -20,7 +20,8 @@ def process_conversation(job):
     without new extraction. Review-only jobs can complete only an existing review
     pause; customer clarification resumes only on a new customer message. Resume
     commands carry job identity, never approval authority. Persist checkpoints
-    synchronously with bounded recursion and raw tracing disabled. Node/business
+    synchronously with bounded recursion. Graph steps are traced only inside the
+    worker's masked job trace (`observability.job_trace`); otherwise tracing is off. Node/business
     errors propagate to worker outcome handling; this function does not dispatch.
     """
     state = {
@@ -56,37 +57,37 @@ def process_conversation(job):
             # A queued older preparation must not replace a staff-prepared or
             # already approved/rejected revision, or incur another model call.
             return
-        with PostgresSaver.from_conn_string(settings().luma_worker_database_url.get_secret_value()) as saver:
+        with (
+            PostgresSaver.from_conn_string(settings().luma_worker_database_url.get_secret_value()) as saver,
+            masked_or_off(),
+        ):
             graph = build_graph(saver)
-            with tracing_context(enabled=False):
-                snapshot = graph.get_state(config)
-                if job["payload"].get("review_only") and "review" not in snapshot.next:
-                    # A decision job only completes an existing review interrupt.
-                    # It must never initiate extraction or answer a customer pause.
-                    return
-                if snapshot.next:
-                    if "clarify" in snapshot.next:
-                        if customer and str(customer["id"]) == snapshot.values.get("customer_message_id"):
-                            # Duplicate queued work is not a new customer answer.
-                            return
-                        graph.invoke(
-                            Command(resume={"job_id": str(job["id"]), "fence": job["fence"]}),
-                            config,
-                            durability="sync",
-                        )
+            snapshot = graph.get_state(config)
+            if job["payload"].get("review_only") and "review" not in snapshot.next:
+                # A decision job only completes an existing review interrupt.
+                # It must never initiate extraction or answer a customer pause.
+                return
+            if snapshot.next:
+                if "clarify" in snapshot.next:
+                    if customer and str(customer["id"]) == snapshot.values.get("customer_message_id"):
+                        # Duplicate queued work is not a new customer answer.
                         return
-                    if "review" in snapshot.next:
-                        with database(worker=True) as conn:
-                            quote = conn.execute(
-                                "select status from luma.quotes where id=%s and company_id=%s",
-                                (snapshot.values.get("quote_id"), job["company_id"]),
-                            ).fetchone()
-                        if quote and quote["status"] in ("approved", "rejected", "superseded", "expired"):
-                            graph.invoke(
-                                Command(resume={"job_id": str(job["id"])}), config, durability="sync"
-                            )
-                            if job["payload"].get("review_only"):
-                                return
-                        else:
-                            raise DomainError("Quotation still awaits an authorized staff decision.")
-                graph.invoke(state, config, durability="sync")
+                    graph.invoke(
+                        Command(resume={"job_id": str(job["id"]), "fence": job["fence"]}),
+                        config,
+                        durability="sync",
+                    )
+                    return
+                if "review" in snapshot.next:
+                    with database(worker=True) as conn:
+                        quote = conn.execute(
+                            "select status from luma.quotes where id=%s and company_id=%s",
+                            (snapshot.values.get("quote_id"), job["company_id"]),
+                        ).fetchone()
+                    if quote and quote["status"] in ("approved", "rejected", "superseded", "expired"):
+                        graph.invoke(Command(resume={"job_id": str(job["id"])}), config, durability="sync")
+                        if job["payload"].get("review_only"):
+                            return
+                    else:
+                        raise DomainError("Quotation still awaits an authorized staff decision.")
+            graph.invoke(state, config, durability="sync")

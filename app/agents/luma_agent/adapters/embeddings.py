@@ -1,11 +1,12 @@
-"""Bounded fixed-model embedding calls without raw external tracing or automatic retries."""
+"""Bounded fixed-model embedding calls without automatic retries; traced (masked) only inside a worker job trace."""
 
 from decimal import Decimal
 
-from langsmith import tracing_context
 from luma.core.errors import DomainError
 from luma.features.catalog.semantic import vector_literal
 from openai import OpenAI
+
+from ..observability import masked_or_off, model_call, set_outputs
 
 
 def validate_embedding_provider(config):
@@ -19,7 +20,8 @@ def embed_texts(config, texts: list[str]) -> tuple[list[list[float]], Decimal]:
 
     Limits are at most 500 nonempty inputs, 8000 UTF-8 bytes each and 100000 bytes
     overall. They conservatively bound this English catalog/query workload below
-    the provider token ceilings. No response text or customer identifier is traced.
+    the provider token ceilings. Inside a job trace the input texts, vector count, dimensions
+    and token usage are traced (masked); the vectors themselves are not exported.
     """
     validate_embedding_provider(config)
     if (
@@ -31,10 +33,19 @@ def embed_texts(config, texts: list[str]) -> tuple[list[list[float]], Decimal]:
         raise DomainError("The embedding input exceeds its bounded policy.", 422)
     with (
         OpenAI(api_key=config.openai_api_key.get_secret_value(), timeout=35, max_retries=0) as client,
-        tracing_context(enabled=False),
+        masked_or_off(),
+        model_call("openai.embeddings", config.embedding_model, {"input": texts}) as call,
     ):
         response = client.embeddings.create(
             model=config.embedding_model, input=texts, dimensions=1536, encoding_format="float"
+        )
+        set_outputs(
+            call,
+            {
+                "vectors": len(response.data),
+                "dimensions": 1536,
+                "usage": {"total_tokens": response.usage.total_tokens},
+            },
         )
     indexed = {item.index: item.embedding for item in response.data}
     if len(response.data) != len(texts) or set(indexed) != set(range(len(texts))):

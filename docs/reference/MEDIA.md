@@ -135,7 +135,8 @@ accurate technical SKU recognition.
 
 Estimated transcription usage uses normalized duration and the documented rate
 assumption. It is not retrieved billing. The provider client has a 45-second
-timeout, no automatic retries and raw tracing disabled.
+timeout and no automatic retries. Inside a worker job trace the call is recorded with
+the transcript or label reading; the audio/image bytes appear only as a byte count.
 
 ## Photo reading contract
 

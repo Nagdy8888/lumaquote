@@ -28,10 +28,10 @@ checked assumptions; it does not replace deterministic authorization or evaluati
   tokens. Current token estimates do not claim invoice parity or include a
   separately verified billing retrieval path.
 
-Provider credentials and recorded speech remain backend-only. Automatic raw
-LangGraph/model tracing is disabled. LangSmith receives only an opaque job UUID
-and allowlisted outcome through a separate optional export; its account quota
-currently blocks live export. See [progress evidence](evidence/phase-3-progress.json)
+Provider credentials and recorded speech remain backend-only. Since 2026-11-03
+(decision D24) LangSmith receives one masked trace per worker job with full model
+inputs and outputs; secrets and phone numbers are masked and audio/image bytes are
+never exported ([trace privacy](reference/AGENT_RUNTIME.md#trace-privacy-and-debugging)). See [progress evidence](evidence/phase-3-progress.json)
 and [morning actions](MORNING_ACTIONS.md).
 
 ## Photo label-reading contract
@@ -54,7 +54,8 @@ responses and a real synthetic index/query plumbing canary.
 The [official embedding guide](https://developers.openai.com/api/docs/guides/embeddings)
 and [model reference](https://developers.openai.com/api/docs/models/text-embedding-3-small)
 were checked against the installed SDK. The adapter fixes `text-embedding-3-small`,
-1536 dimensions, float output, no automatic retries and disabled raw tracing.
+1536 dimensions, float output and no automatic retries; traces record input texts and
+vector counts, never the vectors.
 It caps a batch at 500 nonempty records, 8000 UTF-8 bytes per record and 100000
 bytes overall; the recorded rate is USD 0.02 per million input tokens. Returned
 indices/dimensions/finite values must match before publication. Adapter code is
