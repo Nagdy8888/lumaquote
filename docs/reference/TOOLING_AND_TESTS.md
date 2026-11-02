@@ -19,14 +19,16 @@ Actual runner/CI responsibilities, not a claim that every gate passed in this ta
 ```mermaid
 flowchart LR
   accTitle: Verification boundaries and honest evidence
-  accDescr: Offline verification, full local infrastructure tests, explicitly opted-in live canaries and remote CI prove different scopes. Diagram freshness is a repeatable documentation check, not a business-release certificate.
+  accDescr: Offline verification, full local infrastructure tests, a final secret-value scan, explicitly opted-in live canaries and remote CI prove different scopes. Diagram freshness is a repeatable documentation check, not a business-release certificate.
   Change["Reviewed source and documentation change"] --> Static["Lint, inline contracts, imports, types and diagrams"]
   Static --> Offline["Offline unit and UI tests; build"]
   Static --> Full["Full local Supabase and sandbox tests"]
   Full --> Browser["Owned native browser and restart scenario"]
-  Change -. Explicit separate opt-in .-> Live["Synthetic provider canaries"]
+  Change -. Explicit separate opt-in, paid .-> Live["Synthetic provider canaries and agent evaluation"]
   Change -. Pushed commit only .-> CI["Remote static, unit, UI, diagram and build checks"]
   Offline --> Evidence["Scoped, dated evidence with gaps"]
+  Browser --> Secrets["Secret scan of tracked, built, log and evidence files"]
+  Secrets --> Evidence
   Browser --> Evidence
   Live --> Evidence
   CI --> Evidence
@@ -89,6 +91,12 @@ flowchart LR
   model configuration in `tests/fixtures/evaluation/freeze.json`; `--check` reports drift. The paid
   harness runs the holdout only with a matching freeze, no recorded earlier run and an explicit
   confirmation, then records the run (one-shot). No freeze has been written yet.
+- `scripts/scan_secrets.py` (`npm run check:secrets`, last step of the gates): loads secret-looking values from the
+  ignored `.env`/`.env.local` (not the public Vite/anon values) and searches git-tracked files, the frontend build,
+  retained check logs and evidence for each value, its URL-encoded and base64 forms; reports variable names and
+  paths only. On 2026-11-02: 7 variables, 970 files, no leaks
+  ([evidence](../evidence/secret-scan-2026-11-02.json)). Does not cover git history, other branches, provider-side
+  copies or secrets it was not given; unit-tested with planted values in `tests/unit/test_scan_secrets.py`.
 - `scripts/check_architecture.py`: Python AST check for authored function/class
   docstrings and core/backend/agent import direction. Deterministic rules cannot
   import transport, persistence or provider modules. It currently scans app Python,
@@ -98,7 +106,7 @@ flowchart LR
   is not a complete semantic audit of every anonymous callback or UX state.
 - `scripts/verify.cjs`: sequential gate orchestration, private per-command logs and
   summary and first-failure stop. Commands have a 180-second timeout except the
-  full Python integration suite, which has a bounded 420-second allowance after
+  full Python integration suite, which has a bounded 600-second allowance (raised from 420 after the suite grew to about 345 s) after
   an observed 180-second timeout during cold local verification. The summary
   records the effective deadline and process error code; timeout is a failure.
 

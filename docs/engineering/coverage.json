@@ -64,8 +64,23 @@
     {
       "id": "B08",
       "status": "Planned",
-      "reason": "Ignored environment files and backend-only secrets exist; staged/build/log/trace canaries and key rotation still need complete checks.",
-      "evidence": []
+      "reason": "Ignored environment files and backend-only secrets exist, and a scanner (npm run check:secrets, last step of the gates) found no populated secret value, in plain, URL-encoded or base64 form, in 970 tracked, built, log and evidence files. Still open: git history and other branches, secrets not yet populated (WhatsApp), trace canaries at a live export, and key rotation.",
+      "evidence": [
+        {
+          "kind": "code",
+          "path": "scripts/scan_secrets.py",
+          "result": "observed",
+          "revision": "implementation-working-tree",
+          "environment": "local-windows"
+        },
+        {
+          "kind": "runtime",
+          "path": "docs/evidence/secret-scan-2026-11-02.json",
+          "result": "passed",
+          "revision": "implementation-working-tree",
+          "environment": "local-windows"
+        }
+      ]
     },
     {
       "id": "B09",

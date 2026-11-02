@@ -16,6 +16,7 @@
     "dev:api": "node scripts/python.cjs -m uvicorn luma.main:app --host 127.0.0.1 --port 8001",
     "dev:worker": "node scripts/python.cjs -m luma_agent.worker",
     "test:python": "node scripts/python.cjs -m pytest -m \"not browser\"",
+    "check:secrets": "node scripts/python.cjs scripts/scan_secrets.py",
     "check:architecture": "node scripts/python.cjs scripts/check_architecture.py",
     "lint:python": "node scripts/python.cjs -m ruff check app/backend app/agents tests scripts/check_architecture.py",
     "check:frontend": "node scripts/check_frontend.cjs",
