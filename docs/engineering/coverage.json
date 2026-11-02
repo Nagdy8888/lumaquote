@@ -13,8 +13,23 @@
     {
       "id": "B02",
       "status": "Planned",
-      "reason": "Local Auth token verification is implemented; invalid/expired/issuer/audience and outage behavior need the complete authentication suite.",
-      "evidence": []
+      "reason": "Missing, malformed, wrong-scheme and forged bearer tokens are refused and an Auth outage fails closed with 503 (tested), and revoked membership blocks a live token. Expired, wrong-issuer and wrong-audience tokens still need Supabase-signed fixtures.",
+      "evidence": [
+        {
+          "kind": "code",
+          "path": "app/backend/luma/core/http.py",
+          "result": "observed",
+          "revision": "implementation-working-tree",
+          "environment": "local-windows"
+        },
+        {
+          "kind": "test",
+          "path": "docs/evidence/api-boundaries-2026-11-02.json",
+          "result": "passed",
+          "revision": "implementation-working-tree",
+          "environment": "local-windows"
+        }
+      ]
     },
     {
       "id": "B03",
@@ -54,9 +69,24 @@
     },
     {
       "id": "B09",
-      "status": "Planned",
-      "reason": "Exact loopback CORS is configured; browser and non-browser negative-origin authorization tests remain.",
-      "evidence": []
+      "status": "Covered",
+      "reason": "The staff API allows only the exact local Vite origins with a fixed method and header allowlist and no credentials; foreign, lookalike, null, other-port and https origins receive no grant on preflight or simple requests, and disallowed methods/headers fail preflight. Mutating the allowlist to '*' failed the test. Limits: server headers only (no browser-run enforcement) and local origins; a deployed origin needs its own review.",
+      "evidence": [
+        {
+          "kind": "code",
+          "path": "app/backend/luma/main.py",
+          "result": "observed",
+          "revision": "implementation-working-tree",
+          "environment": "local-windows"
+        },
+        {
+          "kind": "test",
+          "path": "docs/evidence/api-boundaries-2026-11-02.json",
+          "result": "passed",
+          "revision": "implementation-working-tree",
+          "environment": "local-windows"
+        }
+      ]
     },
     {
       "id": "B10",
@@ -106,8 +136,23 @@
     {
       "id": "B15",
       "status": "Planned",
-      "reason": "Shared PostgreSQL minute counters exist; boundary, concurrent-process, clock, and proxy-identity cases remain.",
-      "evidence": []
+      "reason": "The shared per-user minute window is tested at its boundary (30 admitted, 31st is 429 with Retry-After). Bursts across a minute boundary, concurrent processes, clock behavior and proxy identity remain.",
+      "evidence": [
+        {
+          "kind": "code",
+          "path": "app/backend/luma/core/admission.py",
+          "result": "observed",
+          "revision": "implementation-working-tree",
+          "environment": "local-windows"
+        },
+        {
+          "kind": "test",
+          "path": "docs/evidence/api-boundaries-2026-11-02.json",
+          "result": "passed",
+          "revision": "implementation-working-tree",
+          "environment": "local-windows"
+        }
+      ]
     },
     {
       "id": "B16",
@@ -217,8 +262,23 @@
     {
       "id": "B31",
       "status": "Planned",
-      "reason": "Private PDF no-store behavior is tested; all private cache/HTTP/pagination/signed capability cases remain.",
-      "evidence": []
+      "reason": "No-store, nosniff, no-referrer and frame denial are tested on every response of both processes and the authorized PDF is no-store. Pagination limits, signed document capabilities and proxy/cache behavior in a deployed setting remain.",
+      "evidence": [
+        {
+          "kind": "code",
+          "path": "app/backend/luma/core/http.py",
+          "result": "observed",
+          "revision": "implementation-working-tree",
+          "environment": "local-windows"
+        },
+        {
+          "kind": "test",
+          "path": "docs/evidence/api-boundaries-2026-11-02.json",
+          "result": "passed",
+          "revision": "implementation-working-tree",
+          "environment": "local-windows"
+        }
+      ]
     },
     {
       "id": "B32",

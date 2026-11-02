@@ -1,0 +1,25 @@
+{
+  "date": "2026-11-02",
+  "timezone": "Africa/Cairo",
+  "scope": "Staff API and gateway boundary tests against the real apps and local Supabase Auth",
+  "environment": "Native Windows pytest, isolated local Supabase; paid AI off",
+  "invocation": "node scripts/python.cjs -m pytest tests/integration/test_api_boundaries.py -q",
+  "result": "13 passed (26.89 s)",
+  "covers": [
+    "missing, empty, wrong-scheme, garbage and forged bearer tokens are refused before business code with no tenant text in the body",
+    "Supabase Auth outage returns 503",
+    "CORS: exact local origins only; foreign, lookalike, null, other-port and https origins get no grant on preflight or simple requests; no credentials header; DELETE and unlisted headers refused",
+    "no-store, nosniff, no-referrer and X-Frame-Options DENY on every response of both the staff API and the gateway, including 404 and 401",
+    "authorized PDF no-store",
+    "declared Content-Length above 11 MiB or non-numeric rejected with 413",
+    "gateway exposes no staff route, docs, redoc or schema; signed routes exist and refuse unsigned bodies",
+    "per-user mutation limit: 30 admitted, 31st is 429 with Retry-After 60"
+  ],
+  "mutation_checks": "Replacing the CORS allowlist with '*' failed the CORS test; changing Cache-Control to public failed 3 tests; both files were restored (git diff empty) and the suite re-run green.",
+  "limits": [
+    "expired, wrong-issuer and wrong-audience tokens were not exercised (they need Supabase-signed tokens)",
+    "rate limiting is a fixed per-minute window: boundary bursts and multi-process/clock behavior are not tested",
+    "browser-side CORS enforcement was not run; this checks the server's headers",
+    "no TLS, proxy identity or public-ingress claim"
+  ]
+}

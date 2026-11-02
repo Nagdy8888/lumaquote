@@ -263,6 +263,14 @@ need the holdout), and a measured agent-versus-baseline comparison beyond the te
   submission, four failure classes, all gates, monotonic receipts, early receipt, exact PDF bytes).
   Mutation checks removing the allowlist, signature and media-host checks each failed the matching test.
   It never contacts Meta; see [WhatsApp channel](WHATSAPP.md) for what is unproven.
+- `test_api_boundaries.py`: 13 tests of the real staff API and gateway: missing/malformed/forged bearer tokens
+  and an Auth outage fail closed; CORS grants only the exact local origins (lookalike, null, other-port and https
+  origins get nothing; DELETE and unlisted headers fail preflight); every response of both processes is
+  no-store/nosniff/no-referrer/frame-denied; oversize or malformed Content-Length is a 413; the gateway has no
+  staff routes or docs; the 31st mutation in a minute is a 429 with Retry-After (the test starts early in a
+  minute because the window is a fixed bucket). Mutations to the CORS allowlist and Cache-Control failed it.
+  Evidence: [api-boundaries-2026-11-02.json](../evidence/api-boundaries-2026-11-02.json). Not covered: expired,
+  wrong-issuer or wrong-audience tokens and browser-run CORS.
 - `test_retention.py`: dry run changes nothing; media under 7 days is kept and older media is deleted
   once with the row stamped and text kept; 100-day-idle conversations vanish with every child row,
   quote PDF, idempotency response and checkpoint thread while fresh and unfinished ones survive;
