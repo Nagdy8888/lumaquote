@@ -20,7 +20,7 @@ Read [the deep documentation standard](references/deep-documentation.md) before 
 
 ## Professional visual documentation
 
-For architecture, relationships, nontrivial workflows and states, apply [mermaid-diagrams](../mermaid-diagrams/SKILL.md) and read [the visual documentation standard](references/visual-documentation.md). Maintain the relevant canonical sources, exact embeds and readable SVG previews with the code. Run diagram tests/render/freshness checks and inspect actual output; a syntactically valid diagram can still be misleading or unreadable. Keep this skill responsible for app claims/prose/evidence and Mermaid responsible for diagram syntax, without duplicating their policies.
+For architecture, relationships, nontrivial workflows and states, apply [mermaid-diagrams](references/mermaid-diagrams/GUIDE.md) and read [the visual documentation standard](references/visual-documentation.md). Maintain the relevant canonical sources, exact embeds and readable SVG previews with the code. Run diagram tests/render/freshness checks and inspect actual output; a syntactically valid diagram can still be misleading or unreadable. Keep this skill responsible for app claims/prose/evidence and Mermaid responsible for diagram syntax, without duplicating their policies.
 
 ## Ownership
 - README is an entry point linking to setup, the actual workflow, and evidence.
@@ -34,4 +34,4 @@ For architecture, relationships, nontrivial workflows and states, apply [mermaid
 Use real commands, URLs, owners, package versions, and observed results. Mark unavailable verification explicitly. Do not invent incident channels, Kubernetes resources, issue IDs, SLA claims, cloud deployments, or client results.
 Do not copy secrets, populated environment files, private audio URLs, or raw traces. Clearly separate synthetic evaluation, local checks, sandbox integrations, and real pilots.
 Update affected docs in the implementation task without automatically publishing, committing, or rewriting unrelated material. Validate relative links and meaningful command examples.
-Use [contribution-workflow](../contribution-workflow/SKILL.md) for requested PR/release operations and [verify-engineering-coverage](../verify-engineering-coverage/SKILL.md) for evidence-backed readiness.
+Use [contribution-workflow](../contribution-workflow/SKILL.md) for requested PR/release operations and [verify-engineering-coverage](../verify-and-review/references/engineering-coverage/GUIDE.md) for evidence-backed readiness.

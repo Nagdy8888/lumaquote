@@ -30,7 +30,12 @@
         "validate-findings.test.cjs": "b92001117a92c4161d43777a0ba2fa182a8a4d97f2304cc8c0cee5331497b73b",
         "VALIDATION-AND-REPORTING.md": "b892470cb89bb31f33403e050d4bdfbe2cdaef940ade1496fa65e32b2e129449",
         "WEB-PROTOCOL-AND-AUTH.md": "4f3066dffa23c5635859187be9b96c32f2aff29a688186b91ff0c63e47d62b5c"
-      }
+      },
+      "active_path": "secure-quotation-app/references/security-audit",
+      "renamed_files": {
+        "SKILL.md": "GUIDE.md"
+      },
+      "merged_on": "2026-11-03"
     },
     "frontend-design": {
       "source": "https://github.com/anthropics/skills",
@@ -52,7 +57,8 @@
       "local_modifications": [
         "Integrated supplied working-surface guidance while preserving the approved visual direction and 3D"
       ],
-      "adaptation_source_archive": "../skill-source-archives/user-supplied-2026-10-29"
+      "adaptation_source_archive": "../skill-source-archives/user-supplied-2026-10-29",
+      "active_path": "frontend-design"
     },
     "codebase-design": {
       "source": "https://github.com/mattpocock/skills",
@@ -65,7 +71,12 @@
         "DEEPENING.md": "f3dd099ce99289bd213914d8ee3e2429b78309c3957ca4583f7659551b1d53c1",
         "DESIGN-IT-TWICE.md": "52b52e75655a27aea59c6966b410bac82448968ad46ef1ebb9f07c274e3ae010",
         "SKILL.md": "2c20617f87ec8af6a434859f381b2f061a69b530444e74eb39e78bb016a6d1e2"
-      }
+      },
+      "retired_path": "../retired-skills-2026-11-03/codebase-design",
+      "renamed_files": {
+        "SKILL.md": "SKILL.md.disabled"
+      },
+      "retired_on": "2026-11-03"
     },
     "setup-pre-commit": {
       "source": "https://github.com/mattpocock/skills",
@@ -84,7 +95,12 @@
       "local_modifications": [
         "Unified mixed-stack hook guidance and removed competing-runner and automatic-commit requirements"
       ],
-      "adaptation_source_archive": "../skill-source-archives/user-supplied-2026-10-29"
+      "adaptation_source_archive": "../skill-source-archives/user-supplied-2026-10-29",
+      "retired_path": "../retired-skills-2026-11-03/setup-pre-commit",
+      "renamed_files": {
+        "SKILL.md": "SKILL.md.disabled"
+      },
+      "retired_on": "2026-11-03"
     },
     "resolving-merge-conflicts": {
       "source": "https://github.com/mattpocock/skills",
@@ -95,7 +111,12 @@
       "files": {
         "agents/openai.yaml": "a1f4f96838f2ed6282eb28abbbf99029cb8fadce552baf53da90a025b8bffddf",
         "SKILL.md": "9d8114f8ef0b31f535a265fc05c364bd8cf2e2895a830040e06c22acb11f54b0"
-      }
+      },
+      "retired_path": "../retired-skills-2026-11-03/resolving-merge-conflicts",
+      "renamed_files": {
+        "SKILL.md": "SKILL.md.disabled"
+      },
+      "retired_on": "2026-11-03"
     },
     "react-best-practices": {
       "source": "https://github.com/vercel-labs/agent-skills",
@@ -181,7 +202,12 @@
         "rules/server-serialization.md": "f4c7d68b29c82381baad059c4a7f09e868e71ec9c3115a26ad3ae7d24c0dfe1f",
         "SKILL.md": "71ed7794962fa6e803ee83030517b5b93a9f70fbfeb431ec4535c5480a8d8355"
       },
-      "root_license_note": "No standalone license file supplied in the pinned upstream tree; preserve frontmatter declarations and source reference."
+      "root_license_note": "No standalone license file supplied in the pinned upstream tree; preserve frontmatter declarations and source reference.",
+      "active_path": "frontend-structure/references/react-best-practices",
+      "renamed_files": {
+        "SKILL.md": "GUIDE.md"
+      },
+      "merged_on": "2026-11-03"
     },
     "web-design-guidelines": {
       "source": "https://github.com/vercel-labs/agent-skills",
@@ -192,7 +218,12 @@
       "files": {
         "SKILL.md": "f4647ca866a3accf763777f83e7682954f0187cd6bea7eea0399796652414e8f"
       },
-      "root_license_note": "No standalone license file supplied in the pinned upstream tree; preserve frontmatter declarations and source reference."
+      "root_license_note": "No standalone license file supplied in the pinned upstream tree; preserve frontmatter declarations and source reference.",
+      "active_path": "frontend-design/references/web-design-guidelines",
+      "renamed_files": {
+        "SKILL.md": "GUIDE.md"
+      },
+      "merged_on": "2026-11-03"
     },
     "whatsapp-webhooks": {
       "source": "https://github.com/hookdeck/webhook-skills",
@@ -222,7 +253,12 @@
         "references/overview.md": "6cbcd594220c8bb86aef5ceb4efb0cf3ac003685fcd93a301beb4a80bac52991",
         "references/setup.md": "44589a370c288c83cdb2b4bf6b0f025dd85d44c7b895c454db4bd29228bbb031",
         "references/verification.md": "aaa04b37d8fb21e3ec71ade6432ff11b487820a7c961359872b2e71571bce876"
-      }
+      },
+      "active_path": "integrate-whatsapp/references/whatsapp-webhooks",
+      "renamed_files": {
+        "SKILL.md": "GUIDE.md"
+      },
+      "merged_on": "2026-11-03"
     },
     "langgraph-fundamentals": {
       "source": "https://github.com/langchain-ai/langchain-skills",
@@ -235,7 +271,12 @@
         "SKILL.md": "193bea142c9df04abc44917fb96c0be53ec9b5c77f56670004d3c03c117fb990",
         "references/python.md": "3d30871a6463f955452fdebe607248c39b6806cf07c0fe655e3783b48acc6d91",
         "references/typescript.md": "8cf8577265a75a1e46a5e1dfc7599c63efb60059591593dbb92dbd51acd5d22a"
-      }
+      },
+      "active_path": "langgraph/references/fundamentals",
+      "renamed_files": {
+        "SKILL.md": "GUIDE.md"
+      },
+      "merged_on": "2026-11-03"
     },
     "langgraph-human-in-the-loop": {
       "source": "https://github.com/langchain-ai/langchain-skills",
@@ -246,7 +287,12 @@
       "root_license_sha256": "4ec67e4ca6e6721dba849b2ca82261597c86a61ee214bbf21416006b7b2d0478",
       "files": {
         "SKILL.md": "ce56e8ce58548dd1d7cb0d3e524cf546cef0c712e3c35d63fdd4ae354b40d3c1"
-      }
+      },
+      "active_path": "langgraph/references/human-in-the-loop",
+      "renamed_files": {
+        "SKILL.md": "GUIDE.md"
+      },
+      "merged_on": "2026-11-03"
     },
     "langgraph-persistence": {
       "source": "https://github.com/langchain-ai/langchain-skills",
@@ -257,7 +303,12 @@
       "root_license_sha256": "4ec67e4ca6e6721dba849b2ca82261597c86a61ee214bbf21416006b7b2d0478",
       "files": {
         "SKILL.md": "0a9a4f36e6d7895a273ce0882655e57023d2d992d4fde8e033e2936ac1df789e"
-      }
+      },
+      "active_path": "langgraph/references/persistence",
+      "renamed_files": {
+        "SKILL.md": "GUIDE.md"
+      },
+      "merged_on": "2026-11-03"
     },
     "fastapi": {
       "source": "https://github.com/fastapi/fastapi",
@@ -274,7 +325,8 @@
         "references/pydantic.md": "840ab962739861aed2ea77805dc46979c9a96abd8fc0043f197b3bd5d638e84b",
         "references/responses.md": "7c921508bbd093697301ca9612038976cfb5b65bdc2dc42a0c02e2809d3652a7",
         "references/streaming.md": "3ff148c6d153affa960f421d13d27eb8225b70e579ed833c61c6b1a9ff17fa87"
-      }
+      },
+      "active_path": "fastapi"
     },
     "shadcn": {
       "source": "https://github.com/shadcn-ui/ui",
@@ -332,7 +384,8 @@
       "local_modifications": [
         "Removed unsupported user-invocable and host-specific Bash tool metadata",
         "Replaced automatic shell interpolation with explicit Codex terminal context guidance"
-      ]
+      ],
+      "active_path": "shadcn"
     },
     "langsmith-trace": {
       "source": "https://github.com/langchain-ai/langsmith-skills",
@@ -343,7 +396,8 @@
       "root_license_sha256": "4ec67e4ca6e6721dba849b2ca82261597c86a61ee214bbf21416006b7b2d0478",
       "files": {
         "SKILL.md": "6f16ba0969d0327ad4a097d97f30aa0b1daac6141a57ca8d9fd1dd6caa1d5b9e"
-      }
+      },
+      "active_path": "langsmith-trace"
     },
     "mermaid-diagrams": {
       "source": "https://github.com/softaworks/agent-toolkit",
@@ -363,8 +417,14 @@
         "references/flowcharts.md": "73b599797659ced9211ab947e3d4aee4f3ef2bfb4c1aefcfd6537276d2a21f96",
         "references/sequence-diagrams.md": "11900f082d21c7e3fc0addcd2bf50689a1c36a5af806207942a2f772cb5e2b3b"
       },
-      "local_adaptation": "Added project integration routing; original SKILL.md retained in .agents/skill-source-archives/mermaid-diagrams-3027f20f3181; local documentation line endings/trailing whitespace normalized before commit, original upstream hashes retained."
+      "local_adaptation": "Added project integration routing; original SKILL.md retained in .agents/skill-source-archives/mermaid-diagrams-3027f20f3181; local documentation line endings/trailing whitespace normalized before commit, original upstream hashes retained.",
+      "active_path": "project-documentation/references/mermaid-diagrams",
+      "renamed_files": {
+        "SKILL.md": "GUIDE.md"
+      },
+      "merged_on": "2026-11-03"
     }
   },
-  "selection_updated_on": "2026-10-29"
+  "selection_updated_on": "2026-10-29",
+  "merge_note": "2026-11-03: 37 skills consolidated to 19 lead skills (decision D32). Moved skills keep original bytes at active_path with SKILL.md renamed GUIDE.md, except project-authored files whose relative links were rewritten (hashes refreshed by scripts/skills.py manifest). Checked by npm run check:skills."
 }

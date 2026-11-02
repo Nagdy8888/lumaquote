@@ -1,0 +1,17 @@
+# Paths excluded from the graphify knowledge graph (decision D33). Gitignore syntax.
+# Skills are instructions, not app code; .claude/skills is a generated mirror.
+.agents/
+.claude/
+# Archived rule text, generated outputs and binary fixtures.
+docs/archive/
+graphify-out/
+node_modules/
+.venv/
+.local/
+dist/
+supabase/.temp/
+supabase/.branches/
+tests/fixtures/evaluation/media/
+*.pdf
+*.png
+*.wav

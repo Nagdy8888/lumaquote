@@ -4,6 +4,11 @@ Input is the directory of per-scenario JSON records written by
 `tests/integration/test_live_evaluation.py`. The summary never hides errors or
 not-run scenarios: every modality shows scenarios, run, passed, failed, errored and
 not run, and the plan's targets are compared only where the denominator supports it.
+
+Rule R11 (AGENTS.md): the harness pins the scenario/oracle hashes in `<run>/run.json` when
+a run starts. Scoring against different fixtures, or a run without that pin, is refused
+unless `--post-hoc` is given, in which case the report carries `post_hoc: true` and both
+hash sets so readers can see the answer key moved after the observations were made.
 """
 
 import argparse
@@ -101,13 +106,41 @@ def summarize(split: str, scenarios: list[dict], oracle: dict, results: dict[str
 
 
 def main() -> int:
-    """Read a run directory, write the evidence file and print the headline counts."""
+    """Read a run directory, write the evidence file and print the headline counts.
+
+    Returns 1 without writing anything when the fixtures differ from the run-start pin and
+    `--post-hoc` was not given (rule R11); otherwise writes `--output` and returns 0.
+    """
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--run", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--split", choices=["development", "holdout"], default="development")
     parser.add_argument("--note", default="")
+    parser.add_argument(
+        "--post-hoc",
+        action="store_true",
+        help="Score against fixtures that differ from (or were not pinned at) run start; the report is labeled post_hoc.",
+    )
     args = parser.parse_args()
+    current = dataset.fingerprints()
+    start_file = args.run / "run.json"
+    pinned = (
+        json.loads(start_file.read_text(encoding="utf-8")).get("fixtures_sha256")
+        if start_file.exists()
+        else None
+    )
+    post_hoc = pinned != current
+    if post_hoc and not args.post_hoc:
+        reason = (
+            "no run.json with pinned fixture hashes"
+            if pinned is None
+            else "scenarios/oracle changed since the run started"
+        )
+        print(
+            f"Refusing to score (rule R11): {reason}. Rerun, or pass --post-hoc to label the report post-hoc.",
+            file=sys.stderr,
+        )
+        return 1
     scenarios, oracle = dataset.load()
     results = {
         path.stem: json.loads(path.read_text(encoding="utf-8")) for path in sorted(args.run.glob("e*.json"))
@@ -115,7 +148,9 @@ def main() -> int:
     report = {
         "split": args.split,
         "holdout_consumed": args.split == "holdout",
-        "fixtures_sha256": dataset.fingerprints(),
+        "fixtures_sha256": current,
+        "run_fixtures_sha256": pinned,
+        "post_hoc": post_hoc,
         "denominators": dataset.denominators(scenarios),
         "note": args.note,
         "summary": summarize(args.split, scenarios, oracle, results),

@@ -361,5 +361,5 @@ hosting readiness. Estimated model usage remains distinct from provider billing.
 
 Related references: [local setup](../LOCAL_DEVELOPMENT.md),
 [evaluation skill](../.agents/skills/evaluate-quotation-agent/SKILL.md),
-[release verification](../.agents/skills/verify-quotation-release/SKILL.md), and
-[engineering coverage catalog](../.agents/skills/verify-engineering-coverage/references/concepts.json).
+[release verification](../.agents/skills/verify-and-review/references/verify-quotation-release/GUIDE.md), and
+[engineering coverage catalog](../.agents/skills/verify-and-review/references/engineering-coverage/references/concepts.json).

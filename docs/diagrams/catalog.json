@@ -234,6 +234,22 @@
         "app/agents/luma_agent/runtime/delivery.py",
         "supabase/migrations/20261102010000_whatsapp_inbox.sql"
       ]
+    },
+    {
+      "id": "rule-enforcement",
+      "title": "How the working rules are enforced",
+      "scope": "Actual hooks, scripts and checks behind AGENTS.md rules R1-R15; review-only rules are marked as such",
+      "embeds": [
+        "docs/reference/AGENT_RULES.md"
+      ],
+      "bindings": [
+        "scripts/hooks/guard.py",
+        "scripts/check_docs.py",
+        "scripts/skills.py",
+        ".claude/settings.json",
+        "scripts/verify.cjs",
+        "scripts/summarize_agent_run.py"
+      ]
     }
   ]
 }

@@ -10,7 +10,7 @@ function main() {
   if (!npm) throw new Error('Use npm run verify or npm run verify:full so the actual package-manager entrypoint is known.');
   const directory = path.join(root, '.local', 'checks');
   fs.mkdirSync(directory, { recursive: true });
-  const commands = ['lint:python', 'check:architecture', 'check:frontend', 'test:diagrams', 'diagrams:check', 'typecheck', full ? 'test:python' : 'test:unit', 'test:ui', ...(full?['test:browser']:[]), 'build', 'check:secrets'];
+  const commands = ['lint:python', 'check:architecture', 'check:docs', 'skills:check', 'check:frontend', 'test:diagrams', 'diagrams:check', 'typecheck', full ? 'test:python' : 'test:unit', 'test:ui', ...(full?['test:browser']:[]), 'build', 'check:secrets'];
   const summary = [];
   for (const command of commands) {
     const start = Date.now();

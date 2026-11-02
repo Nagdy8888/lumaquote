@@ -15,20 +15,20 @@ Every authored function and class requires meaningful inline documentation, not
 only separate project docs. Root AGENTS.md defines the enforceable conventions.
 
 ## 1. Design and foundations
-- [x] Premium graphite/copper workspace, responsive UI, self-hosted fonts, accessible primitives.
-- [x] Native frontend/API/worker commands; isolated local Supabase; restricted DB identities.
-- [x] Staff Auth, current membership, migrations/RLS/private file access, typed contracts.
-- [x] 72 labeled synthetic products, six catalog PDFs, realistic requests and stock exceptions.
-- [x] Real resource-bounded, network-disabled media sandbox.
+- [x] Premium graphite/copper workspace, responsive UI, self-hosted fonts, accessible primitives. ([evidence](evidence/phase-1.json), [accessibility](evidence/phase-1-accessibility.json))
+- [x] Native frontend/API/worker commands; isolated local Supabase; restricted DB identities. ([evidence](evidence/phase-1.json))
+- [x] Staff Auth, current membership, migrations/RLS/private file access, typed contracts. ([evidence](evidence/phase-1.json))
+- [x] 72 labeled synthetic products, six catalog PDFs, realistic requests and stock exceptions. ([evidence](evidence/phase-1.json))
+- [x] Real resource-bounded, network-disabled media sandbox. ([evidence](evidence/phase-1.json))
 
 ## 2. Manual quotation workflow
-- [x] Intake, clarification, evidence, product selection, deterministic Decimal totals.
-- [x] Immutable revisions, PDF parity, exact customer/revision approval, rejection, takeover.
-- [x] Durable inbox/jobs/outbox, honest delivery state, scoped idempotency and audit.
-- [x] Unit/property/integration/composite/browser validation.
+- [x] Intake, clarification, evidence, product selection, deterministic Decimal totals. ([evidence](evidence/phase-2.json))
+- [x] Immutable revisions, PDF parity, exact customer/revision approval, rejection, takeover. ([evidence](evidence/phase-2.json))
+- [x] Durable inbox/jobs/outbox, honest delivery state, scoped idempotency and audit. ([evidence](evidence/phase-2.json))
+- [x] Unit/property/integration/composite/browser validation. ([evidence](evidence/phase-2.json))
 
 ## 3. Persistent agent and media
-- [x] PostgreSQL-backed LangGraph, restart/resume, customer and staff participation.
+- [x] PostgreSQL-backed LangGraph, restart/resume, customer and staff participation. ([evidence](evidence/phase-3-progress.json))
 - [ ] OpenAI structured extraction (advisory: the deterministic written-order parser stays authoritative), confirmed consequential media fields, evidence-backed matching.
 - [ ] English transcription/photo intake, reservations and limits, redacted LangSmith tracing.
 - [ ] Retrieval versions/citations, embeddings, ambiguity/injection/regression checks.

@@ -1,0 +1,342 @@
+{
+  "schema_version": 1,
+  "reviewed_on": "2026-10-29",
+  "concepts": [
+    {
+      "id": "B01",
+      "concept": "Trust boundaries and threat modeling",
+      "definition": "Identify who controls each input and where authority changes.",
+      "example_failure": "A signed WhatsApp event is mistaken for staff permission.",
+      "verification": "Map browser, customer, staff, webhook, model, worker, database, and external-provider trust transitions.",
+      "source": "asvs"
+    },
+    {
+      "id": "B02",
+      "concept": "Authentication",
+      "definition": "Establish identity with verified credentials rather than a supplied identifier.",
+      "example_failure": "A caller invents a user or phone number.",
+      "verification": "Reject absent, invalid, expired, and incorrectly scoped credentials.",
+      "source": "api"
+    },
+    {
+      "id": "B03",
+      "concept": "Authorization and least privilege",
+      "definition": "Check whether this identity may perform this action now.",
+      "example_failure": "A viewer calls an admin or send endpoint directly.",
+      "verification": "Exercise permitted and forbidden roles against actual endpoints and tools.",
+      "source": "api"
+    },
+    {
+      "id": "B04",
+      "concept": "Object-level access control (IDOR/BOLA)",
+      "definition": "Check access to the specific requested object.",
+      "example_failure": "Changing a quotation ID reveals another customer's offer.",
+      "verification": "Attempt cross-user and cross-company read, update, delete, export, and resume.",
+      "source": "api"
+    },
+    {
+      "id": "B05",
+      "concept": "Mass assignment / property-level authorization",
+      "definition": "Allow only fields the actor is permitted to change.",
+      "example_failure": "A request sets approved=true, role=admin, or company_id.",
+      "verification": "Reject privilege-bearing fields through REST, RPC, and service paths.",
+      "source": "api"
+    },
+    {
+      "id": "B06",
+      "concept": "Tenant isolation and RLS",
+      "definition": "Keep companies separated at storage and service boundaries.",
+      "example_failure": "A service-role client masks a missing RLS policy.",
+      "verification": "Test anon, authenticated, and worker roles; inspect elevated functions, views, joins, and Storage policies.",
+      "source": "supabase"
+    },
+    {
+      "id": "B07",
+      "concept": "Session lifecycle and revocation",
+      "definition": "Bound how long credentials and privileges remain useful.",
+      "example_failure": "Disabled staff keep approving through an old token.",
+      "verification": "Test recovery, logout semantics, role downgrade, token rotation, and current membership checks.",
+      "source": "asvs"
+    },
+    {
+      "id": "B08",
+      "concept": "Secrets management and rotation",
+      "definition": "Keep credentials private, scoped, replaceable, and outside artifacts.",
+      "example_failure": "OpenAI or service-role keys enter a frontend build or trace.",
+      "verification": "Inspect builds/logs/history fixtures and demonstrate configured-key replacement without exposing values.",
+      "source": "asvs"
+    },
+    {
+      "id": "B09",
+      "concept": "CORS",
+      "definition": "Control which browser origins can read responses; it is not authentication.",
+      "example_failure": "Wildcard origins are treated as an access-control system.",
+      "verification": "Test exact origins and credential behavior, and enforce authorization for non-browser clients.",
+      "source": "asvs"
+    },
+    {
+      "id": "B10",
+      "concept": "CSRF",
+      "definition": "Protect mutations when a browser automatically attaches credentials.",
+      "example_failure": "Another site causes a logged-in staff member to approve a quote.",
+      "verification": "Test the chosen cookie/bearer transport, CSRF strategy, origin checks, and no accidental fallback.",
+      "source": "asvs"
+    },
+    {
+      "id": "B11",
+      "concept": "XSS, safe output, and CSP",
+      "definition": "Render hostile content without executing it; CSP adds defense in depth.",
+      "example_failure": "A product snippet or model Markdown runs script in the staff UI.",
+      "verification": "Test hostile snippets, filenames, links, rich text, and policy headers in a browser.",
+      "source": "asvs"
+    },
+    {
+      "id": "B12",
+      "concept": "SQL, command, and template injection",
+      "definition": "Keep data separate from executable queries and programs.",
+      "example_failure": "A model-generated filter, filename, or quote field becomes code.",
+      "verification": "Use parameterization and constrained APIs; test payloads through tools and document generation.",
+      "source": "asvs"
+    },
+    {
+      "id": "B13",
+      "concept": "SSRF and outbound destination validation",
+      "definition": "Prevent untrusted input choosing privileged network destinations.",
+      "example_failure": "An attachment URL accesses metadata, local Supabase, or another internal service.",
+      "verification": "Test redirects, DNS/IP changes, IPv6, authenticated-host restrictions, and response limits.",
+      "source": "api"
+    },
+    {
+      "id": "B14",
+      "concept": "File, archive, audio, and parser safety",
+      "definition": "Bound untrusted parsing and validate actual content.",
+      "example_failure": "A short upload expands massively or hangs a decoder.",
+      "verification": "Test type mismatch, expansion, duration, CPU/memory/time limits, and parser isolation.",
+      "source": "asvs"
+    },
+    {
+      "id": "B15",
+      "concept": "Rate limiting",
+      "definition": "Bound admission frequency and bursts for an operation.",
+      "example_failure": "Parallel callers bypass a process-local limiter.",
+      "verification": "Verify boundary and multi-instance behavior with trusted identity keys and proxy handling.",
+      "source": "api"
+    },
+    {
+      "id": "B16",
+      "concept": "Quotas, spending reservations, and denial of wallet",
+      "definition": "Bound total consumption and reserve allowance before paid work.",
+      "example_failure": "Concurrent audio requests exceed the remaining allowance.",
+      "verification": "Test last-allowance races, unknown provider outcomes, and estimates separated from billed cost.",
+      "source": "consumption"
+    },
+    {
+      "id": "B17",
+      "concept": "Concurrency limits and backpressure",
+      "definition": "Bound active work and queued backlog.",
+      "example_failure": "Uploads exhaust all workers and starve staff interactions.",
+      "verification": "Exercise queue capacity, tenant fairness, worker leases, and bounded deferral under overload.",
+      "source": "sre"
+    },
+    {
+      "id": "B18",
+      "concept": "Deadlines, retries, jitter, and circuit breakers",
+      "definition": "Bound execution and recover selectively from transient failures.",
+      "example_failure": "Nested retries amplify an outage or keep billing after cancellation.",
+      "verification": "Inject timeout/outage responses and verify overall deadline, retry ceiling, cancellation, and recovery.",
+      "source": "aws"
+    },
+    {
+      "id": "B19",
+      "concept": "Idempotency and uncertain external outcomes",
+      "definition": "A repeated request must not repeat a business effect.",
+      "example_failure": "A timeout triggers a duplicate WhatsApp quotation.",
+      "verification": "Race duplicate keys, reject changed payloads, and reconcile accepted-but-unconfirmed sends.",
+      "source": "aws"
+    },
+    {
+      "id": "B20",
+      "concept": "Transactions and isolation",
+      "definition": "Group related database changes and control concurrent visibility.",
+      "example_failure": "Approval is saved but its dispatch intent is lost.",
+      "verification": "Test crash boundaries and concurrent transactions using the actual PostgreSQL isolation strategy.",
+      "source": "pg-transactions"
+    },
+    {
+      "id": "B21",
+      "concept": "Database constraints and referential integrity",
+      "definition": "Make stored invariants hold across every writer.",
+      "example_failure": "A direct write creates duplicate events or orphan quote lines.",
+      "verification": "Verify unique, foreign-key, not-null, and domain constraints using invalid writes.",
+      "source": "pg-constraints"
+    },
+    {
+      "id": "B22",
+      "concept": "Optimistic concurrency, race conditions, and TOCTOU",
+      "definition": "Detect state changes between checking and acting.",
+      "example_failure": "An approved quotation changes before a queued send.",
+      "verification": "Race edits, takeover, approval, and dispatch; stale versions must not commit.",
+      "source": "pg-transactions"
+    },
+    {
+      "id": "B23",
+      "concept": "Transactional outbox, leases, fencing, and dead letters",
+      "definition": "Coordinate durable intent with recoverable workers and stale-owner rejection.",
+      "example_failure": "A restarted worker silently loses or repeats an operation.",
+      "verification": "Inject crash/reclaim/poison events; inspect durable retry and recovery outcomes.",
+      "source": "aws"
+    },
+    {
+      "id": "B24",
+      "concept": "Webhook authenticity, replay, ordering, and batching",
+      "definition": "Verify origin and handle repeated or reordered provider events.",
+      "example_failure": "A forged event triggers model work or a later receipt is discarded.",
+      "verification": "Test signatures, raw-body handling, batched records, duplicates, and monotonic status updates.",
+      "source": "api"
+    },
+    {
+      "id": "B25",
+      "concept": "Prompt injection and excessive agency",
+      "definition": "Keep untrusted content from controlling privileged tools.",
+      "example_failure": "A catalog tells the agent to disclose customer data or send an offer.",
+      "verification": "Test hostile messages, transcripts, and retrieved documents against server-enforced tool permissions.",
+      "source": "agency"
+    },
+    {
+      "id": "B26",
+      "concept": "RAG evidence, provenance, freshness, and access",
+      "definition": "Ground claims in authorized and applicable sources.",
+      "example_failure": "An obsolete catalog or restricted vector hit supplies an answer.",
+      "verification": "Test exact identifiers, current versions, ACL changes, insufficient evidence, and citations.",
+      "source": "agency"
+    },
+    {
+      "id": "B27",
+      "concept": "Durable human approval and replay-safe execution",
+      "definition": "Bind a human decision to the exact operation and survive suspension.",
+      "example_failure": "A boolean approval is reused for a revised quotation.",
+      "verification": "Test restart/resume, stale decisions, duplicate callbacks, revoked roles, and repeated node execution.",
+      "source": "langgraph"
+    },
+    {
+      "id": "B28",
+      "concept": "Data minimization, PII, and trace redaction",
+      "definition": "Export only necessary data with redaction before it leaves the process.",
+      "example_failure": "A nested LangSmith span leaks a transcript, secret, or signed URL.",
+      "verification": "Inject canaries and inspect nested traces, logs, exports, error bodies, and metric labels.",
+      "source": "asvs"
+    },
+    {
+      "id": "B29",
+      "concept": "Audit trails, monitoring, and actionable alerts",
+      "definition": "Record consequential behavior and detect conditions requiring action.",
+      "example_failure": "Logs exist but nobody detects failed sends or exhausted capacity.",
+      "verification": "Trace a decision to its result; trigger a representative alert and restrict audit mutation.",
+      "source": "sre"
+    },
+    {
+      "id": "B30",
+      "concept": "Cryptographic primitives, TLS, and key handling",
+      "definition": "Use standard secure primitives for the purpose they actually provide.",
+      "example_failure": "Encoding is called encryption or a weak random token protects recovery.",
+      "verification": "Inspect external TLS, credential hashing/token generation, key access, and rotation configuration.",
+      "source": "asvs"
+    },
+    {
+      "id": "B31",
+      "concept": "HTTP semantics and cache isolation",
+      "definition": "Keep private responses private and make method/retry/cache behavior explicit.",
+      "example_failure": "A shared cache serves one company's quote to another.",
+      "verification": "Test private caching headers, cache keys, safe methods, pagination bounds, and signed URL handling.",
+      "source": "asvs"
+    },
+    {
+      "id": "B32",
+      "concept": "Secure configuration and failure behavior",
+      "definition": "Make local/public defaults explicit and reject unsafe required settings.",
+      "example_failure": "Missing secrets disable checks or Studio is exposed by a public tunnel.",
+      "verification": "Test missing configuration, loopback bindings, diagnostic exposure, and fail-closed mutation paths.",
+      "source": "top10"
+    },
+    {
+      "id": "B33",
+      "concept": "Dependency and build supply chain",
+      "definition": "Know and constrain code entering builds and deployments.",
+      "example_failure": "A copied skill or component installs an unreviewed executable dependency.",
+      "verification": "Use lockfiles, origin/version review, vulnerability triage, and inspect generated build artifacts.",
+      "source": "top10"
+    },
+    {
+      "id": "B34",
+      "concept": "Migrations and deployment compatibility",
+      "definition": "Change persistent schemas and code without corrupting live workflows.",
+      "example_failure": "An upgrade removes a field still used by pending jobs.",
+      "verification": "Test clean install and upgrade from a prior state, grants/RLS, rollback compatibility, and resumable jobs.",
+      "source": "pg-constraints"
+    },
+    {
+      "id": "B35",
+      "concept": "Backups, restore, RPO, and RTO",
+      "definition": "Define tolerable loss/recovery time and prove restoration works.",
+      "example_failure": "A backup exists but private files or pending approvals cannot be restored.",
+      "verification": "Restore database and required files in isolation and verify a business workflow afterward.",
+      "source": "sre"
+    },
+    {
+      "id": "B36",
+      "concept": "Retention, deletion, and derived-data lifecycle",
+      "definition": "Remove access and clean related copies under a defined policy.",
+      "example_failure": "Deleted customer content survives in vectors, checkpoints, exports, or traces.",
+      "verification": "Test immediate access denial and tracked cleanup of derived/external copies and backup exceptions.",
+      "source": "langgraph"
+    },
+    {
+      "id": "B37",
+      "concept": "Money, units, timezones, and expiry",
+      "definition": "Give business values precise meaning and deterministic arithmetic.",
+      "example_failure": "Float rounding, pack-size confusion, or timezone shifts alter an offer.",
+      "verification": "Test Decimal totals, currency/units, effective dates, business timezone, and expiry boundaries.",
+      "source": "pg-constraints"
+    },
+    {
+      "id": "B38",
+      "concept": "Third-party API contracts and OAuth scopes",
+      "definition": "Treat provider responses as untrusted and grant minimal integration access.",
+      "example_failure": "An unexpected API response or broad token enables unintended operations.",
+      "verification": "Validate schemas, pagination, credential scope, retries, host selection, and version compatibility.",
+      "source": "api"
+    },
+    {
+      "id": "B39",
+      "concept": "Negative, concurrency, and recovery testing",
+      "definition": "Test forbidden and interrupted behavior rather than only successful examples.",
+      "example_failure": "Happy-path tests pass despite an approval bypass.",
+      "verification": "Show targeted deny/race/restart tests through real interfaces and distinguish fixtures from live checks.",
+      "source": "asvs"
+    },
+    {
+      "id": "B40",
+      "concept": "UI consistency, accessibility, and honest state",
+      "definition": "Keep the interface usable and consistent with server-confirmed outcomes.",
+      "example_failure": "The UI displays Sent while delivery failed or approvals are keyboard-inaccessible.",
+      "verification": "Test pending/failure/rollback states, reconnect, focus/keyboard use, and reduced-motion/3D fallback.",
+      "source": "asvs"
+    },
+    {
+      "id": "B41",
+      "concept": "Environment separation and public playground isolation",
+      "definition": "Keep synthetic visitors away from staff records and live integrations.",
+      "example_failure": "An anonymous visitor triggers real messaging or reads a shared session.",
+      "verification": "Test distinct identities/datasets, session expiry, spending bounds, and denial of live actions.",
+      "source": "api"
+    },
+    {
+      "id": "B42",
+      "concept": "Endpoint and feature inventory",
+      "definition": "Know every externally reachable route, RPC, bucket, and admin surface.",
+      "example_failure": "An old/debug endpoint bypasses controls added to the main API.",
+      "verification": "Compare implemented routes and direct Supabase paths with the assessed surface inventory.",
+      "source": "api"
+    }
+  ]
+}

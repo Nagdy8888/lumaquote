@@ -11,7 +11,7 @@ Inspect the chosen provider and verify its current official webhook, authenticat
 Use Meta's WhatsApp Cloud API directly with its developer test number and authorized test recipients for development and the recorded portfolio walkthrough.
 The user requested free WhatsApp integration. Do not introduce a paid messaging provider, subscription, paid template sends, or production billing as a default.
 Confirm current test-account restrictions during setup. Free WhatsApp testing does not establish that model inference, transcription, hosting, or unrestricted production messaging is free.
-Use [whatsapp-webhooks](../whatsapp-webhooks/SKILL.md) for Meta's verification handshake, raw-body signature validation, and inbound/status payload examples.
+Use [whatsapp-webhooks](references/whatsapp-webhooks/GUIDE.md) for Meta's verification handshake, raw-body signature validation, and inbound/status payload examples.
 Its examples are starting points: retain this project's durable queue, tenant isolation, approval, deduplication, and takeover requirements.
 Before adapting examples, reject missing/empty webhook secrets at startup, replace customer-content console logging with redacted operational events, and persist accepted events before acknowledging them.
 Inbound message deduplication can use the message identity; delivery receipts need a distinct event identity or message-plus-status identity so an earlier receipt does not suppress a later delivered/read update. Enforce monotonic delivery transitions with the provider's actual event semantics.

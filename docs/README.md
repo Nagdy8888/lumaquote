@@ -14,6 +14,9 @@ remain intact; progress reports describe observed snapshots rather than release 
 - **Verify a claim:** [testing plan](TESTING_PLAN.md), [engineering ledger](engineering/coverage.json),
   and the [evidence directory](evidence) distinguish local tests, live canaries,
   generated development queries and unfinished release gates.
+- **Follow the working rules:** [AGENTS.md](../AGENTS.md) (rules R1-R15, skill routing), the
+  [user decisions register](DECISIONS.md) and [how the rules are enforced](reference/AGENT_RULES.md)
+  (hooks, `check:docs`, `skills:check`, the scoring pin and the `graphify-out/` knowledge graph).
 - **Continue the implementation:** [implementation tracker](IMPLEMENTATION_PLAN.md),
   [work log](WORK_LOG.md) and [account actions](MORNING_ACTIONS.md).
 - **Record the walkthrough:** the truthful [showcase shot list](SHOWCASE_SHOT_LIST.md) (what is real,
@@ -60,6 +63,9 @@ reference for the module you are changing:
 - [Configuration and operation](reference/CONFIGURATION.md): actual safe variable
   inventory/defaults, precedence/cache behavior, process/port ownership and private
   generated files.
+- [Working rules and enforcement](reference/AGENT_RULES.md): rule-to-check map, Claude Code
+  hooks, documentation/evidence/plan checks, skill mirror and hashes, evaluation scoring pin,
+  knowledge graph, failure fixes and tests.
 - [Tooling and tests](reference/TOOLING_AND_TESTS.md): development scripts/test
   families, fixture preservation, gate commands, browser assertions, live opt-ins,
   CI scope and evidence interpretation, including the [80-scenario evaluation set](../tests/fixtures/evaluation/README.md) and what its offline baseline does not prove.

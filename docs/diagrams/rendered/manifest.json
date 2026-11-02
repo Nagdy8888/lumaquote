@@ -60,7 +60,7 @@
         "supabase/migrations/20261029010000_quotation_domain.sql": "65b37c4e9358aa488174bf842b52c1100b2e83a44170c1b862fc9f25a75b2db6",
         "supabase/migrations/20261029131000_versioned_embeddings.sql": "71b6e35515d12ad5f116019b330790f6fdf00f4fc6162b38054b98b245f57e17"
       },
-      "svg_sha256": "0bbf26175fcbe718430a2b8bad8e271debc578bfcb4ab4054e587291433a17f7",
+      "svg_sha256": "b40764772ebdfe4f2c19978344fb711144a03ed45faab4f6d1832a57b0bb088a",
       "width": 842.09,
       "height": 998.25
     },
@@ -71,7 +71,7 @@
         "supabase/migrations/20261029010000_quotation_domain.sql": "65b37c4e9358aa488174bf842b52c1100b2e83a44170c1b862fc9f25a75b2db6",
         "supabase/migrations/20261029100000_immutable_quotation_content.sql": "acd5b9a206ff4a23277a00499cfa6941217096edcbec3ba5c66db07d3e21078a"
       },
-      "svg_sha256": "01d12f32f23cf2f8d8301e476c19d107ce71ca6857f8a55e8327fec7bb6c5c25",
+      "svg_sha256": "93ac2049bfbe3a84a899310e8cf6254e39a26016092e482e3a31a4ae55f5d559",
       "width": 729.36,
       "height": 825
     },
@@ -83,7 +83,7 @@
         "supabase/migrations/20261029110000_voice_intake.sql": "60b4f99ab5d0ea74677e5c2522807539222a31cd5a3e8aae2dabf5850031bde0",
         "supabase/migrations/20261029111000_media_message_binding.sql": "369cc2db1bd77d42a170d32f2e1d2269207cf7c7c1b53b140ce489ea72140e52"
       },
-      "svg_sha256": "6baed97264c43b056628e52fc1ca346010a3af23ae88dd59ae5dd2528158b95b",
+      "svg_sha256": "7a663e37bd13010470170186fb54cbf961d05630980586e6e58bb95d628428e3",
       "width": 846.89,
       "height": 896.5
     },
@@ -98,7 +98,7 @@
         "app/agents/luma_agent/nodes/workflow.py": "9301dff61ad428af7b2b7f4c3ddc4aaca61313cb33470f6ebfe7f76e2560cbd2",
         "app/agents/luma_agent/runtime/conversations.py": "538aaaf97bab720c695455349621914c026621a08f9b2c20e9355cf03306f189"
       },
-      "svg_sha256": "5e1687914cdfc3246fa2d8353f26e918e1bdbd08310611bc22a1481a5061e488",
+      "svg_sha256": "b064cf41fd7f6f84d9817814ad34c78ad2f69253330178b72c56dbc95c75f1b7",
       "width": 685.62,
       "height": 888.34
     },
@@ -135,7 +135,7 @@
         "app/agents/luma_agent/runtime/media.py": "2491f1eed267ccd8a39c92d67bcadabd5fd09aa04afcb8552a0da8c84e7020c6",
         "app/agents/luma_agent/runtime/recovery.py": "3c51108e0b3c6277eaa6a0746114a43d0938775b101f94c021f937ea96f8e0e7"
       },
-      "svg_sha256": "040f0f1faafbaddc1a42e9a80b1ac2e4cf3777c645d9fe58898cc38f94d001c1",
+      "svg_sha256": "24ab7273bf1bd2dec32f00aeac34f97fee5fc223e768a67e152c72c9294fbe9b",
       "width": 1317.98,
       "height": 693.8
     },
@@ -196,7 +196,7 @@
       "source_sha256": "298dfced352dcd134b726006151179f76547d39e2f19c4a99fbcb66bd0c9bc49",
       "renderer_sha256": "44f5712d92cb37910338d84507da5b3e04fe9603fb0fe445335fa85ef56cffb5",
       "bindings": {
-        "scripts/verify.cjs": "35cfe1ffebaa7c7a1aa72b217bf8b195599498176a9392410c00e515af989a8a",
+        "scripts/verify.cjs": "aea2355295aa6cb802c9774b60e0469ba9b1b09040d109b799cb1eafbe819bed",
         ".github/workflows/ci.yml": "b75c77bbf20f4e1229a59499a14f7515e0b49f669e0c576b9e09b1280ef2796e",
         "tests/integration/test_browser_workflow.py": "7652f2d99e5216b5a81506c73d35715dfa44c8029b18c56ab8304a3ae8010cf4"
       },
@@ -218,6 +218,21 @@
       "svg_sha256": "e948a982956e557af4e8be6af62a1eb2d85a08770697d9e142cf6d6b704ba07e",
       "width": 1063,
       "height": 1453
+    },
+    "rule-enforcement": {
+      "source_sha256": "36b37ae827c03128ee494f9bcc376436d1fe73e5b7f5f4cf53c0aa60a382686c",
+      "renderer_sha256": "44f5712d92cb37910338d84507da5b3e04fe9603fb0fe445335fa85ef56cffb5",
+      "bindings": {
+        "scripts/hooks/guard.py": "6fce9edf3f02c859b69462826c13444aa48c522f3db27e6dda3c84ea1bfcb7ab",
+        "scripts/check_docs.py": "e9b47eaa507a2c2c06d49d99ba48ecd432cd35407ff76379a094eea66468161e",
+        "scripts/skills.py": "d09af51388cba5aee2fc0eb57f8597f46261c963f5efa2203bd546466ceeff93",
+        ".claude/settings.json": "e2881af356a77ec20cee0f9a18d1b08dc46446fd6d4e67a6a17e07608479544b",
+        "scripts/verify.cjs": "aea2355295aa6cb802c9774b60e0469ba9b1b09040d109b799cb1eafbe819bed",
+        "scripts/summarize_agent_run.py": "ef70744ea93818ea9ef77609442099b8e914949f70eaabef3e8274ad5e540a68"
+      },
+      "svg_sha256": "16877e892f2f60b5c6b10042d5309cd485f9aa395c9826e728033fc9322e51d0",
+      "width": 1555.34,
+      "height": 688.7
     }
   }
 }

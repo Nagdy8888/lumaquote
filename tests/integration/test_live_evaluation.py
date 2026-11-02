@@ -64,6 +64,33 @@ SELECTED = [
 
 
 @pytest.fixture(scope="module", autouse=True)
+def record_run_start():
+    """Pin the scenario and oracle hashes when a run starts (rule R11).
+
+    `scripts/summarize_agent_run.py` refuses to score the run against different fixtures
+    unless the report is explicitly labeled post-hoc. The first start of a run name wins,
+    so resuming a run cannot silently re-pin changed answer keys.
+    """
+    if SELECTED:
+        RUN_DIR.mkdir(parents=True, exist_ok=True)
+        start = RUN_DIR / "run.json"
+        if not start.exists():
+            start.write_text(
+                json.dumps(
+                    {
+                        "started": datetime.now(UTC).isoformat(),
+                        "split": SPLIT,
+                        "fixtures_sha256": dataset.fingerprints(),
+                    },
+                    indent=2,
+                )
+                + "\n",
+                encoding="utf-8",
+            )
+    yield
+
+
+@pytest.fixture(scope="module", autouse=True)
 def record_holdout_consumption():
     """After a holdout run (even a partial one) append it to the freeze record so it cannot be repeated."""
     yield

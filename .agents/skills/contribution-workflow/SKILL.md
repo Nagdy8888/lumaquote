@@ -13,10 +13,10 @@ Use actual issue references when available. Do not invent ticket IDs, mandatory 
 Select a branch strategy suited to this repository. Do not introduce main/dev promotion flows, CODEOWNERS, branch protection, or required reviewers as an installation side effect.
 
 ## Boundaries with other skills
-- [review-quotation-code](../review-quotation-code/SKILL.md) owns substantive code review.
-- [verify-engineering-coverage](../verify-engineering-coverage/SKILL.md) owns engineering coverage and evidence.
-- [verify-quotation-release](../verify-quotation-release/SKILL.md) owns release verification.
-- [setup-pre-commit](../setup-pre-commit/SKILL.md) owns explicitly requested hook setup; inspect existing checks and use one coherent hook chain.
+- [review-quotation-code](../verify-and-review/references/review-quotation-code/GUIDE.md) owns substantive code review.
+- [verify-engineering-coverage](../verify-and-review/references/engineering-coverage/GUIDE.md) owns engineering coverage and evidence.
+- [verify-quotation-release](../verify-and-review/references/verify-quotation-release/GUIDE.md) owns release verification.
+- [setup-pre-commit](../../retired-skills-2026-11-03/setup-pre-commit) owns explicitly requested hook setup; inspect existing checks and use one coherent hook chain.
 - [project-documentation](../project-documentation/SKILL.md) owns decisions, guides, and release-note content.
 
 Use [PR description prompts](assets/pr-description-prompts.md) when no repository template exists. Report local checks, external CI, and pushed/unpushed state separately. A passing local build is not proof of remote CI.

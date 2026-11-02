@@ -33,76 +33,95 @@
     "plan-quotation-app": {
       "origin": "project-authored",
       "files": {
-        "SKILL.md": "f731d7f983f454b2ca41ebb6f1527a7263cd488a42c21559c215c137b5619427",
+        "SKILL.md": "3982c936550806b10fbb9fbae2f786019e7292710b487f99dee2a56fef6bae49",
         "references/agent-organization.md": "cf958c9f3c106db5e60a85e586679ed292d71f8a9304ffd38416e8f04b30fbb1"
       },
       "source_archive": "../skill-source-archives/user-supplied-2026-10-29",
-      "adaptation": "Project-specific integration; original notices preserved in non-active archive"
+      "adaptation": "Project-specific integration; original notices preserved in non-active archive",
+      "active_path": "plan-quotation-app"
     },
     "integrate-whatsapp": {
       "origin": "project-authored",
       "files": {
-        "SKILL.md": "2ff021b7abdb8da0354e9cf8f91f4abdfc0626ea08cdf5a7df90075f7961bbcf"
-      }
+        "SKILL.md": "6a7a8e2db89f0979a3fe78f2911c7112247d57b26b2f0cb03bc1e152ac8c1d42"
+      },
+      "active_path": "integrate-whatsapp"
     },
     "process-voice-notes": {
       "origin": "project-authored",
       "files": {
         "SKILL.md": "c7e1f69cd46a070c71480fd1597a57bfda01391c8758a95d5c275b37e2a4dad8"
-      }
+      },
+      "active_path": "process-voice-notes"
     },
     "implement-human-approval": {
       "origin": "project-authored",
       "files": {
-        "SKILL.md": "b7ff639c7a92a7ab6eec2173a8f96a466d2aefcf3bb4d6d9181a4d94e43dd828"
-      }
+        "SKILL.md": "d58dcbbccf8adf9027b4bccc698057dde14b4fd2f9fbba241e91244fd88d90aa"
+      },
+      "active_path": "implement-human-approval"
     },
     "build-quotations": {
       "origin": "project-authored",
       "files": {
         "SKILL.md": "573057579ffa4e9d5e00933edf81c4daca690a86c2195cba1d0c3bcfe9b75e1b"
-      }
+      },
+      "active_path": "build-quotations"
     },
     "automate-google-workspace": {
       "origin": "project-authored",
       "files": {
         "SKILL.md": "9fd7fe2618624942ed2067a2fe5f3682803e17892f6aadfb028a0690f614538f"
-      }
+      },
+      "active_path": "automate-google-workspace"
     },
     "ingest-supplier-evidence": {
       "origin": "project-authored",
       "files": {
         "SKILL.md": "407e989c7d7e0ceebbc0428a5ba141c921445756ac3ddcbcfef0c94ee864c287"
-      }
+      },
+      "active_path": "ingest-supplier-evidence"
     },
     "secure-quotation-app": {
       "origin": "project-authored",
       "files": {
+        "SKILL.md": "d82ba353532202c162d7e64f0b32c8c9957111ad16c7584d2d3149872fdc167c",
         "references/access-and-browser.md": "6bbdfac1f888243548e1b55dfe54ab302d5c2c79ec25aae40cfc85bf93f7d062",
         "references/fastapi-request-boundaries.md": "3914903ec3319c01f9e6ac740913262808d62ab785c08f5bb946a8c8787ed075",
-        "references/files-agent-and-operations.md": "e6f8a3db7e867ae9fef07ec588aa489c807a9669abca23b60540ed391a4953f1",
-        "SKILL.md": "35f287a27235752c1e0c0917d2fffb41cb3c391bc44b79502c0366f1dbf98bbe"
+        "references/files-agent-and-operations.md": "e6f8a3db7e867ae9fef07ec588aa489c807a9669abca23b60540ed391a4953f1"
       },
       "source_archive": "../skill-source-archives/user-supplied-2026-10-29",
-      "adaptation": "Project-specific integration; original notices preserved in non-active archive"
+      "adaptation": "Project-specific integration; original notices preserved in non-active archive",
+      "active_path": "secure-quotation-app"
     },
     "evaluate-quotation-agent": {
       "origin": "project-authored",
       "files": {
         "SKILL.md": "2f4dd3956a4f4508570bd613d247fbe4c436cba215ed1687d03e205ea8c540ad"
-      }
+      },
+      "active_path": "evaluate-quotation-agent"
     },
     "verify-quotation-release": {
       "origin": "project-authored",
       "files": {
-        "SKILL.md": "4c2082e12982d730c31f3cf5abbcf5b177e331de36a5c69acdc649a4ef2380d0"
-      }
+        "SKILL.md": "25f98fe3dc50a00ccead6978713f7bdd83d3ab480c85e98e1f83da413697f99e"
+      },
+      "active_path": "verify-and-review/references/verify-quotation-release",
+      "renamed_files": {
+        "SKILL.md": "GUIDE.md"
+      },
+      "merged_on": "2026-11-03"
     },
     "review-quotation-code": {
       "origin": "project-authored",
       "files": {
-        "SKILL.md": "48e0d38d439f5b1ed6f35279590b090c0a53c7aaf5326ee5d94a505fa2eab4f6"
-      }
+        "SKILL.md": "70fa52bf00620a9bf2a1e3ce46fbc8311c93998f133161872c81e43e7abc0310"
+      },
+      "active_path": "verify-and-review/references/review-quotation-code",
+      "renamed_files": {
+        "SKILL.md": "GUIDE.md"
+      },
+      "merged_on": "2026-11-03"
     },
     "impeccable": {
       "origin": "retained-local",
@@ -149,10 +168,6 @@
         "reference/shape.md": "a55f016c046cb6a27c55bd7f346375aeb506a755c4fbca19a5f92dbd42309c23",
         "reference/typeset.md": "442749aed338f51c1a3ccfb182c6ade9b74b90590b67984062ac94a5b100e914",
         "reference/visualize.md": "896da399bafcffb0623bdd81bb18709d6eab25c9d5917e739c8798f31ff0d076",
-        "reference/degraded/asset-producer.md": "a8547c8565979894f0c07f92a96ac2a38e681a31fbf155ffeefc7566e185d9c2",
-        "reference/degraded/documenter.md": "bcc05ea92faebb5c74037a9d4263a5ce9a56f5ab07c8ab3c59ee704d8cade745",
-        "reference/degraded/finish-reviewer.md": "5f24c5a97b4ffcabc7c432b064cfdd04c7a2ad52f52e765be648dc0aadab8f38",
-        "reference/degraded/manual-edit-applier.md": "5fae7f8a2fc3ddd49ad0a413446dc44daedef5b6b7de5eb935bd2fbfad646d58",
         "scripts/command-metadata.json": "6bdbc3f745ceee15e10b050f109ce42bbeb53ab3c3b5239257de1d596654dee7",
         "scripts/impeccable": "39d9600489073e227e4f4d55c451ce4252a6632ed7ae37923efbbcbc91f16d07",
         "scripts/impeccable.cmd": "759bab1d8adc071fdde2efcf6e2157aa4026f3c2b4f3c342a8070bf328011616",
@@ -162,68 +177,95 @@
         "scripts/live-browser.js": "7af0a8665057c83b39bca2c8c7427ef2343734f70d4128c377113a6726a1e3b1",
         "scripts/modern-screenshot.umd.js": "bb36665889124a0b6e15f16045265737449c3bdcf2712cdb08af3cfa01563e2b",
         "scripts/VERSION": "800cf1c0392b24de7c0a1c6ea6778ecb433dec71c49a150bce96a98477527b2f",
-        "scripts/bin/windows-x64/impeccable.exe": "477e544fc8880a5e82e427490cb9a5f5adab480c0e02966d33fd50772b531c71",
+        "reference/degraded/asset-producer.md": "a8547c8565979894f0c07f92a96ac2a38e681a31fbf155ffeefc7566e185d9c2",
+        "reference/degraded/documenter.md": "bcc05ea92faebb5c74037a9d4263a5ce9a56f5ab07c8ab3c59ee704d8cade745",
+        "reference/degraded/finish-reviewer.md": "5f24c5a97b4ffcabc7c432b064cfdd04c7a2ad52f52e765be648dc0aadab8f38",
+        "reference/degraded/manual-edit-applier.md": "5fae7f8a2fc3ddd49ad0a413446dc44daedef5b6b7de5eb935bd2fbfad646d58",
         "scripts/data/font-index-failures.json": "835f19a0a3812f3652dd6979a2ce5597f654fd01f26e1b420b92d5f42b997ce4",
-        "scripts/data/font-index.json": "47edbdfaf27073c47033d1ac7dfee881be49e2dcbda7671d1157300481dde6da"
-      }
+        "scripts/data/font-index.json": "47edbdfaf27073c47033d1ac7dfee881be49e2dcbda7671d1157300481dde6da",
+        "scripts/bin/windows-x64/impeccable.exe": "477e544fc8880a5e82e427490cb9a5f5adab480c0e02966d33fd50772b531c71"
+      },
+      "active_path": "impeccable"
     },
     "implement-abuse-controls": {
       "origin": "project-authored",
       "files": {
+        "SKILL.md": "ec2dd23e3ee98855d0da57db4b564e8099f7dbba8b75680d2d48fffe762deb48",
         "references/abuse-verification.md": "5ced4706fb7f3d12ffccfe806eaa00209b72c8a2136b152fee3984184296f300",
-        "references/policy-and-implementation.md": "5a366b28126c0d0a5caaa42ebefd9a0b91c81d1c5aefc7844a833c520cd2c62c",
-        "SKILL.md": "1088d6ecb450913f73f93aea0621663877f2106163af5720555128b4f7ba9376"
-      }
+        "references/policy-and-implementation.md": "5a366b28126c0d0a5caaa42ebefd9a0b91c81d1c5aefc7844a833c520cd2c62c"
+      },
+      "active_path": "secure-quotation-app/references/abuse-controls",
+      "renamed_files": {
+        "SKILL.md": "GUIDE.md"
+      },
+      "merged_on": "2026-11-03"
     },
     "verify-engineering-coverage": {
       "origin": "project-authored",
       "files": {
+        "SKILL.md": "6ee2c862a33f80dbf40706137bef09bc0ff30b1ea3558247c1518f9fb34e68a2",
         "references/concepts.json": "9c35c1cd0ef0e107690a122fbb877685032f0ee7ae2e5382426a0b40a7e9c483",
         "references/ledger.md": "4df0de9a95944e2bb4707582ee7d213d664e9470e2afca4730ba67f115971875",
         "references/research.md": "9a4e4ab4a5063bfb66c73890815bc7d8a7ab1dd9f1ec671f85159cf75069967b",
         "scripts/check_coverage.py": "5fd0975192091e8bc5c9f025d9cd8f8074255bebb4405e23ccb4a5503fadf523",
-        "scripts/test_check_coverage.py": "f0c86560beb0a4f68bee38dff53a282ff82edd9f6dabe3ffafd8159a61447494",
-        "SKILL.md": "6ee2c862a33f80dbf40706137bef09bc0ff30b1ea3558247c1518f9fb34e68a2"
-      }
+        "scripts/test_check_coverage.py": "f0c86560beb0a4f68bee38dff53a282ff82edd9f6dabe3ffafd8159a61447494"
+      },
+      "active_path": "verify-and-review/references/engineering-coverage",
+      "renamed_files": {
+        "SKILL.md": "GUIDE.md"
+      },
+      "merged_on": "2026-11-03"
     },
     "client-crud-state": {
       "origin": "adapted-user-supplied",
       "source_archive": "../skill-source-archives/user-supplied-2026-10-29",
       "adaptation": "Project-specific integration; original notices preserved in non-active archive",
       "files": {
-        "SKILL.md": "4b199c81b2b0d81d39ef1d4dfecd0e49c054d3d679cda5a3a30f9ce34ebedc12"
-      }
+        "SKILL.md": "068e28f2aa86f60041ef7e797453436b8f6017adfcba536c5a56551361e58715"
+      },
+      "active_path": "frontend-structure/references/client-crud-state",
+      "renamed_files": {
+        "SKILL.md": "GUIDE.md"
+      },
+      "merged_on": "2026-11-03"
     },
     "project-documentation": {
       "origin": "adapted-user-supplied",
       "source_archive": "../skill-source-archives/user-supplied-2026-10-29",
       "adaptation": "Project-specific integration; original notices preserved in non-active archive",
       "files": {
-        "SKILL.md": "819a9df94868d7c8ea12d79d0b2d3ccfa92b1f6ca5cc0dfed6b570a65f7a581f",
+        "SKILL.md": "5622f16e74878479a859d4bef42c8ab032eb92696f711664abe14259ff5fbe8e",
         "assets/decision-prompts.md": "0cb25d821d08f33ace44fda3a3652e81f35c3cb3a3b6377b31938f7cec7f0c2c",
         "assets/runbook-prompts.md": "617aca9d71ce01cf8e33430ac8156097be23d5c0926ca57f8340cb7a0d00d215",
         "references/deep-documentation.md": "2026c94cbb4500bacec089783b311875efc3f4200c8d8ff6bcab94be375e71cf",
         "references/document-patterns.md": "f001e619c1f0e99a022ac303ffe3b5cef7747d47926b1ce13c690ba5905b7b05",
         "references/visual-documentation.md": "135ac9f8ddfe97170e160e7113f0a0a84f250461fe0a34d7e8d9ae6a554044bb"
-      }
+      },
+      "active_path": "project-documentation"
     },
     "contribution-workflow": {
       "origin": "adapted-user-supplied",
       "source_archive": "../skill-source-archives/user-supplied-2026-10-29",
       "adaptation": "Project-specific integration; original notices preserved in non-active archive",
       "files": {
-        "assets/pr-description-prompts.md": "ebe7350bdbdf8aea6f34306519a792f0a22195d750c8468ba4ae36903e22746d",
-        "SKILL.md": "2501eff53b717f11c5f36c9fdc14f9d0e36bf2e43c4534c5f8e7f7fa40d25b7c"
-      }
+        "SKILL.md": "497346dcf04d4a4740fbb248edcdfd8c8baea3ff40378529387d003835bd37be",
+        "assets/pr-description-prompts.md": "ebe7350bdbdf8aea6f34306519a792f0a22195d750c8468ba4ae36903e22746d"
+      },
+      "active_path": "contribution-workflow"
     },
     "react-feature-structure": {
       "origin": "adapted-user-supplied",
       "source_archive": "../skill-source-archives/user-supplied-2026-10-29",
       "adaptation": "Project-specific integration; original notices preserved in non-active archive",
       "files": {
-        "references/feature-boundaries.md": "150c9d4e7cb3dab7b4d670e0010728c0a012019e2f3dd48d93485b8da3442494",
-        "SKILL.md": "051fc39e961b1335a2b32dc6e1a0060379c59a4c558fd0bd0a79e234ad8b332f"
-      }
+        "SKILL.md": "052259fa1f6d9f7cd966af13ea5f79ac530526e43a4bffc23e458360ef721a9f",
+        "references/feature-boundaries.md": "150c9d4e7cb3dab7b4d670e0010728c0a012019e2f3dd48d93485b8da3442494"
+      },
+      "active_path": "frontend-structure/references/react-feature-structure",
+      "renamed_files": {
+        "SKILL.md": "GUIDE.md"
+      },
+      "merged_on": "2026-11-03"
     },
     "mermaid-diagrams": {
       "origin": "upstream-adapted",
@@ -240,7 +282,34 @@
         "references/flowcharts.md": "e5716f510c94e3474c1db9f166ff2481194f20c10602df0b3a5c6091d25301bd",
         "references/sequence-diagrams.md": "9c016fd7c51f7f9d155ca156fb19649bdcf56c98a76fc8572a2b3d54098a1fef"
       },
-      "adaptation": "Project-local Mermaid guidance; application rules and documentation own claims, rendering and quality gates."
+      "adaptation": "Project-local Mermaid guidance; application rules and documentation own claims, rendering and quality gates.",
+      "active_path": "project-documentation/references/mermaid-diagrams",
+      "renamed_files": {
+        "SKILL.md": "GUIDE.md"
+      },
+      "merged_on": "2026-11-03"
+    },
+    "frontend-structure": {
+      "origin": "project-authored",
+      "active_path": "frontend-structure",
+      "files": {
+        "SKILL.md": "a3f249c7eed57cf3465ebd58844e542cf82e637c1ea94a8b71a59bc9bb54a347"
+      }
+    },
+    "langgraph": {
+      "origin": "project-authored",
+      "active_path": "langgraph",
+      "files": {
+        "SKILL.md": "af8843491f31c2d49df9625c1c6208ea562c3764414abc294d8a30b5c2589449"
+      }
+    },
+    "verify-and-review": {
+      "origin": "project-authored",
+      "active_path": "verify-and-review",
+      "files": {
+        "SKILL.md": "de66ec9b651a3f7f173d322864024130cd7dfff1441b5f09e890e51fe3142acd"
+      }
     }
-  }
+  },
+  "merge_note": "2026-11-03: 37 skills consolidated to 19 lead skills (decision D32). Moved skills keep original bytes at active_path with SKILL.md renamed GUIDE.md, except project-authored files whose relative links were rewritten (hashes refreshed by scripts/skills.py manifest). Checked by npm run check:skills."
 }

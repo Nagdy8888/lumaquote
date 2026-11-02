@@ -16,7 +16,7 @@ Quote-affecting changes invalidate the approval and require review. Preserve the
 Do not imply that quoted availability reserves inventory; reservation is a separate explicit business operation if implemented.
 
 ## Pause and resume
-For LangGraph mechanics, read [langgraph-human-in-the-loop](../langgraph-human-in-the-loop/SKILL.md) and [langgraph-persistence](../langgraph-persistence/SKILL.md). A resume payload is input to validate, not proof of staff authorization.
+For LangGraph mechanics, read [langgraph-human-in-the-loop](../langgraph/references/human-in-the-loop/GUIDE.md) and [langgraph-persistence](../langgraph/references/persistence/GUIDE.md). A resume payload is input to validate, not proof of staff authorization.
 Interrupted nodes restart on resume, and replay can rerun actions. Keep external sends behind durable action identities and an outbox or equivalent dispatch mechanism; placing a send after an interrupt alone does not make it safe to retry.
 Bind the pending decision and resume request to the authorized company, conversation/thread, interrupt, and quotation revision. A framework example using a boolean approval does not replace this project's exact-revision approval record.
 Persist a pending decision before suspending the agent. Resume only from an authenticated, correlated decision; duplicate callbacks must not execute the approved action twice.

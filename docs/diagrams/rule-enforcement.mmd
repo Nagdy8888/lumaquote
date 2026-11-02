@@ -1,0 +1,18 @@
+flowchart LR
+  accTitle: How the working rules are enforced
+  accDescr: AGENTS.md and the user decisions register define the rules. Claude Code hooks guard Bash commands, edits and finishing; npm checks validate docs, skills and evaluation scoring; the verify gate runs them all. Review covers the rules no script can check.
+  Rules["AGENTS.md rules R1-R15 and docs/DECISIONS.md"] --> Routing["Routing table picks one lead skill"]
+  Routing --> Mirror[".agents/skills mirrored to .claude/skills (skills:sync)"]
+  Rules --> Hooks["Claude Code hooks (.claude/settings.json)"]
+  Hooks --> Bash["PreToolUse Bash: block force-push, reset --hard, rebase, amend, --no-verify, deploy (R15)"]
+  Hooks --> Edit["PostToolUse Edit/Write: warn when a file lost more than 30 lines (R6)"]
+  Hooks --> Stop["Stop: code change needs a work-log entry and a doc update, then check:rules (R14)"]
+  Rules --> Checks["npm checks"]
+  Checks --> Docs["check:docs: UTF-8, LF, mojibake, links, evidence header, plan ticks (R8-R10)"]
+  Checks --> Skills["skills:check: mirror, hashes, frontmatter, links, routing"]
+  Checks --> Score["summarize_agent_run: refuse scoring against a moved answer key (R11)"]
+  Stop --> Docs
+  Stop --> Skills
+  Docs --> Gate["npm run verify / verify:full"]
+  Skills --> Gate
+  Rules -. Not scriptable .-> Review["Review: ask first (R2), read APIs (R3), experiments in a worktree (R7), honest gate claims (R12)"]

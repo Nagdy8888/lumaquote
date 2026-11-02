@@ -1,0 +1,23 @@
+{
+  "date": "2026-11-03",
+  "commit": "ebc1b4a plus uncommitted working tree (rules, skills, hooks, docs)",
+  "label": "local",
+  "command": "npm run verify; npm run check:rules; pytest tests/unit/test_agent_rules.py tests/unit/test_summarize_post_hoc.py; graphify update .; Claude Code PreToolUse probe",
+  "result": "passed",
+  "scope": "Working rules R1-R15, skill consolidation and mirror, Claude Code hooks, documentation/evidence/plan checks, evaluation scoring pin and the code knowledge graph (decisions D32-D36). No application behavior changed.",
+  "checks": [
+    {"command": "npm run verify", "status": "Passed", "steps": ["lint:python", "check:architecture", "check:docs", "skills:check", "check:frontend", "test:diagrams", "diagrams:check (18 views)", "typecheck", "test:unit (174 passed)", "test:ui", "build", "check:secrets"]},
+    {"command": "pytest tests/unit/test_agent_rules.py", "status": "Passed", "tests": 17},
+    {"command": "pytest tests/unit/test_summarize_post_hoc.py", "status": "Passed", "tests": 4},
+    {"command": "Claude Code PreToolUse hook probe (a command whose text matched the history-rewrite pattern)", "status": "Blocked as intended", "occurrences": 2},
+    {"command": "graphify update .", "status": "Passed", "nodes": 2604, "edges": 5914, "communities": 163}
+  ],
+  "skillspector": {"recommendation": "DO_NOT_INSTALL", "max_score": 100, "decision": "D36: user approved mirroring all 19 skills after seeing the findings"},
+  "not_run": ["npm run verify:full (no application code changed)", "npm run test:browser", "semantic graphify pass over docs (needs LLM subagents)"],
+  "limits": [
+    "The Stop hook compares the working tree with HEAD, so it enforces documentation per session, not per commit.",
+    "Hook command matching is textual; harmless commands containing blocked text are also blocked (observed twice while writing this evidence).",
+    "R2, R3, R7 and R12 are review-only.",
+    "Graph omits .gs, CSS, Mermaid and SQL (tree_sitter_sql not installed)."
+  ]
+}

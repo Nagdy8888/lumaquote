@@ -40,6 +40,13 @@ flowchart LR
 
 ## Command ownership
 
+- Rule enforcement (`scripts/check_docs.py`, `scripts/skills.py`, `scripts/hooks/guard.py`,
+  `npm run check:rules`, `npm run graph:update`) is documented in
+  [working rules and enforcement](AGENT_RULES.md). `check:docs` and `skills:check` run in
+  `npm run verify` after the architecture check. `scripts/summarize_agent_run.py` now refuses
+  to score a paid run whose scenario/oracle hashes differ from the `run.json` pin written when
+  the run started (rule R11) unless `--post-hoc` labels the report.
+
 - `scripts/python.cjs`: launches this repository's `.venv` Python with backend and
   agent packages on PYTHONPATH, no extra shell, hidden Windows process and the
   child's real exit code. Use it for documented native Python commands.

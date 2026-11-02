@@ -1,159 +1,129 @@
-# Project implementation rules
+# LumaQuote working rules
 
-## Read at the start of every prompt
+Binding for every agent and model (Codex, Claude Code, Sonnet, Opus) on every prompt,
+including small edits, continuations and resumed sessions. Re-read this file at the
+start of each turn; do not rely on an earlier copy. Approved 2026-11-03 (decision D32);
+the reasoning is in [the proposal](docs/proposals/2026-11-03-working-rules.md) and the
+previous long-form rules are archived in [docs/archive/](docs/archive/AGENTS-until-2026-11-03.md).
 
-These rules apply to every Codex prompt and all work in this repository, including
-continuations, resumed sessions, and small edits. At the start of each turn, read
-this root `AGENTS.md` and any applicable nested `AGENTS.md` before acting. Do not
-rely only on a previous turn's copy. Carry these requirements through handoffs and
-context compaction. This file governs this project, not unrelated workspaces.
+User decisions live in [docs/DECISIONS.md](docs/DECISIONS.md). If a rule, skill, doc or
+code conflicts with a decision there, the decision wins; fix the conflicting file in the
+same change.
 
-## Documentation after every step or file change
+## Rules
 
-Use the project-documentation skill at
-`.agents/skills/project-documentation/SKILL.md` for every task that changes files
-or completes an implementation/setup/verification step. Read its instructions
-and relevant references before the first such step in each turn.
+Each rule names its enforcement: **script** (fails `npm run verify`), **hook** (Claude Code
+blocks or warns), **review** (checked by reading).
 
-After each completed step or coherent file-change group, update documentation
-before starting the next step. Do not postpone documentation until the end of a
-phase, commit, or conversation. This covers code, tests, scripts, GAS, migrations,
-configuration, assets, dependencies, and documentation files themselves.
+**Before work**
+- **R1** Read this file, `docs/DECISIONS.md` and the lead skill for the task (routing table below). *review*
+- **R2** Ask the user first when a task changes security, money, data deletion, paid calls, external messages, accounts or scope. Record the answer in `docs/DECISIONS.md`. *review*
+- **R3** Never guess an API. Read the pinned version (`requirements.lock.txt`, `package-lock.json`) and official docs before using it. *review*
 
-- Update the affected inline contracts and existing setup/reference/runbook docs
-  whenever behavior, structure, configuration, or operating instructions change.
-- Append a concise entry to `docs/WORK_LOG.md` recording the step, changed paths,
-  purpose, actual verification results, and remaining gaps or required account
-  actions. Record failures and unrun checks honestly. For private configuration,
-  record only the purpose and safe variable names, never values or credentials.
-- Keep `docs/IMPLEMENTATION_PLAN.md` and its approved scope intact; update existing
-  progress items only when supported by implementation and verification. Preserve
-  `docs/TESTING_PLAN.md` requirements. Put account-dependent follow-up actions in
-  `docs/MORNING_ACTIONS.md` and evidence in the existing evidence location.
-- Include documentation-only changes in the same work-log entry as the step they
-  describe. Updating the log does not require another recursive log entry.
-- Before reporting a step complete, review the changed-file list for documentation
-  coverage and run applicable architecture/documentation checks plus relevant
-  feature checks. A passing check does not replace reviewing the docs themselves.
+**While editing**
+- **R4** Every Python and TypeScript function, class, hook and component has an adjacent contract: purpose, meaningful inputs/outputs, side effects, authority, invariants, errors. Do not restate identifiers. *script: `check:architecture`, `check:frontend`*
+- **R5** Layering: `core` never imports features; routes validate transport and delegate; `main.py` only composes; agent nodes call backend business interfaces; business rules and authorization are deterministic code, never prompt-only. No god files. *script: `check:architecture`, `check:frontend`*
+- **R6** After editing an existing file, look at `git diff --stat`. A file that lost more than 30 lines needs a stated reason in the work log. *hook (warn)*
+- **R7** Experiments that change source (mutation tests, probes) run in a `git worktree` or are reverted with `git checkout -- <file>` and confirmed with `git status`. Never leave them in the main tree. *review*
+- **R8** Text files are UTF-8 with LF line endings and no mojibake (`â€`, `Ã`). *script: `check:docs`*
 
-For a read-only answer with no completed operational step or file changes, no
-work-log entry is required; still read and follow this file for that prompt.
+**Evidence and claims**
+- **R9** Every result names exactly one label: `local`, `local-substitute`, `sandbox`, `live`, `synthetic`. New `docs/evidence/*.json` files carry the common header (`date`, `commit`, `label`, `command`, `result`). *script: `check:docs`*
+- **R10** A plan checkbox is ticked only with an evidence link on the same line. Phase 4 items need `live` evidence. *script: `check:docs`*
+- **R11** Evaluation scoring rules and oracle changes are committed before the run they score. Changes made after seeing results are labeled `post-hoc` and reported separately. *script: `summarize_agent_run.py`*
+- **R12** "All checks pass" means one complete `npm run verify:full` on the final tree. Partial runs are reported as partial; skipped checks as skipped. *review*
+- **R13** Never print, log, commit or trace secrets, tokens or phone numbers. Credentials stay backend-only. *script: `check:secrets`; trace masking tests*
 
-## Required documentation depth
+**Finishing**
+- **R14** A task that changed files ends with deep documentation (next section), one work-log entry in the template, and the narrowest checks that cover the change. *hook (Stop blocks when code changed without a work-log entry)*
+- **R15** Commit and push only at a completed phase or when the user asks. Stage only your own files. Never force-push, rewrite history, bypass hooks or deploy. *hook (blocks force-push, `reset --hard`, deploy)*
 
-Documentation is part of implementation acceptance. A work-log entry, file list,
-generated schema, passing docstring check or one-line purpose comment alone does
-not satisfy the user's requirement for deep documentation.
+## Documentation (decisions D30, D33)
 
-Before changing an existing subsystem, read its relevant implementation reference
-through `docs/README.md` and verify it against source. For each changed behavior,
-document the affected contracts as applicable: actors and authority; module/call
-flow; meaningful inputs, outputs and units; state transitions; database writes and
-transaction/lock boundaries; identity/version/idempotency rules; resource and cost
-limits; external effects; failures, uncertainty and recovery; configuration and
-operation; tests, actual evidence and remaining gaps. Explain why an important
-invariant exists and what callers must preserve when extending the implementation.
+Documentation is part of the change, not a later step. For anything added or changed:
 
-Keep function/class contracts adjacent to definitions and cross-module explanations
-in the focused `docs/reference/` guides linked from the documentation index. Update
-existing guides rather than creating competing explanations. Extend or split a
-guide when responsibilities require it; there is no mandatory page or line count.
-A small change updates its relevant contract, not every unrelated guide.
+1. **Inline contracts** next to the code (R4).
+2. **Deep reference**: update the owning guide in `docs/reference/` (index: [docs/README.md](docs/README.md)).
+   Cover what applies: actors and authority, call flow, inputs/outputs and units, state transitions,
+   database writes and transactions, idempotency, limits and cost, external effects, failures and
+   recovery, configuration, tests and evidence, open gaps. Full standard:
+   [deep documentation](.agents/skills/project-documentation/references/deep-documentation.md).
+3. **Diagrams**: when a change touches architecture, a workflow or a state machine, edit the
+   canonical `docs/diagrams/*.mmd`, run `npm run diagrams:render` then `npm run diagrams:check`, and
+   look at the rendered SVG for clipping and misleading arrows. Local renderer only.
+4. **Knowledge graph**: after a change that adds, moves or deletes modules, run `npm run graph:update`
+   so `graphify-out/` matches the code (decision D33).
+5. **Work log**: append one entry to `docs/WORK_LOG.md`:
 
-Review documentation against all affected new, changed, renamed and deleted paths
-before reporting completion or making a phase commit. Validate links/examples and
-run applicable inline/architecture checks. A documentation-only change should use
-appropriate static/contract checks; do not report historical runtime tests as rerun
-or spend on live providers merely to validate prose. Follow the detailed standard
-in `.agents/skills/project-documentation/references/deep-documentation.md`.
+```
+### YYYY-MM-DD - <what changed> (phase N, <label>)
+- Why: <user request or plan item>
+- Changed: <paths>
+- Checked: <command> -> <result>; not run: <list>
+- Evidence: <file or none>
+- Open: <gaps / user actions>
+```
 
-## Maintained diagrams and professional visual documentation
+One home per fact: plan status in `docs/IMPLEMENTATION_PLAN.md` (checkbox + one status line +
+evidence link); test requirements in `docs/TESTING_PLAN.md` (never weaken); user decisions in
+`docs/DECISIONS.md`; current behavior in `docs/reference/`; history in `docs/WORK_LOG.md`;
+open user actions in `docs/MORNING_ACTIONS.md`; proof in `docs/evidence/`.
 
-Use the installed `mermaid-diagrams` skill with project-documentation when
-documenting architecture, relationships, nontrivial workflows or state changes.
-Maintain the affected diagrams alongside code; do not substitute diagrams for
-meaningful inline contracts or detailed prose.
+## Skill routing
 
-Canonical sources live in `docs/diagrams/*.mmd`, with catalogued code bindings,
-owned guide embeds and generated SVG previews. Keep views focused, labels readable,
-contrast clear and titles/descriptions accessible. Draw actual relationships;
-label optional, planned, unverified and local-only paths explicitly. Exclude
-credentials, private URLs and customer data.
+Skills live in `.agents/skills/` (canonical) and are mirrored to `.claude/skills/` for Claude Code
+with `npm run skills:sync`. Pick one lead skill; add at most two supporting skills.
 
-Before completion or commit, run the diagram tests, render changed sources and
-verify `npm run diagrams:check`. Inspect actual rendered output for readability,
-clipping, stray nodes and misleading arrows; syntax success and file hashes alone
-are insufficient. Source, embeds and assets must agree. Use the local renderer;
-do not upload project data or install global tooling as a side effect. Small
-unrelated prose changes do not require a decorative diagram. The documentation
-skill's visual standard defines the detailed workflow.
+| Task | Lead skill | Supporting |
+|---|---|---|
+| Scope, architecture, new workflow slice | `plan-quotation-app` | `verify-and-review` |
+| Backend route, schema, dependency | `fastapi` | `secure-quotation-app` |
+| Prices, stock, totals, revisions, PDFs | `build-quotations` | `fastapi` |
+| Agent graph, nodes, checkpoints | `langgraph` | `implement-human-approval` |
+| Approval pauses, takeover, clarification | `implement-human-approval` | `langgraph` |
+| Voice notes, transcription, photos | `process-voice-notes` | `secure-quotation-app` |
+| Catalog ingestion, retrieval, citations | `ingest-supplier-evidence` | `langsmith-trace` |
+| LangSmith tracing and trace queries | `langsmith-trace` | `secure-quotation-app` |
+| WhatsApp webhook, media, sending | `integrate-whatsapp` | `secure-quotation-app` |
+| Google Sheets, Drive, Apps Script, clasp | `automate-google-workspace` | `secure-quotation-app` |
+| Auth, tenancy, uploads, rate limits, budgets | `secure-quotation-app` | `verify-and-review` |
+| Frontend code, queries, mutations | `frontend-structure` | `shadcn` |
+| Visual design, layout, motion, 3D | `frontend-design` | `impeccable`, `shadcn` |
+| shadcn components | `shadcn` | `frontend-structure` |
+| Evaluation datasets, scoring, holdout | `evaluate-quotation-agent` | `verify-and-review` |
+| Docs, diagrams, evidence | `project-documentation` | - |
+| Code review, "is it done", plan checkboxes, coverage ledger | `verify-and-review` | `project-documentation` |
+| Commits, pushes, PRs | `contribution-workflow` | `verify-and-review` |
 
-## Layout and responsibilities
+## Code layout
 
-- `app/backend/luma/core`: configuration, identity, database, storage, admission,
-  errors, and other genuinely shared infrastructure. Never import features here.
-- `app/backend/luma/features/<feature>`: transport schemas, routes, domain rules,
-  persistence, and application behavior owned by that feature. Separate files by
-  responsibility; routes validate transport and delegate business decisions.
-- `app/backend/luma/main.py`: application composition only. No business queries,
-  pricing, provider calls, or workflow decisions.
-- `app/agents/luma_agent`: typed graph state, construction, individual nodes,
-  prompts/adapters, and orchestration. Agents call backend business interfaces;
-  deterministic rules and action authorization never live only in prompts.
-- `app/frontend/src/app`: router, providers, and application composition.
-- `app/frontend/src/features/<feature>`: feature UI, queries, mutations, and
-  behavior. Keep internal implementation private behind a small public entry.
-- `app/frontend/src/shared`: business-independent UI, session/API infrastructure,
-  and genuinely shared contracts. Do not accumulate unrelated helpers.
-- Root `scripts`, `tests`, `docs`, and `supabase` own development automation,
-  verification, documentation, and migrations respectively.
+- `app/backend/luma/core`: shared infrastructure (config, identity, database, storage, admission, errors).
+- `app/backend/luma/features/<feature>`: schemas, routes, domain rules, persistence for one feature.
+- `app/backend/luma/main.py`: composition only.
+- `app/agents/luma_agent`: graph state, construction, nodes, adapters, runtime, worker.
+- `app/frontend/src/app` (composition), `src/features/<feature>` (feature UI and data), `src/shared` (business-independent only).
+- Root `scripts`, `tests`, `docs`, `supabase`, `gas`: automation, verification, documentation, migrations, Apps Script.
 
-No god files or speculative empty hierarchies. Split when responsibilities change,
-not according to an arbitrary line count. Use explicit imports; avoid global
-service locators, circular dependencies, and large barrels exporting everything.
+## Commands
 
-## Inline documentation
+Run everything through npm scripts; they wrap the project's Python (`node scripts/python.cjs`).
 
-The user explicitly requires inline documentation for every authored function and
-class. Python definitions, including private helpers and nested functions, need a
-docstring. TypeScript/JavaScript named functions, classes, hooks, components, and
-nontrivial callbacks need adjacent JSDoc explaining their contract. Document small
-inline callbacks at their containing expression when this is clearer.
+| Purpose | Command |
+|---|---|
+| Local Supabase | `npm run db:start` |
+| API / worker / UI | `npm run dev:api`, `npm run dev:worker`, `npm run dev:ui` |
+| Fast rule checks | `npm run check:rules` (docs, skills) |
+| Lint, architecture, frontend | `npm run lint:python`, `npm run check:architecture`, `npm run check:frontend` |
+| Tests | `npm run test:unit`, `npm run test:python`, `npm run test:ui`, `npm run test:browser` |
+| Diagrams | `npm run test:diagrams`, `npm run diagrams:render`, `npm run diagrams:check` |
+| Skills mirror | `npm run skills:sync`, `npm run skills:check`, `npm run skills:manifest` |
+| Knowledge graph | `npm run graph:update` |
+| Full gate | `npm run verify`, `npm run verify:full` |
 
-Explain purpose, meaningful input/output semantics, side effects, authorization,
-invariants, and error behavior as relevant. Do not restate every identifier or
-invent guarantees. Update documentation when behavior changes. Generated API
-types and unmodified vendored components remain clearly labeled; document owned
-wrappers rather than hand-editing generated declarations.
+## Unattended work and accounts
 
-Keep local docs close to code, with project docs recording larger decisions.
-Run the architecture/documentation checks as well as feature tests before claiming
-the requested structure and documentation are covered.
-
-## Verification and truth
-
-Preserve the approved plan in `docs/IMPLEMENTATION_PLAN.md` and testing requirements
-in `docs/TESTING_PLAN.md`. Check off only implemented and verified behavior.
-Read actual contracts/types and pinned documentation before using an API; never
-invent functions, configuration, schemas, completed integrations, or test results.
-Never expose populated environment files or credentials in logs, UI, traces, or
-test output. Keep simulated/local and live integration evidence distinct.
-
-## Phase commits
-
-The user authorizes a commit and push after every completed implementation phase.
-Run that phase's applicable checks, update its tracker and evidence, inspect the
-staged diff for secrets/unrelated changes, then make a descriptive scoped commit.
-Do not call an incomplete phase complete to create a commit. Never bypass failing
-checks or hooks. Push to the verified intended remote without force-pushing; check
-remote CI when available. Report the commit, push result, and validation. If no
-remote is configured, finish the local work and report the missing destination.
-This standing authorization does not include deployment or rewriting history.
-
-## Unattended work and integration tooling
-
-Continue authorized plan work while the user is asleep. Record anything requiring
-their interactive account access, consent, credentials, or decisions in
-`docs/MORNING_ACTIONS.md`; do not pause independent work for those prerequisites.
-Use the applicable installed skills and record actual validation and gaps.
-Manage the Google Apps Script source/project with clasp as explicitly requested.
+Continue authorized plan work while the user is away. Put anything that needs the user's
+accounts, consent or credentials in `docs/MORNING_ACTIONS.md` and keep going with independent
+work. Browser work in the user's Google and Meta accounts is allowed (decision D13); secrets go
+straight into ignored `.env.local` and are never shown, logged or committed. Paid provider calls
+need the opt-in flags the tests define and the user's approval for that run.

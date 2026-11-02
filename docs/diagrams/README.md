@@ -28,6 +28,7 @@ sources and [catalog.json](catalog.json) are the maintained source of truth.
 - [Drive export of approved PDFs](rendered/drive-export.svg).
 - [WhatsApp ingress and gated egress](rendered/whatsapp-channel.svg).
 - [Verification scopes](rendered/verification-scope.svg).
+- [Working-rule enforcement](rendered/rule-enforcement.svg).
 
 ER edges show selected actual SQL relationships, not invented foreign keys to
 JSON lines or graph thread IDs. Ready media is unconfirmed; queued work is not
@@ -67,7 +68,7 @@ enabled and no math is used. The observed low KaTeX advisory and pre-existing cl
 advisory remain recorded in WORK_LOG; this is not a public-renderer safety claim.
 
 The [documentation skill](../../.agents/skills/project-documentation/SKILL.md) owns
-app claims, prose and quality. The [Mermaid skill](../../.agents/skills/mermaid-diagrams/SKILL.md)
+app claims, prose and quality. The [Mermaid skill](../../.agents/skills/project-documentation/references/mermaid-diagrams/GUIDE.md)
 supplies syntax guidance adapted from
 [the pinned GitHub source](https://github.com/softaworks/agent-toolkit/tree/3027f20f3181758385a1bb8c022d4041dfb4de84/skills/mermaid-diagrams).
 Its MIT notice, original instructions and commit/file provenance are preserved.

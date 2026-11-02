@@ -11,7 +11,7 @@ Inspect the actual stack and trust boundaries before choosing controls. Follow c
 For FastAPI endpoint structure and consistent request/error handling, read [request boundaries](references/fastapi-request-boundaries.md). It integrates the supplied declarative-guard ideas using the approved backend, with corrected timeout/idempotency boundaries.
 For login/session/token handling, staff roles, Supabase grants/RLS/Storage, IDOR, CSRF, CORS, XSS, and browser secrets, read [access and browser controls](references/access-and-browser.md).
 For uploads/audio, SSRF, prompt injection, tool permissions, approval races, audit, tracing, retention, and backups, read [files, agent actions, and operations](references/files-agent-and-operations.md).
-For endpoint admission, rate limits, quotas, concurrent jobs, AI budget reservations, idempotency, circuit breakers, and overload, use [implement-abuse-controls](../implement-abuse-controls/SKILL.md).
+For endpoint admission, rate limits, quotas, concurrent jobs, AI budget reservations, idempotency, circuit breakers, and overload, use [implement-abuse-controls](references/abuse-controls/GUIDE.md).
 Each reference defines the relevant terms and enforcement boundaries. Read only the references applicable to the current task. Installing these instructions does not implement or validate the controls.
 
 ## Principals and resources
