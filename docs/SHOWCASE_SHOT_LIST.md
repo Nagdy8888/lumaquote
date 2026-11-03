@@ -19,9 +19,9 @@ Screenshots from the 2026-11-02 verified browser run are in
 | 3 | 22-35 | The clarification the agent asks, then the customer's written reply | "A voice note or a photo can never confirm an order. Only a complete written SKU and quantity can." | Real (policy and tests); the agent runs offline unless paid AI is on |
 | 4 | 35-55 | Quotation workspace: lines, catalog evidence page, subtotal, stock note | "Totals are exact decimal arithmetic from catalog prices. Stock is observed, not reserved." | Real |
 | 5 | 55-70 | Edit a quantity to show the stale-edit conflict, then revision 2 | "A newer revision invalidates the old approval." | Real |
-| 6 | 70-85 | Salesperson approves the exact revision; delivery shows "Delivered in local test" | "Approval binds to this exact revision and is rechecked before any send. Here the send is local." | Local substitute |
+| 6 | 70-85 | Salesperson clicks "Review approval", checks the restated quote number, revision, total and channel, then "Approve revision N & queue delivery"; delivery shows "Delivered in local test" | "Approval binds to this exact revision and is rechecked before any send. Here the send is local." | Local substitute |
 | 7 | 85-95 | Take over the conversation and write a human reply | "A salesperson can take over; queued automated replies stop." | Real |
-| 8 | 95-105 | Portrait width of the same screen | "It works on a narrow screen." | Real |
+| 8 | 95-105 | Portrait width of the same screen: switch between "Conversation" and "Quotation" (the Quotation option shows "Needs approval") | "It works on a narrow screen." | Real |
 | 9 | 105-120 | Closing card with what is not done | "WhatsApp and Google Drive are implemented and tested against stand-ins; live accounts are not connected yet." | Real statement |
 
 ## Not shown (do not demonstrate or claim)
