@@ -49,7 +49,9 @@ navigation, responsive shell and capture-mode context.
 
 Routes are overview `/`, inbox `/inbox/:id?`, new request `/requests/new`,
 quotations `/quotations`, catalog `/catalog` and connections `/integrations`.
-Unknown routes currently show overview rather than a dedicated not-found page.
+Any other path renders `NotFoundPage` (`features/not-found`) inside the shell: the
+heading "This page does not exist." with links to `/` and `/inbox`. It requests no data
+and names no resource.
 Feature components own their task; shared modules must not import feature code.
 
 Vite binds to loopback, reads the root environment directory and proxies `/api`
@@ -159,11 +161,14 @@ It does not invent revenue, conversion improvements or measured hours saved.
 `ConnectionsPage` describes intended integrations and displays server configuration
 states. Configured/unverified is not a successful provider roundtrip or a receipt.
 
-The connections copy still contains legacy Google OAuth/Drive wording while the
-approved backend architecture is Apps Script-only and Drive export is unfinished.
-Follow [Google synchronization](GOOGLE_SYNC.md) and `gas/README.md` for the actual
-contract; this documentation task records that UI-copy gap rather than changing
-product behavior silently.
+The connections copy matches the approved architecture (D10, D24). The Google card
+says Apps Script sends signed snapshots after edits and on an approximately one-minute
+timer, and that Drive export of the approved PDF runs through Apps Script and has not
+run in Google yet; it does not mention OAuth or a backend Google client. The LangSmith
+card says every step, model call and tool call is exported with inputs and outputs,
+with keys, tokens and phone numbers masked. The status badge on each card comes only
+from the server (`data.integrations`); the copy never claims a verified connection.
+See [Google synchronization](GOOGLE_SYNC.md) and `gas/README.md` for the contract.
 
 ## Optional 3D and presentation limits
 

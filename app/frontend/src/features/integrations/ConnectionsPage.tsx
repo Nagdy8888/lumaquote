@@ -25,9 +25,9 @@ const connections = [
     name: "Google Workspace",
     icon: FileSpreadsheet,
     description:
-      "Authoritative prices and stock in Sheets. Identical quotation PDFs in Drive.",
+      "Authoritative prices and stock in Sheets. Apps Script sends signed snapshots after edits and on an approximately one-minute timer.",
     requirement:
-      "Requires your OAuth consent, selected workbook, Drive folder, and signed Apps Script callback.",
+      "Runs through your Apps Script project and a selected workbook. Drive export of the approved PDF also runs through Apps Script and has not run in Google yet.",
   },
   {
     key: "ai",
@@ -43,9 +43,9 @@ const connections = [
     name: "LangSmith",
     icon: Workflow,
     description:
-      "Workflow observability with opaque correlation IDs and explicitly limited exports.",
+      "Workflow observability: every agent step, model call and tool call with its inputs and outputs.",
     requirement:
-      "Configured credentials alone do not verify a trace. Customer content stays out of exports.",
+      "Keys, tokens and phone numbers are masked before export. Configured credentials alone do not verify a trace.",
   },
 ];
 

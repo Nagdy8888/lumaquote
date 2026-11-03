@@ -863,3 +863,10 @@ these entries were logged during the original steps or freshly rerun today.
 - Checked: `npm run check:rules` -> passed (docs 60 files, skills 19). Not run: application checks (no code in this commit; the baseline counts are in the F1 entry).
 - Evidence: none.
 - Open: main folder keeps its own uncommitted copies of these doc edits; reconcile before pulling there.
+
+### 2026-11-03 - Truthful connections copy and a not-found route (phase 5, local)
+- Why: plan task F1, gaps G2 and G8 (decisions D10, D24).
+- Changed: `app/frontend/src/features/integrations/ConnectionsPage.tsx` (Google card: Apps Script signed snapshots, approximately one-minute timer, Drive export not yet run in Google, no OAuth; LangSmith card: it said "Customer content stays out of exports", which D24 contradicts, so it now says full inputs and outputs with keys, tokens and phone numbers masked; WhatsApp and OpenAI cards checked and left unchanged), new `features/not-found/NotFoundPage.tsx`, `app/App.tsx` (`*` routes to it), `app/shell.css` (`.not-found-actions`, 6 lines, not in the plan's file list), `docs/reference/FRONTEND.md`.
+- Checked (`local`): typecheck passed; `test:ui` 3 files, 5 tests passed; `check:frontend` 47 modules passed; `check:rules` passed (docs 60, skills 19); grep for `OAuth` in `app/frontend/src` finds nothing. Baseline note: the F0 baseline was run on the tree that already held these F1 edits, not on a clean `origin/main`; the setup also needed a second `npm ci` after the first hit ENOTEMPTY on `lodash-es`. Not run: `test:browser` (not required for F1), a manual look at `/does-not-exist` (covered by the F8 review).
+- Evidence: none.
+- Open: none for F1.
