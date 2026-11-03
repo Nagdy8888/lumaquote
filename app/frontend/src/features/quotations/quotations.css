@@ -276,8 +276,7 @@
   flex-direction: column;
   gap: 9px;
   padding: 14px;
-  border: 1px solid var(--border);
-  border-left: 3px solid #b67151;
+  border: 1px solid #c59372;
   background: #fbfaf6;
 }
 .approval-confirm h3 {

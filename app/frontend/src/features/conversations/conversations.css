@@ -458,3 +458,27 @@
 .waveform-time { font-size: 12px; color: var(--muted-foreground); font-variant-numeric: tabular-nums; white-space: nowrap; }
 
 .media-preview img { display: block; max-width: 100%; max-height: 220px; object-fit: contain; border-radius: 8px; }
+
+.inbox-section-switch {
+  display: none;
+}
+@media (max-width: 680px) {
+  .inbox-section-switch {
+    display: block;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    background: #fafaf6;
+  }
+  .inbox-section-switch [data-slot="toggle-group"] {
+    width: 100%;
+  }
+  .inbox-section-switch [data-slot="toggle-group-item"] {
+    flex: 1 1 0;
+    gap: 8px;
+    font-size: 13px;
+  }
+  .inbox-workspace[data-section="conversation"] .quotation-panel,
+  .inbox-workspace[data-section="quotation"] .thread {
+    display: none;
+  }
+}

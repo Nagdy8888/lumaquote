@@ -257,6 +257,23 @@ identity/version, explicit upload, authorized normalized preview and temporary
 object URL lifetime. `VoiceNoteUpload.test.tsx` retains its historical filename
 but now tests the shared `MediaUpload` component.
 
+### Portrait inbox section switcher
+
+At 680 px and below the inbox stacks the conversation list, the thread and the quotation
+panel. `SectionSwitch` (a `shared/ui/toggle-group` with two options, "Conversation" and
+"Quotation") sits under the list and chooses which one shows; the "Quotation" option carries the
+server-derived "Needs approval" badge while the stored quote is in `review`, so the approval
+is one tap away. The selection is local state in `InboxPage`, keyed to the selected conversation
+(another conversation starts on "Conversation"). Hiding is CSS only
+(`.inbox-workspace[data-section]` in `conversations.css`, inside the 680 px media query):
+both panels stay mounted, so an unsaved quotation draft and an open approval panel survive
+switching. Above 680 px the switcher is `display: none` and the three-column and two-column
+layouts are unchanged. Checked locally on 2026-11-03 with a populated conversation: no horizontal
+overflow at 390 x 844 in either section or with the approval panel open; "Review approval" is
+visible after one tap on "Quotation"; the desktop screenshot at 1440 x 1050 differs before and
+after only in the randomly generated quote number (pixel diff of the two runs). The F8 review
+repeats the overflow and axe checks for the whole app.
+
 ### Assistant job state
 
 `workspace.jobs` holds the 20 newest jobs company-wide (newest first) as
