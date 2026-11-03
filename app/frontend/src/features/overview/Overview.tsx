@@ -24,6 +24,7 @@ export function Overview() {
   const { data, capture } = useWorkspaceContext();
   const awaiting = data.quotes.filter((q) => q.status === "review").length;
   const quoted = data.conversations.filter((c) => c.status === "quoted").length;
+  const running = data.jobs.filter((job) => job.status === "running").length;
   const attention = data.conversations.filter(
     (c) => c.status === "needs_staff",
   ).length;
@@ -100,6 +101,11 @@ export function Overview() {
           <span>Needs attention</span>
           <strong>{attention.toString().padStart(2, "0")}</strong>
           <small>Requests requiring a human judgment</small>
+        </div>
+        <div>
+          <span>Assistant jobs running</span>
+          <strong>{running.toString().padStart(2, "0")}</strong>
+          <small>Among the 20 newest jobs</small>
         </div>
       </section>
       <div className="overview-lower">

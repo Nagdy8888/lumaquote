@@ -96,6 +96,7 @@ export function InboxPage() {
               key={`thread:${selected}`}
               detail={detail.data}
               capture={capture}
+              jobs={data.jobs.filter((job) => job.conversation_id === selected)}
             />
             <QuotationPanel
               key={`quotation:${selected}`}

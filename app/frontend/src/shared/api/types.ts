@@ -10,3 +10,4 @@ export type DecisionInput = components["schemas"]["Decision"];
 export type OwnershipInput = components["schemas"]["Ownership"];
 export type TextInput = components["schemas"]["TextInput"];
 export type StaffReplyInput = components["schemas"]["StaffReply"];
+export type Job = components["schemas"]["JobView"];

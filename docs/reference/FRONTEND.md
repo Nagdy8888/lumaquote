@@ -229,6 +229,21 @@ identity/version, explicit upload, authorized normalized preview and temporary
 object URL lifetime. `VoiceNoteUpload.test.tsx` retains its historical filename
 but now tests the shared `MediaUpload` component.
 
+### Assistant job state
+
+`workspace.jobs` holds the 20 newest jobs company-wide (newest first) as
+`{id, conversation_id, kind, status, error_code}`. It carries no timestamp and no
+progress value, so the UI shows none. `InboxPage` filters the list to the selected
+conversation and passes it to `ConversationThread`, which renders `JobState` under the
+thread header (the thread still does not read workspace context itself). `JobState`
+considers only the newest `agent` job: `queued` shows "Assistant queued", `running`
+"Assistant is working" with a spinner, `failed` or `blocked` "Assistant stopped" plus the
+error code with underscores as spaces, and `done` shows nothing. The line is a
+`role="status"` element with the existing `Status` badge. The spinner is decorative
+(`aria-hidden`) and stops under `prefers-reduced-motion`. A job older than the 20 newest
+disappears from the list, so a very old stuck job can show no line; that limit comes from
+the API. Tests: `JobState.test.tsx` (every status, `done`, other job kinds, error text).
+
 ## Private documents and temporary capabilities
 
 `shared/api/client.documentUrl` fetches authorized bytes and creates a browser
@@ -248,7 +263,8 @@ Acrobat-style precise cited-line highlighting.
 
 ## Overview, catalog and connection screens
 
-`Overview` derives request/review/quoted counters from returned stored collections.
+`Overview` derives request/review/quoted counters and the "Assistant jobs running"
+count (jobs with status `running` among the 20 newest) from returned stored collections.
 It does not invent revenue, conversion improvements or measured hours saved.
 `CatalogPage` presents product/source evidence from workspace data.
 `QuotationsPage` presents stored revisions and their current lifecycle labels.
