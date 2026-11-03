@@ -63,7 +63,7 @@ destination or a production deployment topology.
 
 ### Authenticated live updates with polling fallback
 
-One bearer-authenticated event stream per tab invalidates cached data; polling stays as a slower safety net.
+One bearer-authenticated event stream per tab invalidates cached data; polling is unchanged and still covers worker-side results.
 
 <!-- diagram:frontend-live-updates:start -->
 ![Authenticated live updates with polling fallback](../diagrams/rendered/frontend-live-updates.svg)
@@ -76,7 +76,7 @@ One bearer-authenticated event stream per tab invalidates cached data; polling s
 ```mermaid
 sequenceDiagram
   accTitle: Authenticated live updates with polling fallback
-  accDescr: The shell opens one authenticated event stream with the bearer token. The server rechecks membership and sends the company revision about every three seconds. A changed revision invalidates the workspace and conversation queries, which refetch through the normal API. A revoked event signs the user out. A normal end reconnects after one second and an error backs off from two to thirty seconds. Polling stays on as a slow safety net while connected and runs at the faster rate when not connected.
+  accDescr: The shell opens one authenticated event stream with the bearer token. The server rechecks membership and sends the company revision about every three seconds. A changed revision invalidates the workspace and conversation queries, which refetch through the normal API. A revoked event signs the user out. A normal end reconnects after one second and an error backs off from two to thirty seconds. Polling is unchanged and keeps running at its normal rate, because worker results such as a finished transcription write no revision.
   participant UI as AppShell and useLiveUpdates
   participant Q as TanStack Query cache
   participant API as GET /api/events
@@ -87,7 +87,7 @@ sequenceDiagram
     UI->>UI: Show Refreshing every few seconds, wait 2 s, 4 s ... up to 30 s
   else Accepted
     API-->>UI: 200 stream
-    UI->>UI: Show Live, poll every 30 s
+    UI->>UI: Show Live, polling continues
     loop About every 3 s, at most 30 events
       API->>DB: Recheck membership, read company revision
       alt Membership lost
@@ -104,7 +104,7 @@ sequenceDiagram
     API-->>UI: Stream closes after about 90 s
     UI->>UI: Reconnect after 1 s
   end
-  Note over UI,Q: Polling is never removed. It runs every 5 or 8 s without a stream and every 30 s with one.
+  Note over UI,Q: Polling is never removed or slowed. It runs every 5 or 8 s with or without a stream.
 ```
 
 </details>
@@ -136,9 +136,14 @@ server sends `event: refresh` with `data: {"revision": <int>}` about every 3 s,
 - Unmount or staff identity change: the stream is aborted and no timer remains.
 
 **Topbar and polling.** The shell shows the text "Live" when connected and "Refreshing
-every few seconds" when not (text, not colour alone). `connected` also reaches
-`useWorkspace(live)` and, through the route context, `useConversation(id, live)`:
-polling is 30 s while connected and 8 s / 5 s otherwise. Polling is never removed.
+every few seconds" when not (text, not colour alone). Polling does not
+change when connected: `useWorkspace` still polls every 8 s and `useConversation` every 5 s.
+The stream's revision is the company's maximum `luma.audit` id, and the worker writes no
+audit row when it finishes a transcription or an agent job, so those results appear only
+through polling. The first version of this task slowed polling to 30 s while connected;
+the browser workflow test (a voice note processed by the worker) then waited longer than
+its 15 s limit, so the slowdown was removed. Open gap (backend, out of scope here): emit a
+revision for worker-side changes, after which polling could be slowed.
 
 **Limits and cost.** One stream per about 90 s is far under the 120 reads per minute
 limit. No token or event data is logged or stored by the browser code; failures carry
@@ -165,9 +170,9 @@ unmount. These are client lifecycle controls; every business API call still
 revalidates the token and current membership on the server.
 
 `features/workspace/api.useWorkspace` keys data by staff user ID, polls every eight
-seconds (30 s while live updates are connected) and retries a failed query once.
+seconds and retries a failed query once.
 `conversations/api.useConversation` keys by user/conversation, polls every five
-seconds (30 s while connected) and passes query cancellation
+seconds and passes query cancellation
 to fetch so navigation can cancel stale reads. Company selection is derived by
 the server; a browser cache key is not authorization.
 
@@ -243,6 +248,20 @@ error code with underscores as spaces, and `done` shows nothing. The line is a
 (`aria-hidden`) and stops under `prefers-reduced-motion`. A job older than the 20 newest
 disappears from the list, so a very old stuck job can show no line; that limit comes from
 the API. Tests: `JobState.test.tsx` (every status, `done`, other job kinds, error text).
+
+### Voice-note waveform
+
+`MediaPreview` still owns the blob URL lifecycle (one `createObjectURL` through
+`documentUrl`, one revoke on replacement or unmount). For audio it renders
+`AudioWaveform` with that URL. `AudioWaveform` decodes the local bytes once, draws 64
+peak bars in an `aria-hidden` SVG and follows the native player's `timeupdate`,
+`seeked` and `ended` events; a mouse click on the bars seeks. Elapsed / total time is
+text. If decoding fails or `AudioContext` is missing, only the native player renders.
+Capture mode still hides media entirely. Tests: `waveform.test.ts` (silence, a single
+spike, fewer samples than buckets, clamping, normalizing, clock format) and
+`AudioWaveform.test.tsx` (fallback, decode failure, 64 bars and a single context close).
+Not verified: playback progress with a real voice note in a browser (jsdom has no audio
+engine); see the work log for the browser check.
 
 ## Private documents and temporary capabilities
 

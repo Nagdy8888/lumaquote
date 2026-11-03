@@ -61,7 +61,7 @@
         "supabase/migrations/20261029010000_quotation_domain.sql": "65b37c4e9358aa488174bf842b52c1100b2e83a44170c1b862fc9f25a75b2db6",
         "supabase/migrations/20261029131000_versioned_embeddings.sql": "71b6e35515d12ad5f116019b330790f6fdf00f4fc6162b38054b98b245f57e17"
       },
-      "svg_sha256": "6fb2d9b16ed996c2c9d467bfa4f35f8a82ce0610a323d500a7c73220c8c0e6a6",
+      "svg_sha256": "5984394ed1cde3691f97e2ac5ec1ff60efe9ffe7970532f13d26fcb29115087f",
       "width": 842.09,
       "height": 998.25
     },
@@ -72,7 +72,7 @@
         "supabase/migrations/20261029010000_quotation_domain.sql": "65b37c4e9358aa488174bf842b52c1100b2e83a44170c1b862fc9f25a75b2db6",
         "supabase/migrations/20261029100000_immutable_quotation_content.sql": "acd5b9a206ff4a23277a00499cfa6941217096edcbec3ba5c66db07d3e21078a"
       },
-      "svg_sha256": "0433af7b4817bf221f499765592a9d764d5c4d909da73bd7e212d02674f69b7e",
+      "svg_sha256": "f80a70b0d6a94fb7170ecac8280aad1e7b2443ab5cebabae12d173d0ff2c2747",
       "width": 729.36,
       "height": 825
     },
@@ -84,7 +84,7 @@
         "supabase/migrations/20261029110000_voice_intake.sql": "60b4f99ab5d0ea74677e5c2522807539222a31cd5a3e8aae2dabf5850031bde0",
         "supabase/migrations/20261029111000_media_message_binding.sql": "369cc2db1bd77d42a170d32f2e1d2269207cf7c7c1b53b140ce489ea72140e52"
       },
-      "svg_sha256": "98c93041cbc4ff489a4960e114e3c329ea58ba37e0be328f747fe23e3bffb451",
+      "svg_sha256": "8edb95666e8cf81e4aa6fd49dd0b5ff0d45dbe948cca2078483c43ac6441a943",
       "width": 846.89,
       "height": 896.5
     },
@@ -99,7 +99,7 @@
         "app/agents/luma_agent/nodes/workflow.py": "9301dff61ad428af7b2b7f4c3ddc4aaca61313cb33470f6ebfe7f76e2560cbd2",
         "app/agents/luma_agent/runtime/conversations.py": "b5afbb3cf434a52320b4be14b5fa3e42a2877111f902574eccf4f174ddb0e8c1"
       },
-      "svg_sha256": "94f33392d5f96b32d7811ef11ce7b937cfc0a162f63cc2efc1aca02aed7225b0",
+      "svg_sha256": "868d8e31d5724053fa95fb26f1a2f8361483a3438cf094cf4678f54b144b5b9b",
       "width": 685.62,
       "height": 888.34
     },
@@ -136,7 +136,7 @@
         "app/agents/luma_agent/runtime/media.py": "2491f1eed267ccd8a39c92d67bcadabd5fd09aa04afcb8552a0da8c84e7020c6",
         "app/agents/luma_agent/runtime/recovery.py": "3c51108e0b3c6277eaa6a0746114a43d0938775b101f94c021f937ea96f8e0e7"
       },
-      "svg_sha256": "0b4cd1ccffcf199dcb2d6713160522408a279297c9edcb1a4529c2ae4c6f6d5d",
+      "svg_sha256": "0d3f7a2b2697cbcc3d3c7f7d6be5063ab1778de2d57e8811691569b249ed8598",
       "width": 1317.98,
       "height": 693.8
     },
@@ -160,22 +160,22 @@
       "bindings": {
         "app/frontend/src/features/quotations/useQuotationDraft.ts": "a3b5fc6fbd2c5fc0ebbe724b5f456d09cdfe0d9b31fe9f1c96173ae1c42714cc",
         "app/frontend/src/features/quotations/QuotationPanel.tsx": "647818f847e2e0d261fc9d1a01006f5ff45ebf858bb9a8d8d58a333b24cefcff",
-        "app/frontend/src/features/conversations/api.ts": "7ff0f1cf2e0fa32b92017431f42547a86da4fb5c0c62b4fda5b9f9cce6122405"
+        "app/frontend/src/features/conversations/api.ts": "86511115b93e0f25d7f5d7d49ff71d30bb6579ebffb98bf18b3027d7abd707df"
       },
       "svg_sha256": "f5087910192b970202175a66971b2843c634dac6c0734c74f759857c64ede9ea",
       "width": 1004.99,
       "height": 510
     },
     "frontend-live-updates": {
-      "source_sha256": "2a75fdda413244623c4ea50443dbd33d0816691d143b29d9c3684a97369cc45a",
+      "source_sha256": "e908bebcaefc4c0c23d02c8cb120267999d8ac7bee891f26fa3ca4fb5abd8bdc",
       "renderer_sha256": "44f5712d92cb37910338d84507da5b3e04fe9603fb0fe445335fa85ef56cffb5",
       "bindings": {
         "app/frontend/src/shared/api/events.ts": "75b65c9d5c89c0c573f017852fb8f9861e1e922037b904294832dc6f9e28feed",
         "app/frontend/src/features/workspace/useLiveUpdates.ts": "5e0779e41dd2b6883b2f21823cbdd8703a807f0e867b856473fcbdfeaeb27fcc",
-        "app/frontend/src/features/workspace/api.ts": "5d1bd4a41be1da795016c59e75b9675915effacefac604d58fcb8ddc9b87d748",
+        "app/frontend/src/features/workspace/api.ts": "fd3be47ebe2d488201e2147b40f45273a080fec14069eb6e7b29e9420453ce75",
         "app/backend/luma/features/workspace/routes.py": "9d3fa03279a4a7f0571d943ac5c0097a2f82e5be68071a51f6b85d7d923189b1"
       },
-      "svg_sha256": "fcb644baca334fe29dfac585df3217e117a7de60bc04b07932066de5496857dd",
+      "svg_sha256": "ec564f640b4ab507a5829ac1b1d41889528713c954133d647d76af99489e57ca",
       "width": 880,
       "height": 1331
     },

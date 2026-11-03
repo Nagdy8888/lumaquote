@@ -80,6 +80,8 @@ async function main() {
     processMediaFixture(configuration.company_id);
     await page.getByRole('button',{name:'Listen to voice note',exact:true}).click({timeout:15000});
     await expect(page.getByLabel('Voice note audio',{exact:true})).toHaveAttribute('src',/^blob:/);
+    await expect(page.locator('.waveform-track rect')).toHaveCount(64);
+    await expect(page.locator('.waveform-time')).toHaveText(/^\d:\d\d \/ \d:\d\d$/);
     await page.getByRole('radio',{name:'Product-label photo attachment',exact:true}).click();
     await page.getByLabel('Test customer product-label photo',{exact:true}).setInputFiles(path.resolve('tests/fixtures/media/synthetic-label.png'));
     await page.getByRole('button',{name:'Upload test label photo',exact:true}).click();

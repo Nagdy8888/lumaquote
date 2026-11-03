@@ -20,10 +20,10 @@ export type ConversationCommand = (
 
 /**
  * Load the selected conversation using a staff-scoped query key; cancellation prevents
- * stale selection updates. `live` is true while the event stream is open; polling
- * then slows from 5 s to a 30 s safety net and is never removed.
+ * stale selection updates. Polling stays at 5 s even while live updates are connected
+ * (see `useWorkspace`: worker-side results write no audit revision).
  */
-export function useConversation(id?: string, live = false) {
+export function useConversation(id?: string) {
   const { session } = useSession();
   return useQuery({
     queryKey: ["conversation", session?.user.id, id],
@@ -32,7 +32,7 @@ export function useConversation(id?: string, live = false) {
     queryFn: function fetchConversation({ signal }) {
       return request<ConversationDetail>(`/conversations/${id}`, { signal });
     },
-    refetchInterval: live ? 30000 : 5000,
+    refetchInterval: 5000,
     retry: 1,
   });
 }

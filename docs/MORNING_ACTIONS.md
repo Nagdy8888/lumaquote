@@ -189,3 +189,15 @@ Recovery verified October 29 after the user restarted Docker: Engine 29.6.1 and
 resetting data. The targeted semantic/budget/photo/restart suite passed 22 tests.
 The prior Windows recovery action is resolved. Browser and full regression
 results are recorded separately in WORK_LOG.md; no manual reset is needed.
+
+## Frontend phase 5 follow-ups (2026-11-03)
+
+- Decision (backend, out of this plan's scope): the live event stream reports the company's
+  maximum `luma.audit` id, and the worker writes no audit row when it finishes a transcription
+  or an agent job. The UI therefore keeps its 5 s and 8 s polling even while connected (a
+  30 s polling slowdown made the browser workflow test time out). Say whether to add a
+  revision bump for worker-side changes; polling can be slowed after that.
+- Flaky test, not changed because other sessions have uncommitted edits to the same file:
+  `tests/unit/test_trace_masking.py::test_job_trace_exports_graph_and_model_runs_masked` asserts
+  `"0199" not in sent`, and a random trace UUID can contain `0199` (it failed once in CI on a
+  push, and passed on re-run). A fix that keeps the strength is `not re.search(r"555[\s-]*0199", sent)`.

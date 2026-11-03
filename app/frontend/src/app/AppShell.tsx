@@ -35,7 +35,7 @@ const navigation = [
 /** Compose the working shell; features own tasks while TanStack Query owns all remote collections. */
 export function AppShell() {
   const { connected } = useLiveUpdates();
-  const workspace = useWorkspace(connected);
+  const workspace = useWorkspace();
   const [capture, setCapture] = useState(false);
   if (workspace.isPending)
     return (
@@ -165,7 +165,7 @@ export function AppShell() {
           </div>
         </header>
         <main id="workspace-main" className="workspace-main">
-          <Outlet context={{ data, capture, live: connected }} />
+          <Outlet context={{ data, capture }} />
         </main>
         <footer className="app-footer">
           <span>

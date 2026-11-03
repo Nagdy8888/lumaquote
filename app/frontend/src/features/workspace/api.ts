@@ -5,10 +5,11 @@ import { useSession } from "@/shared/auth/session";
 
 /**
  * Fetch the current staff workspace with an identity-scoped cache and bounded
- * background reconciliation. `live` is true while the event stream is open; polling
- * then slows to a 30 s safety net instead of 8 s and is never removed.
+ * background reconciliation. Polling stays at 8 s even while live updates are
+ * connected: the event revision follows audit rows, and worker-side results (finished
+ * transcription, agent drafts) write none, so only polling shows them promptly.
  */
-export function useWorkspace(live = false) {
+export function useWorkspace() {
   const { session } = useSession();
   return useQuery({
     queryKey: ["workspace", session?.user.id],
@@ -17,7 +18,7 @@ export function useWorkspace(live = false) {
     queryFn: function loadWorkspace() {
       return request<Workspace>("/workspace");
     },
-    refetchInterval: live ? 30000 : 8000,
+    refetchInterval: 8000,
     retry: 1,
   });
 }
