@@ -271,6 +271,58 @@
   line-height: 1.7;
   margin-bottom: 5px;
 }
+.approval-confirm {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-left: 3px solid #b67151;
+  background: #fbfaf6;
+}
+.approval-confirm h3 {
+  font-size: 13px;
+  font-weight: 600;
+}
+.approval-confirm dl {
+  display: grid;
+  gap: 5px;
+  margin: 0;
+}
+.approval-confirm dl > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 12px;
+}
+.approval-confirm dt {
+  color: #616759;
+}
+.approval-confirm dd {
+  margin: 0;
+  font-weight: 600;
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+.approval-confirm p {
+  font-size: 12px;
+  line-height: 1.6;
+  color: #5e6850;
+}
+.approval-confirm > button {
+  width: 100%;
+  font-size: 12px;
+  white-space: normal;
+  height: auto;
+  min-height: 40px;
+}
+.approval-changed {
+  font-size: 12px;
+  padding: 10px 12px;
+  background: #f8eed7;
+  color: #7a6024;
+  line-height: 1.6;
+}
 .unsaved-note {
   font-size: 12px;
   padding: 12px;

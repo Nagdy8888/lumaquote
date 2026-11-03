@@ -216,6 +216,29 @@ displayed revision decision. The frontend does not calculate authoritative offer
 prices or silently grant an admin discount. An illustrative editable quantity is
 not a reviewed quotation until saving creates a backend revision.
 
+### Two-step approval confirmation
+
+`ui/ReviewActions` no longer approves with one click. Step 1 is the button "Review
+approval" (disabled while a decision is pending or staff owns the conversation). It opens
+an inline panel (no `window.confirm`, no browser dialog) that restates the quote number,
+revision, customer ("this customer" in capture mode), the server total as
+`money(quote.content.total)` (formatting of a server string, never a browser calculation)
+and the channel. Only the panel's button, "Approve revision N & queue delivery", calls
+`onDecide("approve")`; the decision payload is unchanged (`expected_revision` is the revision
+the parent captured). "Cancel" and `Escape` close the panel without a call.
+
+Focus: opening moves focus to the panel heading ("Confirm approval"); Cancel or Escape
+returns focus to "Review approval". Staleness: the panel is open only for the quote id and
+revision it was opened for. If the displayed id or revision changes, the panel closes and
+the text "This quotation changed. Review the new revision." appears (`role="status"`); if
+the user begins editing, or the quote leaves `review`, it closes silently. "Request changes"
+stays available in both steps. Approval and delivery still appear only after the server
+confirms: when the stored status changes the footer shows the server status. Server
+authorization, the revision check and idempotency are unchanged and remain authoritative.
+Tests: `ui/ReviewActions.test.tsx` (server total string, one approve call, capture wording,
+revision and id change, focus, Escape, staff ownership, Request changes) and the browser
+workflow, which now clicks "Review approval" and then the revision-numbered button.
+
 ## Conversation actors and ownership
 
 `InboxPage` owns selected detail and inbox filtering. `NewRequest` creates a
