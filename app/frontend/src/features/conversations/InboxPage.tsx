@@ -6,6 +6,7 @@ import {
   customerName,
   useWorkspaceContext,
 } from "@/shared/api/workspace-context";
+import { captureText } from "@/shared/lib/mask";
 import { Input } from "@/shared/ui/input";
 import { Status } from "@/shared/ui/status";
 import { Skeleton } from "@/shared/ui/skeleton";
@@ -79,7 +80,11 @@ export function InboxPage() {
                   </time>
                 </div>
                 <span>{customerName(c.customer_name, capture)}</span>
-                <p>{c.preview || "New customer request"}</p>
+                <p>
+                  {c.preview
+                    ? captureText(c.preview, capture)
+                    : "New customer request"}
+                </p>
                 <Status value={c.status} />
               </Link>
             ))}

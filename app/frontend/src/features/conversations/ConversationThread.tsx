@@ -1,6 +1,7 @@
 import { Bot, CheckCheck, UserRound } from "lucide-react";
 import type { ConversationDetail, Job } from "@/shared/api/types";
 import { customerName } from "@/shared/api/workspace-context";
+import { captureText } from "@/shared/lib/mask";
 import { Button } from "@/shared/ui/button";
 
 import { Status } from "@/shared/ui/status";
@@ -122,7 +123,7 @@ export function ConversationThread({
                 </span>
               )}
             </div>
-            <p>{message.body}</p>
+            <p>{captureText(message.body, capture)}</p>
             {["audio", "image"].includes(message.kind) &&
               message.media_status && (
                 <span className="message-media-status">
@@ -161,7 +162,9 @@ export function ConversationThread({
                 Customer reply <Status value={item.status} />
               </AlertTitle>
               <AlertDescription>
-                {item.preview ?? "Waiting for a confirmed delivery outcome."}
+                {item.preview
+                  ? captureText(item.preview, capture)
+                  : "Waiting for a confirmed delivery outcome."}
               </AlertDescription>
             </Alert>
           ))}

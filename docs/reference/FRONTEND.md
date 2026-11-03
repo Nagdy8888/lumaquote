@@ -351,9 +351,23 @@ changes with listener cleanup. A canvas fallback/error boundary keeps the screen
 usable when rendering is unavailable. The geometry and temperature controls are
 illustrative, not manufacturer specifications or photometric simulation.
 
-Capture mode changes displayed customer labels and hides media upload/previews.
-It does not comprehensively redact messages, PDFs or every potential identifier.
-Use labeled synthetic data for LinkedIn captures and inspect the actual image.
+Capture mode (display only, never stored, never in normal mode) does the following.
+- Replaces customer names and companies with neutral labels ("Project customer",
+  "Commercial customer", "this customer" in the approval panel).
+- Hides media upload and previews (media is hidden, not masked).
+- Masks free text through `shared/lib/mask.ts` (`maskForCapture`, `captureText`): emails
+  become `[email]`; phone numbers become `[phone]` (a leading "+" with 8-15 digits; a bare run
+  of 10-15 digits; a separated run of 9-15 digits in three or more groups with a last group of
+  three or more digits, never a date); key-shaped secrets (`sk-`, `lsv2_`, `EAA`, JWT) become
+  `[secret]`. SKUs, prices, quantities, dates and quote numbers are left alone. The patterns
+  follow `PRIVATE` in the browser review scripts. Surfaces: message bodies and delivery
+  previews in the thread, the conversation list preview in the inbox and the request table
+  preview on the overview. The conversation recipient is not rendered anywhere in the UI.
+It does not redact the PDF document (capture mode hides the PDF button), quote terms,
+catalog text, names written inside message bodies, addresses, numbers written in words, or
+local numbers written in groups of two digits. It is a pattern mask, not a guarantee. Use
+labeled synthetic data for LinkedIn captures and inspect the actual image.
+Tests: `shared/lib/mask.test.ts`.
 Graphite/copper tokens, fonts, layout and responsive rules live in shared/global
 and feature CSS; do not scatter one-off visual constants into business services.
 

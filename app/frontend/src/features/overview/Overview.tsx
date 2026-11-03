@@ -13,6 +13,7 @@ import {
   customerName,
   useWorkspaceContext,
 } from "@/shared/api/workspace-context";
+import { captureText } from "@/shared/lib/mask";
 import { Status, money } from "@/shared/ui/status";
 import { Button } from "@/shared/ui/button";
 import { LightingFallback, SceneBoundary } from "./SceneBoundary";
@@ -147,7 +148,7 @@ export function Overview() {
                     </strong>
                     <small>
                       {customerName(c.customer_name, capture)} ·{" "}
-                      {c.preview?.slice(0, 62)}
+                      {captureText(c.preview ?? "", capture).slice(0, 62)}
                     </small>
                   </div>
                 </div>
