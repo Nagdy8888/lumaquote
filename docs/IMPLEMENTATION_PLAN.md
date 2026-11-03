@@ -187,8 +187,12 @@ Implemented, not yet sufficient to check any item:
   ([drill evidence](evidence/backup-restore-drill-2026-11-02.json)). Open: outage
   injection, migration checks, scheduled retention, Drive/provider-side retention.
 - Item 4: four screenshots from the verified browser run
-  (`docs/evidence/screenshots/2026-11-02/`). Open: a full desktop/portrait,
-  accessibility and performance review.
+  (`docs/evidence/screenshots/2026-11-02/`). On 2026-11-03 a whole-app review of 19 views at
+  1440 x 1050 and 390 x 844 passed: zero axe violations, no overflow, no capture-mode privacy
+  match, keyboard order and live updates checked, dev-server timings measured
+  ([evidence](evidence/ui-review-2026-11-03.json), `local-substitute`). Not ticked. Open:
+  production-build performance, a screen-reader and real-device review, and 24 px target sizes
+  (recorded, not asserted).
 
 The last fully green `npm run verify:full` is recorded in
 [checkpoint evidence](evidence/checkpoint-2026-11-02.json) (283 passed). A later run

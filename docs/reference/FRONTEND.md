@@ -371,6 +371,23 @@ Tests: `shared/lib/mask.test.ts`.
 Graphite/copper tokens, fonts, layout and responsive rules live in shared/global
 and feature CSS; do not scatter one-off visual constants into business services.
 
+## Whole-app review and its limits
+
+The 2026-11-03 review ([evidence](../evidence/ui-review-2026-11-03.json), `local-substitute`) found
+no axe violation, horizontal overflow, console error or privacy-pattern match in 19 views. It also
+showed: Tab reaches the skip link on press 1, the conversation list on press 12, the composer on 17
+and "Review approval" on 23; the "Live" label appears about 0.9 s after load; a note posted in a
+second browser appears in the first in about 1.4 s (1374 ms). The first page opens two `/api/events`
+requests in this dev run because React StrictMode mounts effects twice in development (the first
+stream is aborted); a production build opens one. Controls under 24 x 24 CSS px are recorded
+(about 2 to 4 per view: the "Capture mode" button, the text links "Review your workspace",
+"View all", "Connection status" and "Back to inbox", and the 23 x 23 "Remove" line button) and are
+not asserted; they are an open WCAG 2.2 target-size gap. Not covered: the live WebGL scene
+(reduced motion shows the static fallback), screen readers, real devices and a production-build
+performance budget. Dev-server timings were 48 to 75 ms `domContentLoaded` and 396 to 556 ms LCP.
+Full-page screenshots taken after a scroll show the fixed skip link and sticky header at the
+scroll offset; that is a capture artifact, the skip link is off-screen for real users.
+
 ## Authored, generated and vendor-owned source
 
 `shared/api/generated.ts` is regenerated from OpenAPI; `types.ts` exposes small
