@@ -1,6 +1,7 @@
 import { useOutletContext } from "react-router-dom";
 import type { Workspace } from "./types";
 
+/** Route context: the authorized workspace and whether capture mode is on. */
 export type WorkspaceContext = { data: Workspace; capture: boolean };
 
 /** Read route-provided authorized workspace data without creating another remote-state store. */

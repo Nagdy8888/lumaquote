@@ -146,7 +146,7 @@
 }
 .metric-strip {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   padding: 25px 0;
   margin: 9px 0 27px;
   border-bottom: 1px solid var(--border);
@@ -406,10 +406,10 @@
     gap: 22px 0;
     margin-top: 0;
   }
-  .metric-strip > div:nth-child(2) {
+  .metric-strip > div:nth-child(even) {
     border-right: 0;
   }
-  .metric-strip > div:nth-child(3) {
+  .metric-strip > div:nth-child(odd) {
     padding-left: 0;
   }
   .metric-strip strong {

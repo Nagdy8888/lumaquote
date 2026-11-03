@@ -182,9 +182,18 @@ selection occurs. Failed retries retain them. Type changes explicitly clear that
 selection; a background refresh must not silently update its precondition. File
 selection alone does not start provider work or request microphone permission.
 
-`MediaPreview` fetches a blob only on staff click, displays native audio or bounded
-image content and revokes object URLs on replacement/unmount. Its mounted guard
+`MediaPreview` fetches a blob only on staff click, displays native audio (inside
+`AudioWaveform`, below) or bounded image content and revokes object URLs on
+replacement/unmount. Its mounted guard
 releases a late response rather than retaining a capability after navigation.
+`AudioWaveform` (`features/conversations`) receives that same object URL; it never
+creates, revokes or network-fetches one. It reads the bytes from the local blob URL,
+decodes them once with `AudioContext.decodeAudioData`, closes the context, reduces
+channel 0 to 64 peaks (`waveform.ts`: `computePeaks`, `normalizePeaks`) and draws them as
+an `aria-hidden` SVG (copper for the played part, mineral for the rest) with elapsed and
+total time as text. A mouse click on the bars seeks; keyboard users use the native
+`<audio controls>`, which stays the accessible control. A missing `AudioContext` or a
+decode failure shows only the native player. No transitions are used.
 Capture mode hides previews/uploads but does not guarantee full transcript/PDF
 redaction; public captures must still use synthetic data.
 

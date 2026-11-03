@@ -1,12 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 import { documentUrl } from "@/shared/api/client";
 import { Button } from "@/shared/ui/button";
+import { AudioWaveform } from "./AudioWaveform";
 
 /**
  * Fetch a normalized private attachment only after an explicit staff request.
  * The API authorizes message/kind and returns bytes; no Storage URL is exposed.
  * This owner revokes blob capabilities on replacement/unmount, including a fetch
- * that resolves after navigation. Preview availability does not establish that
+ * that resolves after navigation. Voice notes render through `AudioWaveform`, which
+ * reuses this URL and never creates or revokes one. Preview availability does not establish that
  * its transcript/label fields are confirmed or safe to quote.
  */
 export function MediaPreview({
@@ -67,12 +69,7 @@ export function MediaPreview({
         kind === "image" ? (
           <img src={url} alt="Unconfirmed product-label photo" />
         ) : (
-          <audio
-            controls
-            preload="metadata"
-            src={url}
-            aria-label="Voice note audio"
-          />
+          <AudioWaveform url={url} />
         )
       ) : (
         <Button

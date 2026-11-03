@@ -7,6 +7,7 @@ import { NewRequest } from "@/features/conversations/NewRequest";
 import { QuotationsPage } from "@/features/quotations/QuotationsPage";
 import { CatalogPage } from "@/features/catalog/CatalogPage";
 import { ConnectionsPage } from "@/features/integrations/ConnectionsPage";
+import { NotFoundPage } from "@/features/not-found/NotFoundPage";
 import { AppShell } from "./AppShell";
 
 /** Route authenticated staff into the business workspace; server authorization remains authoritative. */
@@ -29,7 +30,7 @@ export function App() {
           <Route path="quotations" element={<QuotationsPage />} />
           <Route path="catalog" element={<CatalogPage />} />
           <Route path="integrations" element={<ConnectionsPage />} />
-          <Route path="*" element={<Overview />} />
+          <Route path="*" element={<NotFoundPage />} />
         </Route>
       </Routes>
     </BrowserRouter>

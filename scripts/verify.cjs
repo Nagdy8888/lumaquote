@@ -15,7 +15,7 @@ function main() {
   for (const command of commands) {
     const start = Date.now();
     // Real Auth/Storage/sandbox/process-restart coverage needs a separate bounded integration-suite budget.
-    const timeout = command === 'test:python' ? 600000 : 180000;
+    const timeout = command === 'test:python' ? 600000 : command === 'test:browser' ? 420000 : 180000;
     const result = spawnSync(process.execPath, [npm, 'run', command], { cwd: root, encoding: 'utf8', windowsHide: true, timeout });
     const log = `${command.replaceAll(':', '-')}.log`;
     fs.writeFileSync(path.join(directory, log), (result.stdout ?? '') + (result.stderr ?? ''));

@@ -126,6 +126,38 @@
   width: 12px;
   height: 12px;
 }
+.job-state {
+  padding: 10px 18px;
+  background: #f3f5ee;
+  border-bottom: 1px solid #e6e8df;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  justify-content: space-between;
+}
+.job-state > span {
+  font-size: 12px;
+  color: #3f4a3a;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.job-spinner {
+  width: 13px;
+  height: 13px;
+  animation: job-spin 1s linear infinite;
+}
+@keyframes job-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .job-spinner {
+    animation: none;
+  }
+}
 .message-list {
   padding: 21px 19px;
   flex: 1;
@@ -417,5 +449,36 @@
 .media-upload > button { justify-self: start; }
 .media-preview { margin-top: 10px; }
 .media-preview audio { width: 100%; max-width: 320px; }
+.audio-waveform { display: grid; gap: 6px; max-width: 320px; }
+.waveform-body { display: flex; align-items: center; gap: 10px; }
+.waveform-track { flex: 1; min-width: 0; height: 32px; cursor: pointer; }
+.waveform-track svg { display: block; width: 100%; height: 100%; }
+.waveform-played { fill: #b67151; }
+.waveform-remaining { fill: #b9bdb2; }
+.waveform-time { font-size: 12px; color: var(--muted-foreground); font-variant-numeric: tabular-nums; white-space: nowrap; }
 
 .media-preview img { display: block; max-width: 100%; max-height: 220px; object-fit: contain; border-radius: 8px; }
+
+.inbox-section-switch {
+  display: none;
+}
+@media (max-width: 680px) {
+  .inbox-section-switch {
+    display: block;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    background: #fafaf6;
+  }
+  .inbox-section-switch [data-slot="toggle-group"] {
+    width: 100%;
+  }
+  .inbox-section-switch [data-slot="toggle-group-item"] {
+    flex: 1 1 0;
+    gap: 8px;
+    font-size: 13px;
+  }
+  .inbox-workspace[data-section="conversation"] .quotation-panel,
+  .inbox-workspace[data-section="quotation"] .thread {
+    display: none;
+  }
+}

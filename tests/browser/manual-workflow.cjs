@@ -80,6 +80,8 @@ async function main() {
     processMediaFixture(configuration.company_id);
     await page.getByRole('button',{name:'Listen to voice note',exact:true}).click({timeout:15000});
     await expect(page.getByLabel('Voice note audio',{exact:true})).toHaveAttribute('src',/^blob:/);
+    await expect(page.locator('.waveform-track rect')).toHaveCount(64);
+    await expect(page.locator('.waveform-time')).toHaveText(/^\d:\d\d \/ \d:\d\d$/);
     await page.getByRole('radio',{name:'Product-label photo attachment',exact:true}).click();
     await page.getByLabel('Test customer product-label photo',{exact:true}).setInputFiles(path.resolve('tests/fixtures/media/synthetic-label.png'));
     await page.getByRole('button',{name:'Upload test label photo',exact:true}).click();
@@ -95,7 +97,7 @@ async function main() {
     await page.getByRole('button', { name: 'Save quotation revision' }).click();
     await expect(page.locator('.quote-grand-total')).toContainText('$97.05');
     await page.getByRole('button', { name: 'Take over', exact: true }).click();
-    await expect(page.getByRole('button', { name: 'Approve & queue delivery' })).toBeDisabled();
+    await expect(page.getByRole('button', { name: 'Review approval' })).toBeDisabled();
     await page.getByRole('radio',{name:'Customer reply mode',exact:true}).click();
     await page.getByRole('textbox',{name:'Customer reply',exact:true}).fill('Can you confirm the installation location? Synthetic staff clarification.');
     await page.getByRole('button',{name:'Queue customer reply',exact:true}).click();
@@ -104,7 +106,7 @@ async function main() {
     await expect(page.locator('.message-staff').filter({hasText:'Synthetic staff clarification.'})).toContainText('Sales team',{timeout:15000});
     await page.getByRole('radio',{name:'Internal staff note mode',exact:true}).click();
     await page.getByRole('button', { name: 'Resume agent', exact: true }).click();
-    await expect(page.getByRole('button', { name: 'Approve & queue delivery' })).toBeEnabled();
+    await expect(page.getByRole('button', { name: 'Review approval' })).toBeEnabled();
 
     // An actual background update must preserve the draft and its old precondition.
     await page.getByLabel('Quantity for DL-001', { exact: true }).fill('4');
@@ -128,7 +130,8 @@ async function main() {
     await page.getByRole('button', { name: 'View PDF', exact: true }).click();
     await expect(page.getByRole('dialog')).toBeVisible();
     await page.getByRole('button', { name: 'Close document' }).click();
-    await page.getByRole('button', { name: 'Approve & queue delivery' }).click();
+    await page.getByRole('button', { name: 'Review approval' }).click();
+    await page.getByRole('button', { name: /^Approve revision \d+ & queue delivery$/ }).click();
     await expect(page.locator('.delivery-summary')).toContainText('Queued');
 
     // Invoke only the fixture company's real worker dispatch; no debug/approval-

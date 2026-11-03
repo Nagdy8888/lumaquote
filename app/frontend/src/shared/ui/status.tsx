@@ -15,6 +15,8 @@ const labels: Record<string, string> = {
   disabled: "Disabled",
   enabled: "Enabled",
   queued: "Queued",
+  running: "Running",
+  done: "Done",
   unknown: "Outcome unknown",
   failed: "Failed",
   blocked: "Blocked",
