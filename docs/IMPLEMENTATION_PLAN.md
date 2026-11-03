@@ -167,6 +167,9 @@ The live steps are in [morning actions](MORNING_ACTIONS.md). See
 
 ### Phase 5 - in progress (0 of 4 items)
 
+Frontend task breakdown for items 1 and 4 (proposed 2026-11-03, not started):
+[frontend work plan](proposals/2026-11-03-frontend-plan.md).
+
 Implemented, not yet sufficient to check any item:
 
 - Item 1: lazy `LightingScene` (React Three Fiber) with a reduced-motion static fallback
