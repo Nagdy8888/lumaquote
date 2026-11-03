@@ -231,7 +231,8 @@
       "bindings": [
         "scripts/verify.cjs",
         ".github/workflows/ci.yml",
-        "tests/integration/test_browser_workflow.py"
+        "tests/integration/test_browser_workflow.py",
+        "tests/integration/test_ui_review.py"
       ]
     },
     {

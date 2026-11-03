@@ -928,3 +928,10 @@ these entries were logged during the original steps or freshly rerun today.
 - Checked (`local`): `npm run check:rules` passed. The complete `npm run verify:full`, `npm run test:browser` and the UI review for this exact commit are recorded in the pull request body (Validation section), because a log entry cannot contain the result of the run that validates the commit holding it. CI on the F7 commit passed; CI on the F8 commit is in the PR body too.
 - Evidence: `docs/evidence/ui-review-2026-11-03.json`.
 - Open: phase 5 item 4 stays unticked (production-build performance, screen reader and real device, 24 px targets); the backend revision gap for worker-side changes and the flaky `"0199"` assertion are in `docs/MORNING_ACTIONS.md`; the main folder's uncommitted edits to `docs/WORK_LOG.md`, `IMPLEMENTATION_PLAN.md`, `DECISIONS.md`, `package.json`, `scripts/verify.cjs`, `FRONTEND.md`, `TOOLING_AND_TESTS.md` and others overlap this branch and must be reconciled before pulling `main` there.
+
+### 2026-11-03 - Refresh the verification-scope diagram after the browser gate changed (phase 5, local)
+- Why: CI failed `diagrams:check` ("Stale or missing diagram asset/binding: verification-scope") on the F8 commit because F8 changed `scripts/verify.cjs`, which that diagram binds; the local runs of `diagrams:check` before the F8 edit to `verify.cjs` had passed, and the first `verify:full` on the F9 commit stopped at the same check.
+- Changed: `docs/diagrams/verification-scope.mmd` (the browser node now says "Owned native browser workflow, restart scenario and whole-app UI review"), `docs/diagrams/catalog.json` (binds `tests/integration/test_ui_review.py`), re-rendered `verification-scope.svg` and `manifest.json`, the `TOOLING_AND_TESTS.md` embed, and again five unrelated SVGs with id-only changes.
+- Checked (`local`): `diagrams:render` and `diagrams:check` passed (19 diagrams). The complete `verify:full` for the new tip is in the PR body.
+- Evidence: none.
+- Open: none.

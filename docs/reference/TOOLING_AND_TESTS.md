@@ -23,7 +23,7 @@ flowchart LR
   Change["Reviewed source and documentation change"] --> Static["Lint, inline contracts, imports, types and diagrams"]
   Static --> Offline["Offline unit and UI tests; build"]
   Static --> Full["Full local Supabase and sandbox tests"]
-  Full --> Browser["Owned native browser and restart scenario"]
+  Full --> Browser["Owned native browser workflow, restart scenario and whole-app UI review"]
   Change -. Explicit separate opt-in, paid .-> Live["Synthetic provider canaries and agent evaluation"]
   Change -. Pushed commit only .-> CI["Remote static, unit, UI, diagram and build checks"]
   Offline --> Evidence["Scoped, dated evidence with gaps"]

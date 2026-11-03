@@ -61,7 +61,7 @@
         "supabase/migrations/20261029010000_quotation_domain.sql": "65b37c4e9358aa488174bf842b52c1100b2e83a44170c1b862fc9f25a75b2db6",
         "supabase/migrations/20261029131000_versioned_embeddings.sql": "71b6e35515d12ad5f116019b330790f6fdf00f4fc6162b38054b98b245f57e17"
       },
-      "svg_sha256": "5984394ed1cde3691f97e2ac5ec1ff60efe9ffe7970532f13d26fcb29115087f",
+      "svg_sha256": "940ae99dddd0db0b3dfefeab274d9cb53a08f0fd3b11d195e53817e4d35769da",
       "width": 842.09,
       "height": 998.25
     },
@@ -72,7 +72,7 @@
         "supabase/migrations/20261029010000_quotation_domain.sql": "65b37c4e9358aa488174bf842b52c1100b2e83a44170c1b862fc9f25a75b2db6",
         "supabase/migrations/20261029100000_immutable_quotation_content.sql": "acd5b9a206ff4a23277a00499cfa6941217096edcbec3ba5c66db07d3e21078a"
       },
-      "svg_sha256": "f80a70b0d6a94fb7170ecac8280aad1e7b2443ab5cebabae12d173d0ff2c2747",
+      "svg_sha256": "0b39ee86292601eddde184dfa6627dd6439bdd90e618df741abc3a1cb84e9b04",
       "width": 729.36,
       "height": 825
     },
@@ -84,7 +84,7 @@
         "supabase/migrations/20261029110000_voice_intake.sql": "60b4f99ab5d0ea74677e5c2522807539222a31cd5a3e8aae2dabf5850031bde0",
         "supabase/migrations/20261029111000_media_message_binding.sql": "369cc2db1bd77d42a170d32f2e1d2269207cf7c7c1b53b140ce489ea72140e52"
       },
-      "svg_sha256": "8edb95666e8cf81e4aa6fd49dd0b5ff0d45dbe948cca2078483c43ac6441a943",
+      "svg_sha256": "baa7dc5a39ce0e6fa9e50689c04f06cc19faa93a5e371a6512c23e5a3cf5cecb",
       "width": 846.89,
       "height": 896.5
     },
@@ -99,7 +99,7 @@
         "app/agents/luma_agent/nodes/workflow.py": "9301dff61ad428af7b2b7f4c3ddc4aaca61313cb33470f6ebfe7f76e2560cbd2",
         "app/agents/luma_agent/runtime/conversations.py": "b5afbb3cf434a52320b4be14b5fa3e42a2877111f902574eccf4f174ddb0e8c1"
       },
-      "svg_sha256": "868d8e31d5724053fa95fb26f1a2f8361483a3438cf094cf4678f54b144b5b9b",
+      "svg_sha256": "34ecf5a0999c935d755351e0266381dbb5c08eb796a3e347f0b0649cb0008232",
       "width": 685.62,
       "height": 888.34
     },
@@ -136,7 +136,7 @@
         "app/agents/luma_agent/runtime/media.py": "2491f1eed267ccd8a39c92d67bcadabd5fd09aa04afcb8552a0da8c84e7020c6",
         "app/agents/luma_agent/runtime/recovery.py": "3c51108e0b3c6277eaa6a0746114a43d0938775b101f94c021f937ea96f8e0e7"
       },
-      "svg_sha256": "0d3f7a2b2697cbcc3d3c7f7d6be5063ab1778de2d57e8811691569b249ed8598",
+      "svg_sha256": "c85f13abe4162930031b9f51907e9569e544c09c0ba32bbf85d50f50b6bce9b1",
       "width": 1317.98,
       "height": 693.8
     },
@@ -207,15 +207,16 @@
       "height": 1067
     },
     "verification-scope": {
-      "source_sha256": "298dfced352dcd134b726006151179f76547d39e2f19c4a99fbcb66bd0c9bc49",
+      "source_sha256": "e28a3844b8f4e4a35aa2bf183e7838e59ff77b582b772f163bd252965b14d2c3",
       "renderer_sha256": "44f5712d92cb37910338d84507da5b3e04fe9603fb0fe445335fa85ef56cffb5",
       "bindings": {
-        "scripts/verify.cjs": "aea2355295aa6cb802c9774b60e0469ba9b1b09040d109b799cb1eafbe819bed",
+        "scripts/verify.cjs": "4e8e206e0ec8604fa21e56b487020f8cef702b5f3d59d4a215becd9891655505",
         ".github/workflows/ci.yml": "b75c77bbf20f4e1229a59499a14f7515e0b49f669e0c576b9e09b1280ef2796e",
-        "tests/integration/test_browser_workflow.py": "7652f2d99e5216b5a81506c73d35715dfa44c8029b18c56ab8304a3ae8010cf4"
+        "tests/integration/test_browser_workflow.py": "7652f2d99e5216b5a81506c73d35715dfa44c8029b18c56ab8304a3ae8010cf4",
+        "tests/integration/test_ui_review.py": "7b120cc83c01f822240837422595bde8ae33d6228b9732c015413dff85468666"
       },
-      "svg_sha256": "7ea2bb3d27776e43183ed4bb6943097123641257f7bd07d9838bfb655fda96b0",
-      "width": 1905.99,
+      "svg_sha256": "b50af1e225f0ac7b47b981a15545523bcc03349c9fb44cddd50abf36b928c019",
+      "width": 1897.16,
       "height": 409.05
     },
     "whatsapp-channel": {
@@ -241,7 +242,7 @@
         "scripts/check_docs.py": "e9b47eaa507a2c2c06d49d99ba48ecd432cd35407ff76379a094eea66468161e",
         "scripts/skills.py": "d09af51388cba5aee2fc0eb57f8597f46261c963f5efa2203bd546466ceeff93",
         ".claude/settings.json": "e2881af356a77ec20cee0f9a18d1b08dc46446fd6d4e67a6a17e07608479544b",
-        "scripts/verify.cjs": "aea2355295aa6cb802c9774b60e0469ba9b1b09040d109b799cb1eafbe819bed",
+        "scripts/verify.cjs": "4e8e206e0ec8604fa21e56b487020f8cef702b5f3d59d4a215becd9891655505",
         "scripts/summarize_agent_run.py": "ef70744ea93818ea9ef77609442099b8e914949f70eaabef3e8274ad5e540a68"
       },
       "svg_sha256": "16877e892f2f60b5c6b10042d5309cd485f9aa395c9826e728033fc9322e51d0",
