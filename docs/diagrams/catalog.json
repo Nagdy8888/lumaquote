@@ -179,6 +179,20 @@
       ]
     },
     {
+      "id": "frontend-live-updates",
+      "title": "Authenticated live updates with polling fallback",
+      "scope": "One bearer-authenticated event stream per tab invalidates cached data; polling stays as a slower safety net",
+      "embeds": [
+        "docs/reference/FRONTEND.md"
+      ],
+      "bindings": [
+        "app/frontend/src/shared/api/events.ts",
+        "app/frontend/src/features/workspace/useLiveUpdates.ts",
+        "app/frontend/src/features/workspace/api.ts",
+        "app/backend/luma/features/workspace/routes.py"
+      ]
+    },
+    {
       "id": "google-snapshot",
       "title": "Signed Apps Script snapshot validation and atomic publication",
       "scope": "Implemented GAS transport; live timer and complete account verification remain separate",

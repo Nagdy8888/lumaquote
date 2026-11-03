@@ -1,0 +1,31 @@
+sequenceDiagram
+  accTitle: Authenticated live updates with polling fallback
+  accDescr: The shell opens one authenticated event stream with the bearer token. The server rechecks membership and sends the company revision about every three seconds. A changed revision invalidates the workspace and conversation queries, which refetch through the normal API. A revoked event signs the user out. A normal end reconnects after one second and an error backs off from two to thirty seconds. Polling stays on as a slow safety net while connected and runs at the faster rate when not connected.
+  participant UI as AppShell and useLiveUpdates
+  participant Q as TanStack Query cache
+  participant API as GET /api/events
+  participant DB as PostgreSQL audit revision
+  UI->>API: fetch with bearer token and Accept text/event-stream
+  alt Rejected or network error
+    API-->>UI: Non-2xx or failure
+    UI->>UI: Show Refreshing every few seconds, wait 2 s, 4 s ... up to 30 s
+  else Accepted
+    API-->>UI: 200 stream
+    UI->>UI: Show Live, poll every 30 s
+    loop About every 3 s, at most 30 events
+      API->>DB: Recheck membership, read company revision
+      alt Membership lost
+        API-->>UI: event revoked
+        UI->>UI: Sign out and stop
+      else Still a member
+        API-->>UI: event refresh with revision
+        opt Revision differs from the last one seen
+          UI->>Q: Invalidate workspace and conversation
+          Q->>API: Normal authorized refetch
+        end
+      end
+    end
+    API-->>UI: Stream closes after about 90 s
+    UI->>UI: Reconnect after 1 s
+  end
+  Note over UI,Q: Polling is never removed. It runs every 5 or 8 s without a stream and every 30 s with one.

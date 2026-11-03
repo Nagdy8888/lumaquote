@@ -18,8 +18,12 @@ export type ConversationCommand = (
   | { action: "messages" | "customer-reply"; body: TextInput }
 ) & { key: string };
 
-/** Load the selected conversation using a staff-scoped query key; cancellation prevents stale selection updates. */
-export function useConversation(id?: string) {
+/**
+ * Load the selected conversation using a staff-scoped query key; cancellation prevents
+ * stale selection updates. `live` is true while the event stream is open; polling
+ * then slows from 5 s to a 30 s safety net and is never removed.
+ */
+export function useConversation(id?: string, live = false) {
   const { session } = useSession();
   return useQuery({
     queryKey: ["conversation", session?.user.id, id],
@@ -28,7 +32,7 @@ export function useConversation(id?: string) {
     queryFn: function fetchConversation({ signal }) {
       return request<ConversationDetail>(`/conversations/${id}`, { signal });
     },
-    refetchInterval: 5000,
+    refetchInterval: live ? 30000 : 5000,
     retry: 1,
   });
 }

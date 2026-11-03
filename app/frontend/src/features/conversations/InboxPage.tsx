@@ -15,11 +15,11 @@ import { QuotationPanel } from "@/features/quotations/QuotationPanel";
 
 /** Compose request navigation, conversation, and quotation review as independent focused feature components. */
 export function InboxPage() {
-  const { data, capture } = useWorkspaceContext();
+  const { data, capture, live } = useWorkspaceContext();
   const { id } = useParams();
   const [search, setSearch] = useState("");
   const selected = id ?? data.conversations[0]?.id;
-  const detail = useConversation(selected);
+  const detail = useConversation(selected, live);
   const requests = data.conversations.filter((c) =>
     `${c.customer_name} ${c.customer_company} ${c.preview}`
       .toLowerCase()

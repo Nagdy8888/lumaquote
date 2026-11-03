@@ -59,6 +59,99 @@ to the native backend. `LUMA_API_PROXY_TARGET` changes that local development
 proxy, including isolated browser-test ports. It is not a browser-selected API
 destination or a production deployment topology.
 
+## Live updates over an authenticated event stream
+
+### Authenticated live updates with polling fallback
+
+One bearer-authenticated event stream per tab invalidates cached data; polling stays as a slower safety net.
+
+<!-- diagram:frontend-live-updates:start -->
+![Authenticated live updates with polling fallback](../diagrams/rendered/frontend-live-updates.svg)
+
+[Open full-size SVG](../diagrams/rendered/frontend-live-updates.svg) · [Editable Mermaid](../diagrams/frontend-live-updates.mmd)
+
+<details>
+<summary>Mermaid source</summary>
+
+```mermaid
+sequenceDiagram
+  accTitle: Authenticated live updates with polling fallback
+  accDescr: The shell opens one authenticated event stream with the bearer token. The server rechecks membership and sends the company revision about every three seconds. A changed revision invalidates the workspace and conversation queries, which refetch through the normal API. A revoked event signs the user out. A normal end reconnects after one second and an error backs off from two to thirty seconds. Polling stays on as a slow safety net while connected and runs at the faster rate when not connected.
+  participant UI as AppShell and useLiveUpdates
+  participant Q as TanStack Query cache
+  participant API as GET /api/events
+  participant DB as PostgreSQL audit revision
+  UI->>API: fetch with bearer token and Accept text/event-stream
+  alt Rejected or network error
+    API-->>UI: Non-2xx or failure
+    UI->>UI: Show Refreshing every few seconds, wait 2 s, 4 s ... up to 30 s
+  else Accepted
+    API-->>UI: 200 stream
+    UI->>UI: Show Live, poll every 30 s
+    loop About every 3 s, at most 30 events
+      API->>DB: Recheck membership, read company revision
+      alt Membership lost
+        API-->>UI: event revoked
+        UI->>UI: Sign out and stop
+      else Still a member
+        API-->>UI: event refresh with revision
+        opt Revision differs from the last one seen
+          UI->>Q: Invalidate workspace and conversation
+          Q->>API: Normal authorized refetch
+        end
+      end
+    end
+    API-->>UI: Stream closes after about 90 s
+    UI->>UI: Reconnect after 1 s
+  end
+  Note over UI,Q: Polling is never removed. It runs every 5 or 8 s without a stream and every 30 s with one.
+```
+
+</details>
+<!-- diagram:frontend-live-updates:end -->
+
+**Actors and authority.** `GET /api/events` requires the staff bearer header
+(`HTTPBearer`), so the browser `EventSource` API cannot be used. `shared/api/events.ts`
+uses `fetch` and a `ReadableStream` reader instead. The server rechecks company
+membership before every event; the browser only reacts. `AppShell` mounts
+`useLiveUpdates` once, so there is one stream per tab.
+
+**Call flow.** `openEventStream({ path, token, signal, onEvent, onOpen })` sends
+`Authorization: Bearer <token>` and `Accept: text/event-stream`, decodes with a
+`TextDecoder` and feeds `parseEventStream(chunk, buffer)` (pure: LF and CRLF, a CR/LF
+pair split across chunks, comment lines ignored, several `data:` lines joined). The
+server sends `event: refresh` with `data: {"revision": <int>}` about every 3 s,
+`event: revoked` when membership fails, and closes after 30 events (about 90 s).
+
+**State and transitions.** `useLiveUpdates` returns `{ connected }`.
+- Opened: `connected` becomes true and the failure count resets.
+- `refresh` with a revision different from the last one seen (the first one always counts):
+  invalidates the `workspace` and `conversation` query keys; TanStack Query refetches
+  through the normal API, so authorization and the canonical data path are unchanged.
+- `revoked`: `auth.signOut()`, then the loop stops.
+- Normal end: reconnect after 1 s; `connected` stays true across that planned gap so the
+  topbar label does not flicker.
+- Error (non-2xx, network, missing session): `connected` becomes false and the loop
+  reconnects after 2 s, 4 s, 8 s ... capped at 30 s.
+- Unmount or staff identity change: the stream is aborted and no timer remains.
+
+**Topbar and polling.** The shell shows the text "Live" when connected and "Refreshing
+every few seconds" when not (text, not colour alone). `connected` also reaches
+`useWorkspace(live)` and, through the route context, `useConversation(id, live)`:
+polling is 30 s while connected and 8 s / 5 s otherwise. Polling is never removed.
+
+**Limits and cost.** One stream per about 90 s is far under the 120 reads per minute
+limit. No token or event data is logged or stored by the browser code; failures carry
+only a fixed message and the status.
+
+**Tests and evidence.** `shared/api/events.test.ts` covers the parser and the bearer
+header; `features/workspace/useLiveUpdates.test.tsx` covers invalidation only on a changed
+revision, abort on unmount, reconnect after a normal end, backoff and sign-out on
+`revoked` (all with a mocked `fetch`, label `local`).
+
+**Open gaps.** Cross-tab propagation was checked only through the mocked stream tests;
+a live two-tab check against the local API is recorded in the work log.
+
 ## Session and cache boundary
 
 `shared/auth/client.ts` uses only public Supabase URL/anon configuration. Auth
@@ -72,8 +165,9 @@ unmount. These are client lifecycle controls; every business API call still
 revalidates the token and current membership on the server.
 
 `features/workspace/api.useWorkspace` keys data by staff user ID, polls every eight
-seconds and retries a failed query once. `conversations/api.useConversation`
-keys by user/conversation, polls every five seconds and passes query cancellation
+seconds (30 s while live updates are connected) and retries a failed query once.
+`conversations/api.useConversation` keys by user/conversation, polls every five
+seconds (30 s while connected) and passes query cancellation
 to fetch so navigation can cancel stale reads. Company selection is derived by
 the server; a browser cache key is not authorization.
 

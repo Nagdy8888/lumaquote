@@ -18,6 +18,7 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import { useWorkspace } from "@/features/workspace/api";
+import { useLiveUpdates } from "@/features/workspace/useLiveUpdates";
 import { auth } from "@/shared/auth/client";
 import { Button } from "@/shared/ui/button";
 import { Skeleton } from "@/shared/ui/skeleton";
@@ -33,7 +34,8 @@ const navigation = [
 
 /** Compose the working shell; features own tasks while TanStack Query owns all remote collections. */
 export function AppShell() {
-  const workspace = useWorkspace();
+  const { connected } = useLiveUpdates();
+  const workspace = useWorkspace(connected);
   const [capture, setCapture] = useState(false);
   if (workspace.isPending)
     return (
@@ -139,6 +141,10 @@ export function AppShell() {
             <span className="workspace-disclosure">
               Synthetic supplier data
             </span>
+            <span className="topbar-divider" />
+            <span className="live-state" data-live={connected}>
+              {connected ? "Live" : "Refreshing every few seconds"}
+            </span>
           </div>
           <div className="topbar-actions">
             <button
@@ -159,7 +165,7 @@ export function AppShell() {
           </div>
         </header>
         <main id="workspace-main" className="workspace-main">
-          <Outlet context={{ data, capture }} />
+          <Outlet context={{ data, capture, live: connected }} />
         </main>
         <footer className="app-footer">
           <span>

@@ -61,7 +61,7 @@
         "supabase/migrations/20261029010000_quotation_domain.sql": "65b37c4e9358aa488174bf842b52c1100b2e83a44170c1b862fc9f25a75b2db6",
         "supabase/migrations/20261029131000_versioned_embeddings.sql": "71b6e35515d12ad5f116019b330790f6fdf00f4fc6162b38054b98b245f57e17"
       },
-      "svg_sha256": "305e0faa84e7850e5fb5ac482b9aeb8387c18db3ff131d85af09c19e6b3f86e4",
+      "svg_sha256": "6fb2d9b16ed996c2c9d467bfa4f35f8a82ce0610a323d500a7c73220c8c0e6a6",
       "width": 842.09,
       "height": 998.25
     },
@@ -72,7 +72,7 @@
         "supabase/migrations/20261029010000_quotation_domain.sql": "65b37c4e9358aa488174bf842b52c1100b2e83a44170c1b862fc9f25a75b2db6",
         "supabase/migrations/20261029100000_immutable_quotation_content.sql": "acd5b9a206ff4a23277a00499cfa6941217096edcbec3ba5c66db07d3e21078a"
       },
-      "svg_sha256": "37fa2462d4c0de11cef150f8e1cbaef3153d5c17679f96c5e94db1c7f6f44218",
+      "svg_sha256": "0433af7b4817bf221f499765592a9d764d5c4d909da73bd7e212d02674f69b7e",
       "width": 729.36,
       "height": 825
     },
@@ -84,7 +84,7 @@
         "supabase/migrations/20261029110000_voice_intake.sql": "60b4f99ab5d0ea74677e5c2522807539222a31cd5a3e8aae2dabf5850031bde0",
         "supabase/migrations/20261029111000_media_message_binding.sql": "369cc2db1bd77d42a170d32f2e1d2269207cf7c7c1b53b140ce489ea72140e52"
       },
-      "svg_sha256": "dc84b4d3845610fb9f3e0add9e85490ffe2873200f4d1d65b4daab2bdc092d0a",
+      "svg_sha256": "98c93041cbc4ff489a4960e114e3c329ea58ba37e0be328f747fe23e3bffb451",
       "width": 846.89,
       "height": 896.5
     },
@@ -99,7 +99,7 @@
         "app/agents/luma_agent/nodes/workflow.py": "9301dff61ad428af7b2b7f4c3ddc4aaca61313cb33470f6ebfe7f76e2560cbd2",
         "app/agents/luma_agent/runtime/conversations.py": "b5afbb3cf434a52320b4be14b5fa3e42a2877111f902574eccf4f174ddb0e8c1"
       },
-      "svg_sha256": "78b39af0206b457d35734cebdac10bbaeb549a0760a9f73c5e83bbf0826e57a3",
+      "svg_sha256": "94f33392d5f96b32d7811ef11ce7b937cfc0a162f63cc2efc1aca02aed7225b0",
       "width": 685.62,
       "height": 888.34
     },
@@ -136,7 +136,7 @@
         "app/agents/luma_agent/runtime/media.py": "2491f1eed267ccd8a39c92d67bcadabd5fd09aa04afcb8552a0da8c84e7020c6",
         "app/agents/luma_agent/runtime/recovery.py": "3c51108e0b3c6277eaa6a0746114a43d0938775b101f94c021f937ea96f8e0e7"
       },
-      "svg_sha256": "72bd8652cfce3c3277d1e848eb448e2659c2fe6ad2c41e308f4e20e1cd64902e",
+      "svg_sha256": "0b4cd1ccffcf199dcb2d6713160522408a279297c9edcb1a4529c2ae4c6f6d5d",
       "width": 1317.98,
       "height": 693.8
     },
@@ -160,11 +160,24 @@
       "bindings": {
         "app/frontend/src/features/quotations/useQuotationDraft.ts": "a3b5fc6fbd2c5fc0ebbe724b5f456d09cdfe0d9b31fe9f1c96173ae1c42714cc",
         "app/frontend/src/features/quotations/QuotationPanel.tsx": "647818f847e2e0d261fc9d1a01006f5ff45ebf858bb9a8d8d58a333b24cefcff",
-        "app/frontend/src/features/conversations/api.ts": "eeb0f01ceb0fce0b3b60f564df5a60b32a0e6d96bdde60a1a15864f14f63fc0d"
+        "app/frontend/src/features/conversations/api.ts": "7ff0f1cf2e0fa32b92017431f42547a86da4fb5c0c62b4fda5b9f9cce6122405"
       },
       "svg_sha256": "f5087910192b970202175a66971b2843c634dac6c0734c74f759857c64ede9ea",
       "width": 1004.99,
       "height": 510
+    },
+    "frontend-live-updates": {
+      "source_sha256": "2a75fdda413244623c4ea50443dbd33d0816691d143b29d9c3684a97369cc45a",
+      "renderer_sha256": "44f5712d92cb37910338d84507da5b3e04fe9603fb0fe445335fa85ef56cffb5",
+      "bindings": {
+        "app/frontend/src/shared/api/events.ts": "75b65c9d5c89c0c573f017852fb8f9861e1e922037b904294832dc6f9e28feed",
+        "app/frontend/src/features/workspace/useLiveUpdates.ts": "5e0779e41dd2b6883b2f21823cbdd8703a807f0e867b856473fcbdfeaeb27fcc",
+        "app/frontend/src/features/workspace/api.ts": "5d1bd4a41be1da795016c59e75b9675915effacefac604d58fcb8ddc9b87d748",
+        "app/backend/luma/features/workspace/routes.py": "9d3fa03279a4a7f0571d943ac5c0097a2f82e5be68071a51f6b85d7d923189b1"
+      },
+      "svg_sha256": "fcb644baca334fe29dfac585df3217e117a7de60bc04b07932066de5496857dd",
+      "width": 880,
+      "height": 1331
     },
     "google-snapshot": {
       "source_sha256": "7a53d325a6e85f23904246db9f450b5c162c20a194cf0351a8274bb0d0f019ab",
@@ -175,7 +188,7 @@
         "app/backend/luma/features/google_sync/snapshots.py": "193684fd8accdd99b103118f0c69c90f0ed6a8e4de411469cf9d5f28aa512f2d",
         "app/backend/luma/features/google_sync/validation.py": "b33ebd2b8954c94d12b4c722590ba24c9f7c0fa6c8e871bc776ff17cc3aee04b"
       },
-      "svg_sha256": "e408212bede4fcd200429ec794715f4155c87f782d5c8a1510608502f9d268db",
+      "svg_sha256": "ae08d22dc0daeea3ec493a6d8d3b46a46f334fc7388814bbf3a73f2416b9952f",
       "width": 853,
       "height": 1235
     },
@@ -189,7 +202,7 @@
         "app/backend/luma/features/quotations/documents.py": "59ce06a1c7308b3ddd7cc7ee12d64fef761467f47dd183c7743689e74af15a24",
         "supabase/migrations/20261102000000_drive_exports.sql": "43837378d3f8c8ebe7dc9482a4a847b2a1fae1a5dca9a36522fd1f0c960362e9"
       },
-      "svg_sha256": "30b63085b65b24d2ca48e989b391912b56571830626cd9fa3981c354221206ca",
+      "svg_sha256": "61ca3b983b22ffb11da51a0be6f99d1a36cd19cccd9f822f098a0cc12a849490",
       "width": 1250,
       "height": 1067
     },
@@ -216,7 +229,7 @@
         "app/agents/luma_agent/runtime/delivery.py": "5ef5a31ecb1e2425cf0faecf51f53a0dd9ecd2c8fb931983b6bd5d1e396307b0",
         "supabase/migrations/20261102010000_whatsapp_inbox.sql": "0804cc9c5596b4fb3b19bb3dbc074d09ff5ac21bd6bbb0bb27ee8a77e52d2047"
       },
-      "svg_sha256": "e948a982956e557af4e8be6af62a1eb2d85a08770697d9e142cf6d6b704ba07e",
+      "svg_sha256": "2f080c92cc6bf4999429e71948de41408a56c497ea584336f20029e405f11bda",
       "width": 1063,
       "height": 1453
     },

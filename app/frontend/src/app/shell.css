@@ -764,4 +764,8 @@
   .local-state .topbar-divider {
     display: none;
   }
+  .local-state .live-state {
+    grid-column: 2;
+    font-size: 10px;
+  }
 }
