@@ -39,7 +39,7 @@ function readSupplierTable_(book, name) {
 function synchronizeSupplierWorkbook() {
   var config = configuration_();
   var lock = LockService.getScriptLock();
-  if (!lock.tryLock(1000)) throw new Error('Supplier synchronization is already running; retry after it completes.');
+  lock.waitLock(LOCK_WAIT_MS);
   try {
     var book = SpreadsheetApp.openById(config.spreadsheetId);
     var tables = {};

@@ -103,7 +103,9 @@ it. Apps Script moves its cursor only after the backend answered 200.
 
 ## Limits and cost
 
-Apps Script runs each trigger about once a minute (approximate). Gmail and Apps Script daily quotas
+Apps Script runs each trigger about once a minute (approximate). All `.gs` files share one script lock
+(`LockService.getScriptLock()`): supplier sync (8-11 s on 2026-11-07), mail poll, mail send and Drive export run
+one at a time, so a reply can be delayed by up to about one sync. Gmail and Apps Script daily quotas
 apply to the user's account (check the current quota page before relying on numbers). Each customer
 mail costs the same paid AI call as a Telegram message when paid AI is on.
 
@@ -127,6 +129,7 @@ the user must re-authorize the script.
 | Apps Script crashes after claiming | lease expires, outbox `unknown`, never resent |
 | PDF digest mismatch in Apps Script | receipt `failed` (`gmail_transfer_corrupt`) |
 | Nobody collects a reply for 24 hours | outbox `failed` (`mail_not_collected`) |
+| Another trigger holds the script lock | `pollLumaMail`/`sendLumaMail` wait up to `LOCK_WAIT_MS` (25 s); on timeout the run throws (shows Failed). Before 2026-11-07 they used `tryLock(1000)` and returned silently, so a reply stayed `waiting` while the run showed Completed |
 
 ## Configuration (names only)
 

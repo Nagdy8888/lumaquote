@@ -74,7 +74,7 @@ function exportOne_(config, folder, claimed) {
 function exportApprovedQuotations() {
   var config = configuration_();
   var lock = LockService.getScriptLock();
-  if (!lock.tryLock(1000)) return;
+  lock.waitLock(LOCK_WAIT_MS);
   try {
     var folder = exportFolder_();
     for (var count = 0; count < 3; count++) {

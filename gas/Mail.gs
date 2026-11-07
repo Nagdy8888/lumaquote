@@ -9,6 +9,12 @@
 var MAIL_BATCH = 5;
 var MAIL_BODY_CHARS = 8000;
 var MAIL_FIRST_RUN_MS = 60 * 60 * 1000;
+/**
+ * How long a one-minute trigger waits for the shared script lock (shared by every .gs file). The supplier
+ * sync can hold it for ~10 s; a 1 s try-lock made send/poll skip silently every minute. A timeout now
+ * throws, so the run shows as Failed instead of Completed.
+ */
+var LOCK_WAIT_MS = 25000;
 
 /** Return the Gmail label name that marks customer requests (Script Property LUMA_GMAIL_LABEL, default LumaQuote). */
 function mailLabelName_() {
@@ -88,7 +94,7 @@ function mailPayload_(item) {
 function pollLumaMail() {
   var config = configuration_();
   var lock = LockService.getScriptLock();
-  if (!lock.tryLock(1000)) return;
+  lock.waitLock(LOCK_WAIT_MS);
   try {
     var properties = PropertiesService.getScriptProperties();
     var cursor = Number(properties.getProperty('LUMA_MAIL_CURSOR') || String(Date.now() - MAIL_FIRST_RUN_MS));
@@ -155,7 +161,7 @@ function sendOneMail_(config, mail) {
 function sendLumaMail() {
   var config = configuration_();
   var lock = LockService.getScriptLock();
-  if (!lock.tryLock(1000)) return;
+  lock.waitLock(LOCK_WAIT_MS);
   try {
     for (var count = 0; count < 3; count++) {
       var claim = signedExportPost_(config, '/mail/claim', { event: 'gmail_send_claim' });
