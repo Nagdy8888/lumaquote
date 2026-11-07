@@ -180,6 +180,22 @@ def reserve_quote(conn, company, quote) -> dict[UUID, int]:
     return wanted
 
 
+def held_quantities(conn, company, quote_id) -> dict[UUID, int]:
+    """Return the quantity currently held for a quotation, keyed by product id; empty when nothing is held.
+
+    A read only: no lock, no write. The dispatch freshness check uses it to prove that an
+    approved quotation still owns its stock. The caller holds the quote lock, so a release
+    (which also needs that lock or the reconcile row lock) cannot interleave.
+    """
+    return {
+        row["product_id"]: row["quantity"]
+        for row in conn.execute(
+            "select product_id,quantity from luma.stock_reservations where company_id=%s and quote_id=%s and status='held'",
+            (company, quote_id),
+        ).fetchall()
+    }
+
+
 def _held(conn, company, quote_id) -> list[dict]:
     """Lock a quotation's levels, then its held reservations; return the held rows by product id.
 

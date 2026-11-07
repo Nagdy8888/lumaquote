@@ -7,6 +7,7 @@ from psycopg.types.json import Jsonb
 from luma.core.admission import enqueue, rate_limit
 from luma.core.audit import audit
 from luma.core.errors import DomainError
+from luma.features.inventory import ledger
 from luma.features.workspace.queries import detail
 
 from .repository import conversation
@@ -29,7 +30,9 @@ def accept_customer_text(conn, company, current, text, *, provider_id=None):
     invalidate old approvals/queued sends identically. The caller holds the conversation lock
     and has authorized the sender. A `provider_id` already seen returns False with no effect
     (provider redelivery); otherwise True. Under staff ownership the message is recorded and
-    the conversation marked for staff, but no agent job is queued.
+    the conversation marked for staff, but no agent job is queued. Every quotation this
+    supersedes releases its stock reservation (reason `superseded`, decision D49) in the same
+    transaction, under the caller's conversation lock.
     """
     cid = current["id"]
     rate_limit(conn, f"conversation:{cid}", 6)
@@ -39,10 +42,12 @@ def accept_customer_text(conn, company, current, text, *, provider_id=None):
         "update luma.conversations set last_customer_at=now(),status=%s where id=%s",
         ("new" if current["owner"] == "agent" else "needs_staff", cid),
     )
-    conn.execute(
-        "update luma.quotes set status='superseded' where conversation_id=%s and status in ('review','approved')",
+    superseded = conn.execute(
+        "update luma.quotes set status='superseded' where conversation_id=%s and status in ('review','approved') returning id",
         (cid,),
-    )
+    ).fetchall()
+    for row in superseded:
+        ledger.release_quote(conn, company, row["id"], "superseded")
     conn.execute(
         "update luma.outbox set status='blocked',error_code='customer_revision',updated_at=now() where conversation_id=%s and status='queued'",
         (cid,),
@@ -64,7 +69,12 @@ def record_customer_reply(conn, member, user, cid, body: TextInput):
 
 
 def change_ownership(conn, member, user, cid, body: Ownership):
-    """Version-check human takeover/resume, blocking queued automation before releasing the conversation lock."""
+    """Version-check human takeover/resume, blocking queued automation before releasing the conversation lock.
+
+    Takeover also releases the stock reservation of every quotation whose queued send it blocked
+    (reason `staff_takeover`, decision D49): that offer can no longer reach the customer, and
+    the hold must not outlive it. An already-submitted send is untouched and keeps its hold.
+    """
     company = member["company_id"]
     current = conversation(conn, company, cid, lock=True)
     if current["version"] != body.expected_version:
@@ -74,10 +84,14 @@ def change_ownership(conn, member, user, cid, body: Ownership):
         (body.owner, cid),
     )
     if body.owner == "staff":
-        conn.execute(
-            "update luma.outbox set status='blocked',error_code='staff_takeover',updated_at=now() where conversation_id=%s and status='queued' and (payload->>'origin') is distinct from 'staff'",
+        blocked = conn.execute(
+            "update luma.outbox set status='blocked',error_code='staff_takeover',updated_at=now() where conversation_id=%s and status='queued' and (payload->>'origin') is distinct from 'staff' returning quote_id",
             (cid,),
-        )
+        ).fetchall()
+        # A quotation whose queued send was just blocked will never go out, so its hold is freed
+        # now instead of waiting for the worker's reconcile. Quote ids are released in sorted order.
+        for quote_id in sorted({row["quote_id"] for row in blocked if row["quote_id"]}, key=str):
+            ledger.release_quote(conn, company, quote_id, "staff_takeover")
     else:
         conn.execute(
             "update luma.outbox set status='blocked',error_code='ownership_changed',updated_at=now() where conversation_id=%s and status='queued' and payload->>'origin'='staff'",

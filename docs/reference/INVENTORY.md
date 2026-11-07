@@ -1,11 +1,12 @@
 # Inventory: the stock ledger
 
 Decision [D49](../DECISIONS.md), plan [stock, orders and purchasing](../proposals/2026-11-07-stock-orders-plan.md).
-This guide describes what is implemented in task T1: the tables, the single writer
-(`app/backend/luma/features/inventory/ledger.py`), the read queries, and how the rest of
-the application now reads stock. Reservation at approval, release hooks, customer
-acceptance, orders, purchase orders, exports and the UI are later tasks; they are listed
-under [Open gaps](#open-gaps) and are not described as working.
+This guide describes what is implemented in tasks T1 and T2: the tables, the single writer
+(`app/backend/luma/features/inventory/ledger.py`), the read queries, how the rest of
+the application reads stock, and the reservation lifecycle (hold at approval, release on
+every exit, the dispatch check and the worker's reconcile). Customer acceptance, orders,
+purchase orders, exports and the UI are later tasks; they are listed under
+[Open gaps](#open-gaps) and are not described as working.
 
 ## Purpose and ownership
 
@@ -70,6 +71,7 @@ All take the caller's open psycopg transaction (dict rows) and never commit.
 |---|---|
 | `lock_levels(conn, company, product_ids)` | `select ... for update` in ascending product id; returns rows by product id; creates nothing |
 | `apply_movement(conn, company, product_id, delta, kind, actor, reference_id=None, reason=None)` | One movement and the on-hand change; creates a missing level row; returns the level |
+| `held_quantities(conn, company, quote_id)` | Read only: held quantity per product of one quote; the dispatch check uses it |
 | `reserve_quote(conn, company, quote)` | All-or-nothing hold of every quote line; idempotent per (quote, product) |
 | `release_quote(conn, company, quote_id, reason)` | `held` to `released`, lowers `reserved`; idempotent; no movement |
 | `convert_quote(conn, company, quote_id, order_id, actor)` | `held` to `converted`, lowers `reserved` and writes `order` movements together; idempotent |
@@ -115,16 +117,78 @@ only; an unknown-delivery quote that passes `valid_until` is still released and 
 `expired`, since the customer can no longer accept it. Each case is a test in
 `test_reconcile_rules`.
 
+## Reservation lifecycle (task T2)
+
+A quotation's stock is held from its approval until it is released or converted:
+`review` -> approve -> `approved` with `held` reservations -> `released` (superseded, blocked,
+failed, expired, taken over) or `converted` (order confirmed, task T4).
+
+**Hold.** `quotations/approval.decide` calls `ledger.reserve_quote` right after
+`check_snapshot` and before it writes the approval, the quotation outbox row or the Drive
+export row, all in the one request transaction. Lock order: conversation, then quote, then
+stock levels in ascending product id. A request for more than `on_hand - reserved` raises the
+ledger's 409 "Stock changed. Create a new revision."; the transaction rolls back, so no approval,
+outbox row, Drive export, reservation or `reserved` change survives
+(`test_a_ledger_refusal_after_the_snapshot_check_rolls_the_whole_approval_back`). The earlier
+`check_snapshot` availability check gives the same 409 in the common case (stock gone before
+the click); the ledger check is the one that wins a race. Two staff approving 60 + 60 units of a
+100-unit product at once: exactly one succeeds
+(`test_two_approvals_race_for_the_last_units_and_exactly_one_wins`).
+
+**Dispatch check.** `check_snapshot(conn, quote, current, dispatch=True)`, called from
+`quotations/dispatch.check_quotation` (through `messaging/authorization.authorize_outbound`) with
+the quote row locked, replaces the `available >= quantity` test, which would count the quote's own
+hold against itself, with "the quote's `held` reservations equal its summed line quantities per
+product". A missing, released, converted or differently sized hold raises `DomainError`; the
+dispatcher then blocks the intent with `dispatch_revalidation` and releases whatever is left.
+At approval time `dispatch=False` keeps the original available check, because no hold exists yet.
+
+**Release triggers.** Every one calls `ledger.release_quote`, which is idempotent.
+
+| Trigger | Where | Reason stored |
+|---|---|---|
+| Customer text arrives (any channel) | `conversations/participation.accept_customer_text`, for each review/approved quote it supersedes | `superseded` |
+| Customer photo or voice note | `media/intake.accept_media`, same rule | `superseded` |
+| Staff saves a new revision | `quotations/drafting.draft`, before stock is read so the old hold does not count against the new lines; it rolls back with a refused draft | `superseded` |
+| Staff takeover blocks a queued quotation send | `conversations/participation.change_ownership`, for the quotes of the outbox rows it just blocked | `staff_takeover` |
+| A gate or the revalidation blocks the send | `messaging/outbound.block`; `runtime/delivery.deliver_one` for `live_adapter_not_enabled` and `dispatch_revalidation` | `delivery_blocked` |
+| The provider definitely did not take it | `messaging/outbound.record` when the result is `failed` | `delivery_failed` |
+| Gmail mail not collected in 24 h, or PDF over 5 MiB | `messaging/email_dispatch.sweep`, `claim_mail` | `delivery_failed` |
+| Anything missed, and expiry | `ledger.reconcile` from the worker | `quote_<status>`, `expired`, `delivery_failed` |
+| Operator retention deletes a conversation idle for 90 days | `scripts/retention.py` releases its held reservations, then deletes the reservation rows before the quotes | `retention` |
+
+`unknown` outcomes never release, because the message may have reached the customer: not
+`record` with `unknown`, not the 2-minute stale-`submitting` sweep, not an expired Gmail lease.
+A takeover does not touch a send that is already `submitting` or `submitted`; its hold stays.
+Takeover releases explicitly instead of waiting for reconcile because the blocked send can never
+go out, and the hold would otherwise keep stock from other customers; reconcile still covers
+it if that release were ever missed. A WhatsApp `failed` delivery receipt
+(`messaging/inbound.apply_status`) is left to reconcile, which sees the `failed` outbox row on
+its next tick.
+
+**Worker.** `worker.tick` ends with `reconcile_stock()`: `ledger.reconcile(conn)` for all
+companies in its own `database(worker=True)` transaction with a 10-second statement timeout.
+A failure is logged as the exception class only and never stops the loop. The worker role's
+existing grants suffice (select/update on the ledger tables, `update(status)` and row locks on
+`quotes`, insert on `audit`), so no new migration was needed. Proved by
+`test_worker_reconcile_releases_an_expired_approved_quote` and
+`test_tick_runs_reconcile_once_and_a_failure_never_stops_the_loop`.
+
+**Quotation content and PDF.** The hashed quotation content keeps `stock_reserved: false`:
+content is immutable and fixed at draft time, before any hold exists, so it cannot report one.
+The authoritative record of a hold is `luma.stock_reservations`. The PDF sentence now reads
+"Availability is a snapshot. Stock is held for this quotation until it expires." (the PDF is not
+part of the content hash). PDFs already stored for earlier quotes keep their old wording.
+
 ## How the rest of the application reads stock
 
 Every former reader of `products.available` now joins `stock_levels` and computes
 `on_hand - reserved` (zero when the row is missing): quotation drafting and its
 `rules.calculate` input, `quotations/freshness.check_snapshot`, the agent's `prepare` node,
 the staff workspace product list (the API payload keeps an `available` field, so the UI
-contract is unchanged) and `scripts/evaluate_scenarios.py`. Freshness keeps its current
-rule (`available >= quantity` at approval and again at dispatch); because nothing reserves
-yet, that is unchanged behavior. Making an approved quote's own hold not count against
-itself at dispatch is task T2.
+contract is unchanged) and `scripts/evaluate_scenarios.py`. Freshness checks
+`available >= quantity` at approval and the quote's own held reservations at dispatch
+(see the reservation lifecycle above).
 
 `inventory/queries.py` (read-only, scoped by company, current non-retired sources only):
 `stock_rows`, `low_stock_rows` and `low_stock_count` (`available <= reorder_level`,
@@ -138,7 +202,12 @@ cursor), and `open_alerts`.
   rolls back as a whole, so a partial reservation cannot persist.
 - A crash between approval and dispatch leaves holds that `reconcile` later releases when
   the quote expires or its delivery is dead. Nothing releases a hold from a customer's
-  `unknown` delivery automatically; staff decide.
+  `unknown` delivery automatically (until the quote expires); staff decide.
+- If `reconcile` fails (database down, statement timeout), the worker logs the error class
+  and retries on the next one-second tick; holds only stay longer, stock is never lost.
+- A release hook that raises inside a request rolls that request back (for example a
+  customer message is then not stored). The hooks write only rows the caller already locks,
+  so the practical cause is a database outage, which fails the whole request anyway.
 - If the ledger and a reader ever disagreed, the movements are the authority: recompute
   `on_hand` as their sum. No repair command exists yet.
 - Data loss risk: the migration drops `products.available` irreversibly. The local database is
@@ -155,8 +224,13 @@ cursor), and `open_alerts`.
 
 ## Open gaps
 
-- No route, worker tick or approval path calls `reserve_quote`, `release_quote` or `reconcile`
-  yet (task T2); `stock_reserved` in quotation content is still `false`.
+- `stock_reserved` in the hashed quotation content stays `false` by design (see above). PDFs
+  stored before T2 keep the old "does not reserve stock" sentence. The review-screen text in
+  `QuoteSummary.tsx` is only reworded; the inventory UI is task T6.
+- A WhatsApp `failed` delivery receipt does not release at once; reconcile does within a tick.
+- Quotes approved and queued before T2 have no hold and are blocked at dispatch.
+- Release on customer decline and on order cancel belong to tasks T3 and T4.
+- `scripts/retention.py` handles reservations only; when orders and alerts exist (tasks T3-T4) it must also delete or keep them, because they reference quotes and conversations.
 - Orders, acceptance, purchase orders, adjustments and reorder-level routes, alerts, exports
   and the UI are not built (tasks T3-T6); their tables exist and are empty.
 - Google sync still requires the `Inventory` table to be present (task T5 makes it optional).

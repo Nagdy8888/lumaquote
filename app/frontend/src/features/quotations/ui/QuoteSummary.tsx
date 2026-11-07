@@ -31,7 +31,7 @@ export function QuoteSummary({
             </span>
             <strong>{money(quote.content.total)}</strong>
           </div>
-          <p>Tax excluded. Valid for 7 days. Stock is not reserved.</p>
+          <p>Tax excluded. Valid for 7 days. Stock is held for this quotation from approval until it expires.</p>
         </div>
       )}
       {dirty && (
@@ -46,7 +46,7 @@ export function QuoteSummary({
           <p>
             {quote.content.terms}
             <br />
-            Availability is observed, not reserved.
+            Availability is checked again at approval, when the stock is held.
           </p>
         </div>
       )}

@@ -49,6 +49,8 @@ def calculate(lines: list[dict], discount: Decimal, shipping: Decimal, role: str
         "discount": str(discount_value),
         "shipping": str(shipping),
         "total": str(subtotal - discount_value + shipping),
+        # Content is immutable and hashed at draft time, before approval reserves anything, so this
+        # stays False. The real hold lives in `luma.stock_reservations` (inventory ledger, D49).
         "stock_reserved": False,
     }
 

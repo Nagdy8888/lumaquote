@@ -2,17 +2,26 @@ from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 
 from luma.core.errors import DomainError
+from luma.features.inventory.ledger import held_quantities
 
 
-def check_snapshot(conn, quote, current):
+def check_snapshot(conn, quote, current, *, dispatch: bool = False):
     """Validate the stored offer against current commercial and source records.
 
     Synthetic observations are eligible only on local_test; other observations
     must be at most 90 seconds old. Each line must retain its snapshot, active
-    source/page, price, valid pack quantity and sufficient available stock (on hand
-    minus reserved, read from the stock ledger), with no discontinued product. Raise DomainError before approval/dispatch on any
-    mismatch. This check neither reserves stock nor mutates/reprices an offer;
-    the caller must require a new reviewed revision when evidence changed.
+    source/page, price, valid pack quantity and a non-discontinued product. Stock
+    depends on the phase (decision D49):
+    - Approval (`dispatch=False`, quote in review, no reservation yet): every line needs
+      `available >= quantity`, available being on hand minus reserved from the stock ledger.
+      The approval then reserves the stock in the same transaction.
+    - Dispatch (`dispatch=True`, called with the quote row locked for an already-approved
+      quote): its own hold already lowered available, so instead every product must have a
+      `held` reservation for this quote equal to the summed line quantity. A released,
+      converted or missing reservation is a mismatch.
+    Raise DomainError before approval/dispatch on any mismatch. This check neither reserves
+    stock nor mutates/reprices an offer; the caller must require a new reviewed revision when
+    evidence changed.
     """
     source = conn.execute(
         "select * from luma.snapshots where id=%s and company_id=%s",
@@ -32,6 +41,15 @@ def check_snapshot(conn, quote, current):
         (quote["company_id"], ids),
     ).fetchall()
     lookup = {str(p["id"]): p for p in products}
+    held = None
+    if dispatch:
+        wanted: dict[str, int] = {}
+        for line in quote["content"]["lines"]:
+            wanted[line["product_id"]] = wanted.get(line["product_id"], 0) + line["quantity"]
+        reserved = {str(key): value for key, value in held_quantities(conn, quote["company_id"], quote["id"]).items()}
+        if reserved != wanted:
+            raise DomainError("Price or availability changed. Create and approve a new revision.")
+        held = reserved
     for line in quote["content"]["lines"]:
         p = lookup.get(line["product_id"])
         if (
@@ -43,6 +61,6 @@ def check_snapshot(conn, quote, current):
             or p["price"] != Decimal(line["unit_price"])
             or line["quantity"] % p["pack_size"] != 0
             or p["discontinued"]
-            or p["available"] < line["quantity"]
+            or (held is None and p["available"] < line["quantity"])
         ):
             raise DomainError("Price or availability changed. Create and approve a new revision.")

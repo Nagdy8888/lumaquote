@@ -24,6 +24,7 @@ import re
 
 from luma.core.audit import audit
 from luma.features.conversations.service import add_message
+from luma.features.inventory import ledger
 from luma.features.quotations.documents import stored_quotation_pdf
 
 from . import provider
@@ -33,11 +34,33 @@ from .errors import ProviderError
 SAFE = re.compile(r"[^A-Za-z0-9._-]")
 
 
+def release_hold(conn, item, reason: str) -> int:
+    """Release the stock reservation of the quotation an outbox intent carries; return lines released.
+
+    Does nothing for an intent without a quotation (a plain reply). The quotation row is locked
+    first (lock order conversation, quote, stock levels, decision D49), then
+    `ledger.release_quote` runs, which is idempotent. Call it only for a terminal outcome that
+    proves the customer did not get the offer (`blocked`, definite `failed`), never for `unknown`,
+    where the message may have been sent. The caller holds the conversation lock.
+    """
+    if not item["quote_id"]:
+        return 0
+    conn.execute(
+        "select id from luma.quotes where company_id=%s and id=%s for update", (item["company_id"], item["quote_id"])
+    )
+    return ledger.release_quote(conn, item["company_id"], item["quote_id"], reason)
+
+
 def block(conn, item, code: str) -> None:
-    """Mark an intent blocked with an opaque code and audit it; a blocked intent is never retried."""
+    """Mark an intent blocked with an opaque code and audit it; a blocked intent is never retried.
+
+    A blocked quotation also releases its stock reservation (reason `delivery_blocked`), because
+    it can no longer reach the customer.
+    """
     conn.execute(
         "update luma.outbox set status='blocked',error_code=%s,updated_at=now() where id=%s", (code, item["id"])
     )
+    release_hold(conn, item, "delivery_blocked")
     audit(conn, item["company_id"], "worker", "delivery.blocked", item["id"])
 
 
@@ -92,7 +115,12 @@ def submit(plan: dict) -> dict:
 
 
 def record(conn, plan: dict, result: dict) -> None:
-    """Persist the classified outcome; an accepted send also records the assistant/staff message once."""
+    """Persist the classified outcome; an accepted send also records the assistant/staff message once.
+
+    A definite `failed` outcome of a quotation releases its stock reservation (reason
+    `delivery_failed`) in the same transaction. `unknown` never does: the customer may have the
+    offer, so the hold stays until the quotation expires or staff decide.
+    """
     item, quote = plan["item"], plan["quote"]
     updated = conn.execute(
         """update luma.outbox set status=%s,provider_id=%s,error_code=%s,updated_at=now()
@@ -114,4 +142,6 @@ def record(conn, plan: dict, result: dict) -> None:
                 "update luma.conversations set status='quoted',updated_at=now() where id=%s",
                 (item["conversation_id"],),
             )
+    if updated and result["status"] == "failed":
+        release_hold(conn, item, "delivery_failed")
     audit(conn, item["company_id"], "worker", f"delivery.{result['status']}", item["id"])

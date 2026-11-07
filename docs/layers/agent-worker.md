@@ -39,7 +39,7 @@ for retrieval.
 ```mermaid
 flowchart TB
   accTitle: One worker tick from claim to inbound processing
-  accDescr: Each tick first recovers expired leases and claims at most one queued job, respecting a global limit of two running jobs and one running job per conversation. The job runs inside a masked trace and its outcome is committed only while the fence still matches. The tick then resolves one outbox intent and one inbound WhatsApp event, and the loop sleeps one second.
+  accDescr: Each tick first recovers expired leases and claims at most one queued job, respecting a global limit of two running jobs and one running job per conversation. The job runs inside a masked trace and its outcome is committed only while the fence still matches. The tick then resolves one outbox intent and one inbound WhatsApp event, releases stock reservations that no longer protect a live quotation, and the loop sleeps one second.
   Start["tick()"] --> Claim["claim_job: capacity lock, recover expired leases"]
   Claim --> Cap{"Fewer than 2 running and a queued job with no running sibling?"}
   Cap -->|no| Deliver
@@ -61,7 +61,8 @@ flowchart TB
   Reauth -->|yes| Effect["local_delivered, or gated WhatsApp begin, submit, record"]
   VisBlock --> Inbox
   Effect --> Inbox["process_inbox: 2 min lease, up to 5 attempts"]
-  Inbox --> Sleep["sleep 1 s, unless --once"]
+  Inbox --> Reconcile["reconcile_stock: release stock holds no live quote needs, own transaction"]
+  Reconcile --> Sleep["sleep 1 s, unless --once"]
 ```
 
 </details>

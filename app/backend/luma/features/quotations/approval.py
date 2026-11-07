@@ -7,6 +7,7 @@ from luma.core.admission import enqueue
 from luma.core.audit import audit
 from luma.core.errors import DomainError
 from luma.features.conversations.repository import conversation
+from luma.features.inventory import ledger
 
 from .freshness import check_snapshot
 from .repository import latest_quote
@@ -33,9 +34,12 @@ def decide(conn, member, user, cid, body: Decision):
     Conversation-before-quote locking serializes edits/takeover. Reject stale or
     expired review; rejection records needs-staff state without approving a send.
     Approval additionally requires agent ownership and fresh commercial evidence,
-    then writes the approver/hash/recipient binding, quotation outbox intent and
-    review-only job atomically. Return decision/quote identity, not a delivery
-    receipt. Final dispatch reauthorizes the approver and current evidence again.
+    then reserves the quotation's stock (`ledger.reserve_quote`, decision D49) and writes
+    the approver/hash/recipient binding, quotation outbox intent and review-only job
+    atomically. Lock order is conversation, quote, then stock levels in product-id order.
+    Not enough stock raises the ledger's 409 and the whole transaction, including the
+    approval, outbox and Drive export rows, rolls back. Return decision/quote identity, not
+    a delivery receipt. Final dispatch reauthorizes the approver and re-proves the hold.
     """
     company = member["company_id"]
     current = conversation(conn, company, cid, lock=True)
@@ -56,6 +60,7 @@ def decide(conn, member, user, cid, body: Decision):
     if current["owner"] != "agent":
         raise DomainError("Automation is paused. Resume it before approving automated delivery.")
     check_snapshot(conn, quote, current)
+    ledger.reserve_quote(conn, company, quote)
     conn.execute(
         """insert into luma.approvals(id,company_id,quote_id,approver,content_hash,recipient)
         values(%s,%s,%s,%s,%s,%s)""",

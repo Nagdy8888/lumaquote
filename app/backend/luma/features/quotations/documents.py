@@ -71,7 +71,7 @@ def quotation_pdf(quote: dict) -> bytes:
         [
             Spacer(1, 8 * mm),
             Paragraph(escape(content["terms"]), styles["Normal"]),
-            Paragraph("Availability is a snapshot. This quotation does not reserve stock.", styles["Normal"]),
+            Paragraph("Availability is a snapshot. Stock is held for this quotation until it expires.", styles["Normal"]),
         ]
     )
     SimpleDocTemplate(

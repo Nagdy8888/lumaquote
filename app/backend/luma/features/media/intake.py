@@ -8,6 +8,7 @@ from luma.core.errors import DomainError
 from luma.core.storage import put_file
 from luma.features.conversations.repository import conversation
 from luma.features.conversations.service import add_message
+from luma.features.inventory import ledger
 
 
 def authorize_upload(conn, company, cid):
@@ -67,10 +68,12 @@ def store_media(conn, company, actor, cid, data, *, kind, provider_id=None):
         "insert into luma.media(message_id,company_id,conversation_id,original_path,kind) values(%s,%s,%s,%s,%s)",
         (message, company, cid, path, kind),
     )
-    conn.execute(
-        "update luma.quotes set status='superseded' where conversation_id=%s and status in ('review','approved')",
+    superseded = conn.execute(
+        "update luma.quotes set status='superseded' where conversation_id=%s and status in ('review','approved') returning id",
         (cid,),
-    )
+    ).fetchall()
+    for row in superseded:
+        ledger.release_quote(conn, company, row["id"], "superseded")
     conn.execute(
         "update luma.outbox set status='blocked',error_code='customer_revision',updated_at=now() where conversation_id=%s and status='queued'",
         (cid,),

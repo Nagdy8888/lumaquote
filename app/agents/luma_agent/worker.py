@@ -5,7 +5,9 @@ import logging
 import threading
 import time
 
+from luma.core.database import database
 from luma.core.errors import DomainError
+from luma.features.inventory import ledger
 from luma.features.messaging import provider
 from luma.features.messaging.inbound import process_next as process_inbox
 from luma.features.messaging.telegram_ingress import poll_once
@@ -20,13 +22,34 @@ from .runtime.media import process_media
 logger = logging.getLogger("luma.worker")
 
 
+def reconcile_stock() -> int:
+    """Release stock reservations that no longer protect a live quotation; return how many quotations were released.
+
+    Runs `ledger.reconcile` (expired quotes, dead deliveries, quotes that are no longer approved;
+    decision D49) in its own short worker transaction, so a failure here never touches a job or
+    a dispatch. Any error is logged as its class name only and swallowed: the next tick retries
+    and the loop never stops. Returns 0 after a failure.
+    """
+    try:
+        with database(worker=True) as conn:
+            conn.execute("set local statement_timeout='10s'")
+            result = ledger.reconcile(conn)
+    except Exception as error:
+        logger.warning("Stock reconcile: %s", type(error).__name__)
+        return 0
+    if result["released"]:
+        logger.info("Stock reconcile: released %s, expired %s", result["released"], result["expired"])
+    return result["released"]
+
+
 def tick():
-    """Run one claimed graph job, one dispatch and one inbound WhatsApp or Telegram event.
+    """Run one claimed graph job, one dispatch, one inbound event and one stock reconcile.
 
     Each job runs inside a masked LangSmith root trace when tracing is enabled
     (`observability.job_trace`, decision D24); its graph steps and model calls nest
     under it, and the root records the outcome and error class. Logs keep safe failure
-    codes only. Trace export never changes the job outcome.
+    codes only. Trace export never changes the job outcome. The stock reconcile
+    (`reconcile_stock`) runs last, after the dispatch and inbound work of the tick.
     """
     job = claim_job()
     if job:
@@ -51,7 +74,8 @@ def tick():
         flush()
     dispatched = deliver_one()
     received = process_inbox()
-    return bool(job) or dispatched or received
+    released = reconcile_stock()
+    return bool(job) or dispatched or received or bool(released)
 
 
 def poll_telegram(stop: threading.Event) -> None:

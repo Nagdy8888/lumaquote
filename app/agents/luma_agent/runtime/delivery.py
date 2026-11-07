@@ -7,7 +7,7 @@ from luma.features.conversations.repository import conversation
 from luma.features.conversations.service import add_message
 from luma.features.messaging.authorization import authorize_outbound
 from luma.features.messaging.email_dispatch import queue as queue_email
-from luma.features.messaging.outbound import begin, record, submit
+from luma.features.messaging.outbound import begin, record, release_hold, submit
 
 
 def deliver_one(company_id=None):
@@ -18,7 +18,8 @@ def deliver_one(company_id=None):
     outbox and reauthorize origin/ownership/approval/freshness. Ineligible or
     nonlocal work is visibly blocked. Local message identity derives from the
     intent, and message plus local_delivered status commit together. Return True
-    when an intent was handled (including blocked), False when none was selected;
+    when an intent was handled (including blocked), False when none was selected; a blocked
+    quotation intent also releases its stock reservation (`outbound.release_hold`, D49);
     neither value is a live provider receipt or an instruction to retry unknowns.
     Email intents are queued for Apps Script (D47) and excluded from the stale-submitting sweep;
     their lease and expiry rules live in `messaging.email_dispatch`.
@@ -67,6 +68,7 @@ def deliver_one(company_id=None):
                     "update luma.outbox set status='blocked',error_code='live_adapter_not_enabled',updated_at=now() where id=%s",
                     (item["id"],),
                 )
+                release_hold(conn, item, "delivery_blocked")
                 audit(conn, item["company_id"], "worker", "delivery.blocked", item["id"])
                 return True
         except DomainError:
@@ -74,6 +76,7 @@ def deliver_one(company_id=None):
                 "update luma.outbox set status='blocked',error_code='dispatch_revalidation',updated_at=now() where id=%s",
                 (item["id"],),
             )
+            release_hold(conn, item, "delivery_blocked")
             audit(conn, item["company_id"], "worker", "delivery.blocked", item["id"])
             return True
         if plan is None:
