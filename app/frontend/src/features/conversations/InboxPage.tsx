@@ -6,11 +6,13 @@ import {
   customerName,
   useWorkspaceContext,
 } from "@/shared/api/workspace-context";
+import { captureText } from "@/shared/lib/mask";
 import { Input } from "@/shared/ui/input";
 import { Status } from "@/shared/ui/status";
 import { Skeleton } from "@/shared/ui/skeleton";
 import { useConversation } from "./api";
 import { ConversationThread } from "./ConversationThread";
+import { SectionSwitch, type InboxSection } from "./SectionSwitch";
 import { QuotationPanel } from "@/features/quotations/QuotationPanel";
 
 /** Compose request navigation, conversation, and quotation review as independent focused feature components. */
@@ -20,6 +22,12 @@ export function InboxPage() {
   const [search, setSearch] = useState("");
   const selected = id ?? data.conversations[0]?.id;
   const detail = useConversation(selected);
+  const [chosen, setChosen] = useState<{ id?: string; value: InboxSection }>({
+    value: "conversation",
+  });
+  // Portrait only: the choice belongs to one conversation, so another selection starts on "Conversation".
+  const section: InboxSection =
+    chosen.id === selected ? chosen.value : "conversation";
   const requests = data.conversations.filter((c) =>
     `${c.customer_name} ${c.customer_company} ${c.preview}`
       .toLowerCase()
@@ -37,7 +45,7 @@ export function InboxPage() {
           {data.conversations.length === 1 ? "conversation" : "conversations"}
         </span>
       </div>
-      <div className="inbox-workspace">
+      <div className="inbox-workspace" data-section={section}>
         <aside className="conversation-sidebar" aria-label="Conversation list">
           <div className="conversation-sidebar-title">
             <h2>Inbox</h2>
@@ -73,7 +81,11 @@ export function InboxPage() {
                   </time>
                 </div>
                 <span>{customerName(c.customer_name, capture)}</span>
-                <p>{c.preview || "New customer request"}</p>
+                <p>
+                  {c.preview
+                    ? captureText(c.preview, capture)
+                    : "New customer request"}
+                </p>
                 <Status value={c.status} />
               </Link>
             ))}
@@ -93,10 +105,16 @@ export function InboxPage() {
           </div>
         ) : detail.data ? (
           <>
+            <SectionSwitch
+              value={section}
+              onChange={(value) => setChosen({ id: selected, value })}
+              needsApproval={detail.data.quote?.status === "review"}
+            />
             <ConversationThread
               key={`thread:${selected}`}
               detail={detail.data}
               capture={capture}
+              jobs={data.jobs.filter((job) => job.conversation_id === selected)}
             />
             <QuotationPanel
               key={`quotation:${selected}`}

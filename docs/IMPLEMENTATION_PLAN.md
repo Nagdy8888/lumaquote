@@ -194,10 +194,14 @@ Implemented, not yet sufficient to check any item:
   (`test_outages.py`). Open: scheduled retention, Drive/provider-side retention, orphan
   Storage objects.
 - Item 4: four screenshots from the verified browser run
-  (`docs/evidence/screenshots/2026-11-02/`). On 2026-11-03 a 14-view desktop/portrait axe, layout
-  and target-size review passed after fixing undersized controls
-  ([evidence](evidence/page-accessibility-review-2026-11-03.json), `local-substitute`). Open:
-  screen-reader and real-device review, performance measurement.
+  (`docs/evidence/screenshots/2026-11-02/`). On 2026-11-03 a whole-app review of 19 views at
+  1440 x 1050 and 390 x 844 passed: zero axe violations, no overflow, no capture-mode privacy
+  match, keyboard order and live updates checked, dev-server timings measured
+  ([evidence](evidence/ui-review-2026-11-03.json), `local-substitute`). Not ticked. Open:
+  production-build performance, a screen-reader and real-device review, and 24 px target sizes
+  (recorded, not asserted).
+  A later re-review of the same views, 14 views by axe, layout and target-size, also passed
+  ([evidence](evidence/page-accessibility-review-2026-11-03.json), `local-substitute`).
 
 The last fully green `npm run verify:full` is recorded in
 [checkpoint evidence](evidence/checkpoint-2026-11-02.json) (283 passed). A later run

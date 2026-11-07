@@ -1,7 +1,8 @@
 """Start isolated native API and Vite servers for a fixture tenant and run one Playwright review script.
 
-Used by the scene and page reviews. Both servers bind unused loopback ports, log under `.local/`, and are
-always stopped. The scenario file holds the fixture user's throwaway credentials and is deleted afterwards.
+Used by the whole-app UI review, the scene and page reviews, and any other review that needs a signed-in
+browser. Both servers bind unused loopback ports, log under `.local/`, and are always stopped. The scenario
+file holds the fixture user's throwaway credentials and is deleted afterwards.
 """
 
 import json

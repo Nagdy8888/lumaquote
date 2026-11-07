@@ -274,3 +274,15 @@ xfail) shows that requests failing after the rate check (409/404) roll their cou
 they are never limited. Recommended fix: commit the counter on its own short connection before
 the business transaction (one extra connection per request, no change to successful behavior).
 This changes admission/security behavior, so tell Claude to apply it or to leave it documented.
+
+## Frontend phase 5 follow-ups (2026-11-03)
+
+- Decision (backend, out of this plan's scope): the live event stream reports the company's
+  maximum `luma.audit` id, and the worker writes no audit row when it finishes a transcription
+  or an agent job. The UI therefore keeps its 5 s and 8 s polling even while connected (a
+  30 s polling slowdown made the browser workflow test time out). Say whether to add a
+  revision bump for worker-side changes; polling can be slowed after that.
+- Flaky test, not changed because other sessions have uncommitted edits to the same file:
+  `tests/unit/test_trace_masking.py::test_job_trace_exports_graph_and_model_runs_masked` asserts
+  `"0199" not in sent`, and a random trace UUID can contain `0199` (it failed once in CI on a
+  push, and passed on re-run). A fix that keeps the strength is `not re.search(r"555[\s-]*0199", sent)`.

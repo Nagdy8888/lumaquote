@@ -23,7 +23,7 @@ flowchart LR
   Change["Reviewed source and documentation change"] --> Static["Lint, inline contracts, imports, types and diagrams"]
   Static --> Offline["Offline unit and UI tests; build"]
   Static --> Full["Full local Supabase and sandbox tests"]
-  Full --> Browser["Owned native browser and restart scenario"]
+  Full --> Browser["Owned native browser workflow, restart scenario and whole-app UI review"]
   Change -. Explicit separate opt-in, paid .-> Live["Synthetic provider canaries and agent evaluation"]
   Change -. Pushed commit only .-> CI["Remote static, unit, UI, diagram and build checks"]
   Offline --> Evidence["Scoped, dated evidence with gaps"]
@@ -382,6 +382,35 @@ unchanged when the variable is unset.
 Screenshots are ignored local artifacts, including photo intake, stale editor,
 delivered quote and portrait capture. Inspect the actual screenshot before making
 visual claims; browser assertions alone do not prove visual polish or privacy.
+
+### Whole-app UI review
+
+`tests/integration/test_ui_review.py` (marked `browser`, part of `npm run test:browser` and so of
+`verify:full`) uses `tests/integration/browser_servers.py` (`run_review`: temporary native API and
+Vite servers on unused loopback ports, logs under `.local/`, a scenario file with the throwaway
+fixture credentials that is deleted afterwards) to run `tests/browser/ui-review.cjs` in headless
+Chromium. Label `local-substitute`: reduced motion (the 3D scene shows its static fallback), the Vite
+dev server, software rendering, a synthetic tenant, no assistive technology or real device.
+
+Per view (seven routes at 1440 x 1050 and 390 x 844, plus the populated conversation in the
+conversation view, the quotation view in portrait and with the approval panel open: 19 views) the
+test requires: zero axe violations (ids and impact only are kept), no horizontal overflow, one main
+landmark and an h1, no unnamed control; and, after turning capture mode on, no email, phone or
+key pattern in the visible text. A customer message with a synthetic email and phone number must be
+visible in normal mode and masked in capture mode. Also required: no console or page errors; a
+keyboard pass on `/inbox/<id>` in which Tab from the skip link reaches the conversation list,
+the composer and "Review approval" (the press counts are recorded); the topbar "Live" label, at
+least one `/api/events` request, and a note added in a second signed-in browser appearing in the
+first (latency recorded; polling alone could also deliver it, so this proves the whole path works,
+not that the stream caused it). Recorded but not asserted: controls smaller than 24 x 24 CSS px,
+and Navigation Timing (`domContentLoaded`, load) and LCP per view. Those timings are from the dev
+server and are not a production budget. Screenshots go to the ignored `.local/ui-review/`.
+Set `LUMA_UI_REVIEW_EVIDENCE` to a path to write the evidence JSON (the common R9 header plus the
+per-view numbers); the 2026-11-03 run is
+[evidence/ui-review-2026-11-03.json](../evidence/ui-review-2026-11-03.json).
+Run it alone with
+`node scripts/python.cjs -m pytest tests/integration/test_ui_review.py -q`. The browser step of
+`verify:full` now has a 420 s budget (it was 180 s) because it runs both browser tests.
 
 ## Explicit provider canaries
 

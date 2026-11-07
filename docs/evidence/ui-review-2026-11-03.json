@@ -1,0 +1,332 @@
+{
+  "date": "2026-11-03",
+  "commit": "103eae2",
+  "label": "local-substitute",
+  "command": "node scripts/python.cjs -m pytest tests/integration/test_ui_review.py -q",
+  "result": "passed: 19 views, 0 axe violations, no horizontal overflow, no private pattern in capture mode, 0 console errors",
+  "scope": "Whole-app review of / /inbox /quotations /catalog /integrations /requests/new /does-not-exist at 1440x1050 and 390x844, plus the populated conversation in the conversation view, the quotation view and with the approval panel open. Headless Chromium (reduced motion, so the 3D scene shows its static fallback) against the Vite dev server, synthetic tenant. Not a screen-reader, real-device or production-build performance review.",
+  "timing_note": "dev-server numbers (unbundled modules, software rendering); not a production budget",
+  "keyboard": {
+    "tab_presses_to": {
+      "skip": 1,
+      "list": 12,
+      "composer": 17,
+      "approval": 23
+    },
+    "first_stops": [
+      "Skip to workspace",
+      "LumaQuote.",
+      "Overview",
+      "Inbox",
+      "Quotations",
+      "Catalog & evidence",
+      "Connections",
+      "Sign out"
+    ]
+  },
+  "live": {
+    "live_label_seen": true,
+    "events_requests": 2,
+    "cross_tab_ms": 1374,
+    "live_label_ms": 882,
+    "live_label_text": "Live"
+  },
+  "views": {
+    "overview-desktop": {
+      "axe_violations": 0,
+      "horizontal_overflow": false,
+      "unnamed_controls": 0,
+      "targets_under_24px": [
+        "button 96x18 Capture mode",
+        "a 153x18 Review your workspace",
+        "a 61x18 View all",
+        "a 115x18 Connection status"
+      ],
+      "capture_private_matches": [],
+      "timing": {
+        "dom_content_loaded_ms": 75,
+        "load_ms": 77,
+        "lcp_ms": 540
+      }
+    },
+    "inbox-desktop": {
+      "axe_violations": 0,
+      "horizontal_overflow": false,
+      "unnamed_controls": 0,
+      "targets_under_24px": [
+        "button 96x18 Capture mode",
+        "button 23x23 Remove DL-001",
+        "a 115x18 Connection status"
+      ],
+      "capture_private_matches": [],
+      "timing": {
+        "dom_content_loaded_ms": 68,
+        "load_ms": 69,
+        "lcp_ms": 556
+      }
+    },
+    "quotations-desktop": {
+      "axe_violations": 0,
+      "horizontal_overflow": false,
+      "unnamed_controls": 0,
+      "targets_under_24px": [
+        "button 96x18 Capture mode",
+        "a 115x18 Connection status"
+      ],
+      "capture_private_matches": [],
+      "timing": {
+        "dom_content_loaded_ms": 58,
+        "load_ms": 60,
+        "lcp_ms": 428
+      }
+    },
+    "catalog-desktop": {
+      "axe_violations": 0,
+      "horizontal_overflow": false,
+      "unnamed_controls": 0,
+      "targets_under_24px": [
+        "button 96x18 Capture mode",
+        "a 115x18 Connection status"
+      ],
+      "capture_private_matches": [],
+      "timing": {
+        "dom_content_loaded_ms": 49,
+        "load_ms": 50,
+        "lcp_ms": 452
+      }
+    },
+    "connections-desktop": {
+      "axe_violations": 0,
+      "horizontal_overflow": false,
+      "unnamed_controls": 0,
+      "targets_under_24px": [
+        "button 96x18 Capture mode",
+        "a 115x18 Connection status"
+      ],
+      "capture_private_matches": [],
+      "timing": {
+        "dom_content_loaded_ms": 51,
+        "load_ms": 52,
+        "lcp_ms": 428
+      }
+    },
+    "new-request-desktop": {
+      "axe_violations": 0,
+      "horizontal_overflow": false,
+      "unnamed_controls": 0,
+      "targets_under_24px": [
+        "button 96x18 Capture mode",
+        "a 650x18 Back to inbox",
+        "a 115x18 Connection status"
+      ],
+      "capture_private_matches": [],
+      "timing": {
+        "dom_content_loaded_ms": 49,
+        "load_ms": 50,
+        "lcp_ms": 424
+      }
+    },
+    "not-found-desktop": {
+      "axe_violations": 0,
+      "horizontal_overflow": false,
+      "unnamed_controls": 0,
+      "targets_under_24px": [
+        "button 96x18 Capture mode",
+        "a 115x18 Connection status"
+      ],
+      "capture_private_matches": [],
+      "timing": {
+        "dom_content_loaded_ms": 55,
+        "load_ms": 56,
+        "lcp_ms": 420
+      }
+    },
+    "conversation-conversation-desktop": {
+      "axe_violations": 0,
+      "horizontal_overflow": false,
+      "unnamed_controls": 0,
+      "targets_under_24px": [
+        "button 96x18 Capture mode",
+        "button 23x23 Remove DL-001",
+        "a 115x18 Connection status"
+      ],
+      "capture_private_matches": [],
+      "timing": {
+        "dom_content_loaded_ms": 59,
+        "load_ms": 61,
+        "lcp_ms": 472
+      }
+    },
+    "conversation-approval-open-desktop": {
+      "axe_violations": 0,
+      "horizontal_overflow": false,
+      "unnamed_controls": 0,
+      "targets_under_24px": [
+        "button 96x18 Capture mode",
+        "button 23x23 Remove DL-001",
+        "a 115x18 Connection status"
+      ],
+      "capture_private_matches": [],
+      "timing": {
+        "dom_content_loaded_ms": 63,
+        "load_ms": 64,
+        "lcp_ms": 452
+      }
+    },
+    "overview-portrait": {
+      "axe_violations": 0,
+      "horizontal_overflow": false,
+      "unnamed_controls": 0,
+      "targets_under_24px": [
+        "button 14x14 Capture mode",
+        "a 153x18 Review your workspace",
+        "a 61x18 View all",
+        "a 115x19 Connection status"
+      ],
+      "capture_private_matches": [],
+      "timing": {
+        "dom_content_loaded_ms": 63,
+        "load_ms": 64,
+        "lcp_ms": 544
+      }
+    },
+    "inbox-portrait": {
+      "axe_violations": 0,
+      "horizontal_overflow": false,
+      "unnamed_controls": 0,
+      "targets_under_24px": [
+        "button 14x14 Capture mode",
+        "a 115x19 Connection status"
+      ],
+      "capture_private_matches": [],
+      "timing": {
+        "dom_content_loaded_ms": 54,
+        "load_ms": 55,
+        "lcp_ms": 456
+      }
+    },
+    "quotations-portrait": {
+      "axe_violations": 0,
+      "horizontal_overflow": false,
+      "unnamed_controls": 0,
+      "targets_under_24px": [
+        "button 14x14 Capture mode",
+        "a 115x19 Connection status"
+      ],
+      "capture_private_matches": [],
+      "timing": {
+        "dom_content_loaded_ms": 51,
+        "load_ms": 52,
+        "lcp_ms": 444
+      }
+    },
+    "catalog-portrait": {
+      "axe_violations": 0,
+      "horizontal_overflow": false,
+      "unnamed_controls": 0,
+      "targets_under_24px": [
+        "button 14x14 Capture mode",
+        "a 115x19 Connection status"
+      ],
+      "capture_private_matches": [],
+      "timing": {
+        "dom_content_loaded_ms": 48,
+        "load_ms": 49,
+        "lcp_ms": 424
+      }
+    },
+    "connections-portrait": {
+      "axe_violations": 0,
+      "horizontal_overflow": false,
+      "unnamed_controls": 0,
+      "targets_under_24px": [
+        "button 14x14 Capture mode",
+        "a 115x19 Connection status"
+      ],
+      "capture_private_matches": [],
+      "timing": {
+        "dom_content_loaded_ms": 52,
+        "load_ms": 53,
+        "lcp_ms": 436
+      }
+    },
+    "new-request-portrait": {
+      "axe_violations": 0,
+      "horizontal_overflow": false,
+      "unnamed_controls": 0,
+      "targets_under_24px": [
+        "button 14x14 Capture mode",
+        "a 354x18 Back to inbox",
+        "a 115x19 Connection status"
+      ],
+      "capture_private_matches": [],
+      "timing": {
+        "dom_content_loaded_ms": 51,
+        "load_ms": 52,
+        "lcp_ms": 408
+      }
+    },
+    "not-found-portrait": {
+      "axe_violations": 0,
+      "horizontal_overflow": false,
+      "unnamed_controls": 0,
+      "targets_under_24px": [
+        "button 14x14 Capture mode",
+        "a 115x19 Connection status"
+      ],
+      "capture_private_matches": [],
+      "timing": {
+        "dom_content_loaded_ms": 52,
+        "load_ms": 53,
+        "lcp_ms": 476
+      }
+    },
+    "conversation-conversation-portrait": {
+      "axe_violations": 0,
+      "horizontal_overflow": false,
+      "unnamed_controls": 0,
+      "targets_under_24px": [
+        "button 14x14 Capture mode",
+        "a 115x19 Connection status"
+      ],
+      "capture_private_matches": [],
+      "timing": {
+        "dom_content_loaded_ms": 55,
+        "load_ms": 56,
+        "lcp_ms": 408
+      }
+    },
+    "conversation-quotation-portrait": {
+      "axe_violations": 0,
+      "horizontal_overflow": false,
+      "unnamed_controls": 0,
+      "targets_under_24px": [
+        "button 14x14 Capture mode",
+        "button 23x23 Remove DL-001",
+        "a 115x19 Connection status"
+      ],
+      "capture_private_matches": [],
+      "timing": {
+        "dom_content_loaded_ms": 49,
+        "load_ms": 50,
+        "lcp_ms": 428
+      }
+    },
+    "conversation-approval-open-portrait": {
+      "axe_violations": 0,
+      "horizontal_overflow": false,
+      "unnamed_controls": 0,
+      "targets_under_24px": [
+        "button 14x14 Capture mode",
+        "button 23x23 Remove DL-001",
+        "a 115x19 Connection status"
+      ],
+      "capture_private_matches": [],
+      "timing": {
+        "dom_content_loaded_ms": 50,
+        "load_ms": 51,
+        "lcp_ms": 396
+      }
+    }
+  }
+}

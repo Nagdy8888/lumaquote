@@ -18,7 +18,11 @@ export type ConversationCommand = (
   | { action: "messages" | "customer-reply"; body: TextInput }
 ) & { key: string };
 
-/** Load the selected conversation using a staff-scoped query key; cancellation prevents stale selection updates. */
+/**
+ * Load the selected conversation using a staff-scoped query key; cancellation prevents
+ * stale selection updates. Polling stays at 5 s even while live updates are connected
+ * (see `useWorkspace`: worker-side results write no audit revision).
+ */
 export function useConversation(id?: string) {
   const { session } = useSession();
   return useQuery({

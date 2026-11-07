@@ -13,6 +13,7 @@ import {
   customerName,
   useWorkspaceContext,
 } from "@/shared/api/workspace-context";
+import { captureText } from "@/shared/lib/mask";
 import { Status, money } from "@/shared/ui/status";
 import { Button } from "@/shared/ui/button";
 import { LightingFallback, SceneBoundary } from "./SceneBoundary";
@@ -24,6 +25,7 @@ export function Overview() {
   const { data, capture } = useWorkspaceContext();
   const awaiting = data.quotes.filter((q) => q.status === "review").length;
   const quoted = data.conversations.filter((c) => c.status === "quoted").length;
+  const running = data.jobs.filter((job) => job.status === "running").length;
   const attention = data.conversations.filter(
     (c) => c.status === "needs_staff",
   ).length;
@@ -101,6 +103,11 @@ export function Overview() {
           <strong>{attention.toString().padStart(2, "0")}</strong>
           <small>Requests requiring a human judgment</small>
         </div>
+        <div>
+          <span>Assistant jobs running</span>
+          <strong>{running.toString().padStart(2, "0")}</strong>
+          <small>Among the 20 newest jobs</small>
+        </div>
       </section>
       <div className="overview-lower">
         <section className="request-section">
@@ -141,7 +148,7 @@ export function Overview() {
                     </strong>
                     <small>
                       {customerName(c.customer_name, capture)} ·{" "}
-                      {c.preview?.slice(0, 62)}
+                      {captureText(c.preview ?? "", capture).slice(0, 62)}
                     </small>
                   </div>
                 </div>
