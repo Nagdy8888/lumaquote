@@ -197,3 +197,37 @@ def test_freeze_blocks_the_holdout_until_pinned_unchanged_and_unspent(monkeypatc
     assert any("oracle.json" in p for p in dataset.freeze_problems(record, drifted))
     spent = {**record, "holdout_runs": [{"run": "x"}]}
     assert any("already consumed" in p for p in dataset.freeze_problems(spent, current))
+
+
+def test_retrieval_denominator_is_fourteen_with_five_in_the_holdout():
+    """Recall@5 rests on 14 labeled descriptive requests (9 development, 5 holdout) after the pre-freeze relabel."""
+    scenarios, oracle = dataset.load()
+    labeled = [s["split"] for s in scenarios if oracle[s["id"]]["retrieval"]]
+    assert len(labeled) == 14 and labeled.count("holdout") == 5 and labeled.count("development") == 9
+
+
+def test_validator_rejects_a_retrieval_label_that_disagrees_with_the_catalog(loaded):
+    """The label must be exactly the current models matching its spec; a wrong target or spec is an authoring error."""
+    scenarios, oracle = loaded
+    sid = next(k for k, v in oracle.items() if v["retrieval"])
+    oracle[sid]["retrieval"]["target_skus"] = ["DL-003"]
+    assert any("spec matches" in error for error in dataset.validate(scenarios, oracle))
+
+
+def test_validator_rejects_a_text_request_that_does_not_state_its_spec_or_names_a_code(loaded):
+    """A descriptive text turn must carry the labeled numbers and must not give the model code away."""
+    scenarios, oracle = loaded
+    item = next(s for s in scenarios if oracle[s["id"]]["retrieval"] and s["turns"][0]["kind"] == "text")
+    original = item["turns"][0]["text"]
+    item["turns"][0]["text"] = "Do you have any lights?"
+    assert any("first turn must state" in error for error in dataset.validate(scenarios, oracle))
+    item["turns"][0]["text"] = f"{original} DL-001"
+    assert any("no model code" in error for error in dataset.validate(scenarios, oracle))
+
+
+def test_validator_rejects_a_retrieval_label_without_a_spec(loaded):
+    """Labels written before the spec field existed cannot slip back in."""
+    scenarios, oracle = loaded
+    sid = next(k for k, v in oracle.items() if v["retrieval"])
+    del oracle[sid]["retrieval"]["spec"]
+    assert any("needs a spec" in error for error in dataset.validate(scenarios, oracle))

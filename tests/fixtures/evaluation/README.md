@@ -58,9 +58,19 @@ They follow the product's documented policy, not a model's opinion:
   policy will score highly **by construction**. A pass shows internal consistency
   and regression safety, not agent quality, speech recognition, label reading or
   retrieval recall on real noisy input.
-- Retrieval-labeled cases are few: 4 development (2 text, 1 voice, 1 photo) and 3
-  holdout (1 each). The offline baseline can only run the 2 development text ones.
-  Neither count is a statistically meaningful recall estimate.
+- Retrieval-labeled cases: 14 in total, 9 development (7 text, 1 voice, 1 photo) and 5
+  holdout (3 text, 1 voice, 1 photo). Before the freeze (decisions D22, D38) the first
+  message of seven plain exact-code text scenarios (e016, e078, e054, e069, e035 in
+  development; e030, e014 in holdout) was rewritten into a description such as
+  "Do you stock an 18W 4000K IP44 downlight?" and labeled; their later turn still gives the
+  exact written order, so final outcomes and subtotals did not change. A label is a `spec`
+  (watts, colour temperature, optional IP rating) plus `target_skus`; the validator requires the
+  targets to be exactly the current models matching the spec and a text request to state the
+  spec's numbers and no model code. Voice and photo scenarios were not rewritten, so their media
+  hashes are unchanged. The edits came after development runs 1 and 2, so those results do not
+  describe the rewritten scenarios (post-hoc, R11); no holdout run existed. The offline baseline
+  can run the 7 development text ones. With 5 holdout cases a 95% target tolerates no miss, so
+  holdout Recall@5 remains weak evidence.
 - Final outcomes are 31 draft / 18 staff / 11 clarify in development and
   13 draft / 4 staff / 3 clarify in holdout. The holdout escalation denominator
   (4) is small, so a zero-unsupported-line result there is weak evidence.
