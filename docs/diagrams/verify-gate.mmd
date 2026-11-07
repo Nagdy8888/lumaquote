@@ -1,0 +1,16 @@
+flowchart TB
+  accTitle: The npm verify gate and what verify:full adds
+  accDescr: scripts/verify.cjs runs the steps in a fixed order and stops at the first failure. verify runs offline unit tests. verify:full swaps in the whole Python suite with a 1500 second allowance and adds the browser suite with 420 seconds. Every step writes a private log and the run writes a summary under .local/checks.
+  S1["lint:python"] --> S2["check:architecture"] --> S3["check:docs"] --> S4["skills:check"]
+  S4 --> S5["check:frontend"] --> S6["test:diagrams"] --> S7["diagrams:check"] --> S8["typecheck"]
+  S8 --> Mode{"--full?"}
+  Mode -->|no| U["test:unit"]
+  Mode -->|yes| PY["test:python, 1500 s"]
+  U --> UI["test:ui"]
+  PY --> UI
+  UI --> Br{"--full?"}
+  Br -->|yes| B["test:browser, 420 s"]
+  Br -->|no| Build
+  B --> Build["build"]
+  Build --> Sec["check:secrets"]
+  Sec --> Sum[".local/checks/summary.json"]

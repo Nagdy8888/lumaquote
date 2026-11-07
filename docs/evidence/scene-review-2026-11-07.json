@@ -1,0 +1,40 @@
+{
+  "date": "2026-11-07",
+  "commit": "853147d plus uncommitted change",
+  "label": "local-substitute",
+  "command": "node scripts/python.cjs -m pytest tests/integration/test_scene_review.py -m browser; node tests/browser/scene-review.cjs <private config> against the running dev server",
+  "result": "passed",
+  "scope": "Re-review after the showcase 3D rework: Overview LightingScene becomes a track-light showroom (fluted wall, beams, floor pools, staggered ignition, pointer aiming, colour cross-fade) and SignIn gains the decorative PendantField. Headless Chromium with software WebGL (swiftshader), not a user GPU and not assistive technology.",
+  "findings": [
+  "pytest test_scene_review: 1 passed (17.30 s). Desktop, portrait and reduced-motion axe runs report zero violations; no portrait horizontal overflow.",
+    "Reduced motion: no canvas is created on Overview (static LightingFallback shown) and none on SignIn (PendantField renders nothing). An intermediate version that drew one still WebGL frame was reverted because the test requires no canvas.",
+    "Keyboard: canvas is not a tab stop; the three temperature radios change with arrow keys, show a 3 px focus outline, and Tab leaves the scene. OrbitControls was removed; the pointer only aims the lights and moves the camera slightly, which conveys no information.",
+    "Capture privacy: no credential, email or phone pattern in the overview text; the scene still says 'Illustrative 3D scene'.",
+    "drei MeshReflectorMaterial rendered a black floor under swiftshader; it was replaced with a standard glossy floor plus additive light pools so the result does not depend on an unverified GPU path.",
+    "Production build: entry chunk unchanged at 616.81 kB (179.38 kB gzip). Three.js and the scenes stay in lazy chunks (shared 916.82 kB / 243.56 kB gzip; PendantField 55.93 kB; LightingScene 6.22 kB). The sign-in page now requests the shared chunk, which it did not before."
+  ],
+  "measurements": {
+    "viewport": { "desktop_axe": [], "portrait_axe": [], "portrait_horizontal_overflow": false },
+    "motion": { "canvas_count": 1, "webgl_context": true, "canvas_box": { "width": 573, "height": 380 }, "scene_chunk_requested": true },
+    "reduced": { "canvas_count": 0, "fallback_visible": 1, "axe": [] },
+    "keyboard": {
+      "radio_count": 3,
+      "canvas_tabindex": null,
+      "canvas_aria_label": "Illustrative track lights washing a showroom wall",
+      "arrow_key_changes_selection": true,
+      "tab_after_radios_leaves_scene": true
+    },
+    "performance_dev_server": {
+      "scene_visible_ms_after_sign_in_submit": 1543,
+      "long_tasks_ms": [97, 118, 322, 65, 55, 50, 52, 50, 53, 52, 50, 50],
+      "js_heap_mb": 87,
+      "idle_frames_in_2s": 43
+    },
+    "privacy": { "matches": [], "mentions_synthetic_label": true },
+    "console": []
+  },
+  "limits": [
+    "Software WebGL only; frame rate and long tasks on a real GPU were not measured. Dev-server timings are not a performance claim.",
+    "The scene is illustrative: no product, photometric or manufacturer claim."
+  ]
+}

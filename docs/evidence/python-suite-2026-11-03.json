@@ -1,0 +1,342 @@
+{
+  "date": "2026-11-03",
+  "commit": "853147d plus uncommitted change",
+  "label": "local",
+  "command": "npm run test:python  (node scripts/python.cjs -m pytest -m \"not browser\")",
+  "result": "361 passed, 66 skipped, 3 deselected, 1 xfailed in 790.46 s (0:13:10)",
+  "scope": "Whole Python suite (unit and integration) against the isolated local Supabase stack, run once on the working tree that adds the admission-limit, migration, outage and trace-redaction tests. Browser tests are deselected (npm run test:browser runs them). The 66 skipped tests are the opt-in paid live tests (LUMA_RUN_LIVE_*, LUMA_RUN_TRACE_CANARY), not run; the 1 xfail is the documented failed-request rate-limit gap.",
+  "totals_from_marks": {
+    "passed": 361,
+    "skipped": 66,
+    "xfailed": 1,
+    "failed": 0
+  },
+  "per_file": {
+    "tests/integration/test_admission_limits.py": {
+      "results": "........x",
+      "passed": 8,
+      "skipped": 0,
+      "xfailed": 1,
+      "failed": 0
+    },
+    "tests/integration/test_agent_retrieval.py": {
+      "results": "....",
+      "passed": 4,
+      "skipped": 0,
+      "xfailed": 0,
+      "failed": 0
+    },
+    "tests/integration/test_api_boundaries.py": {
+      "results": ".............",
+      "passed": 13,
+      "skipped": 0,
+      "xfailed": 0,
+      "failed": 0
+    },
+    "tests/integration/test_backup_restore.py": {
+      "results": ".",
+      "passed": 1,
+      "skipped": 0,
+      "xfailed": 0,
+      "failed": 0
+    },
+    "tests/integration/test_budget_reservations.py": {
+      "results": "....",
+      "passed": 4,
+      "skipped": 0,
+      "xfailed": 0,
+      "failed": 0
+    },
+    "tests/integration/test_catalog_index.py": {
+      "results": "..",
+      "passed": 2,
+      "skipped": 0,
+      "xfailed": 0,
+      "failed": 0
+    },
+    "tests/integration/test_catalog_retrieval.py": {
+      "results": "........",
+      "passed": 8,
+      "skipped": 0,
+      "xfailed": 0,
+      "failed": 0
+    },
+    "tests/integration/test_drive_exports.py": {
+      "results": ".......",
+      "passed": 7,
+      "skipped": 0,
+      "xfailed": 0,
+      "failed": 0
+    },
+    "tests/integration/test_gas_snapshots.py": {
+      "results": ".",
+      "passed": 1,
+      "skipped": 0,
+      "xfailed": 0,
+      "failed": 0
+    },
+    "tests/integration/test_google_callback.py": {
+      "results": ".",
+      "passed": 1,
+      "skipped": 0,
+      "xfailed": 0,
+      "failed": 0
+    },
+    "tests/integration/test_graph_restart.py": {
+      "results": ".......",
+      "passed": 7,
+      "skipped": 0,
+      "xfailed": 0,
+      "failed": 0
+    },
+    "tests/integration/test_hostile_content.py": {
+      "results": "...................",
+      "passed": 19,
+      "skipped": 0,
+      "xfailed": 0,
+      "failed": 0
+    },
+    "tests/integration/test_job_recovery.py": {
+      "results": "...",
+      "passed": 3,
+      "skipped": 0,
+      "xfailed": 0,
+      "failed": 0
+    },
+    "tests/integration/test_live_embeddings.py": {
+      "results": "s",
+      "passed": 0,
+      "skipped": 1,
+      "xfailed": 0,
+      "failed": 0
+    },
+    "tests/integration/test_live_evaluation.py": {
+      "results": "sssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss",
+      "passed": 0,
+      "skipped": 61,
+      "xfailed": 0,
+      "failed": 0
+    },
+    "tests/integration/test_live_model.py": {
+      "results": "s",
+      "passed": 0,
+      "skipped": 1,
+      "xfailed": 0,
+      "failed": 0
+    },
+    "tests/integration/test_live_photo.py": {
+      "results": "s",
+      "passed": 0,
+      "skipped": 1,
+      "xfailed": 0,
+      "failed": 0
+    },
+    "tests/integration/test_live_voice.py": {
+      "results": "s",
+      "passed": 0,
+      "skipped": 1,
+      "xfailed": 0,
+      "failed": 0
+    },
+    "tests/integration/test_manual_workflow.py": {
+      "results": "......",
+      "passed": 6,
+      "skipped": 0,
+      "xfailed": 0,
+      "failed": 0
+    },
+    "tests/integration/test_media_sandbox.py": {
+      "results": "......",
+      "passed": 6,
+      "skipped": 0,
+      "xfailed": 0,
+      "failed": 0
+    },
+    "tests/integration/test_migrations.py": {
+      "results": "..",
+      "passed": 2,
+      "skipped": 0,
+      "xfailed": 0,
+      "failed": 0
+    },
+    "tests/integration/test_outages.py": {
+      "results": "..",
+      "passed": 2,
+      "skipped": 0,
+      "xfailed": 0,
+      "failed": 0
+    },
+    "tests/integration/test_photo_intake.py": {
+      "results": "....",
+      "passed": 4,
+      "skipped": 0,
+      "xfailed": 0,
+      "failed": 0
+    },
+    "tests/integration/test_preparation_conflicts.py": {
+      "results": ".....",
+      "passed": 5,
+      "skipped": 0,
+      "xfailed": 0,
+      "failed": 0
+    },
+    "tests/integration/test_quotation_concurrency.py": {
+      "results": "...",
+      "passed": 3,
+      "skipped": 0,
+      "xfailed": 0,
+      "failed": 0
+    },
+    "tests/integration/test_quotation_pdf.py": {
+      "results": ".",
+      "passed": 1,
+      "skipped": 0,
+      "xfailed": 0,
+      "failed": 0
+    },
+    "tests/integration/test_quotation_storage_invariants.py": {
+      "results": "...",
+      "passed": 3,
+      "skipped": 0,
+      "xfailed": 0,
+      "failed": 0
+    },
+    "tests/integration/test_retention.py": {
+      "results": "...",
+      "passed": 3,
+      "skipped": 0,
+      "xfailed": 0,
+      "failed": 0
+    },
+    "tests/integration/test_semantic_catalog.py": {
+      "results": ".......",
+      "passed": 7,
+      "skipped": 0,
+      "xfailed": 0,
+      "failed": 0
+    },
+    "tests/integration/test_staff_replies.py": {
+      "results": "...",
+      "passed": 3,
+      "skipped": 0,
+      "xfailed": 0,
+      "failed": 0
+    },
+    "tests/integration/test_trace_canary.py": {
+      "results": "s",
+      "passed": 0,
+      "skipped": 1,
+      "xfailed": 0,
+      "failed": 0
+    },
+    "tests/integration/test_voice_intake.py": {
+      "results": "......",
+      "passed": 6,
+      "skipped": 0,
+      "xfailed": 0,
+      "failed": 0
+    },
+    "tests/integration/test_whatsapp.py": {
+      "results": "......................",
+      "passed": 22,
+      "skipped": 0,
+      "xfailed": 0,
+      "failed": 0
+    },
+    "tests/integration/test_workspace_integrations.py": {
+      "results": "..",
+      "passed": 2,
+      "skipped": 0,
+      "xfailed": 0,
+      "failed": 0
+    },
+    "tests/integration/test_written_confirmation.py": {
+      "results": "........",
+      "passed": 8,
+      "skipped": 0,
+      "xfailed": 0,
+      "failed": 0
+    },
+    "tests/unit/test_agent_rules.py": {
+      "results": ".................",
+      "passed": 17,
+      "skipped": 0,
+      "xfailed": 0,
+      "failed": 0
+    },
+    "tests/unit/test_catalog_questions.py": {
+      "results": ".",
+      "passed": 1,
+      "skipped": 0,
+      "xfailed": 0,
+      "failed": 0
+    },
+    "tests/unit/test_channel_contracts.py": {
+      "results": "......................",
+      "passed": 22,
+      "skipped": 0,
+      "xfailed": 0,
+      "failed": 0
+    },
+    "tests/unit/test_embedding_contracts.py": {
+      "results": "...............",
+      "passed": 15,
+      "skipped": 0,
+      "xfailed": 0,
+      "failed": 0
+    },
+    "tests/unit/test_evaluation_dataset.py": {
+      "results": "....................",
+      "passed": 20,
+      "skipped": 0,
+      "xfailed": 0,
+      "failed": 0
+    },
+    "tests/unit/test_quotation_rules.py": {
+      "results": ".................",
+      "passed": 17,
+      "skipped": 0,
+      "xfailed": 0,
+      "failed": 0
+    },
+    "tests/unit/test_requirement_policy.py": {
+      "results": "...................",
+      "passed": 19,
+      "skipped": 0,
+      "xfailed": 0,
+      "failed": 0
+    },
+    "tests/unit/test_scan_secrets.py": {
+      "results": "...",
+      "passed": 3,
+      "skipped": 0,
+      "xfailed": 0,
+      "failed": 0
+    },
+    "tests/unit/test_summarize_post_hoc.py": {
+      "results": "....",
+      "passed": 4,
+      "skipped": 0,
+      "xfailed": 0,
+      "failed": 0
+    },
+    "tests/unit/test_trace_masking.py": {
+      "results": "........................",
+      "passed": 24,
+      "skipped": 0,
+      "xfailed": 0,
+      "failed": 0
+    },
+    "tests/unit/test_written_requests.py": {
+      "results": "..........................................................",
+      "passed": 58,
+      "skipped": 0,
+      "xfailed": 0,
+      "failed": 0
+    }
+  },
+  "limits": [
+    "Per-file strings are pytest -q progress marks (. passed, s skipped, x expected failure) copied from the log, not test names.",
+    "Passing here does not cover live Google, WhatsApp, paid model calls or the holdout."
+  ]
+}

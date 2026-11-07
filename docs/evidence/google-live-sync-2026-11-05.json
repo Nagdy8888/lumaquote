@@ -1,0 +1,18 @@
+{
+  "date": "2026-11-05",
+  "commit": "853147d (working tree with uncommitted changes)",
+  "label": "live",
+  "command": "Apps Script editor: run installSupplierSynchronization (browser, user's authorized session); SQL read of luma.google_sync_state and luma.drive_exports via docker exec; Drive folder listing in the browser",
+  "result": "Passed for snapshot import, timer refresh and one earlier Drive export. Not established: sustained timer runs, a Drive export started today, Meta WhatsApp.",
+  "environment": "local Supabase, native callback gateway on 127.0.0.1:8002, ngrok tunnel (same domain as before), authorized synthetic workbook, user's Google account",
+  "observations": [
+    {"time": "2026-11-05 21:15:38-21:15:48 Africa/Cairo", "what": "installSupplierSynchronization execution log: 'Supplier snapshot accepted by backend validation.' then 'Execution completed'."},
+    {"time": "2026-11-05 19:15:46 UTC", "what": "luma.google_sync_state: 1 row persisted (digest prefix 27a40325f9af)."},
+    {"time": "2026-11-05 19:16:43 UTC", "what": "observed_at advanced about 57 s after the install run, which is consistent with the one-minute reconciliation trigger. One refresh seen; a longer run was not observed."},
+    {"time": "2026-11-03 01:56:30-01:56:47 UTC", "what": "luma.drive_exports: one row, status done, attempts 1, revision 2, 2508 bytes, drive_file_id set. The private folder 'LumaQuote quotation exports (private)' holds LQ-CB5DCFBF-r2.pdf (2 KB, owner me, modified 3 Nov). The size is a rounded browser display; the byte hash was not compared against Drive."}
+  ],
+  "limits": [
+    "The Drive export happened on 2026-11-03; no work-log entry from that run was found, so it is recorded here from the database row and the folder listing only.",
+    "Synthetic supplier records only; no real client relationship is claimed."
+  ]
+}

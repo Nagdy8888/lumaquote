@@ -7,8 +7,16 @@
     {
       "id": "B01",
       "status": "Planned",
-      "reason": "Map the implemented browser/Auth/API/worker/database/file trust transitions and the planned Meta/Google/OpenAI boundaries; verify the complete release inventory.",
-      "evidence": []
+      "reason": "The reviewed surface inventory (backend reference) maps the staff API, signed gateway, direct Supabase paths and outbound adapters, and the local trust transitions are tested. Open: the live Meta, Google and OpenAI boundaries and the tunnel are unverified, and no written threat model covers them.",
+      "evidence": [
+        {
+          "kind": "code",
+          "path": "docs/reference/BACKEND.md",
+          "result": "observed",
+          "revision": "implementation-working-tree",
+          "environment": "local-windows"
+        }
+      ]
     },
     {
       "id": "B02",
@@ -151,7 +159,7 @@
     {
       "id": "B15",
       "status": "Planned",
-      "reason": "The shared per-user minute window is tested at its boundary (30 admitted, 31st is 429 with Retry-After). Bursts across a minute boundary, concurrent processes, clock behavior and proxy identity remain.",
+      "reason": "Every per-user, per-conversation and queue limit has an integration test (reads 120, catalog search 30, mutations 30, replies 10, decisions 10, uploads 6, customer messages 6 per conversation, queue 100) and denied attempts keep counting. Open gap: a request that fails after the check (409, 404) rolls its increment back, so failed requests are never limited (strict xfail); the fixed window can admit twice the limit across a minute boundary; proxy identity is unverified. Awaiting the user's decision on committing the counter independently.",
       "evidence": [
         {
           "kind": "code",
@@ -162,7 +170,7 @@
         },
         {
           "kind": "test",
-          "path": "docs/evidence/api-boundaries-2026-11-02.json",
+          "path": "docs/evidence/python-suite-2026-11-03.json",
           "result": "passed",
           "revision": "implementation-working-tree",
           "environment": "local-windows"
@@ -178,14 +186,44 @@
     {
       "id": "B17",
       "status": "Planned",
-      "reason": "Durable queue and worker caps exist; multi-worker races, fairness, stale leases, and overload responsiveness remain.",
-      "evidence": []
+      "reason": "The 100-job queue cap returns a recoverable 503 (tested) and the worker caps running jobs at two with conversation serialization and leases. Open: the queue cap is global, so one tenant can fill it for all; worker capacity under multi-process contention and overload responsiveness are not tested.",
+      "evidence": [
+        {
+          "kind": "code",
+          "path": "app/agents/luma_agent/runtime/jobs.py",
+          "result": "observed",
+          "revision": "implementation-working-tree",
+          "environment": "local-windows"
+        },
+        {
+          "kind": "test",
+          "path": "docs/evidence/python-suite-2026-11-03.json",
+          "result": "passed",
+          "revision": "implementation-working-tree",
+          "environment": "local-windows"
+        }
+      ]
     },
     {
       "id": "B18",
       "status": "Planned",
-      "reason": "Provider deadlines exist; complete eligible-retry/backoff/cancellation/outage recovery remains to implement and test.",
-      "evidence": []
+      "reason": "Provider deadlines exist and a database or Storage outage returns a safe retryable 503 with recovery (tested); Drive export and Graph sends retry up to five attempts. Open: no jitter or circuit breaker, no overall request deadline across provider chains, and provider 429 handling is exercised only against stand-ins.",
+      "evidence": [
+        {
+          "kind": "code",
+          "path": "app/backend/luma/core/http.py",
+          "result": "observed",
+          "revision": "implementation-working-tree",
+          "environment": "local-windows"
+        },
+        {
+          "kind": "test",
+          "path": "docs/evidence/python-suite-2026-11-03.json",
+          "result": "passed",
+          "revision": "implementation-working-tree",
+          "environment": "local-windows"
+        }
+      ]
     },
     {
       "id": "B19",
@@ -207,9 +245,31 @@
     },
     {
       "id": "B22",
-      "status": "Planned",
-      "reason": "Revision and takeover cases pass; actual edit/approve/source/dispatch races across connections remain.",
-      "evidence": []
+      "status": "Covered",
+      "reason": "Two independent RLS connections editing one version yield one revision and one explicit conflict; a dispatcher waiting on human ownership cannot deadlock takeover; a queued job cannot create a revision or clarification after staff review, approval or rejection; the browser flow preserves a stale edit and its precondition (all in the 2026-11-03 full run). Limits: two simultaneous approvals of one revision and a source change at finalization are not raced directly; connections, not processes across machines.",
+      "evidence": [
+        {
+          "kind": "code",
+          "path": "app/backend/luma/features/conversations/participation.py",
+          "result": "observed",
+          "revision": "implementation-working-tree",
+          "environment": "local-windows"
+        },
+        {
+          "kind": "test",
+          "path": "docs/evidence/python-suite-2026-11-03.json",
+          "result": "passed",
+          "revision": "implementation-working-tree",
+          "environment": "local-windows"
+        },
+        {
+          "kind": "test",
+          "path": "docs/evidence/checkpoint-2026-11-03.json",
+          "result": "passed",
+          "revision": "implementation-working-tree",
+          "environment": "local-windows"
+        }
+      ]
     },
     {
       "id": "B23",
@@ -240,27 +300,115 @@
     },
     {
       "id": "B25",
-      "status": "Planned",
-      "reason": "Model extraction cannot approve/send or independently confirm request fields. A whole-message latest-order gate now has 40 controlled development policy cases and real persisted-graph denial/resume checks; broader hostile catalog/transcript/tool coverage and frozen media evaluation remain unresolved.",
-      "evidence": []
+      "status": "Covered",
+      "reason": "Model extraction cannot approve, send or confirm fields; transcripts and label readings are data that create no quote, approval, price change or reply echo (19 hostile-content cases), a latest-written-order gate has 40 policy cases and persisted-graph denial/resume checks, malicious catalog prose cannot become commercial instructions, and the development set includes an injection family (59/60, zero unauthorized sends, synthetic assets). Limits: no holdout run, no human speech or camera photos, and model behavior is sampled, not proven.",
+      "evidence": [
+        {
+          "kind": "code",
+          "path": "app/agents/luma_agent/requirements.py",
+          "result": "observed",
+          "revision": "implementation-working-tree",
+          "environment": "local-windows"
+        },
+        {
+          "kind": "test",
+          "path": "docs/evidence/python-suite-2026-11-03.json",
+          "result": "passed",
+          "revision": "implementation-working-tree",
+          "environment": "local-windows"
+        },
+        {
+          "kind": "test",
+          "path": "docs/evidence/checkpoint-2026-11-03.json",
+          "result": "passed",
+          "revision": "implementation-working-tree",
+          "environment": "local-windows"
+        }
+      ]
     },
     {
       "id": "B26",
-      "status": "Planned",
-      "reason": "Exact/lexical retrieval and version-bound semantic SQL exclude stale, retired and cross-tenant evidence in local DB tests. Paid embedding quality and frozen recall evaluation remain pending.",
-      "evidence": []
+      "status": "Covered",
+      "reason": "Similarity cannot replace explicit model codes or violate specs and never returns another tenant's records; a changed source, record, page or active status invalidates cached candidates; an edit during provider work aborts publication; suggestions carry current source versions and pages and need a written selection (semantic and retrieval tests in the 2026-11-03 full run). Limits: paid embedding quality and frozen-holdout Recall@5 are unmeasured; ACL changes beyond retiring a source are not modeled.",
+      "evidence": [
+        {
+          "kind": "code",
+          "path": "app/backend/luma/features/catalog/retrieval.py",
+          "result": "observed",
+          "revision": "implementation-working-tree",
+          "environment": "local-windows"
+        },
+        {
+          "kind": "test",
+          "path": "docs/evidence/python-suite-2026-11-03.json",
+          "result": "passed",
+          "revision": "implementation-working-tree",
+          "environment": "local-windows"
+        },
+        {
+          "kind": "test",
+          "path": "docs/evidence/checkpoint-2026-11-03.json",
+          "result": "passed",
+          "revision": "implementation-working-tree",
+          "environment": "local-windows"
+        }
+      ]
     },
     {
       "id": "B27",
-      "status": "Planned",
-      "reason": "Manual exact-revision approval and durable customer/staff restart/resume are locally tested, including written-confirmation denial followed by a complete restatement into review only. Complete revoked-decision replay, external callback and release-wide participation coverage remain unresolved.",
-      "evidence": []
+      "status": "Covered",
+      "reason": "Exact-revision approval is idempotent on replay and rejects stale revisions; a persisted review resumes in a new worker without redrafting, a pause resumes once on a written restatement, an extra queued job cannot resume clarification or duplicate a question, and revoked staff access after queueing blocks delivery (graph-restart, manual-workflow and staff-reply tests). Limits: external callbacks from live Meta and Google are not exercised; participation by real customers is simulated.",
+      "evidence": [
+        {
+          "kind": "code",
+          "path": "app/agents/luma_agent/runtime/conversations.py",
+          "result": "observed",
+          "revision": "implementation-working-tree",
+          "environment": "local-windows"
+        },
+        {
+          "kind": "test",
+          "path": "docs/evidence/python-suite-2026-11-03.json",
+          "result": "passed",
+          "revision": "implementation-working-tree",
+          "environment": "local-windows"
+        },
+        {
+          "kind": "test",
+          "path": "docs/evidence/checkpoint-2026-11-03.json",
+          "result": "passed",
+          "revision": "implementation-working-tree",
+          "environment": "local-windows"
+        }
+      ]
     },
     {
       "id": "B28",
-      "status": "Planned",
-      "reason": "Explicit trace allowlisting is scaffolded; nested/export/log canary checks and a real redacted LangSmith trace remain.",
-      "evidence": []
+      "status": "Covered",
+      "reason": "Trace payloads are masked inside the LangSmith client (inputs, outputs, metadata, error strings and keys): nested tool, subgraph, exception, job-payload and metadata canaries never reach the exporter, worker logs and durable rows keep only safe codes on provider failure, and a live trace read back from LangSmith showed content with the planted secret and phone masked. A nested probe found that run error strings escaped masking until anonymizer=mask was added. Limits: a phone number spelled in words and customer names are not masked by design; the live canary predates the error-string fix and did not exercise a failing node; LangSmith retention is outside this app.",
+      "evidence": [
+        {
+          "kind": "code",
+          "path": "app/agents/luma_agent/observability.py",
+          "result": "observed",
+          "revision": "implementation-working-tree",
+          "environment": "local-windows"
+        },
+        {
+          "kind": "test",
+          "path": "docs/evidence/trace-redaction-nested-2026-11-03.json",
+          "result": "passed",
+          "revision": "implementation-working-tree",
+          "environment": "local-windows"
+        },
+        {
+          "kind": "test",
+          "path": "docs/evidence/python-suite-2026-11-03.json",
+          "result": "passed",
+          "revision": "implementation-working-tree",
+          "environment": "local-windows"
+        }
+      ]
     },
     {
       "id": "B29",
@@ -309,9 +457,31 @@
     },
     {
       "id": "B34",
-      "status": "Planned",
-      "reason": "Local migrations are applied; clean install, upgrade with pending jobs, and compatibility/rollback cases remain.",
-      "evidence": []
+      "status": "Covered",
+      "reason": "All 15 migrations apply in order to a disposable database and the resulting luma schema (columns, constraints, indexes, policies, grants, functions, triggers, RLS flags) equals the live local schema, with a negative check; a pending job and conversation survive the later five files; anon and authenticated hold no grants and the Storage bucket is private. Limits: migrations are forward-only (no rollback files; restore from backup is the rollback), pending approvals and quotes across an upgrade and production-size data are untested, and the local database was bootstrapped outside the Supabase CLI ledger.",
+      "evidence": [
+        {
+          "kind": "code",
+          "path": "supabase/migrations/20261102020000_media_purge.sql",
+          "result": "observed",
+          "revision": "implementation-working-tree",
+          "environment": "local-windows"
+        },
+        {
+          "kind": "test",
+          "path": "docs/evidence/python-suite-2026-11-03.json",
+          "result": "passed",
+          "revision": "implementation-working-tree",
+          "environment": "local-windows"
+        },
+        {
+          "kind": "test",
+          "path": "docs/evidence/checkpoint-2026-11-03.json",
+          "result": "passed",
+          "revision": "implementation-working-tree",
+          "environment": "local-windows"
+        }
+      ]
     },
     {
       "id": "B35",
@@ -376,15 +546,52 @@
     },
     {
       "id": "B39",
-      "status": "Planned",
-      "reason": "Deny/revision/takeover/local integration tests exist; multi-process races and durable recovery cases remain.",
-      "evidence": []
+      "status": "Covered",
+      "reason": "Targeted deny, race, restart and recovery tests run through the real API, Auth and PostgreSQL: per-endpoint limits and queue capacity, two-connection edit and takeover races, lease expiry with fencing, crash/restart resume, database and Storage outages, clean install and upgrade, populated backup/restore, forged and replayed webhooks, and stand-in versus live labeling in every evidence file. Limits: concurrency is two connections on one machine, not multi-process or multi-host; no live provider failure injection; the failed-request rate-limit gap is a strict xfail.",
+      "evidence": [
+        {
+          "kind": "code",
+          "path": "tests/integration/test_admission_limits.py",
+          "result": "observed",
+          "revision": "implementation-working-tree",
+          "environment": "local-windows"
+        },
+        {
+          "kind": "test",
+          "path": "docs/evidence/python-suite-2026-11-03.json",
+          "result": "passed",
+          "revision": "implementation-working-tree",
+          "environment": "local-windows"
+        },
+        {
+          "kind": "test",
+          "path": "docs/evidence/checkpoint-2026-11-03.json",
+          "result": "passed",
+          "revision": "implementation-working-tree",
+          "environment": "local-windows"
+        }
+      ]
     },
     {
       "id": "B40",
       "status": "Planned",
-      "reason": "Four local desktop/portrait route captures have zero axe findings and reviewed fixes; all remaining failure/reconnect/capture-privacy flows remain.",
-      "evidence": []
+      "reason": "Fourteen views (six pages and a populated conversation, desktop and portrait) pass axe, overflow, landmark, naming and WCAG 2.2 24 px target-size checks after fixes; the 3D scene is lazy, falls back under reduced motion and has an accessible name; stale-edit and honest-state flows are browser-tested and the overview text was scanned for credential, email and phone patterns. Open: reconnect behavior, approved/failed-media/error page states in the axe run, and any screen-reader or real-device review.",
+      "evidence": [
+        {
+          "kind": "code",
+          "path": "app/frontend/src/features/overview/LightingScene.tsx",
+          "result": "observed",
+          "revision": "implementation-working-tree",
+          "environment": "local-windows"
+        },
+        {
+          "kind": "test",
+          "path": "docs/evidence/page-accessibility-review-2026-11-03.json",
+          "result": "passed",
+          "revision": "implementation-working-tree",
+          "environment": "local-windows"
+        }
+      ]
     },
     {
       "id": "B41",
@@ -394,9 +601,31 @@
     },
     {
       "id": "B42",
-      "status": "Planned",
-      "reason": "Inventory the final staff API, isolated webhook ingress, direct Supabase schemas/buckets and all external adapters before release review.",
-      "evidence": []
+      "status": "Covered",
+      "reason": "The staff API's 18 operations and the signed gateway's 6 are pinned by a test (all staff operations need a bearer credential except liveness; the gateway has no staff route and no documentation endpoints), and browser-facing Supabase roles hold no grants with a private Storage bucket; the inventory table in the backend reference lists the outbound adapters. Limits: the staff API serves /docs and /openapi.json unauthenticated (acceptable only while local); the adapter list is reviewed by reading, not enforced by a test.",
+      "evidence": [
+        {
+          "kind": "code",
+          "path": "docs/reference/BACKEND.md",
+          "result": "observed",
+          "revision": "implementation-working-tree",
+          "environment": "local-windows"
+        },
+        {
+          "kind": "test",
+          "path": "docs/evidence/python-suite-2026-11-03.json",
+          "result": "passed",
+          "revision": "implementation-working-tree",
+          "environment": "local-windows"
+        },
+        {
+          "kind": "test",
+          "path": "docs/evidence/checkpoint-2026-11-03.json",
+          "result": "passed",
+          "revision": "implementation-working-tree",
+          "environment": "local-windows"
+        }
+      ]
     }
   ]
 }

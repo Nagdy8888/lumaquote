@@ -317,10 +317,21 @@ each model call received and returned, and how the graph moved.
 |---|---|---|---|
 | `luma.job.<kind>` (root, one per worker job) | chain | job id, kind, company id, conversation id, job payload | `outcome` (`done`/`blocked`/`failed`), `error` class |
 | LangGraph steps (`extract`, `retrieve`, `prepare`, ... and the graph itself) | chain | graph state passed to the step | state update returned by the step |
-| `openai.responses.extraction` | llm | model, instructions, the customer's latest message | parsed extraction (SKU/quantity lines, clarification, uncertainty), token usage |
-| `openai.responses.label_reading` | llm | model, instructions, request text, image as a byte count | parsed label reading, token usage |
-| `openai.audio.transcription` | llm | model, file description (name, bytes, seconds), languages | transcript text, detected languages |
-| `openai.embeddings` | llm | model, input texts | vector count, dimensions, token usage (vectors are not exported) |
+| `openai.responses.extraction` | llm | model, instructions, the customer's latest message | parsed extraction (SKU/quantity lines, clarification, uncertainty), token usage; LangSmith tokens and estimated cost |
+| `openai.responses.label_reading` | llm | model, instructions, request text, image as a byte count | parsed label reading, token usage; LangSmith tokens and estimated cost |
+| `openai.audio.transcription` | llm | model, file description (name, bytes, seconds), languages | transcript text, detected languages; LangSmith estimated cost (per-minute rate, no tokens) |
+| `openai.embeddings` | llm | model, input texts | vector count, dimensions, token usage (vectors are not exported); LangSmith tokens and estimated cost |
+
+**Tokens and cost in LangSmith.** `observability.set_usage(run, ...)` sets the run's
+`usage_metadata` (`input_tokens`, `output_tokens`, `total_tokens`, `input_cost`, `output_cost`,
+`total_cost`), which fills LangSmith's Tokens and Cost columns, the trace totals and the project
+dashboards. `model_call` also sets `ls_provider=openai` and `ls_model_name`. The cost is sent
+explicitly because `gpt-6-luna` has no built-in LangSmith price: it uses the same
+per-million-token allowance rates as settlement (USD 0.10 input and 0.50 output for the Responses
+model, 0.02 for embeddings, 0.0045 per audio minute for transcription, which has no tokens). It is
+the project's estimate, never provider billing. A failure while recording usage is logged by class name and never fails the job. The
+rates are duplicated at the call site and in the settlement code; change both together. Test:
+`test_model_call_exports_tokens_and_estimated_cost`.
 
 **Call flow.** `worker.tick` claims a job and enters `job_trace(job)`, which sets the
 LangSmith tracing context (`enabled=True`, the masked client, the project) and opens the
@@ -332,8 +343,8 @@ the outcome and `flush()` sends buffered runs. Graph runtimes and adapters wrap 
 evaluation harness, scripts) it forces tracing off, so an environment variable can never
 cause unmasked automatic tracing through LangChain's default client.
 
-**Masking** happens inside the client (`hide_inputs`, `hide_outputs`, `hide_metadata` all
-call `observability.mask`), so every run, including LangGraph's own, is masked before it
+**Masking** happens inside the client (`hide_inputs`, `hide_outputs`, `hide_metadata` and
+`anonymizer` all call `observability.mask`), so every run, including LangGraph's own, is masked before it
 leaves the process:
 
 - every configured `SecretStr` value (OpenAI, LangSmith, WhatsApp, Google callback and
@@ -342,7 +353,11 @@ leaves the process:
   `sha256=` signatures and `token=` / `signature=` / `api_key=` style URL parameters become `[secret]`;
 - phone numbers in `+` international form, 10-15 consecutive digits (WhatsApp ids) and common
   local forms starting with 0 become `[phone]`;
-- raw bytes and base64 `data:` URLs become a size note, so audio and images never leave the machine.
+- raw bytes and base64 `data:` URLs become a size note, so audio and images never leave the machine;
+- a run's `error` string (exception repr and traceback, which can echo request data) is masked
+  too. langsmith 0.14.14 routes it only through `anonymizer`, never through `hide_*`, so a nested
+  failure leaked the planted secret and phone until `anonymizer=mask` was added (found by the
+  nested probes on 2026-11-03).
 
 Message text, transcripts, label readings, retrieval results and quotation content are
 kept on purpose. Limits: masking is pattern-based (a phone number spelled out in words is
@@ -353,12 +368,15 @@ control (see the retention notes in [data model](DATA_MODEL.md)).
 **Failures.** Export problems are logged by exception class only and never change a job's
 outcome. If LangSmith is unreachable or over quota, quotation work continues untraced.
 
-**Tests and evidence.** `tests/unit/test_trace_masking.py` (18 tests) checks the masking
+**Tests and evidence.** `tests/unit/test_trace_masking.py` (22 tests) checks the masking
 rules, that business content (SKUs, quantities, prices, dates, ids) stays readable, that
 bytes and data URLs are dropped, and that a real `langsmith.Client` with a fake HTTP session
 sends a root run, a real LangGraph step and a model-call run with content but without the
-planted secret and phone. With masking disabled in memory that test fails (negative check,
-2026-11-03). `tests/integration/test_trace_canary.py` is the opt-in live proof
+planted secret and phone. Nested probes plant the same canaries in a `@traceable` tool run, a
+compiled subgraph, deeply nested payloads, a node exception (message and traceback), the job
+payload and caller metadata keys, and assert none reaches the exporter; a test pins the production
+client's `anonymizer`/`hide_*` options. With masking disabled in memory the capture test fails
+(negative check, 2026-11-03); the exception probe failed before the `anonymizer` fix. `tests/integration/test_trace_canary.py` is the opt-in live proof
 (`LUMA_RUN_TRACE_CANARY=1`): one paid synthetic job, read back from LangSmith. On 2026-11-03 it
 passed with 8 runs (`luma.job.agent`, `LangGraph`, `extract`, `openai.responses.extraction`,
 `route`, `retrieve`, `ask`, `clarify`), content visible and the planted secret and phone masked

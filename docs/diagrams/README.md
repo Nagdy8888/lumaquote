@@ -30,6 +30,20 @@ sources and [catalog.json](catalog.json) are the maintained source of truth.
 - [Verification scopes](rendered/verification-scope.svg).
 - [Working-rule enforcement](rendered/rule-enforcement.svg).
 
+## Layer views
+
+Embedded in the [layer guides](../layers/README.md):
+
+- [Layers and dependency direction](rendered/layer-map.svg) and
+  [one request through every layer](rendered/request-trace.svg).
+- [Frontend composition and server state](rendered/frontend-layer.svg).
+- [Staff API request pipeline and status codes](rendered/api-pipeline.svg).
+- [Processes and the features they call](rendered/backend-modules.svg).
+- [One worker tick](rendered/worker-tick.svg).
+- [Data-layer identities and stores](rendered/data-access.svg).
+- [Integration gates and proof levels](rendered/integrations-map.svg).
+- [The verify gate](rendered/verify-gate.svg).
+
 ER edges show selected actual SQL relationships, not invented foreign keys to
 JSON lines or graph thread IDs. Ready media is unconfirmed; queued work is not
 delivered; local delivery is not a WhatsApp receipt. The diagrams complement

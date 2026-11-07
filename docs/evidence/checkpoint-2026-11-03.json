@@ -1,0 +1,27 @@
+{
+  "date": "2026-11-03",
+  "commit": "853147d plus uncommitted change",
+  "label": "local",
+  "command": "npm run verify:full",
+  "result": "13 of 13 steps passed in one complete run: lint:python, check:architecture, check:docs, skills:check, check:frontend, test:diagrams, diagrams:check, typecheck, test:python (364 passed, 66 skipped opt-in paid live tests, 3 deselected browser tests, 1 expected failure, 587 s), test:ui, test:browser (3 passed, 95 s), build, check:secrets.",
+  "scope": "Local working tree after the relabel, nested trace redaction, admission, outage, migration, surface inventory and 3D/page review changes. Docs-only edits (this file, the coverage ledger, work log, decisions) were made after the run and re-checked with check:docs and check:rules.",
+  "steps": [
+    {"command": "lint:python", "status": "Passed"},
+    {"command": "check:architecture", "status": "Passed"},
+    {"command": "check:docs", "status": "Passed"},
+    {"command": "skills:check", "status": "Passed"},
+    {"command": "check:frontend", "status": "Passed"},
+    {"command": "test:diagrams", "status": "Passed"},
+    {"command": "diagrams:check", "status": "Passed"},
+    {"command": "typecheck", "status": "Passed"},
+    {"command": "test:python", "status": "Passed", "seconds": 591.16},
+    {"command": "test:ui", "status": "Passed"},
+    {"command": "test:browser", "status": "Passed", "seconds": 97.58},
+    {"command": "build", "status": "Passed"},
+    {"command": "check:secrets", "status": "Passed"}
+  ],
+  "limits": [
+    "Not covered: paid live tests (skipped by design), live Google, Meta and WhatsApp, the holdout, screen readers and real devices.",
+    "The strict expected failure is the documented failed-request rate-limit gap."
+  ]
+}

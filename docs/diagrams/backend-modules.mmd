@@ -1,0 +1,29 @@
+flowchart LR
+  accTitle: Which process calls which business feature
+  accDescr: The staff API composes five feature routers. The signed gateway composes only Google callbacks and the WhatsApp webhook. The worker, drawn with dotted arrows, calls feature business interfaces for conversations, quotations, catalog, media and messaging. Every feature depends on core, and core never imports a feature.
+  subgraph Proc["Processes"]
+    StaffAPI["Staff API main.py"]
+    Worker["Worker luma_agent"]
+    Gateway["Gateway google_gateway.py"]
+  end
+  subgraph Feat["luma/features, all built on luma/core, which imports no feature"]
+    Conv["conversations: intake, participation, takeover"]
+    Quote["quotations: rules, drafting, approval, freshness, dispatch, PDF"]
+    Cat["catalog: criteria, lexical and semantic retrieval"]
+    Media["media: intake, persistence, sandbox decode"]
+    WSp["workspace: read model, events"]
+    Msg["messaging: webhook, inbound, outbound, allowlist"]
+    GS["google_sync: snapshots, edits, Drive export"]
+  end
+  StaffAPI --> Conv
+  StaffAPI --> Quote
+  StaffAPI --> Cat
+  StaffAPI --> Media
+  StaffAPI --> WSp
+  Worker -.-> Conv
+  Worker -.-> Quote
+  Worker -.-> Cat
+  Worker -.-> Media
+  Worker -. "inbound, gated outbound" .-> Msg
+  Gateway --> GS
+  Gateway -->|"webhook only"| Msg

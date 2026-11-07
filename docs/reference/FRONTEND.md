@@ -167,15 +167,60 @@ product behavior silently.
 
 ## Optional 3D and presentation limits
 
-`Overview` lazy-loads `LightingScene` inside Suspense and `SceneBoundary`.
-`LightingScene` builds procedural luminaire geometry with React Three Fiber/Drei,
-uses demand rendering and capped device pixel ratio, and offers illustrative
-warm/neutral/cool controls. It disables pan/zoom and bounds orbit rotation.
+Two lazy scenes exist. Both are decorative showcase surfaces. Neither carries information
+the working screens need.
 
-Reduced-motion preference switches to a static fallback and follows preference
-changes with listener cleanup. A canvas fallback/error boundary keeps the screen
-usable when rendering is unavailable. The geometry and temperature controls are
+| Scene | Where | What it shows | Interaction |
+|---|---|---|---|
+| `features/overview/LightingScene.tsx` | Overview hero, right half (380 px tall, 250 px under 680 px width) | Three brass track heads on a rail wash a fluted wall with light scallops over a glossy floor. Beams are additive cones and floor pools are additive glow planes. | On load the heads ignite in sequence (0.6 s delay, 0.45 s stagger, short flicker). They sweep slowly and aim toward the pointer. The camera drifts and follows the pointer slightly. The warm/neutral/cool radios cross-fade the light colour. |
+| `features/showcase/PendantField.tsx` | Sign-in story panel, full bleed behind the copy (`aria-hidden`) | 15 brass dome pendants on cords, in a fixed layout so captures repeat. The headline sits at the bottom under a CSS scrim. | Bulbs ignite in a left-to-right wave, sway gently and brighten near the pointer. |
+
+Shared mechanics live in `features/showcase/sceneKit.ts`:
+- `useScenePlayback` reports the live reduced-motion preference. It sets `frameloop="never"`
+  while the canvas is off screen (IntersectionObserver) or the tab is hidden, so idle pages use
+  no GPU.
+- `glowTexture` caches one radial-gradient texture for halos.
+- `ignition` is the pure easing for the staggered switch-on.
+
+All animation mutates Three.js objects inside `useFrame`. React state never changes per frame.
+Device pixel ratio is capped at 1.75.
+
+Reduced motion creates no canvas. `Overview` shows the static `LightingFallback`. `SignIn` shows
+the plain panel gradient. `tests/integration/test_scene_review.py` enforces this. Each scene
+sits inside `SceneBoundary`, which now takes an optional `fallback` (`SignIn` passes `null`).
+The canvas `fallback` covers missing WebGL. The geometry and temperature controls are
 illustrative, not manufacturer specifications or photometric simulation.
+
+Bundle: Three.js and both scenes load in lazy chunks. The shared chunk is 917 kB (244 kB gzip).
+The entry chunk is unchanged. The sign-in page now requests the shared chunk, so the first
+paint of sign-in no longer avoids Three.js. drei's `MeshReflectorMaterial` was tried and dropped:
+it rendered black under software WebGL, and nobody verified it on a real GPU.
+
+**Re-review (2026-11-07, `local-substitute`)** after the showcase rework
+([evidence](../evidence/scene-review-2026-11-07.json)):
+- Axe reports zero violations on desktop, portrait and reduced motion.
+- Reduced motion creates no canvas.
+- The radios stay keyboard operable.
+- OrbitControls was removed, so the pointer is the only scene input.
+
+Frame rate on a real GPU was not measured.
+
+**Review (2026-11-03, `local-substitute`).** `tests/integration/test_scene_review.py` drives
+headless Chromium with software WebGL through `tests/browser/scene-review.cjs`
+([evidence](../evidence/scene-review-2026-11-03.json)). It found a serious axe violation
+(`aria-prohibited-attr`: the canvas wrapper had `aria-label` without a role), fixed with
+`role="img"`. Earlier accessibility runs used reduced motion, so they never rendered the canvas.
+Keyboard: the canvas is not a tab stop and orbit is pointer-only, an accepted limit because orbit
+conveys nothing; the temperature radios work with arrow keys and show a 3 px focus outline. The
+production build keeps Three.js out of the entry chunk (entry 616 kB, 179 kB gzip; scene chunk
+934 kB, 248 kB gzip, loaded on demand). Timings are from the dev server and are not a performance
+claim. Capture privacy: no credential, email or phone pattern in the overview text.
+
+`tests/integration/test_page_review.py` reviews 14 views (six pages and one populated conversation,
+at 1440 px and 430 px) for axe violations, overflow, landmarks, unnamed controls and WCAG 2.2 target
+size of at least 24 x 24 px ([evidence](../evidence/page-accessibility-review-2026-11-03.json)). It
+found undersized controls (a 14 px icon button, a 23 px remove button, 18 px text links), now
+fixed in CSS and enforced by the test. Automated axe is not a screen-reader review.
 
 Capture mode changes displayed customer labels and hides media upload/previews.
 It does not comprehensively redact messages, PDFs or every potential identifier.

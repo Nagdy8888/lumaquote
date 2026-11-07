@@ -1,4 +1,7 @@
-# WhatsApp channel (Meta Cloud API)
+# WhatsApp channel (Meta Cloud API or Twilio Sandbox)
+
+Two providers share one inbox, worker and outbox. Meta is described first; the Twilio
+Sandbox provider added for D43 is described in [its own section](#twilio-sandbox-provider-d43).
 
 This explains the implemented WhatsApp adapter: what it trusts, how an event moves through it,
 what it writes, and what it does and does not prove. **Everything here is verified only against a
@@ -192,3 +195,95 @@ test. **Not proven:** that Meta accepts these request/response shapes, signature
 payloads, tunnel reachability, real media URLs/redirects, template or window rules as Meta enforces
 them today, rate limits, or any real delivery. Quote sending also needs a real Google snapshot. No
 staff UI shows channel state, and no retention policy covers customer numbers or inbox rows.
+
+## Twilio Sandbox provider (D43)
+
+**Why.** Meta refused app creation for the user's `LumaQuote Test` business portfolio ("restricted
+from advertising", 2026-11-07), and WhatsApp apps require a portfolio. Twilio's WhatsApp Sandbox
+needs no Meta portfolio: the user opens a Twilio trial account and joins the shared sandbox number
+from their phone. Selected with `WHATSAPP_PROVIDER=twilio`; Meta code is unchanged and still default.
+
+**Actors and authority.** Twilio is trusted only through the Auth Token: it signs every webhook
+(`X-Twilio-Signature`) and authenticates every REST call (HTTP Basic, `AccountSid:AuthToken`). The
+tenant is never taken from the payload: `AccountSid` and our sandbox number (`To` inbound, `From` on
+receipts) must equal configuration, which maps to `WHATSAPP_COMPANY_ID`. Allowlist, ownership,
+approval, revision, freshness and the 24-hour window are the same checks as for Meta.
+
+**Modules.**
+
+| Module | Role |
+| --- | --- |
+| `messaging/errors.py` | `ProviderError` (`rejected`, `unreachable`, `unknown`); Meta's `GraphError` subclasses it |
+| `messaging/provider.py` | picks the adapter for sends (`WHATSAPP_PROVIDER`) and for media (the event's `provider` field) |
+| `messaging/twilio_client.py` | send text, send PDF by link, fetch media; fixed `api.twilio.com` paths only |
+| `messaging/twilio_webhook.py` | `POST /webhooks/twilio` (messages) and `POST /webhooks/twilio/status` (receipts) |
+| `messaging/media_links.py` | mints and serves `GET /media/quotations/{outbox}/{expires}/{sig}/quotation.pdf` |
+| `google_gateway.py` | mounts the three routes on the tunnel app; the staff API is still never tunnelled |
+
+**Ingress flow.** Body read with the shared 1 MiB cap -> form parsed (`parse_qs`, blank values kept)
+-> signature recomputed over `PUBLIC_GATEWAY_URL + path` plus every parameter name and value sorted
+(HMAC-SHA1, base64; the URL is tried with and without `:443`, as Twilio's own validator does; checked
+against twilio-python's published vector in `tests/unit/test_twilio_signature.py`) -> tenant match ->
+reduced to the Meta event shape with `provider: "twilio"` -> `webhook.persist` (idempotent on
+`MessageSid`, or `status:<sid>:<state>` for receipts) -> 200. Inbound returns empty TwiML, so Twilio
+sends no automatic reply. Only the first media item (`MediaUrl0`) is used; its URL must be on
+`api.twilio.com` under our account and the same `MessageSid`, and is stored as `MessageSid/MediaSid`,
+not as a URL.
+
+**Inbound media.** The worker calls `provider.fetch_media`, which for Twilio events checks the signed
+declared type (`MediaContentType0`) against the audio/image allowlist before any request, GETs the
+media by SID with Basic auth, follows at most one redirect, only to HTTPS and without credentials,
+and streams with the same 10 MB (audio) / 5 MB (image) limits. The bytes then go through the same
+sandboxed decoder as Meta media.
+
+**Egress flow.** `outbound.begin` gates on `ENABLE_LIVE_WHATSAPP` and `provider.ready()` (valid
+Account SID, token, sender digits and an `https://` public URL). `submit` posts one form to
+`/2010-04-01/Accounts/{sid}/Messages.json` with `From`, `To` (`whatsapp:+<digits>`), `Body` and
+`StatusCallback` (`<public>/webhooks/twilio/status`). A quotation adds `MediaUrl`, a link valid for
+15 minutes, HMAC-SHA256 over `<outbox id>.<expiry>` with a key derived from the Auth Token. The link
+serves the stored canonical PDF only while that outbox row belongs to the configured company, has a
+quote, and is in `submitting` or a later sent state. Every failed check is an opaque 404 with
+`Cache-Control: no-store`. A PDF over 500 KB (Twilio's documented limit for non-image media) is
+refused before sending (`failed`, `document_too_large`). The reply needs a `sid` matching
+`SM|MM` + 32 hex; a 2xx without one is `unknown`.
+
+**Receipts.** `sent`, `delivered` and `read` map as for Meta. `undelivered` and `failed` both become
+`failed` (code `twilio_<ErrorCode>`), and only for a send that is still unconfirmed. `queued`,
+`sending`, `accepted` and other intermediate states are acknowledged and not stored. Twilio states
+callbacks can arrive out of order, and the existing monotonic rank handles that.
+
+**Database writes.** None new. The same `luma.inbox`, `luma.outbox.provider_id` (Twilio `SM...` SID)
+and `luma.messages.provider_id` columns are used. The media link reads `luma.outbox` joined to
+`luma.quotes` with the worker role and writes nothing.
+
+**Failures.**
+
+| Condition | Result |
+| --- | --- |
+| Twilio not selected or not fully configured | 503 on both Twilio webhooks |
+| Missing, wrong-token or tampered signature | 401, nothing stored |
+| Other account or other receiving number | 200, nothing stored |
+| Media URL for another account or message, denied type, non-HTTPS redirect | attachment refused with the fixed notice |
+| Timeout, 5xx or a 2xx without a SID on send | outbox `unknown`, never resent |
+| 4xx (for example `twilio_63015`, recipient has not joined the sandbox), unreachable | outbox `failed` |
+| Expired, forged or foreign media link | 404 |
+
+**Limits and cost (Twilio docs, read 2026-11-07; re-check before the live run).** Sandbox sender
+`+14155238886` is shared. Each phone must send `join <code>` first, and the join lapses after three
+days. Sends are limited to one message every three seconds. Free-form messages work only inside the
+24-hour window. Business-initiated messages need Twilio's fixed sandbox templates, which this app
+does not send. Trial accounts include a small number of WhatsApp messages, and sandbox sends beyond
+that are billed at standard rates. This is for testing only, not production.
+
+**Proof.** `tests/unit/test_twilio_signature.py` (4 tests: Twilio's published signature vector, port
+variants, media-link binding and expiry, no token means no link) and
+`tests/integration/test_twilio.py` (14 tests, real PostgreSQL and Storage, mock Twilio transport):
+signature, tenant and configuration gates, allowlist, voice fetch with credentials kept off the CDN,
+three hostile-media cases, single submission with the exact form, five failure classes, monotonic
+receipts with `undelivered`, and exact PDF bytes behind the signed link with forged and foreign links
+refused. Label: `local-substitute`. **Not proven:** Twilio accepting these requests, the real
+redirect host for media, Twilio fetching the PDF link through the tunnel, or any delivery to a phone.
+
+**Open gaps.** Only the first media item of a multi-media message is used. Twilio's
+`I-Twilio-Idempotency-Token` header is not used for deduplication (the SID-based key is enough).
+Sandbox joins expire, so a demo must re-join within three days.

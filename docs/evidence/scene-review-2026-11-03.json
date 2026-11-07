@@ -1,0 +1,86 @@
+{
+  "date": "2026-11-03",
+  "commit": "853147d plus uncommitted change",
+  "label": "local-substitute",
+  "command": "node scripts/python.cjs -m pytest tests/integration/test_scene_review.py -m browser",
+  "result": "passed",
+  "scope": "Review of the optional lazy 3D lighting scene (LightingScene.tsx) in headless Chromium with software WebGL (swiftshader) against isolated native servers and a synthetic tenant: not a user GPU, not assistive technology.",
+  "findings": [
+    "axe: aria-prohibited-attr (serious) on the canvas wrapper, which carried aria-label without a role. Fixed with role=\"img\"; desktop, portrait and reduced-motion axe runs now report zero violations. (The 2026-11-02 accessibility evidence ran with reduced motion, so it never rendered the canvas.)",
+    "Keyboard: the canvas is not a tab stop and OrbitControls is pointer-only. Accepted: orbiting conveys no information and the only functional control, the three-way temperature radio group, is keyboard operable (arrow keys change the selection, focus outline 3px, Tab leaves the scene).",
+    "Reduced motion: no canvas is created; the static fallback is shown.",
+    "Capture privacy: no credential, token, email or phone pattern in the page text; the scene is labelled 'Illustrative 3D scene'."
+  ],
+  "measurements": {
+    "viewport": {
+      "desktop_axe": [],
+      "portrait_axe": [],
+      "portrait_horizontal_overflow": false
+    },
+    "motion": {
+      "canvas_count": 1,
+      "webgl_context": true,
+      "fallback_visible": 1,
+      "canvas_box": {
+        "x": 832,
+        "y": 201.4375,
+        "width": 573,
+        "height": 310
+      },
+      "scene_chunk_requested": true
+    },
+    "reduced": {
+      "canvas_count": 0,
+      "fallback_visible": 1,
+      "axe": []
+    },
+    "keyboard": {
+      "radio_count": 3,
+      "canvas_tabindex": null,
+      "canvas_aria_label": "Illustrative adjustable track-light scene",
+      "arrow_key_changes_selection": true,
+      "focus_outline_visible": {
+        "tag": "INPUT",
+        "outline": "solid 3px",
+        "swatch_outline": "solid"
+      },
+      "tab_after_radios_leaves_scene": true
+    },
+    "performance": {
+      "scene_visible_ms_after_sign_in_submit": 1926,
+      "script_requests": "40 dev-server script requests (unbundled; sizes not representative, see production_build)",
+      "long_tasks_ms": [
+        60,
+        168,
+        95,
+        234
+      ],
+      "navigation": {
+        "dom_content_loaded_ms": 280,
+        "load_ms": 281
+      },
+      "js_heap_mb": 78,
+      "idle_frames_in_2s": 123
+    },
+    "privacy": {
+      "matches": [],
+      "text_length": 1539,
+      "mentions_synthetic_label": true
+    },
+    "console": []
+  },
+  "production_build": {
+    "entry_js_kb": 615.94,
+    "entry_js_gzip_kb": 179.03,
+    "scene_chunk_js_kb": 934.09,
+    "scene_chunk_gzip_kb": 248.07,
+    "css_kb": 70.17,
+    "css_gzip_kb": 14.14,
+    "note": "Three.js and react-three-fiber are in the lazy LightingScene chunk, not the entry chunk; the 934 kB scene chunk exceeds Vite's 700 kB warning threshold (it is lazy, so it does not load with the entry chunk); the 616 kB entry chunk is under it."
+  },
+  "limits": [
+    "Timings come from the Vite dev server in a headless browser; a production-build timing on real hardware is not measured.",
+    "Idle frames (123 in 2 s on this software renderer) were measured by an unrelated requestAnimationFrame counter, so they do not prove frameloop=\"demand\" stops rendering.",
+    "No human keyboard or screen-reader session."
+  ]
+}

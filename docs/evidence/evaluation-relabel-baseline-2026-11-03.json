@@ -1,0 +1,74 @@
+{
+  "date": "2026-11-03",
+  "commit": "853147d plus uncommitted relabel change",
+  "label": "local",
+  "command": "node scripts/python.cjs scripts/evaluate_scenarios.py --company <synthetic company uuid> --output <file>; node scripts/python.cjs -m pytest tests/unit/test_evaluation_dataset.py -q",
+  "result": "passed",
+  "scope": "Pre-freeze Recall@5 relabel (decisions D22, D38). Offline exact-order baseline over the 30 development text scenarios against the local synthetic catalog: no model, audio, vision or provider call, not the agent, no holdout run. Dataset tests: 20 passed.",
+  "labeled_retrieval_cases": {
+    "total": 14,
+    "development": 9,
+    "holdout": 5,
+    "rewritten_scenarios": [
+      "e016",
+      "e078",
+      "e054",
+      "e069",
+      "e035",
+      "e030",
+      "e014"
+    ]
+  },
+  "baseline_summary": {
+    "by_modality": {
+      "text": {
+        "scenarios": 30,
+        "run": 30,
+        "not_run": 0,
+        "passed": 30,
+        "failed": 0
+      },
+      "voice": {
+        "scenarios": 18,
+        "run": 0,
+        "not_run": 18,
+        "passed": 0,
+        "failed": 0
+      },
+      "photo": {
+        "scenarios": 12,
+        "run": 0,
+        "not_run": 12,
+        "passed": 0,
+        "failed": 0
+      }
+    },
+    "workflow_success": {
+      "passed": 30,
+      "run": 30
+    },
+    "ambiguity_acted_on": {
+      "acted": 18,
+      "applicable_run": 18
+    },
+    "unsupported_final_lines": 0,
+    "unauthorized_sends": "not measured: the baseline cannot send",
+    "retrieval_recall_at_5": {
+      "found": 7,
+      "applicable_run": 7
+    },
+    "decision_latency_ms": {
+      "median": 0.036,
+      "p95": 0.319
+    }
+  },
+  "fixtures_sha256": {
+    "scenarios.json": "e03900cf8275f380d6ae69267ee217695511231bb22531c6e9e33ff465e2daf2",
+    "oracle.json": "80d7e387f6d2242a39e2dfda0fd3caaabc9d889086ef3eecc3d97381d4a815d8"
+  },
+  "limits": [
+    "Seven development/holdout scenarios were rewritten after development runs 1 and 2, so those runs do not describe them (post-hoc, R11); a new paid development re-run needs your approval.",
+    "The baseline recall (7/7) is lexical search over text written from the same catalog rule that labels it: it shows the labels are reachable, not agent or semantic recall.",
+    "Holdout has 5 labeled cases (3 text, 1 voice, 1 photo); a 95% target tolerates no miss there."
+  ]
+}

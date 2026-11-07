@@ -167,25 +167,37 @@ The live steps are in [morning actions](MORNING_ACTIONS.md). See
 
 ### Phase 5 - in progress (0 of 4 items)
 
+Frontend task breakdown for items 1 and 4 (proposed 2026-11-03, not started):
+[frontend work plan](proposals/2026-11-03-frontend-plan.md).
+
 Implemented, not yet sufficient to check any item:
 
 - Item 1: lazy `LightingScene` (React Three Fiber) with a reduced-motion static fallback
-  and an error boundary (`app/frontend/src/features/overview/`). Open: keyboard
-  interaction review, performance measurement and the LinkedIn capture privacy check.
+  and an error boundary (`app/frontend/src/features/overview/`). Reviewed 2026-11-03: keyboard
+  and capture-privacy review done, an axe defect fixed, scene lazy-loaded
+  ([evidence](evidence/scene-review-2026-11-03.json), `local-substitute`). Open: performance on
+  a production build on real hardware, and a human keyboard/screen-reader pass.
 - Item 2: API boundary tests (credential refusal, Auth outage 503, exact-origin CORS,
   security headers, 413, gateway route exposure, the 30/min mutation limit) and a
   secret-value scanner (`npm run check:secrets`)
   ([API evidence](evidence/api-boundaries-2026-11-02.json),
-  [secret scan](evidence/secret-scan-2026-11-02.json)). Engineering ledger: 3 Covered,
-  2 NotApplicable, 37 Planned ([ledger](engineering/coverage.json)). Open: the other
-  rate/quota/capacity limits under test and a reviewed ledger.
+  [secret scan](evidence/secret-scan-2026-11-02.json)). Since 2026-11-03 every per-user,
+  per-conversation and queue limit has an integration test
+  (`tests/integration/test_admission_limits.py`) and a database outage is a safe 503. Known
+  gap: failed requests are never rate limited (strict xfail test; decision in
+  [morning actions](MORNING_ACTIONS.md)). Engineering ledger: 3 Covered,
+  2 NotApplicable, 37 Planned ([ledger](engineering/coverage.json)). Open: a reviewed ledger.
 - Item 3: concurrency tests (export claims, duplicate webhooks), a retention command
   (dry run by default, not scheduled) and a logical backup/restore drill
-  ([drill evidence](evidence/backup-restore-drill-2026-11-02.json)). Open: outage
-  injection, migration checks, scheduled retention, Drive/provider-side retention.
+  ([drill evidence](evidence/backup-restore-drill-2026-11-02.json)). Since 2026-11-03: clean
+  install and upgrade tests (`test_migrations.py`) and database/Storage outage tests
+  (`test_outages.py`). Open: scheduled retention, Drive/provider-side retention, orphan
+  Storage objects.
 - Item 4: four screenshots from the verified browser run
-  (`docs/evidence/screenshots/2026-11-02/`). Open: a full desktop/portrait,
-  accessibility and performance review.
+  (`docs/evidence/screenshots/2026-11-02/`). On 2026-11-03 a 14-view desktop/portrait axe, layout
+  and target-size review passed after fixing undersized controls
+  ([evidence](evidence/page-accessibility-review-2026-11-03.json), `local-substitute`). Open:
+  screen-reader and real-device review, performance measurement.
 
 The last fully green `npm run verify:full` is recorded in
 [checkpoint evidence](evidence/checkpoint-2026-11-02.json) (283 passed). A later run
@@ -206,6 +218,8 @@ was stopped by memory pressure after `test:python` and `test:ui` passed; see the
   9.9 s, estimated USD 0.013 (app estimate, not billing)
   ([evidence](evidence/evaluation-development-agent-run2-2026-11-02.json)). Development
   results on synthetic assets only; four retrieval cases are too few to judge the 95% target.
+  Since 2026-11-03 the set has 14 labeled retrieval cases (9 development, 5 holdout) and seven
+  rewritten scenarios, so runs 1 and 2 no longer describe the current fixtures.
 - A holdout freeze guard refuses holdout runs without a matching freeze record and
   explicit confirmation. No freeze record and no holdout run exist.
 - [Showcase shot list](SHOWCASE_SHOT_LIST.md) (nine shots, 90-120 s, each labeled Real,
@@ -215,20 +229,27 @@ was stopped by memory pressure after `test:python` and `test:ui` passed; see the
 
 Local work (no account needed):
 
-1. Relabel scenarios for Recall@5 before the freeze (decision above), update the oracle,
-   validator tests and fixture README.
+1. ~~Relabel scenarios for Recall@5 before the freeze~~ Done 2026-11-03 (D22, D38): 14 labeled
+   cases, 9 development and 5 holdout; seven text scenarios rewritten, validator checks each label
+   against the catalog ([evidence](evidence/evaluation-relabel-baseline-2026-11-03.json), `local`).
+   Paid development re-run done on 40 of 60 scenarios (D41), all traced in LangSmith (D42):
+   [evidence](evidence/evaluation-development-agent-run3-2026-11-03.json), `synthetic`.
 2. Phase 3: nested trace-redaction check; check items 2-4 only when their evidence exists.
 3. Phase 5: the remaining rate/quota/capacity tests, outage and migration checks, the
    3D keyboard/performance/capture review, the visual/accessibility review and a reviewed ledger.
-4. A single fully green `npm run verify:full` on the final tree.
+4. ~~A single fully green `npm run verify:full` on the final tree.~~ Done 2026-11-03: 13 of 13
+   steps in one run ([evidence](evidence/checkpoint-2026-11-03.json), `local`). Later edits were
+   docs, evidence and one live-test change; rerun it once more before the freeze.
 
-Needs the user:
+Done by Claude in the browser (decision D37); the user only signs in, approves consent and enters codes:
 
 5. Google: run `installSupplierSynchronization`, then the Drive export steps
    (see [morning actions](MORNING_ACTIONS.md)).
 6. Meta: test number, credentials in `.env.local`, tunnel and a live send/receipt.
 7. Confirm the agent is final; then freeze and run the holdout once.
-8. Record the local showcase from the shot list; review it for private data.
+8. ~~Record the local showcase from the shot list; review it for private data.~~ Recorded and
+   reviewed 2026-11-03 ([evidence](evidence/showcase-recording-2026-11-03.json), `local-substitute`):
+   silent 66 s clip, kept local; trim and narrate before publishing.
 
 ## Evidence and commits
 

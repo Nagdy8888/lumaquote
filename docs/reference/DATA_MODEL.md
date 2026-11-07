@@ -132,7 +132,9 @@ the agent will query it.
 ## Conversation and quotation records
 
 - `conversations`: customer labels, recipient/channel, agent/staff owner, workflow
-  status, optimistic version and customer activity time. Owner controls who may
+  status, optimistic version and customer activity time. `channel` is `local_test`,
+  `whatsapp` (recipient is phone digits) or `telegram` (recipient is the private chat id,
+  equal to the Telegram user id; migration `20261107010000_telegram_channel.sql`, D44). Owner controls who may
   act; status reports progress. They are separate concepts.
 - `messages`: company/conversation, actor, kind, body, optional object/provider
   references and creation time. Provider IDs are unique; local dispatch derives
@@ -287,8 +289,16 @@ This local database has bootstrap-applied files absent from the CLI ledger.
 `supabase db push --local` was observed attempting the existing foundation again
 and failing on `companies`. Use the documented setup path for this stack. Do not
 repair history, drop tables or reset the database just to suppress that error.
-Clean installation, upgrade with in-flight jobs and production rollback/restore
-remain separate verification requirements.
+Clean installation and a simple upgrade are now tested by
+`tests/integration/test_migrations.py` in a disposable database (`luma_migration_check`,
+always dropped) that has only stand-ins for `auth.users`, `auth.uid()`, `storage.buckets` and the
+`extensions` schema: all 15 files apply in order, and the resulting `luma` schema (columns,
+constraints, indexes, policies, grants, functions, triggers, RLS flags) equals the live local
+schema, so a reset cannot drift (negative check: omitting the last file fails the comparison).
+A pending job and conversation created under the first ten files survive the last five. Migrations
+are one-shot and are not idempotent (re-applying the second file fails on `companies`, by design
+of the ledger check above). Not covered: a pending approval or quote across the upgrade, data
+transforms on a populated production-size database, and production rollback or restore.
 
 ## Checkpoints, retention and preservation
 

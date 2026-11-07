@@ -85,11 +85,37 @@ cross-company access is intentional for trusted jobs; worker entry points must
 carry and check the persisted company/conversation scope. Administrative DSNs and
 Storage service credentials belong to provisioning/backend processes only.
 
+**Dependency outages.** `core/http.dependency_unavailable` (registered in `main.py` for
+`psycopg.OperationalError` and `httpx.TransportError`) answers 503 with `Retry-After: 30` and a
+fixed message, never the exception text, because connection errors can echo a DSN. The request
+transaction has already rolled back, so a failed upload leaves no message, media row or job; the
+same call works after recovery. Authentication outages keep their own 503 in `staff`. The signed
+gateway (`google_gateway.py`) does not register this handler, so a database outage during a Google
+callback or WhatsApp webhook still returns FastAPI's generic 500 (no exception text); the senders
+retry on their own, but the answer carries no `Retry-After`. Untested. Before
+2026-11-03 a database outage returned a bare 500. Tested in `tests/integration/test_outages.py`
+(database unreachable, Storage transport error during a voice upload, recovery afterwards). A
+Storage success followed by a failed commit can leave an orphan object; retention works from
+database rows (`scripts/retention.py`), so nothing removes an object that has no row. This is an
+open gap (see the data model).
+
 The response middleware rejects invalid or declared bodies above 11 MiB and adds
 `no-store`, `nosniff`, `no-referrer` and framing-denial headers to responses that
 reach its normal response path. This coarse declaration check does not replace
 the actual-byte limits implemented by media and callback routes. CORS accepts the
 two configured loopback Vite origins and explicit headers; it is not authorization.
+
+## Surface inventory (reviewed 2026-11-03)
+
+Two processes, two different exposures. `tests/unit/test_surface_inventory.py` fails when either
+list changes without this table being reviewed.
+
+| Process | Reachable from | Operations |
+|---|---|---|
+| Staff API `luma.main:app` (port 8001) | this machine only; never tunneled | 17 operations under `/api/` (workspace, events, conversations and their draft/decision/ownership/reply/messages/customer-reply/audio/image actions, media preview, quote and source PDFs, catalog search) all behind a bearer credential, plus unauthenticated `GET /api/health`. FastAPI's `/docs`, `/redoc` and `/openapi.json` are also served unauthenticated, acceptable only because the process is local; disable them before any non-local exposure. |
+| Signed gateway `luma.google_gateway:app` (port 8002) | the internet, through a tunnel, once live | `POST /callbacks/google`, `/callbacks/google/snapshot`, `/callbacks/google/exports/claim`, `/callbacks/google/exports/receipt` (HMAC and nonce) and `GET`/`POST /webhooks/whatsapp` (verify token and raw-body signature). No staff route and no documentation endpoints. |
+| Direct Supabase paths | the browser, by design only Auth | `anon` and `authenticated` hold no grants on any `luma` table (asserted against the clean-install schema in `test_migrations.py`); the `luma-private` Storage bucket is private. Business data is reached only through the staff API. |
+| Outbound adapters | this machine to providers | OpenAI (Responses, transcription, vision, embeddings), LangSmith export, Meta Graph (fixed host), Google through Apps Script callbacks (no backend Google credentials), local Supabase Auth and Storage. |
 
 ## Admission and repeat submissions
 
@@ -101,6 +127,19 @@ would have different consequences. The current policy uses staff read, mutation,
 approval, attachment-type and conversation-turn keys. It is a fixed-window counter,
 not a sliding-window limiter. Counter retention and all public ingress profiles
 are not yet complete.
+
+Limits per user per minute: reads 120, catalog search 30, mutations 30, staff replies 10,
+decisions 10, voice or photo uploads 6 each; per conversation 6 customer messages or media
+(a shared key for the staff-operated reply, WhatsApp ingress and uploads). Each is exercised
+through the real API by `tests/integration/test_admission_limits.py` (the n-th request passes,
+the next is 429), plus the denial-counter-kept and key-isolation property and the queue cap
+(503 at 100 jobs). **Known gap (xfail test):** the increment shares the request transaction, so
+a request that passes the check and then fails in business code (409, 404) rolls its increment
+back; 14 stale decisions all returned 409 and none 429. Only successful requests and the
+denial itself consume the window. A fix needs the counter committed independently of the
+request transaction (an extra short connection), which is a security-behavior change awaiting
+the user's decision (rule R2). The 100-job queue cap is global, not per company, so one
+tenant can fill it for all.
 
 `enqueue` takes the shared queue advisory lock and admits at most 100 queued or
 running jobs globally. It inserts the job inside the caller's transaction. A full
@@ -138,9 +177,9 @@ changes:
 - `record_customer_reply`: staff-operated simulation restricted to `local_test`.
   It delegates to `accept_customer_text`, which records customer activity (deduplicated by an
   optional provider id), supersedes review/approved quotes, blocks queued sends and enqueues
-  preparation only when ownership permits automation. The verified WhatsApp ingress calls the same
-  function, so both channels invalidate old decisions identically; see
-  [WhatsApp channel](WHATSAPP.md).
+  preparation only when ownership permits automation. The verified WhatsApp ingress and the
+  Telegram poller call the same function, so every channel invalidates old decisions identically;
+  see [WhatsApp channel](WHATSAPP.md) and [Telegram channel](TELEGRAM.md).
 - `change_ownership`: requires `expected_version`. Takeover blocks queued
   non-staff intents. Resume blocks queued staff-origin replies and can enqueue
   preparation. Neither operation fabricates a quotation approval.

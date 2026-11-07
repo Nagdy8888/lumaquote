@@ -1,8 +1,20 @@
 # Morning actions
 
 This file records account actions that cannot be completed without your access.
+Since 2026-11-03 (decision D37) Claude performs the Google and Meta steps below in the
+browser; you are asked only to sign in, approve consent screens and enter verification codes.
 Implementation and local checks continue independently. No credentials belong in
 this document or a Git commit.
+
+## Waiting on you (as of 2026-11-03)
+
+1. **Internet provider notice: resolved 2026-11-05.** HTTP and HTTPS work again and the ngrok tunnel
+   starts. `installSupplierSynchronization` ran and a timer refresh was seen
+   ([evidence](evidence/google-live-sync-2026-11-05.json)). The Meta webhook still needs your Meta account.
+2. **Failed-request rate limiting** (decision below): apply the recommended fix or leave it documented.
+3. **Paid development re-run: done 2026-11-03** as `dev-run-3` (capped at 40 of 60 scenarios, D41; every job traced in LangSmith, D42). 39/40 workflow, 34/40 exact action, Recall@5 6/7, no unsafe sends, about USD 0.009. [Evidence](evidence/evaluation-development-agent-run3-2026-11-03.json). The other 20 development scenarios were not re-run.
+4. **Final agent and holdout.** Say when the agent is final; only then freeze and run the holdout
+   once (D21).
 
 ## Workspace and repository
 
@@ -12,6 +24,14 @@ this document or a Git commit.
 - See `IMPLEMENTATION_PLAN.md` for phase status and the evidence reports for checks.
 
 ## Google Workspace / clasp
+
+**Blocked 2026-11-03 01:40 (Africa/Cairo): internet provider redirection.** Every plain-HTTP
+request from this machine is redirected to `megaplusredirection.tedata.net/VDSL-Redirection_100.html`
+and HTTPS requests time out, so ngrok cannot fetch its certificate revocation list and no tunnel
+starts. Open any `http://` page in the browser to see the provider's notice (often a used-up data
+quota or a message to acknowledge), resolve it, then tell Claude to continue. The Apps Script source
+(6 files, including the Drive scope in `appsscript.json`) was pushed at 01:40 with
+`clasp push --force` (needed because clasp skips a changed manifest without a terminal prompt).
 
 Clasp source management was verified during this chat. The initial four files
 were uploaded and read back; the later snapshot implementation added a fifth
@@ -37,10 +57,10 @@ are distinct; do not assume one fixes the other.
   The subsequent manual-cell-edit receipt is verified above.
 - [x] User chose GAS-only Google integration. No backend Google OAuth client,
   refresh token or Google Cloud Console setup is required.
-- [ ] Run `installSupplierSynchronization` in the refreshed Apps Script editor.
+- [x] Run `installSupplierSynchronization` in the refreshed Apps Script editor (done 2026-11-05, [evidence](evidence/google-live-sync-2026-11-05.json)).
   This validates the first full snapshot and installs a one-minute reconciliation
   trigger. Verify a persisted `google_sync_state` row and subsequent timer refresh.
-- [ ] GAS Drive export is implemented (`gas/Exports.gs`) and its backend protocol is locally
+- [~] GAS Drive export (one export done 2026-11-03, see evidence; a fresh run today was not made) is implemented (`gas/Exports.gs`) and its backend protocol is locally
   tested, but it has not run in Google. To verify it live: (a) run `npm run google:push`;
   (b) create a private Drive folder (do not share it) and set Script Property
   `LUMA_DRIVE_FOLDER_ID`; (c) run `installDriveExport` in the editor and approve the new
@@ -60,11 +80,66 @@ so the GAS-only adapter includes a one-minute reconciliation trigger. Its instal
 and live execution remain pending. Apps Script scheduling is approximate; stale
 commercial evidence continues to block finalization.
 
+## Telegram bot connection (D44, recommended)
+
+Status 2026-11-07: steps 1-4 are done. Bot `@luma_quote_bot` is configured, the user is
+allowlisted and two live text replies were accepted by Telegram (outbox `submitted`). Still open:
+step 5 (a quotation request and PDF delivery) and rotating the token, because it was pasted in a
+chat: send `/revoke` to @BotFather and put the new token in `.env.local` yourself.
+
+The Telegram channel is built and tested locally (`tests/integration/test_telegram.py`). It is free
+and needs no tunnel. What only you can do (about five minutes):
+
+1. In Telegram, open **@BotFather**, send `/newbot`, and choose a name and a username ending in `bot`.
+   BotFather replies with a token. Put it in the ignored `.env.local` as `TELEGRAM_BOT_TOKEN=...`.
+   Never paste it in chat.
+2. Also in `.env.local`, set `TELEGRAM_COMPANY_ID` to the seeded company id (the same value as
+   `WHATSAPP_COMPANY_ID` or `GOOGLE_COMPANY_ID`).
+3. Open your bot in Telegram and send it any message. With the worker stopped, run
+   `npm run telegram:check`. It prints the bot name and your numeric user id.
+4. Set `TELEGRAM_ALLOWED_USERS=<that id>` and `ENABLE_LIVE_TELEGRAM=true`, then start the worker
+   (`npm run dev:worker`) and API. The worker log shows "Telegram polling started".
+5. Send `/start`, then a request (text, voice note or label photo). Check it appears in the inbox,
+   approve the quotation in the app, and confirm the PDF arrives in Telegram. A quotation still needs
+   a real, fresh Google snapshot.
+
 ## WhatsApp test connection
+
+**Twilio Sandbox route (D43, chosen 2026-11-07; use this while Meta is blocked).** The code is
+done and tested locally (`tests/integration/test_twilio.py`). What only you can do:
+
+1. Sign up for a free Twilio trial at twilio.com (email and phone verification). Claude does not create accounts.
+2. In the Twilio Console open Messaging > Try it out > Send a WhatsApp message. Note the sandbox
+   number (`+1 415 523 8886`) and your `join <word-word>` code. From your phone, send that join message
+   to the sandbox number on WhatsApp. Re-send it every three days.
+3. Put these in the ignored `.env.local` (never in chat): `WHATSAPP_PROVIDER=twilio`,
+   `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN` (both on the Console home page), `TWILIO_WHATSAPP_FROM=14155238886`,
+   `WHATSAPP_COMPANY_ID` (the seeded company id), `WHATSAPP_TEST_RECIPIENTS` (your number, digits only),
+   `PUBLIC_GATEWAY_URL` (your https tunnel origin, no trailing slash) and `ENABLE_LIVE_WHATSAPP=true` when you want real replies.
+4. Start the gateway (`luma.google_gateway:app`, port 8002) behind the tunnel. In the sandbox settings, set
+   "When a message comes in" to `<PUBLIC_GATEWAY_URL>/webhooks/twilio` (method POST). Status callbacks
+   are sent per message automatically. The URL must match `PUBLIC_GATEWAY_URL` exactly, or every request fails with 401.
+5. Send a text from your phone, check it appears as a conversation, then reply from the app.
+
+Once steps 1-3 are done, Claude can do step 4 in the browser if the extension is allowed on `console.twilio.com`.
+
+**Meta route (original, D11):**
 
 The WhatsApp adapter is implemented and verified only against a mock Graph transport
 (see `docs/reference/WHATSAPP.md`). Real messaging needs your Meta account:
 
+- **Blocked 2026-11-07:** the Meta developer registration now works (phone added through Accounts Center first) and
+  the business portfolio `LumaQuote Test` exists (`Verify later` chosen). The create-app wizard (name `LumaQuote Test`,
+  use case "Connect with customers through WhatsApp") shows that portfolio disabled with Meta's message "This business
+  can't claim apps because it's restricted from advertising." No app exists yet. Only you can fix this: check
+  Business Suite > Security Centre / Account Quality for the restriction and request review. A separate portfolio
+  `Nagdy AI` exists under a different Meta login and is not visible to this developer login.
+  Rechecked later on 2026-11-07: the wizard still greys out `LumaQuote Test`, and Meta marks the WhatsApp use case
+  "Business portfolio required", so there is no skip path. The Claude in Chrome extension is also denied on
+  `facebook.com` and `business.facebook.com` (only `developers.facebook.com` is allowed), so Claude cannot open
+  Account Quality. To unblock, do one of these: (a) request review of the restriction in Account Quality; (b) allow
+  the extension on `business.facebook.com` and `facebook.com` so Claude can check it; or (c) sign in to
+  developers.facebook.com with the login that owns `Nagdy AI` so Claude can create the app under that portfolio.
 - [ ] In the Meta developer app, add the WhatsApp product, use the free developer test number,
   and add your own phone as an authorized test recipient.
 - [ ] Put these in the ignored `.env.local` (never chat): `WHATSAPP_TOKEN`, `WHATSAPP_APP_SECRET`,
@@ -91,8 +166,10 @@ that the agent is final. Each item needs your explicit go-ahead because it spend
 
 - [x] Re-measure the development split after the null-SKU candidate fix (`LUMA_RUN_LIVE_EVAL=1`).
   Authorized by you on 2026-11-02 and run as `dev-run-2`; results are in the work log.
-- [ ] Planned before the freeze (decided 2026-11-02): relabel some existing scenarios as
-  descriptive/retrieval requests so Recall@5 rests on more than three holdout cases.
+- [x] Relabel scenarios as descriptive/retrieval requests so Recall@5 rests on more than three
+  holdout cases: done 2026-11-03 (14 labeled, 5 in the holdout),
+  [evidence](evidence/evaluation-relabel-baseline-2026-11-03.json). Re-run paid on 40 of 60 scenarios as
+  `dev-run-3` (D41).
 - [ ] When you are ready to stop changing the agent: `node scripts/python.cjs scripts/freeze_evaluation.py --write`,
   then run the holdout once with `LUMA_EVAL_SPLIT=holdout LUMA_EVAL_CONFIRM_HOLDOUT=spend-the-holdout-once`
   and summarize it with `scripts/summarize_agent_run.py --split holdout`. It cannot be repeated.
@@ -189,3 +266,11 @@ Recovery verified October 29 after the user restarted Docker: Engine 29.6.1 and
 resetting data. The targeted semantic/budget/photo/restart suite passed 22 tests.
 The prior Windows recovery action is resolved. Browser and full regression
 results are recorded separately in WORK_LOG.md; no manual reset is needed.
+
+## Decision needed: failed requests are not rate limited
+
+`tests/integration/test_admission_limits.py::test_failed_requests_also_consume_admission` (strict
+xfail) shows that requests failing after the rate check (409/404) roll their counter back, so
+they are never limited. Recommended fix: commit the counter on its own short connection before
+the business transaction (one extra connection per request, no change to successful behavior).
+This changes admission/security behavior, so tell Claude to apply it or to leave it documented.

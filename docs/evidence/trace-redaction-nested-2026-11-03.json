@@ -1,0 +1,14 @@
+{
+  "date": "2026-11-03",
+  "commit": "853147d plus uncommitted change",
+  "label": "local-substitute",
+  "command": "node scripts/python.cjs -m pytest tests/unit/test_trace_masking.py -q",
+  "result": "passed (22 tests)",
+  "scope": "Nested trace-redaction check (docs/TESTING_PLAN.md section 10, canaries in nested tools, model calls, exceptions). A real langsmith.Client with a fake HTTP session captures the exact request bodies; synthetic secret and phone canaries are planted in a traceable tool, a compiled subgraph, deep payloads, a node exception, the job payload and metadata keys. No network, no LangSmith cloud.",
+  "finding": "The exception probe failed first: langsmith 0.14.14 masks a run's error string only through Client(anonymizer=...), not hide_inputs/hide_outputs/hide_metadata, so the canary secret and phone reached the exporter inside the error repr and traceback. Fixed by anonymizer=mask in observability.masked_client.",
+  "limits": [
+    "The live LangSmith canary of 2026-11-03 predates the fix and did not exercise a failing node; it is not re-run (paid call, needs approval).",
+    "Logs, browser assets and attachments (TESTING_PLAN section 10) are covered by other checks or not at all; this file covers the exporter payload only.",
+    "Masking is pattern-based; a phone number spelled in words is not caught."
+  ]
+}

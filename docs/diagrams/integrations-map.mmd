@@ -1,0 +1,19 @@
+flowchart LR
+  accTitle: External integrations, their gates and current proof level
+  accDescr: Google Apps Script and Meta webhooks reach the system only through the signed gateway. The worker calls OpenAI only when paid AI is enabled and a budget reservation succeeds, exports masked traces to LangSmith when tracing is enabled, and sends WhatsApp messages only behind a master switch and an allowlist. Each provider node states how far it has been proven.
+  subgraph In["Inbound, through the gateway only"]
+    GAS["Google Apps Script. Proven: local stand-in, live setup blocked"]
+    MetaIn["Meta webhooks. Proven: mock only"]
+  end
+  Gateway["Signed gateway :8002"]
+  Worker["Worker and operator scripts"]
+  subgraph Out["Outbound, from the worker only"]
+    OpenAI["OpenAI models. Proven: synthetic canaries, paid dev runs"]
+    LS["LangSmith traces. Proven: live traces for dev-run-3"]
+    MetaOut["Meta Graph send. Proven: mock transport only"]
+  end
+  GAS -->|"HMAC envelope and nonce"| Gateway
+  MetaIn -->|"raw-body signature, verify token"| Gateway
+  Worker -->|"ENABLE_PAID_AI, key, reservation"| OpenAI
+  Worker -->|"LANGSMITH_TRACING, key, masked client"| LS
+  Worker -->|"ENABLE_LIVE_WHATSAPP, allowlist"| MetaOut

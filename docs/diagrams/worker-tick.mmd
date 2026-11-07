@@ -1,0 +1,25 @@
+flowchart TB
+  accTitle: One worker tick from claim to inbound processing
+  accDescr: Each tick first recovers expired leases and claims at most one queued job, respecting a global limit of two running jobs and one running job per conversation. The job runs inside a masked trace and its outcome is committed only while the fence still matches. The tick then resolves one outbox intent and one inbound WhatsApp event, and the loop sleeps one second.
+  Start["tick()"] --> Claim["claim_job: capacity lock, recover expired leases"]
+  Claim --> Cap{"Fewer than 2 running and a queued job with no running sibling?"}
+  Cap -->|no| Deliver
+  Cap -->|yes| Lease["status running, fence + 1, lease 120 s"]
+  Lease --> Trace["job_trace: masked LangSmith root, or tracing forced off"]
+  Trace --> Kind{"job kind"}
+  Kind -->|agent| Graph["process_conversation: LangGraph with Postgres checkpoints"]
+  Kind -->|transcribe| Audio["process_audio"]
+  Kind -->|read_photo| Photo["process_media image"]
+  Kind -->|other| Blocked["DomainError: not enabled"]
+  Graph --> Fin["finish_job: done, blocked or failed, only if fence matches"]
+  Audio --> Fin
+  Photo --> Fin
+  Blocked --> Fin
+  Fin --> Flush["finish and flush trace, export errors logged by class only"]
+  Flush --> Deliver["deliver_one: stale submitting becomes unknown after 2 min"]
+  Deliver --> Reauth{"Ownership, approval, recipient, expiry, source still valid?"}
+  Reauth -->|no| VisBlock["Visible blocked intent"]
+  Reauth -->|yes| Effect["local_delivered, or gated WhatsApp begin, submit, record"]
+  VisBlock --> Inbox
+  Effect --> Inbox["process_inbox: 2 min lease, up to 5 attempts"]
+  Inbox --> Sleep["sleep 1 s, unless --once"]

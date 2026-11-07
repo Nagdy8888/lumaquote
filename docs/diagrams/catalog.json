@@ -48,7 +48,8 @@
       "title": "Staff identity, idempotency and optimistic mutation protocol",
       "scope": "New mutation versus identical replay; no bearer values shown",
       "embeds": [
-        "docs/api/README.md"
+        "docs/api/README.md",
+        "docs/layers/core.md"
       ],
       "bindings": [
         "app/backend/luma/core/http.py",
@@ -250,6 +251,139 @@
         ".claude/settings.json",
         "scripts/verify.cjs",
         "scripts/summarize_agent_run.py"
+      ]
+    },
+    {
+      "id": "layer-map",
+      "title": "LumaQuote layers and allowed dependency direction",
+      "scope": "Current code layers and call direction; external providers are optional and gated",
+      "embeds": [
+        "docs/layers/README.md"
+      ],
+      "bindings": [
+        "app/backend/luma/main.py",
+        "app/backend/luma/google_gateway.py",
+        "app/agents/luma_agent/worker.py",
+        "scripts/check_architecture.py",
+        "scripts/check_frontend.cjs"
+      ]
+    },
+    {
+      "id": "request-trace",
+      "title": "One staff request traced through every layer",
+      "scope": "Local-test intake path from browser to worker; no customer delivery shown",
+      "embeds": [
+        "docs/layers/README.md"
+      ],
+      "bindings": [
+        "app/frontend/src/shared/api/client.ts",
+        "app/backend/luma/features/conversations/routes.py",
+        "app/backend/luma/features/conversations/service.py",
+        "app/backend/luma/core/admission.py",
+        "app/backend/luma/core/idempotency.py",
+        "app/agents/luma_agent/runtime/jobs.py"
+      ]
+    },
+    {
+      "id": "frontend-layer",
+      "title": "Frontend composition, server state and API boundary",
+      "scope": "Current routes, polling hooks and API client; SSE events are not used by the UI",
+      "embeds": [
+        "docs/layers/frontend.md"
+      ],
+      "bindings": [
+        "app/frontend/src/main.tsx",
+        "app/frontend/src/app/App.tsx",
+        "app/frontend/src/shared/api/client.ts",
+        "app/frontend/src/features/workspace/api.ts",
+        "app/frontend/src/features/conversations/api.ts",
+        "app/frontend/vite.config.ts"
+      ]
+    },
+    {
+      "id": "api-pipeline",
+      "title": "Staff API request pipeline and the response each check produces",
+      "scope": "Staff API only; the gateway has no dependency outage handler",
+      "embeds": [
+        "docs/layers/transport.md"
+      ],
+      "bindings": [
+        "app/backend/luma/main.py",
+        "app/backend/luma/core/http.py",
+        "app/backend/luma/core/identity.py",
+        "app/backend/luma/core/admission.py",
+        "app/backend/luma/core/idempotency.py",
+        "app/backend/luma/core/errors.py"
+      ]
+    },
+    {
+      "id": "backend-modules",
+      "title": "Which process calls which business feature",
+      "scope": "Router composition and worker imports of feature interfaces",
+      "embeds": [
+        "docs/layers/business-features.md"
+      ],
+      "bindings": [
+        "app/backend/luma/main.py",
+        "app/backend/luma/google_gateway.py",
+        "app/agents/luma_agent/worker.py",
+        "app/agents/luma_agent/runtime/delivery.py",
+        "app/agents/luma_agent/runtime/conversations.py"
+      ]
+    },
+    {
+      "id": "worker-tick",
+      "title": "One worker tick from claim to inbound processing",
+      "scope": "Current worker loop; WhatsApp sending is gated and mock-verified only",
+      "embeds": [
+        "docs/layers/agent-worker.md"
+      ],
+      "bindings": [
+        "app/agents/luma_agent/worker.py",
+        "app/agents/luma_agent/runtime/jobs.py",
+        "app/agents/luma_agent/runtime/delivery.py",
+        "app/agents/luma_agent/observability.py",
+        "app/backend/luma/features/messaging/inbound.py"
+      ]
+    },
+    {
+      "id": "data-access",
+      "title": "Who may reach which store in the data layer",
+      "scope": "Local Supabase roles, grants and private Storage; not a production deployment",
+      "embeds": [
+        "docs/layers/data.md"
+      ],
+      "bindings": [
+        "supabase/migrations/20261029010000_quotation_domain.sql",
+        "app/backend/luma/core/database.py",
+        "app/backend/luma/core/storage.py",
+        "app/agents/luma_agent/runtime/conversations.py"
+      ]
+    },
+    {
+      "id": "integrations-map",
+      "title": "External integrations, their gates and current proof level",
+      "scope": "Gates from configuration; proof levels from dated evidence, not live verification of WhatsApp or Google",
+      "embeds": [
+        "docs/layers/integrations.md"
+      ],
+      "bindings": [
+        "app/backend/luma/core/config.py",
+        "app/agents/luma_agent/observability.py",
+        "app/backend/luma/features/messaging/outbound.py",
+        "app/backend/luma/features/google_sync/routes.py"
+      ]
+    },
+    {
+      "id": "verify-gate",
+      "title": "The npm verify gate and what verify:full adds",
+      "scope": "Local gate order and timeouts; CI runs a smaller set",
+      "embeds": [
+        "docs/layers/verification.md"
+      ],
+      "bindings": [
+        "scripts/verify.cjs",
+        "package.json"
       ]
     }
   ]

@@ -9,6 +9,9 @@ remain intact; progress reports describe observed snapshots rather than release 
   approval, takeover, internal notes, human replies, evidence and media confirmation.
 - **Change the code:** [architecture](ARCHITECTURE.md) explains processes, trust
   boundaries, module ownership, durable state and known recovery limits.
+- **Learn one layer at a time:** the [layer guides](layers/README.md) cover presentation,
+  transport, business features, agent worker, core, data, external integrations and
+  verification, each with its own diagram, recent changes, tests and open gaps.
 - **Call or extend an endpoint:** [API guide](api/README.md) and
   [generated OpenAPI](api/openapi.json) describe transport and business preconditions.
 - **Verify a claim:** [testing plan](TESTING_PLAN.md), [engineering ledger](engineering/coverage.json),
@@ -60,6 +63,8 @@ reference for the module you are changing:
 - [WhatsApp channel](reference/WHATSAPP.md): signed webhook ingress, sender allowlist,
   restricted media fetch, three-phase gated sending, uncertain outcomes, monotonic receipts
   and the (mock-only) proof boundary.
+- [Telegram channel](reference/TELEGRAM.md): bot long polling with persist-before-confirm offsets,
+  private-chat allowlist, media download limits, gated sends and the token-in-URL logging guard (D44).
 - [Configuration and operation](reference/CONFIGURATION.md): actual safe variable
   inventory/defaults, precedence/cache behavior, process/port ownership and private
   generated files.

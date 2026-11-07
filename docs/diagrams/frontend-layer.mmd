@@ -1,0 +1,20 @@
+flowchart TB
+  accTitle: Frontend composition, server state and API boundary
+  accDescr: main.tsx installs the query cache and session provider. App shows sign-in until a session exists, then the shell routes to six feature pages. Feature hooks poll the workspace and conversation, send mutations with a stable operation key and invalidate caches after the server confirms. Quotation edits stay local until saved. The shared client adds the bearer token and calls the staff API through the Vite proxy.
+  Main["main.tsx: QueryClient, SessionProvider"] --> App["App: session gate"]
+  App -->|"no session"| SignIn["SignIn"]
+  App -->|"session"| Shell["AppShell routes"]
+  Shell --> Pages["Overview, Inbox, New request, Quotations, Catalog, Integrations"]
+  Pages --> Hooks["Feature hooks"]
+  Hooks --> WS["useWorkspace: poll 8 s"]
+  Hooks --> Conv["useConversation: poll 5 s"]
+  Hooks --> Act["useConversationAction: mutation with operation key"]
+  Hooks --> Draft["useQuotationDraft: dirty edits stay local"]
+  WS --> Client["shared/api request: bearer, Idempotency-Key"]
+  Conv --> Client
+  Act --> Client
+  Draft --> Client
+  Act -. "on success: invalidate workspace and conversation" .-> WS
+  Pages --> Doc["documentUrl: private PDF or media as object URL"]
+  Doc --> Client
+  Client -->|"/api via Vite proxy"| API["Staff API :8001"]
