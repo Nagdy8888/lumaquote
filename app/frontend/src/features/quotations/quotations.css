@@ -530,3 +530,15 @@
     font-size: 13px;
   }
 }
+/* Decorative heading scene; negative margins keep the heading height unchanged. */
+.revision-stack {
+  width: 250px;
+  height: 150px;
+  flex-shrink: 0;
+  margin: -40px -12px -32px 0;
+}
+@media (max-width: 680px) {
+  .revision-stack {
+    display: none;
+  }
+}

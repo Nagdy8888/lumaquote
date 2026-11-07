@@ -1,62 +1,62 @@
-# Graph Report - Demo_Project_4-gmail  (2026-11-07)
+# Graph Report - Demo_Project_4  (2026-11-07)
 
 ## Corpus Check
-- 369 files · ~297,503 words
+- 379 files · ~308,765 words
 - Verdict: corpus is large enough that graph structure adds value.
-- Unclassified: 50 file(s) not represented in the graph (top: .mmd 28, .css 8, .gs 6)
+- Unclassified: 50 file(s) not represented in the graph (top: .mmd 28, .css 9, .gs 6)
 
 ## Summary
-- 3576 nodes · 8205 edges · 204 communities (140 shown, 64 thin omitted)
-- Extraction: 93% EXTRACTED · 7% INFERRED · 0% AMBIGUOUS · INFERRED: 575 edges (avg confidence: 0.93)
+- 3649 nodes · 8464 edges · 205 communities (139 shown, 66 thin omitted)
+- Extraction: 93% EXTRACTED · 7% INFERRED · 0% AMBIGUOUS · INFERRED: 596 edges (avg confidence: 0.93)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `935bda53`
+- Built from commit: `9f1b5f24`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
 ## Community Hubs (Navigation)
 - psycopg
-- re
-- workflow.py
+- ProviderError
+- semantic.py
 - October 29, 2026 - Offline embedding contract tests and engine recovery result
-- core/errors.py
-- test_operator_index_settles_or_blocks_uncertain_retries
+- conversation
+- decimal
 - frontend/package.json
-- rows
+- test_whatsapp.py
 - evaluation_dataset.py
 - test_catalog_retrieval.py
-- test_drive_exports.py
+- make_draft
 - evaluate_scenarios.py
 - cn
 - scan_secrets.py
-- vitest
-- ConversationThread.tsx
-- react
+- DocumentButton
+- bootstrap.py
+- Button
 - worker.py
 - clarification_for
-- extraction.py
-- DomainError
-- database
-- generate_evaluation_media.py
-- io
-- scripts
+- validate
+- google_sync/routes.py
+- outbound.py
+- re
 - subprocess
+- scripts
+- guard.py
 - workspace/schemas.py
-- LightingScene.tsx
+- react
 - skills.py
-- deliver_one
+- react
 - test_trace_masking.py
-- AGENT_RULES.md
-- graph.py
+- Proposal: working rules, skill routing and documentation (draft for approval)
+- workflow.py
 - index.cjs
-- begin
-- run
-- ProviderError
+- provider.py
+- FixtureInspector.tsx
+- Telegram channel (Bot API, long polling)
 - steps
 - retention.py
 - Design System: LumaQuote
-- useQuotationDraft
+- App
 - ref_node_path
 - compilerOptions
 - settings
@@ -64,126 +64,129 @@
 - quotation-approval
 - Test layers
 - Persistent data, privileges and migration lifecycle
-- test_brain.py
+- extraction.py
 - LumaQuote implementation tracker
 - components.json
 - Work log
-- check_docs.py
+- main
 - AppShell.tsx
 - whatsapp_client.py
-- apply
+- drafting.py
 - check_frontend.cjs
-- freeze_evaluation.py
+- test_expired_operation_is_fenced_visible_and_not_retried
 - package.json
-- receive
+- webhook.py
 - manual-workflow.cjs
-- Telegram channel (Bot API, long polling)
-- InboxPage.tsx
+- staff
+- ConversationThread.tsx
 - job-recovery
 - bindings
-- integrations-map
+- whatsapp-channel
 - LumaQuote
 - start-local-supabase.cjs
-- ExportEnvelope
+- ReceiptRequest
 - catalog-retrieval
-- Email channel (Gmail through Apps Script)
+- fetch_media
 - diagrams
 - google-snapshot
 - drive-export
-- evidence-data
+- workflow-data
 - bindings
 - test_twilio.py
 - backend-modules
 - frontend-draft
 - verification-scope
 - ui-review.cjs
-- create_request
+- test_voice_note_uses_auth_on_twilio_only_and_enters_the_media_pipeline
 - conversation-data
 - Local Supabase
-- media/routes.py
-- processor.py
+- upload_audio
+- claim_mail
 - Morning actions
 - LumaQuote
 - Configuration and native process operation
-- ref_node_fs
-- test_twilio_signature.py
+- page-review.cjs
+- telegram_ingress.py
 - LumaQuote architecture
-- observability.py
+- media.py
 - appsscript.json
 - Apps Script transport and validated commercial snapshots
 - frontend-live-updates
 - Sales and agent workflows
-- Google Apps Script integration
-- time
+- environment
+- test_api_boundaries.py
 - Layer 3: Business features
-- semantic.py
+- nodes/retrieval.py
 - Visual guide to LumaQuote
 - Project documentation
-- datetime
+- DomainError
 - rule-enforcement
 - Layer 1: Presentation (React staff workspace)
 - CLAUDE.md
 - Verified OpenAI contracts
-- docs/README.md
-- post
-- test_email.py
-- test_whatsapp.py
+- IMPLEMENTATION_PLAN.md
+- get_detail
+- scripts
 - Proposal: working rules, skill routing and documentation (draft for approval)
-- Working rules, skill routing and their enforcement
-- test_agent_rules.py
-- test_embedding_contracts.py
+- health
+- media_links.py
+- signed_body
 - test_admission_limits.py
+- Email channel (Gmail through Apps Script)
+- stored_quotation_pdf
 - lumaquote
-- validate
+- embedding_inputs
 - Development tooling, verification and evidence interpretation
 - catalog.test.cjs
-- staff
-- test_summarize_post_hoc.py
-- Showcase shot list (90-120 seconds)
+- test_surface_inventory.py
+- pin
+- test_agent_semantic_fallback_preserves_action_and_source_boundaries
 - dependency_unavailable
-- test_nested_tool_and_subgraph_runs_are_masked
-- Voice and product-label media lifecycle
+- _assert_no_canaries
+- gmail_claim
 - FakeSession
 - Frontend work plan (for Sonnet execution)
-- environment
-- sys
+- test_telegram.py
+- pathlib
 - Layer 6: Data (PostgreSQL and private Storage)
 - test_phone_numbers_are_masked
 - test_workspace_reports_only_complete_tenant_mapped_gas_configuration
-- get_detail
-- json
+- test_quotation_concurrency.py
+- backup_restore_drill.py
 - State
 - test_job_trace_exports_graph_and_model_runs_masked
-- test_written_requests.py
-- InputRecord
+- review
+- Layer 5: Core infrastructure
 - pull_request_template.md
 - Layer 7: External integrations
 - LumaQuote by layer
-- test_every_route_passes_axe_fits_both_viewports_and_masks_capture
+- test_approved_quotation_is_sent_as_the_exact_canonical_pdf
 - brain
 - Cross-cutting layer: verification and tooling
-- health
-- allowlist.py
-- Staff API reference
-- test_agent_on_development_scenario
-- test_only_an_approved_revision_is_exported_and_bytes_match_the_staff_pdf
-- test_holdout_is_refused_unless_frozen_unspent_and_confirmed
+- Sales workspace direction
+- WhatsApp channel (Meta Cloud API or Twilio Sandbox)
+- scripts
+- Agent state, participation, spending and recovery
+- queue_drive_export
+- UI_DIRECTION.md
 - Backend contracts and business transactions
-- test_surface_inventory.py
+- test_handshake_requires_the_exact_verify_token_and_full_configuration
 
 ## God Nodes (most connected - your core abstractions)
 1. `DomainError` - 135 edges
-2. `October 29, 2026 - Offline embedding contract tests and engine recovery result` - 123 edges
+2. `October 29, 2026 - Offline embedding contract tests and engine recovery result` - 129 edges
 3. `settings()` - 88 edges
 4. `get_detail()` - 82 edges
 5. `database()` - 81 edges
 6. `create_request()` - 75 edges
 7. `post()` - 74 edges
 8. `make_draft()` - 49 edges
-9. `cn()` - 42 edges
-10. `deliver_one()` - 38 edges
+9. `react` - 45 edges
+10. `cn()` - 42 edges
 
 ## Surprising Connections (you probably didn't know these)
+- `Agent fallback and publication recheck` --references--> `ask()`  [INFERRED]
+  docs/reference/CATALOG.md → app/agents/luma_agent/nodes/workflow.py
 - `Command ownership` --references--> `prepare()`  [INFERRED]
   docs/reference/TOOLING_AND_TESTS.md → app/agents/luma_agent/nodes/workflow.py
 - `Two-step approval confirmation` --references--> `review()`  [INFERRED]
@@ -192,156 +195,154 @@
   docs/WORK_LOG.md → app/agents/luma_agent/observability.py
 - `Working method` --references--> `job_trace()`  [INFERRED]
   docs/DECISIONS.md → app/agents/luma_agent/observability.py
-- `2026-11-03 - Send tokens and estimated cost to LangSmith model-call runs (phase 3, local)` --references--> `set_usage()`  [INFERRED]
-  docs/WORK_LOG.md → app/agents/luma_agent/observability.py
 
 ## Import Cycles
 - None detected.
 
-## Communities (204 total, 64 thin omitted)
+## Communities (205 total, 66 thin omitted)
 
 ### Community 0 - "psycopg"
 Cohesion: 0.04
-Nodes (21): run_review(), available_port(), test_complete_native_browser_workflow(), wait_for_server(), test_duplicate_paid_operation_never_reserves_again(), test_retrieval_requires_settled_room_and_cannot_repeat(), test_unresolved_prior_day_call_still_consumes_daily_allowance(), test_expired_operation_is_fenced_visible_and_not_retried() (+13 more)
+Nodes (21): verify_mapping(), claim_export(), ClaimRequest, ExportEnvelope, record_nonce(), record_receipt(), verify_envelope(), MailClaim (+13 more)
 
-### Community 1 - "re"
-Cohesion: 0.07
-Nodes (14): fetch_media(), account_base(), auth(), call(), create_message(), fetch_media(), make_client(), message_sid() (+6 more)
+### Community 1 - "ProviderError"
+Cohesion: 0.08
+Nodes (16): key(), load_pdf(), quotation_pdf(), quotation_url(), signature(), account_base(), auth(), call() (+8 more)
 
-### Community 2 - "workflow.py"
+### Community 2 - "semantic.py"
 Cohesion: 0.06
-Nodes (28): assert_job(), assert_request_version(), retrieve(), ask(), prepare(), has_explicit_lines(), query_constraints(), SearchCriteria (+20 more)
+Nodes (25): query_constraints(), SearchCriteria, candidate_question(), search_catalog(), CatalogHit, CatalogSearch, semantic_search(), vector_literal() (+17 more)
 
 ### Community 3 - "October 29, 2026 - Offline embedding contract tests and engine recovery result"
 Cohesion: 0.02
-Nodes (103): 2026-10-29 - Agent fallback boundary tests added, 2026-10-29 - Agent fallback checks passed and evidence consolidated, 2026-10-29 - All Mermaid views rendered locally, 2026-10-29 - Configuration and verification reference coverage, 2026-10-29 — Current workflow documentation and screenshot reviewed, 2026-10-29 — Database gates passed; browser startup assertion failed, 2026-10-29 - Deep agent, media and retrieval references, 2026-10-29 - Deep backend and persistence documentation (+95 more)
+Nodes (108): 2026-10-29 - Agent fallback boundary tests added, 2026-10-29 - Agent fallback checks passed and evidence consolidated, 2026-10-29 - All Mermaid views rendered locally, 2026-10-29 - Configuration and verification reference coverage, 2026-10-29 — Current workflow documentation and screenshot reviewed, 2026-10-29 — Database gates passed; browser startup assertion failed, 2026-10-29 - Deep agent, media and retrieval references, 2026-10-29 - Deep backend and persistence documentation (+100 more)
 
-### Community 4 - "core/errors.py"
+### Community 4 - "conversation"
 Cohesion: 0.05
-Nodes (35): _deliver_local(), recover_expired(), enqueue(), audit(), accept_customer_text(), change_ownership(), queue_staff_reply(), record_customer_reply() (+27 more)
+Nodes (39): _deliver_local(), enqueue(), audit(), accept_customer_text(), change_ownership(), queue_staff_reply(), record_customer_reply(), record_note() (+31 more)
 
 ### Community 6 - "frontend/package.json"
-Cohesion: 0.04
-Nodes (64): dependencies, class-variance-authority@^0.7.1, clsx@^2.1.1, cn@^0.4.0, @fontsource/ibm-plex-sans@^5.3.0, @fontsource-variable/space-grotesk@^5.3.0, lucide-react@^1.63.0, radix-ui@^1.8.1 (+56 more)
+Cohesion: 0.05
+Nodes (55): dependencies, class-variance-authority@^0.7.1, clsx@^2.1.1, cn@^0.4.0, @fontsource/ibm-plex-sans@^5.3.0, @fontsource-variable/space-grotesk@^5.3.0, lucide-react@^1.63.0, radix-ui@^1.8.1 (+47 more)
 
-### Community 7 - "rows"
-Cohesion: 0.14
-Nodes (14): conversation_for(), deliver_webhook(), envelope(), rows(), test_concurrent_duplicate_webhooks_and_workers_process_each_event_once(), test_hostile_media_metadata_is_refused_without_fetching_or_storing(), test_inbound_voice_is_fetched_safely_and_enters_the_media_pipeline(), test_redelivered_events_are_stored_once_and_processed_once() (+6 more)
+### Community 7 - "test_whatsapp.py"
+Cohesion: 0.09
+Nodes (25): conversation_for(), deliver_webhook(), envelope(), graph(), Graph, outbox(), rows(), start() (+17 more)
 
 ### Community 8 - "evaluation_dataset.py"
-Cohesion: 0.06
-Nodes (22): 2026-11-02 - Holdout freeze guard (phase 6 preparation, offline), loaded(), test_counts_and_family_split_match_the_plan(), test_every_media_turn_has_a_hashed_asset_and_stays_unconfirmed(), test_family_table_matches_the_bootstrap_catalog(), test_fingerprints_are_stable_hex_digests(), test_freeze_blocks_the_holdout_until_pinned_unchanged_and_unspent(), test_media_manifest_never_records_outcomes() (+14 more)
+Cohesion: 0.04
+Nodes (35): Unit and component coverage, 2026-11-02 - Holdout freeze guard (phase 6 preparation, offline), 2026-11-03 - Pre-freeze Recall@5 relabel: 7 to 14 retrieval cases (phase 6, local), catalog_model(), _check_outcome(), _check_retrieval(), _check_structure(), _check_turns() (+27 more)
 
 ### Community 9 - "test_catalog_retrieval.py"
-Cohesion: 0.19
+Cohesion: 0.17
 Nodes (6): search(), test_authoritative_family_is_searchable_when_name_uses_different_words(), test_changed_product_evidence_requires_another_review(), test_description_lookup_retains_original_page_version_and_explicit_specs(), test_exact_sku_precedes_descriptive_similarity(), test_retired_catalog_cannot_be_recommended_or_finalized()
 
-### Community 10 - "test_drive_exports.py"
-Cohesion: 0.18
-Nodes (9): Features, 2026-11-02 - Concurrency tests, showcase shot list and screenshots; CI result, approved_quote(), exports(), poller(), test_changed_pdf_blocks_the_export_instead_of_shipping_different_bytes(), test_concurrent_pollers_cannot_claim_the_same_export(), test_failures_retry_then_block_and_expired_leases_are_reclaimed() (+1 more)
+### Community 10 - "make_draft"
+Cohesion: 0.07
+Nodes (18): 2026-11-02 - Concurrency tests, showcase shot list and screenshots; CI result, approve(), approved_quote(), exports(), poller(), Poller, test_changed_pdf_blocks_the_export_instead_of_shipping_different_bytes(), test_concurrent_pollers_cannot_claim_the_same_export() (+10 more)
 
 ### Community 11 - "evaluate_scenarios.py"
-Cohesion: 0.08
-Nodes (15): evaluate(), main(), decide(), evaluate(), load_catalog(), main(), run_scenario(), summarize() (+7 more)
+Cohesion: 0.06
+Nodes (22): main(), evaluate(), main(), decide(), evaluate(), load_catalog(), main(), run_scenario() (+14 more)
 
 ### Community 12 - "cn"
 Cohesion: 0.11
-Nodes (31): NewRequest(), cn(), Badge(), badgeVariants, Empty(), EmptyContent(), EmptyDescription(), EmptyHeader() (+23 more)
+Nodes (32): SignIn(), SectionSwitch(), cn(), Badge(), badgeVariants, Empty(), EmptyContent(), EmptyDescription() (+24 more)
 
 ### Community 13 - "scan_secrets.py"
 Cohesion: 0.13
 Nodes (9): load_secrets(), main(), run(), scan_files(), tracked_files(), make_repo(), test_clean_repo_reports_no_leaks(), test_only_secret_looking_long_nonpublic_values_are_loaded() (+1 more)
 
-### Community 14 - "vitest"
-Cohesion: 0.14
-Nodes (21): AudioWaveform(), decodeAudioData(), MediaPreview(), load(), computePeaks(), formatClock(), normalizePeaks(), documentUrl() (+13 more)
+### Community 14 - "DocumentButton"
+Cohesion: 0.15
+Nodes (18): PhotoReading, AudioWaveform(), decodeAudioData(), MediaPreview(), computePeaks(), formatClock(), normalizePeaks(), F4 - Voice-note waveform player (G4) (+10 more)
 
-### Community 15 - "ConversationThread.tsx"
+### Community 15 - "bootstrap.py"
 Cohesion: 0.10
-Nodes (23): ConversationCommand, useConversationAction(), ConversationComposer(), JobState(), components, $defs, operations, paths (+15 more)
+Nodes (14): digest(), StrictModel, Intake, Ownership, StaffReply, TextInput, draft(), DraftInput (+6 more)
 
-### Community 16 - "react"
-Cohesion: 0.13
-Nodes (14): QuotationPanel(), ProductSelections(), QuoteSummary(), ReviewActions(), view(), EditableLine, ConversationDetail, Product (+6 more)
+### Community 16 - "Button"
+Cohesion: 0.07
+Nodes (32): ConversationCommand, useConversationAction(), ConversationComposer(), load(), NewRequest(), QuotationPanel(), ProductSelections(), ReviewActions() (+24 more)
 
 ### Community 17 - "worker.py"
-Cohesion: 0.13
-Nodes (9): process_audio(), process_conversation(), claim_job(), finish_job(), process_media(), main(), poll_telegram(), tick() (+1 more)
+Cohesion: 0.09
+Nodes (17): validate_media_provider(), assert_job(), assert_request_version(), prepare(), process_audio(), process_conversation(), claim_job(), finish_job() (+9 more)
 
 ### Community 18 - "clarification_for"
 Cohesion: 0.13
 Nodes (12): clarification_for(), Integration coverage by responsibility, 2026-11-02 - Negative (mutation-style) checks for hostile-content tests, extracted(), test_duplicate_sku_requires_clarification(), test_empty_placeholder_lines_do_not_suppress_candidate_discovery(), test_explicit_matching_text_confirms_media_fields(), test_media_alone_cannot_confirm_itself() (+4 more)
 
-### Community 19 - "extraction.py"
+### Community 19 - "validate"
 Cohesion: 0.07
-Nodes (28): MediaReading, _read_label(), read_media(), catalog_context(), is_yes(), known_skus(), model_input(), restatement() (+20 more)
+Nodes (23): catalog_context(), is_yes(), known_skus(), model_input(), restatement(), safe_reply(), transcript(), unknown_reply() (+15 more)
 
-### Community 20 - "DomainError"
-Cohesion: 0.03
-Nodes (46): DomainError, accept_hint(), EditHint, verify_hint(), verify_mapping(), verify_signature(), claim_export(), drive_filename() (+38 more)
+### Community 20 - "google_sync/routes.py"
+Cohesion: 0.17
+Nodes (4): accept_hint(), EditHint, verify_hint(), google_callback()
 
-### Community 21 - "database"
-Cohesion: 0.05
-Nodes (38): rate_limit(), digest(), StrictModel, database(), domain_error(), operation(), membership(), search() (+30 more)
+### Community 21 - "outbound.py"
+Cohesion: 0.07
+Nodes (26): rate_limit(), database(), operation(), membership(), search(), source_pdf(), customer_reply(), detail() (+18 more)
 
-### Community 22 - "generate_evaluation_media.py"
+### Community 22 - "re"
 Cohesion: 0.10
 Nodes (13): degrade(), draw_label(), font(), main(), make_photo(), make_voice(), mix(), noise() (+5 more)
 
-### Community 23 - "io"
-Cohesion: 0.13
-Nodes (6): process_file(), test_corrupt_files_are_rejected(), test_image_is_normalized_without_metadata(), test_native_pdf_retains_original_page_text(), test_overlong_audio_is_rejected_before_transcription(), test_pdf_uses_persisted_revision_and_stable_private_bytes()
+### Community 23 - "subprocess"
+Cohesion: 0.08
+Nodes (11): inspect_audio(), inspect_image(), inspect_pdf(), main(), bounded_output(), process_file(), docker(), test_corrupt_files_are_rejected() (+3 more)
 
 ### Community 24 - "scripts"
 Cohesion: 0.06
 Nodes (36): scripts, build, check:architecture, check:docs, check:frontend, check:rules, check:secrets, db:configure (+28 more)
 
-### Community 25 - "subprocess"
-Cohesion: 0.12
-Nodes (13): bounded_output(), `bash` (PreToolUse on Bash, R15), Claude Code hooks, `edit` (PostToolUse on Edit and Write, R6), `stop` (Stop, R14 and R8-R10), bash(), block(), changed_paths() (+5 more)
+### Community 25 - "guard.py"
+Cohesion: 0.14
+Nodes (12): `bash` (PreToolUse on Bash, R15), Claude Code hooks, `edit` (PostToolUse on Edit and Write, R6), `stop` (Stop, R14 and R8-R10), bash(), block(), changed_paths(), edit() (+4 more)
 
 ### Community 26 - "workspace/schemas.py"
 Cohesion: 0.09
 Nodes (14): ActivityView, CompanyView, ConversationDetail, ConversationView, DeliveryView, JobView, MessageView, ProductView (+6 more)
 
-### Community 27 - "LightingScene.tsx"
-Cohesion: 0.11
-Nodes (27): PendantField, SignIn(), beamFade(), beamGeometry(), CameraDrift(), FlutedWall(), HeadParts, HEADS (+19 more)
+### Community 27 - "react"
+Cohesion: 0.06
+Nodes (73): App(), PendantField, CatalogPage(), FixtureCanvas, FixtureInspector, FixtureView, FixtureCanvas(), ConnectionHub() (+65 more)
 
 ### Community 28 - "skills.py"
 Cohesion: 0.12
 Nodes (13): active_skills(), check_frontmatter(), check_links(), check_manifests(), check_mirror(), check_routing(), digest(), located() (+5 more)
 
-### Community 29 - "deliver_one"
-Cohesion: 0.09
-Nodes (19): deliver_one(), poll_once(), Bot, bot(), start(), telegram_conversation(), test_allowlisted_user_opens_a_telegram_conversation_and_others_are_ignored(), test_approved_quotation_is_uploaded_as_the_exact_canonical_pdf() (+11 more)
+### Community 29 - "react"
+Cohesion: 0.10
+Nodes (17): deliver_one(), Bot, bot(), start(), telegram_conversation(), test_allowlisted_user_opens_a_telegram_conversation_and_others_are_ignored(), test_approved_quotation_is_uploaded_as_the_exact_canonical_pdf(), test_gates_block_without_calling_telegram() (+9 more)
 
 ### Community 30 - "test_trace_masking.py"
 Cohesion: 0.10
 Nodes (7): test_business_content_is_kept(), test_disabled_tracing_exports_nothing(), test_media_bytes_and_inline_data_are_omitted(), test_model_call_exports_tokens_and_estimated_cost(), test_production_client_masks_every_exported_field(), test_set_usage_is_a_noop_without_a_run(), test_tracing_is_forced_off_outside_a_job_trace()
 
-### Community 31 - "AGENT_RULES.md"
+### Community 31 - "Proposal: working rules, skill routing and documentation (draft for approval)"
 Cohesion: 0.15
 Nodes (12): Code layout, Commands, Documentation (decisions D30, D33), LumaQuote working rules, Rules, Skill routing, Unattended work and accounts, AI, evaluation and tracing (+4 more)
 
-### Community 32 - "graph.py"
-Cohesion: 0.10
-Nodes (19): build_graph(), route(), clarify(), review(), AgentState, Agent state, participation, spending and recovery, Asking, drafting and review, Durable thread routing and restart (+11 more)
+### Community 32 - "workflow.py"
+Cohesion: 0.12
+Nodes (15): build_graph(), route(), retrieve(), ask(), clarify(), has_explicit_lines(), AgentState, Where it lives (+7 more)
 
 ### Community 33 - "index.cjs"
 Cohesion: 0.15
 Nodes (20): crypto, embeddedBlock(), existingFile(), fingerprint(), fs, hash(), path, readCatalog() (+12 more)
 
-### Community 34 - "begin"
+### Community 34 - "provider.py"
+Cohesion: 0.22
+Nodes (5): adapter(), fetch_media(), live_enabled(), ready(), Twilio Sandbox provider (D43)
+
+### Community 35 - "FixtureInspector.tsx"
+Cohesion: 0.12
+Nodes (29): @react-three/drei@^10.7.9, @react-three/fiber@^9.8.2, fadeTexture(), FixtureInspector(), InspectedProduct, InspectorModel(), nearestTemperature(), Part (+21 more)
+
+### Community 36 - "Telegram channel (Bot API, long polling)"
 Cohesion: 0.09
-Nodes (20): begin(), block(), record(), submit(), adapter(), live_enabled(), ready(), Actors and authority (+12 more)
-
-### Community 35 - "run"
-Cohesion: 0.15
-Nodes (11): reply_texts(), run(), start(), test_free_wording_is_restated_then_yes_prepares_review(), test_model_reads_conversation_and_catalog_without_prices(), test_unknown_sku_is_not_restated_and_yes_then_asks_the_model(), test_unsafe_model_reply_is_replaced_by_the_fixed_question(), test_written_order_matching_the_model_prepares_directly() (+3 more)
-
-### Community 36 - "ProviderError"
-Cohesion: 0.10
 Nodes (12): send_pdf(), send_text(), ProviderError, call(), fetch_media(), get_updates(), make_client(), message_ref() (+4 more)
 
 ### Community 37 - "steps"
@@ -356,9 +357,9 @@ Nodes (9): connect(), expired_media(), idle_conversations(), main(), purge_conve
 Cohesion: 0.10
 Nodes (21): Buttons, Cards / Containers, Chips, Colors, Components, Design System: LumaQuote, Do:, Do's and Don'ts (+13 more)
 
-### Community 40 - "useQuotationDraft"
-Cohesion: 0.13
-Nodes (18): draftSuite(), capturesLatestCleanVersion(), preservesConflict(), fixture(), useQuotationDraft(), beginEdit(), updateDiscount(), updateLines() (+10 more)
+### Community 40 - "App"
+Cohesion: 0.11
+Nodes (22): draftSuite(), capturesLatestCleanVersion(), preservesConflict(), fixture(), useQuotationDraft(), beginEdit(), updateDiscount(), updateLines() (+14 more)
 
 ### Community 41 - "ref_node_path"
 Cohesion: 0.09
@@ -369,8 +370,8 @@ Cohesion: 0.11
 Nodes (18): compilerOptions, allowImportingTsExtensions, baseUrl, esModuleInterop, jsx, lib, module, moduleResolution (+10 more)
 
 ### Community 43 - "settings"
-Cohesion: 0.06
-Nodes (22): validate_media_provider(), run_media(), settings(), Settings, delete_files(), get_file(), put_file(), storage_headers() (+14 more)
+Cohesion: 0.13
+Nodes (14): settings(), Settings, delete_files(), get_file(), put_file(), storage_headers(), ready(), ready() (+6 more)
 
 ### Community 44 - "estimated-allowance"
 Cohesion: 0.10
@@ -388,7 +389,7 @@ Nodes (19): 10. Security, privacy, and abuse tests, 11. Concurrency, fault injec
 Cohesion: 0.18
 Nodes (11): Catalog, commercial snapshot and current embedding relationships, Checkpoints, retention and preservation, Conversation and quotation records, Conversation, offer, approval, media and work relationships, Exact conversation and attachment binding, Google synchronization records, Migration sequence and local application, Persistent data, privileges and migration lifecycle (+3 more)
 
-### Community 48 - "test_brain.py"
+### Community 48 - "extraction.py"
 Cohesion: 0.13
 Nodes (8): make(), test_anything_more_than_agreement_is_not_yes(), test_plain_agreement_is_yes(), test_plain_reply_passes_trimmed(), test_restatement_is_built_from_pairs_only(), test_unsafe_or_empty_replies_are_dropped(), test_unusable_model_orders_are_rejected(), test_valid_lines_normalize_case()
 
@@ -404,49 +405,49 @@ Nodes (16): aliases, components, hooks, lib, ui, utils, iconLibrary, rsc (+8 mor
 Cohesion: 0.12
 Nodes (17): October 29, 2026 - Agent semantic fallback wiring, October 29, 2026 - Application documentation reconciliation, October 29, 2026 - Chat documentation reconciliation, October 29, 2026 - Documentation reconciliation validation, October 29, 2026 - Documentation workflow rule, October 29, 2026 - Fixed embedding adapter and explicit index command, October 29, 2026 - Local engine availability diagnosis, October 29, 2026 - Photo browser fixture and attempted verification (+9 more)
 
-### Community 53 - "check_docs.py"
+### Community 53 - "main"
 Cohesion: 0.20
 Nodes (8): check_encoding(), check_evidence(), check_links(), check_plan(), documentation_files(), evidence_header(), main(), relative()
 
 ### Community 54 - "AppShell.tsx"
 Cohesion: 0.09
-Nodes (28): AppShell(), navigation, useConversation(), MediaUpload(), useWorkspace(), followStream(), reconnectDelay(), encoder (+20 more)
+Nodes (31): @supabase/supabase-js@^2.109.0, AppShell(), navigation, useConversation(), useWorkspace(), followStream(), reconnectDelay(), encoder (+23 more)
 
 ### Community 55 - "whatsapp_client.py"
-Cohesion: 0.08
-Nodes (19): call(), download(), endpoint(), fetch_media(), GraphError, headers(), make_client(), media_host_allowed() (+11 more)
+Cohesion: 0.10
+Nodes (17): call(), download(), endpoint(), fetch_media(), GraphError, headers(), make_client(), media_host_allowed() (+9 more)
 
-### Community 56 - "apply"
-Cohesion: 0.25
-Nodes (4): apply(), shape(), test_all_migrations_apply_cleanly_and_match_the_live_schema(), test_upgrade_keeps_pending_work()
+### Community 56 - "drafting.py"
+Cohesion: 0.13
+Nodes (7): recover_expired(), complete_media(), media_record(), decide(), latest_quote(), Decision, workspace()
 
 ### Community 57 - "check_frontend.cjs"
 Cohesion: 0.17
 Nodes (13): What is stored, Identity and evidence records, definitionName(), fs, inspect(), walk(), main(), visit() (+5 more)
 
-### Community 58 - "freeze_evaluation.py"
-Cohesion: 0.19
-Nodes (6): freeze_fingerprints(), freeze_problems(), load_freeze(), check(), main(), write()
+### Community 58 - "test_expired_operation_is_fenced_visible_and_not_retried"
+Cohesion: 0.12
+Nodes (9): test_expired_operation_is_fenced_visible_and_not_retried(), test_live_label_reading_remains_unconfirmed(), photo_bytes(), photo_job(), test_corrupt_photo_is_rejected_before_provider_use(), test_photo_normalizes_to_private_jpeg_without_paid_reading(), test_photo_stream_limit_and_replay_binding(), test_unknown_provider_outcome_retains_reservation_and_never_retries() (+1 more)
 
 ### Community 59 - "package.json"
 Cohesion: 0.16
 Nodes (15): devDependencies, @google/clasp@3.4.1, mermaid@11.17.2, supabase@2.122.0, typescript@5.9.3, typescript, name, overrides (+7 more)
 
-### Community 60 - "receive"
-Cohesion: 0.10
-Nodes (11): addressed_to_us(), configured(), first(), message_event(), receive_message(), receive_status(), status_event(), configured() (+3 more)
+### Community 60 - "webhook.py"
+Cohesion: 0.06
+Nodes (24): addressed_to_us(), configured(), expected_signature(), first(), message_event(), receive_message(), receive_status(), status_event() (+16 more)
 
 ### Community 61 - "manual-workflow.cjs"
 Cohesion: 0.25
 Nodes (10): beat(), { chromium, expect }, dispatchFixture(), fs, main(), path, PRIVATE, processMediaFixture() (+2 more)
 
-### Community 62 - "Telegram channel (Bot API, long polling)"
-Cohesion: 0.14
-Nodes (12): largest_photo(), reduce_update(), Configuration (names only), External effects and secrets, Idempotency, Limits and cost, Modules and call flow, Open gaps (+4 more)
+### Community 62 - "staff"
+Cohesion: 0.09
+Nodes (19): poll_telegram(), largest_photo(), poll_once(), reduce_update(), Actors and authority, Configuration (names only), Database writes and transactions, External effects and secrets (+11 more)
 
-### Community 63 - "InboxPage.tsx"
-Cohesion: 0.12
-Nodes (32): App(), CatalogPage(), ConversationThread(), InboxPage(), InboxSection, SectionSwitch(), connections, ConnectionsPage() (+24 more)
+### Community 63 - "ConversationThread.tsx"
+Cohesion: 0.11
+Nodes (25): ConversationThread(), InboxPage(), JobState(), MediaUpload(), InboxSection, Job, customerName(), captureText() (+17 more)
 
 ### Community 64 - "job-recovery"
 Cohesion: 0.11
@@ -456,7 +457,7 @@ Nodes (19): app/agents/luma_agent/lease.py, app/agents/luma_agent/runtime/jobs.p
 Cohesion: 0.10
 Nodes (21): bindings, height, renderer_sha256, source_sha256, svg_sha256, width, app/agents/luma_agent/graph.py, app/agents/luma_agent/nodes/extraction.py (+13 more)
 
-### Community 66 - "integrations-map"
+### Community 66 - "whatsapp-channel"
 Cohesion: 0.09
 Nodes (23): app/agents/luma_agent/observability.py, app/backend/luma/core/config.py, app/backend/luma/features/google_sync/routes.py, app/backend/luma/features/messaging/inbound.py, app/backend/luma/features/messaging/outbound.py, app/backend/luma/features/messaging/webhook.py, app/backend/luma/features/messaging/whatsapp_client.py, supabase/migrations/20261102010000_whatsapp_inbox.sql (+15 more)
 
@@ -468,17 +469,17 @@ Nodes (11): Accessibility & Inclusion, Brand Commitments, Capabilities and Const
 Cohesion: 0.18
 Nodes (10): api(), databaseClients, { execFileSync, spawnSync }, fs, http, names, path, privateDir (+2 more)
 
-### Community 69 - "ExportEnvelope"
-Cohesion: 0.10
-Nodes (9): ClaimRequest, ExportEnvelope, ReceiptRequest, MailClaim, MailReceipt, MailPush, base_receipt(), test_receipt_models_reject_incomplete_or_unsafe_outcomes() (+1 more)
+### Community 69 - "ReceiptRequest"
+Cohesion: 0.15
+Nodes (5): ReceiptRequest, base_receipt(), test_media_hosts_must_be_meta_owned_https(), test_receipt_models_reject_incomplete_or_unsafe_outcomes(), test_valid_receipts_and_drive_filenames()
 
 ### Community 70 - "catalog-retrieval"
 Cohesion: 0.18
 Nodes (11): app/agents/luma_agent/nodes/workflow.py, app/backend/luma/features/catalog/criteria.py, app/backend/luma/features/catalog/retrieval.py, app/backend/luma/features/catalog/semantic.py, bindings, height, renderer_sha256, source_sha256 (+3 more)
 
-### Community 71 - "Email channel (Gmail through Apps Script)"
-Cohesion: 0.06
-Nodes (25): MailItem, sender_authenticated(), strip_quoted(), Actors and authority, Configuration (names only), Email channel (Gmail through Apps Script), External effects and secrets, Failures and recovery (+17 more)
+### Community 71 - "fetch_media"
+Cohesion: 0.09
+Nodes (14): MailItem, reduce_mail(), sender_address(), sender_authenticated(), Sender authentication, item(), test_anything_else_is_unauthenticated(), test_each_passing_mechanism_counts() (+6 more)
 
 ### Community 72 - "diagrams"
 Cohesion: 0.12
@@ -492,7 +493,7 @@ Nodes (11): app/backend/luma/features/google_sync/callbacks.py, app/backend/luma
 Cohesion: 0.18
 Nodes (11): app/backend/luma/features/google_sync/exports.py, app/backend/luma/features/quotations/documents.py, gas/Exports.gs, supabase/migrations/20261102000000_drive_exports.sql, drive-export, bindings, height, renderer_sha256 (+3 more)
 
-### Community 75 - "evidence-data"
+### Community 75 - "workflow-data"
 Cohesion: 0.12
 Nodes (17): supabase/migrations/20261029010000_quotation_domain.sql, supabase/migrations/20261029100000_immutable_quotation_content.sql, supabase/migrations/20261029131000_versioned_embeddings.sql, evidence-data, workflow-data, bindings, height, renderer_sha256 (+9 more)
 
@@ -520,9 +521,9 @@ Nodes (19): .github/workflows/ci.yml, package.json, scripts/verify.cjs, tests/in
 Cohesion: 0.26
 Nodes (12): { chromium }, fs, keyboardPass(), livePass(), main(), measure(), PRIVATE, reviewView() (+4 more)
 
-### Community 82 - "create_request"
-Cohesion: 0.08
-Nodes (19): test_voice_upload_limit_is_6_per_minute(), test_populated_tenant_restores_identically_with_checkpoints_and_objects(), test_real_synthetic_voice_is_readable_but_unconfirmed(), create_request(), test_database_outage_is_a_safe_retryable_503(), test_storage_outage_leaves_nothing_half_written_and_recovers(), age(), one() (+11 more)
+### Community 82 - "test_voice_note_uses_auth_on_twilio_only_and_enters_the_media_pipeline"
+Cohesion: 0.07
+Nodes (20): test_voice_upload_limit_is_6_per_minute(), test_populated_tenant_restores_identically_with_checkpoints_and_objects(), test_real_synthetic_voice_is_readable_but_unconfirmed(), create_request(), test_database_outage_is_a_safe_retryable_503(), test_storage_outage_leaves_nothing_half_written_and_recovers(), test_quotation_dispatch_requires_an_actual_revision_identity(), age() (+12 more)
 
 ### Community 83 - "conversation-data"
 Cohesion: 0.22
@@ -532,17 +533,17 @@ Nodes (9): supabase/migrations/20261029110000_voice_intake.sql, supabase/migrati
 Cohesion: 0.22
 Nodes (9): Conflicts, unavailable infrastructure and evidence, Credentials and application configuration, Local Supabase, Media and worker diagnosis, Native processes and optional provider work, Schema, Semantic index command under development, Services (+1 more)
 
-### Community 85 - "media/routes.py"
-Cohesion: 0.09
-Nodes (13): accept_audio(), accept_media(), authorize_upload(), store_media(), admit_upload(), audio_playback(), image_preview(), persist_upload() (+5 more)
+### Community 85 - "upload_audio"
+Cohesion: 0.21
+Nodes (3): audio_playback(), upload_audio(), upload_image()
 
-### Community 86 - "processor.py"
-Cohesion: 0.24
-Nodes (4): inspect_audio(), inspect_image(), inspect_pdf(), main()
+### Community 86 - "claim_mail"
+Cohesion: 0.18
+Nodes (8): drive_filename(), claim_mail(), queue(), record_mail_receipt(), reply_subject(), sweep(), Database writes and transactions, Modules and call flow
 
 ### Community 87 - "Morning actions"
-Cohesion: 0.14
-Nodes (14): Decision needed: failed requests are not rate limited, Evidence limits, Gmail requests (D47), Google callback preparation, Google Workspace / clasp, LangSmith account limit, Latest verification, Local Docker / WSL availability (+6 more)
+Cohesion: 0.13
+Nodes (15): Decision needed: failed requests are not rate limited, Evidence limits, Gmail requests (D47), Google callback preparation, Google Workspace / clasp, LangSmith account limit, Latest verification, Local Docker / WSL availability (+7 more)
 
 ### Community 88 - "LumaQuote"
 Cohesion: 0.25
@@ -552,29 +553,29 @@ Nodes (8): Documentation, LumaQuote, LumaQuote request-to-reviewed-offer workflo
 Cohesion: 0.29
 Nodes (7): Configuration and native process operation, Messaging and Google configuration, Paid AI policy, Private generated files and reproducibility, Safe routine operation, Supabase and database identities, Tracing policy
 
-### Community 90 - "ref_node_fs"
+### Community 90 - "page-review.cjs"
 Cohesion: 0.13
 Nodes (16): @axe-core/playwright@^4.13.0, @playwright/test@^1.64.1, @axe-core/playwright, @playwright/test, { chromium }, fs, main(), ROUTES (+8 more)
 
-### Community 91 - "test_twilio_signature.py"
-Cohesion: 0.15
-Nodes (5): test_media_link_binds_outbox_id_and_expires(), test_media_link_refuses_without_a_token(), test_signature_matches_twilio_python_vector(), test_url_variants_add_or_remove_the_default_port(), token()
+### Community 91 - "telegram_ingress.py"
+Cohesion: 0.22
+Nodes (3): test_media_link_binds_outbox_id_and_expires(), test_media_link_refuses_without_a_token(), token()
 
 ### Community 92 - "LumaQuote architecture"
 Cohesion: 0.40
 Nodes (5): Agent participation and recovery limits, Code ownership, LumaQuote architecture, Processes and trust boundaries, Semantic retrieval work in progress
 
-### Community 93 - "observability.py"
-Cohesion: 0.08
-Nodes (16): configured_secrets(), finish(), flush(), job_trace(), mask(), mask_text(), masked_client(), reset() (+8 more)
+### Community 93 - "media.py"
+Cohesion: 0.07
+Nodes (25): MediaReading, _read_label(), read_media(), configured_secrets(), finish(), flush(), job_trace(), mask() (+17 more)
 
 ### Community 94 - "appsscript.json"
 Cohesion: 0.33
 Nodes (5): dependencies, exceptionLogging, oauthScopes, runtimeVersion, timeZone
 
 ### Community 95 - "Apps Script transport and validated commercial snapshots"
-Cohesion: 0.18
-Nodes (11): Apps Script transport and validated commercial snapshots, Atomic publication and offer freshness, Authority and process boundary, Diagnosis without leaking integration data, Drive export of approved quotations, Envelope authentication and replay, GAS source responsibilities, Invalidation hint versus full snapshot (+3 more)
+Cohesion: 0.22
+Nodes (9): Apps Script transport and validated commercial snapshots, Atomic publication and offer freshness, Authority and process boundary, Diagnosis without leaking integration data, Envelope authentication and replay, GAS source responsibilities, Signed Apps Script snapshot validation and atomic publication, Trigger/reconciliation limitations (+1 more)
 
 ### Community 96 - "frontend-live-updates"
 Cohesion: 0.18
@@ -584,21 +585,21 @@ Nodes (11): app/backend/luma/features/workspace/routes.py, app/frontend/src/feat
 Cohesion: 0.40
 Nodes (5): Agent requests and evidence, Manual quotation, Notes, human replies and takeover, Sales and agent workflows, Voice and product-label photos
 
-### Community 98 - "Google Apps Script integration"
-Cohesion: 0.25
-Nodes (8): Account setup, Backend contracts and persistence, Evidence limits, Gmail channel (D47), Google Apps Script integration, Local receiver, Source responsibilities, Troubleshooting and verification
+### Community 98 - "environment"
+Cohesion: 0.29
+Nodes (7): Account setup, Evidence limits, Gmail channel (D47), Google Apps Script integration, Local receiver, Source responsibilities, Troubleshooting and verification
 
-### Community 99 - "time"
+### Community 99 - "test_api_boundaries.py"
 Cohesion: 0.07
-Nodes (12): test_auth_outage_is_a_safe_503_not_an_open_door(), test_cors_allows_only_the_exact_local_origins(), test_declared_oversize_and_malformed_length_are_rejected_before_routing(), test_every_response_is_private_nosniff_and_unframed(), test_gateway_never_exposes_staff_routes_or_documentation(), test_missing_or_invalid_credentials_never_reach_business_code(), test_mutation_rate_limit_rejects_the_thirty_first_request_with_retry_guidance(), test_private_pdf_is_never_cacheable() (+4 more)
+Nodes (11): test_auth_outage_is_a_safe_503_not_an_open_door(), test_cors_allows_only_the_exact_local_origins(), test_declared_oversize_and_malformed_length_are_rejected_before_routing(), test_every_response_is_private_nosniff_and_unframed(), test_gateway_never_exposes_staff_routes_or_documentation(), test_missing_or_invalid_credentials_never_reach_business_code(), test_mutation_rate_limit_rejects_the_thirty_first_request_with_retry_guidance(), test_private_pdf_is_never_cacheable() (+3 more)
 
 ### Community 100 - "Layer 3: Business features"
-Cohesion: 0.33
-Nodes (6): Changes on 2026-11-03, Extending safely, Layer 3: Business features, Open gaps, Rules every feature follows, Tests and evidence
+Cohesion: 0.25
+Nodes (8): Changes on 2026-11-03, Extending safely, Features, Layer 3: Business features, Open gaps, Rules every feature follows, Tests and evidence, Who calls what
 
-### Community 101 - "semantic.py"
-Cohesion: 0.08
-Nodes (16): embed_texts(), validate_embedding_provider(), reserve(), usage_totals(), index_company(), embedding_inputs(), has_current_embeddings(), publish_embeddings() (+8 more)
+### Community 101 - "nodes/retrieval.py"
+Cohesion: 0.14
+Nodes (6): embed_texts(), validate_embedding_provider(), reserve(), usage_totals(), index_company(), test_live_embedding_index_and_query_roundtrip()
 
 ### Community 102 - "Visual guide to LumaQuote"
 Cohesion: 0.40
@@ -608,9 +609,9 @@ Nodes (5): Data and runtime, Layer views, Maintaining a view, Visual guide to Lu
 Cohesion: 0.50
 Nodes (4): Current verification boundaries, Detailed implementation references, Documentation coverage and update ownership, Project documentation
 
-### Community 104 - "datetime"
-Cohesion: 0.10
-Nodes (11): check_quotation(), check_snapshot(), assert_dispatchable(), calculate(), Approval, freshness and dispatch, product(), test_dispatch_rejects_invalid_approval_bindings(), test_independently_calculated_discount_and_shipping() (+3 more)
+### Community 104 - "DomainError"
+Cohesion: 0.05
+Nodes (24): DomainError, verify_signature(), InputRecord, InventoryInput, PolicyInput, PriceInput, ProductInput, SnapshotEnvelope (+16 more)
 
 ### Community 105 - "rule-enforcement"
 Cohesion: 0.17
@@ -624,45 +625,49 @@ Nodes (6): Changes on 2026-11-03, Extending safely, Layer 1: Presentation (React
 Cohesion: 0.67
 Nodes (3): Embedding adapter under development, Photo label-reading contract, Verified OpenAI contracts
 
-### Community 109 - "docs/README.md"
-Cohesion: 0.22
-Nodes (3): Direction contract, Sales workspace direction, Synthetic development confirmation cases
+### Community 109 - "IMPLEMENTATION_PLAN.md"
+Cohesion: 0.24
+Nodes (4): Not shown (do not demonstrate or claim), Reproducible evidence behind each claim, Showcase shot list (90-120 seconds), Synthetic development confirmation cases
 
-### Community 110 - "post"
-Cohesion: 0.07
-Nodes (19): pending(), run_next(), test_customer_clarification_resumes_after_restart(), test_descriptive_request_gets_cited_choices_before_selection(), test_duplicate_work_is_not_a_customer_answer(), test_manual_decision_job_cannot_start_an_agent_run(), test_staff_decision_resumes_review_after_restart(), test_voice_waits_for_processing_and_exact_written_confirmation() (+11 more)
+### Community 110 - "get_detail"
+Cohesion: 0.04
+Nodes (39): reply_texts(), run(), start(), test_free_wording_is_restated_then_yes_prepares_review(), test_model_reads_conversation_and_catalog_without_prices(), test_unknown_sku_is_not_restated_and_yes_then_asks_the_model(), test_unsafe_model_reply_is_replaced_by_the_fixed_question(), test_written_order_matching_the_model_prepares_directly() (+31 more)
 
-### Community 111 - "test_email.py"
+### Community 111 - "scripts"
 Cohesion: 0.12
 Nodes (14): conversation_for(), mail(), process(), queued_notice(), rows(), Script, test_approved_quotation_is_claimed_with_the_exact_canonical_pdf(), test_expired_claim_becomes_unknown_and_is_never_offered_again() (+6 more)
 
-### Community 114 - "test_whatsapp.py"
-Cohesion: 0.12
-Nodes (11): graph(), Graph, outbox(), start(), test_approved_quotation_is_sent_as_the_exact_canonical_pdf(), test_gates_block_without_calling_meta(), test_handshake_requires_the_exact_verify_token_and_full_configuration(), test_receipt_for_a_message_not_yet_recorded_is_retried_then_applied() (+3 more)
-
 ### Community 115 - "Proposal: working rules, skill routing and documentation (draft for approval)"
-Cohesion: 0.17
-Nodes (12): 1. What went wrong so far (evidence from the work log and this session), 2. Principles, 3. The rulebook (replaces most of AGENTS.md + CLAUDE.md prose), 4.1 Make skills discoverable, 4.2 Consolidate 37 -> about 20 skills, 4.3 One routing table, 4. Skill routing, 5. Documentation: one home per fact (+4 more)
+Cohesion: 0.20
+Nodes (10): 1. What went wrong so far (evidence from the work log and this session), 3. The rulebook (replaces most of AGENTS.md + CLAUDE.md prose), 4.1 Make skills discoverable, 4.2 Consolidate 37 -> about 20 skills, 4.3 One routing table, 4. Skill routing, 5. Documentation: one home per fact, 6. Claude Code enforcement (project `.claude/settings.json`) (+2 more)
 
-### Community 116 - "Working rules, skill routing and their enforcement"
+### Community 116 - "health"
 Cohesion: 0.18
 Nodes (11): Evaluation scoring pin (R11), Failure and recovery, Knowledge graph (decision D33), npm checks, Overview, Rule-to-enforcement map, `scripts/check_docs.py` details, `scripts/skills.py` details (+3 more)
 
-### Community 117 - "test_agent_rules.py"
+### Community 117 - "media_links.py"
 Cohesion: 0.11
 Nodes (9): docs_root(), test_r10_ticked_items_need_evidence_and_phase_4_needs_live(), test_r14_stop_requires_work_log_and_docs_for_code(), test_r15_bash_guard(), test_r6_edit_guard_warns_on_large_deletions(), test_r8_flags_mojibake_crlf_and_broken_links_but_not_quoted_code(), test_r9_requires_header_and_allowed_label_for_new_evidence(), test_skills_frontmatter_and_routing() (+1 more)
 
-### Community 118 - "test_embedding_contracts.py"
-Cohesion: 0.15
-Nodes (6): test_embedding_response_indices_bind_each_vector_to_its_requested_record(), create(), test_invalid_provider_vectors_fail_closed(), test_shared_filters_refuse_ambiguous_or_negated_requirements(), test_valid_vector_has_only_finite_numeric_json(), unit_vector()
+### Community 118 - "signed_body"
+Cohesion: 0.20
+Nodes (8): drive_export_claim(), drive_export_receipt(), signed_body(), supplier_snapshot(), Drive export of approved quotations, Invalidation hint versus full snapshot, Pull-based Drive export of an approved quotation PDF, Backend contracts and persistence
 
 ### Community 119 - "test_admission_limits.py"
 Cohesion: 0.09
 Nodes (15): early_in_minute(), first_denial(), test_approval_limit_is_10_per_minute(), test_catalog_search_limit_is_30_per_minute(), test_customer_messages_are_limited_per_conversation(), test_failed_requests_also_consume_admission(), test_queue_capacity_refuses_work_at_100_with_a_recoverable_503(), test_read_limit_is_120_per_minute() (+7 more)
 
-### Community 144 - "validate"
-Cohesion: 0.11
-Nodes (10): Unit and component coverage, 2026-11-03 - Pre-freeze Recall@5 relabel: 7 to 14 retrieval cases (phase 6, local), catalog_model(), _check_outcome(), _check_retrieval(), _check_structure(), _check_turns(), subtotal() (+2 more)
+### Community 127 - "Email channel (Gmail through Apps Script)"
+Cohesion: 0.14
+Nodes (13): strip_quoted(), Actors and authority, Configuration (names only), Email channel (Gmail through Apps Script), External effects and secrets, Failures and recovery, Idempotency, Inputs and outputs (+5 more)
+
+### Community 128 - "stored_quotation_pdf"
+Cohesion: 0.16
+Nodes (4): submit(), quotation_pdf(), stored_quotation_pdf(), Egress
+
+### Community 144 - "embedding_inputs"
+Cohesion: 0.20
+Nodes (6): embedding_inputs(), has_current_embeddings(), publish_embeddings(), Operator indexing, test_index_publication_rejects_changed_input(), test_semantic_cache_excludes_stale_evidence()
 
 ### Community 145 - "Development tooling, verification and evidence interpretation"
 Cohesion: 0.20
@@ -672,57 +677,53 @@ Nodes (10): Browser scenario and screenshots, Command ownership, Development too
 Cohesion: 0.20
 Nodes (5): assert, fs, os, path, test
 
-### Community 147 - "staff"
-Cohesion: 0.17
-Nodes (5): staff(), Identity, company selection and transactions, operations(), test_gateway_exposes_only_signed_receivers_and_no_documentation_or_staff_route(), test_staff_api_surface_is_the_reviewed_inventory_and_only_health_is_open()
+### Community 147 - "test_surface_inventory.py"
+Cohesion: 0.24
+Nodes (4): operations(), test_gateway_exposes_only_signed_receivers_and_no_documentation_or_staff_route(), test_staff_api_directly_mounted_paths_are_health_and_documentation_only(), test_staff_api_surface_is_the_reviewed_inventory_and_only_health_is_open()
 
-### Community 148 - "test_summarize_post_hoc.py"
-Cohesion: 0.22
+### Community 148 - "pin"
+Cohesion: 0.21
 Nodes (5): pin(), run_summarizer(), test_changed_or_missing_pin_is_refused_without_post_hoc(), test_matching_pin_is_scored_normally(), test_post_hoc_flag_labels_the_report()
 
-### Community 149 - "Showcase shot list (90-120 seconds)"
-Cohesion: 0.67
-Nodes (3): Not shown (do not demonstrate or claim), Reproducible evidence behind each claim, Showcase shot list (90-120 seconds)
+### Community 149 - "test_agent_semantic_fallback_preserves_action_and_source_boundaries"
+Cohesion: 0.22
+Nodes (3): test_agent_semantic_fallback_preserves_action_and_source_boundaries(), publish_fixture(), test_semantic_candidates_obey_scope_specs_and_exact_codes()
 
 ### Community 150 - "dependency_unavailable"
-Cohesion: 0.17
-Nodes (11): dependency_unavailable(), response_boundaries(), Layer 2: Transport (staff API and signed gateway), Open gaps, Request pipeline, Status codes a caller should expect, Tests and evidence, The two processes (+3 more)
+Cohesion: 0.09
+Nodes (19): dependency_unavailable(), domain_error(), response_boundaries(), staff(), Command payloads and a review sequence, Errors and limits, Identity and mutation protocol, Regenerating contracts (+11 more)
 
-### Community 151 - "test_nested_tool_and_subgraph_runs_are_masked"
+### Community 151 - "_assert_no_canaries"
 Cohesion: 0.19
 Nodes (7): _assert_no_canaries(), _job(), test_exception_text_and_error_field_are_masked(), test_metadata_tags_and_job_payload_are_masked(), test_nested_tool_and_subgraph_runs_are_masked(), inner(), lookup_tool()
 
-### Community 152 - "Voice and product-label media lifecycle"
-Cohesion: 0.25
-Nodes (7): PhotoReading, Failure response and evidence, Fixed sandbox boundary, Photo reading contract, Publication and customer confirmation, Voice and product-label media lifecycle, Voice reading contract
+### Community 152 - "gmail_claim"
+Cohesion: 0.32
+Nodes (3): gmail_claim(), gmail_inbound(), gmail_receipt()
 
 ### Community 154 - "Frontend work plan (for Sonnet execution)"
 Cohesion: 0.25
 Nodes (8): Acceptance for the whole plan, Branch, pull request and merge (decision D39), Execution protocol for Sonnet (read before every task), Frontend work plan (for Sonnet execution), How to start, Open questions for the user (not blocking any task; use the stated default), Run to completion (user instruction, 2026-11-03), Why this plan exists
 
-### Community 155 - "environment"
-Cohesion: 0.22
-Nodes (3): environment(), TestEnvironment, receipt()
+### Community 156 - "pathlib"
+Cohesion: 0.08
+Nodes (10): F8 - Whole-app visual and accessibility review with evidence (G9), 2026-11-07 - 3D fixture inspector, overview light rail, page transitions (phase 5, local-substitute), inspect_python(), main(), main(), run_review(), available_port(), test_complete_native_browser_workflow() (+2 more)
 
 ### Community 157 - "Layer 6: Data (PostgreSQL and private Storage)"
 Cohesion: 0.29
 Nodes (7): Changes on 2026-11-03, Extending safely, Layer 6: Data (PostgreSQL and private Storage), Migrations, Open gaps, Retention and recovery, Who may reach what
 
-### Community 160 - "get_detail"
-Cohesion: 0.05
-Nodes (17): test_agent_semantic_fallback_preserves_action_and_source_boundaries(), test_expiry_recovery_skips_another_transactions_locked_job(), get_detail(), make_draft(), test_complete_manual_quotation_and_local_delivery(), test_revision_invalidates_approval_and_blocks_old_dispatch(), test_takeover_prevents_queued_delivery(), test_every_page_passes_axe_and_fits_both_viewports() (+9 more)
+### Community 161 - "backup_restore_drill.py"
+Cohesion: 0.11
+Nodes (8): object_paths(), prepare_scratch(), snapshot(), apply(), scratch(), shape(), test_all_migrations_apply_cleanly_and_match_the_live_schema(), test_upgrade_keeps_pending_work()
 
-### Community 161 - "json"
-Cohesion: 0.10
-Nodes (10): docker(), main(), object_paths(), prepare_scratch(), run(), snapshot(), source_params(), main() (+2 more)
+### Community 164 - "review"
+Cohesion: 0.29
+Nodes (6): review(), 2. Principles, 2026-11-01 - Unit policy gate passed; persisted-workflow regressions added, 2026-11-07 - Gmail channel live test and Apps Script scope fix (phase 4, live), 2026-11-07 - Paid AI brain live test on Telegram (phase 4, live), script()
 
-### Community 164 - "test_written_requests.py"
-Cohesion: 0.14
-Nodes (4): test_development_confirmation_policy(), test_development_corpus_has_separate_complete_oracle(), test_positive_written_fields_survive_and_negation_never_does(), test_unsupported_or_out_of_range_input_clarifies_without_schema_crash()
-
-### Community 165 - "InputRecord"
-Cohesion: 0.15
-Nodes (6): InputRecord, InventoryInput, PolicyInput, PriceInput, ProductInput, SupplierTables
+### Community 165 - "Layer 5: Core infrastructure"
+Cohesion: 0.33
+Nodes (6): Admission, Changes on 2026-11-03, Extending safely, Idempotency, Layer 5: Core infrastructure, Open gaps
 
 ### Community 166 - "pull_request_template.md"
 Cohesion: 0.40
@@ -740,45 +741,41 @@ Nodes (6): Keeping these guides current, Layer map, LumaQuote by layer, One requ
 Cohesion: 0.40
 Nodes (5): Changes on 2026-11-03, Cross-cutting layer: verification and tooling, Open gaps, Test families by layer, The verify gate
 
-### Community 173 - "allowlist.py"
-Cohesion: 0.21
-Nodes (5): allowed(), allowed_email_senders(), allowed_senders(), allowed_telegram_users(), test_allowlist_parses_plus_whitespace_and_empty()
+### Community 173 - "WhatsApp channel (Meta Cloud API or Twilio Sandbox)"
+Cohesion: 0.33
+Nodes (6): Configuration (names only), Data, Failure and recovery, Proof and limits, WhatsApp channel (Meta Cloud API or Twilio Sandbox), WhatsApp webhook ingress and gated egress
 
-### Community 174 - "Staff API reference"
-Cohesion: 0.18
-Nodes (9): Binary attachment protocol, Command payloads and a review sequence, Errors and limits, Identity and mutation protocol, Regenerating contracts, Staff API reference, Staff identity, idempotency and optimistic mutation protocol, approve() (+1 more)
+### Community 174 - "scripts"
+Cohesion: 0.40
+Nodes (5): scripts, build, dev, test, typecheck
 
-### Community 188 - "test_agent_on_development_scenario"
-Cohesion: 0.18
-Nodes (5): observe(), run_turns(), seed_catalog(), spent(), test_agent_on_development_scenario()
-
-### Community 189 - "test_only_an_approved_revision_is_exported_and_bytes_match_the_staff_pdf"
-Cohesion: 0.31
-Nodes (3): Poller, test_forged_stale_cross_company_and_replayed_envelopes_are_rejected(), test_only_an_approved_revision_is_exported_and_bytes_match_the_staff_pdf()
+### Community 188 - "Agent state, participation, spending and recovery"
+Cohesion: 0.40
+Nodes (5): Agent state, participation, spending and recovery, Durable thread routing and restart, Estimated allowance lifecycle, Expired-job fencing and conservative uncertainty recovery, Interrupted work and unknown outcomes
 
 ### Community 191 - "Backend contracts and business transactions"
-Cohesion: 0.29
-Nodes (7): Admission and repeat submissions, Backend contracts and business transactions, Canonical quotation, exact approval and final dispatch checks, Composition and dependency direction, Drafting an immutable offer, Failure boundaries and evidence, Surface inventory (reviewed 2026-11-03)
+Cohesion: 0.22
+Nodes (9): Admission and repeat submissions, Approval, freshness and dispatch, Backend contracts and business transactions, Canonical quotation, exact approval and final dispatch checks, Composition and dependency direction, Drafting an immutable offer, Failure boundaries and evidence, Identity, company selection and transactions (+1 more)
 
 ## Knowledge Gaps
 - **1 isolated node(s):** `lumaquote`
-  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 1838 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
-- **64 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 1852 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
+- **66 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `DomainError` connect `DomainError` to `psycopg`, `workflow.py`, `core/errors.py`, `test_operator_index_settles_or_blocks_uncertain_retries`, `worker.py`, `extraction.py`, `staff`, `database`, `io`, `subprocess`, `deliver_one`, `graph.py`, `get_detail`, `settings`, `receive`, `media/routes.py`, `test_twilio_signature.py`, `observability.py`, `semantic.py`, `datetime`, `test_embedding_contracts.py`, `test_admission_limits.py`?**
-  _High betweenness centrality (0.111) - this node is a cross-community bridge._
+- **Why does `DomainError` connect `DomainError` to `psycopg`, `ProviderError`, `semantic.py`, `conversation`, `decimal`, `make_draft`, `bootstrap.py`, `embedding_inputs`, `worker.py`, `validate`, `google_sync/routes.py`, `outbound.py`, `dependency_unavailable`, `subprocess`, `react`, `workflow.py`, `review`, `drafting.py`, `test_expired_operation_is_fenced_visible_and_not_retried`, `webhook.py`, `upload_audio`, `claim_mail`, `telegram_ingress.py`, `media.py`, `nodes/retrieval.py`, `signed_body`, `test_admission_limits.py`?**
+  _High betweenness centrality (0.102) - this node is a cross-community bridge._
 - **Are the 49 inferred relationships involving `DomainError` (e.g. with `embed_texts()` and `validate_embedding_provider()`) actually correct?**
   _`DomainError` has 49 INFERRED edges - model-reasoned connections that need verification._
 - **What connects `lumaquote` to the rest of the system?**
   _1 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `psycopg` be split into smaller, more focused modules?**
-  _Cohesion score 0.0416084458934948 - nodes in this community are weakly interconnected._
-- **Why does `audit()` connect `core/errors.py` to `re`, `begin`, `test_job_trace_exports_graph_and_model_runs_masked`, `semantic.py`, `vitest`, `Persistent data, privileges and migration lifecycle`, `DomainError`, `media/routes.py`, `AppShell.tsx`, `check_frontend.cjs`, `deliver_one`?**
-  _High betweenness centrality (0.096) - this node is a cross-community bridge._
+  _Cohesion score 0.042440318302387266 - nodes in this community are weakly interconnected._
+- **Why does `October 29, 2026 - Offline embedding contract tests and engine recovery result` connect `October 29, 2026 - Offline embedding contract tests and engine recovery result` to `workflow.py`, `review`, `conversation`, `evaluation_dataset.py`, `make_draft`, `DocumentButton`, `clarification_for`, `media.py`, `whatsapp_client.py`, `AppShell.tsx`, `dependency_unavailable`, `Work log`, `react`, `pathlib`, `queue_drive_export`, `ConversationThread.tsx`?**
+  _High betweenness centrality (0.075) - this node is a cross-community bridge._
 - **Are the 3 inferred relationships involving `settings()` (e.g. with `Where it lives` and `Loading and restart semantics`) actually correct?**
   _`settings()` has 3 INFERRED edges - model-reasoned connections that need verification._
-- **Should `re` be split into smaller, more focused modules?**
-  _Cohesion score 0.06767676767676768 - nodes in this community are weakly interconnected._
+- **Should `ProviderError` be split into smaller, more focused modules?**
+  _Cohesion score 0.07948717948717948 - nodes in this community are weakly interconnected._

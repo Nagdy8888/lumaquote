@@ -153,3 +153,17 @@
     margin: 0;
   }
 }
+/* Decorative hub scene; the list below stays the accessible source of every status. */
+.connection-hub {
+  position: relative;
+  height: 280px;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 22px;
+  background: #202727;
+}
+@media (max-width: 680px) {
+  .connection-hub {
+    height: 230px;
+  }
+}

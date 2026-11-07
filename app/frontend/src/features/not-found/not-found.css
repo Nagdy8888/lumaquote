@@ -1,0 +1,13 @@
+/* Decorative 404 scene below the actions; the text and buttons carry the message. */
+.lost-pendant {
+  margin-top: 32px;
+  height: 340px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #202727;
+}
+@media (max-width: 680px) {
+  .lost-pendant {
+    height: 260px;
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "date": "2026-11-07",
+  "commit": "935bda5 plus uncommitted change",
+  "label": "local-substitute",
+  "command": "node .local/inspector-shot.cjs \"High bays\"; node .local/inspector-axe.cjs; node .local/overview-shot.cjs; node .local/reduced-check.cjs (ignored local Playwright helpers against this repo's Vite on 127.0.0.1:5174, credentials read from a private file); npm run test:browser",
+  "result": "partial",
+  "scope": "Catalog 3D inspector dialog, Overview metric light rail, sidebar view transitions. Headless Chromium with software WebGL (swiftshader), not a user GPU and not assistive technology.",
+  "findings": [
+    "Inspector opens from 'Inspect HB-001 in 3D' at 1440 x 900 and 390 x 844; light cone, floor pool and brass reflections render; exploded view and 5000 K apply; Escape closes it (0 open dialogs afterwards); no console or page errors.",
+    "First version closed itself immediately: a StrictMode effect cleanup called dialog.close(), whose close event cleared the state. The cleanup was removed.",
+    "Inspector accessibility: axe scoped to the open dialog reports zero violations; opened with Enter on the tile button; Tab cycles radios, Light on, Exploded view, Turn 45 degrees and Close inside the modal (leaving only to browser chrome, as native modals do).",
+    "Overview rail: five lamps align with the five metric columns; bead rows show the stored counts (4, 1, 1, 0, 0 at capture time).",
+    "View transition: document.startViewTransition exists in the test browser; a frame 180 ms after clicking Quotations shows the new page mid-entry.",
+    "Reduced motion: overview 0 canvases and no rail; catalog 0 canvases and no inspect buttons.",
+    "During this work port 5173 was served by a Vite process from another folder (Demo_Project_4-gmail); captures before that was noticed were of the wrong code and were discarded. This repo was served on 5174 instead; the other server was left running.",
+    "Production build: entry 616.73 kB (179.60 kB gzip) with no Three.js; shared chunk 919.19 kB; FixtureInspector 21.59 kB, fixtureModels 7.74 kB, FixtureShowroom 6.68 kB, MetricRail 3.40 kB."
+  ],
+  "measurements": {
+    "reduced": { "overview_canvases": 0, "overview_rail": 0, "catalog_canvases": 0, "catalog_inspect_buttons": 0 },
+    "inspector_after_escape": { "desktop_open_dialogs": 0, "mobile_open_dialogs": 0 },
+    "browser_errors": [],
+    "checks": {
+      "check_frontend": "passed (72 modules)",
+      "test_ui": "66 passed",
+      "build": "passed",
+      "inspector_axe": "0 violations",
+      "test_browser": "3 passed, 1 failed: test_complete_native_browser_workflow ('The isolated voice processor did not complete.'), twice; a luma_agent.worker from another folder (Demo_Project_4-gmail) was running on the shared local database and can take the queued job first. Not caused by this frontend change; not rerun with that worker stopped because it belongs to another session."
+    }
+  },
+  "limits": [
+    "Software WebGL only; inspector and rail frame rate on a real GPU not measured.",
+    "Models are illustrative; colour temperature tint is a display approximation, not colorimetry or photometry.",
+    "Not reviewed with a screen reader; the inspector axe run is a one-off local script, not part of test_page_review."
+  ]
+}

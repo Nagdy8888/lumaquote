@@ -16,13 +16,21 @@ import {
 import { captureText } from "@/shared/lib/mask";
 import { Status, money } from "@/shared/ui/status";
 import { Button } from "@/shared/ui/button";
+import { useReducedMotion } from "@/features/showcase/reducedMotion";
 import { LightingFallback, SceneBoundary } from "./SceneBoundary";
 
 const LightingScene = lazy(() => import("./LightingScene"));
+const MetricRail = lazy(() => import("./MetricRail"));
 
-/** Show actual request state and a domain-specific lighting scene without inventing business impact metrics. */
+/**
+ * Show actual request state and a domain-specific lighting scene without inventing business impact
+ * metrics. A decorative light rail above the metric strip mirrors the same stored counts (lazy;
+ * absent under reduced motion and on narrow screens).
+ */
 export function Overview() {
   const { data, capture } = useWorkspaceContext();
+  const reduced = useReducedMotion();
+  const open = data.conversations.filter((c) => c.status !== "quoted").length;
   const awaiting = data.quotes.filter((q) => q.status === "review").length;
   const quoted = data.conversations.filter((c) => c.status === "quoted").length;
   const running = data.jobs.filter((job) => job.status === "running").length;
@@ -74,18 +82,20 @@ export function Overview() {
           </SceneBoundary>
         </div>
       </section>
+      {!reduced && (
+        <SceneBoundary fallback={null}>
+          <Suspense fallback={null}>
+            <MetricRail counts={[open, awaiting, quoted, attention, running]} />
+          </Suspense>
+        </SceneBoundary>
+      )}
       <section
         className="metric-strip"
         aria-label="Actual stored request counts"
       >
         <div>
           <span>Open conversations</span>
-          <strong>
-            {data.conversations
-              .filter((c) => c.status !== "quoted")
-              .length.toString()
-              .padStart(2, "0")}
-          </strong>
+          <strong>{open.toString().padStart(2, "0")}</strong>
           <small>Customer requests in your workspace</small>
         </div>
         <div>

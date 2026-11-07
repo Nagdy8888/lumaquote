@@ -1,0 +1,34 @@
+{
+  "date": "2026-11-07",
+  "commit": "935bda5 plus uncommitted change",
+  "label": "local-substitute",
+  "command": "node .local/pages-shots.cjs <tag> [reduce] and .local/families-shot.cjs / .local/layer-shot.cjs (ignored local Playwright helpers, credentials read from a private file) against the running dev server; npm run test:browser",
+  "result": "passed",
+  "scope": "Four new decorative scenes: catalog fixture tiles (one shared canvas, drei View per tile), Connections hub, Quotations revision stack, 404 pendant. Headless Chromium with software WebGL (swiftshader), not a user GPU and not assistive technology.",
+  "findings": [
+    "Motion on, 1440 x 900 and 390 x 844: one canvas each on catalog, quotations, connections and 404; no page errors or console errors.",
+    "Reduced motion, both viewports: zero canvases on all four pages; catalog shows its CSS fixtures and quotations its heading icon.",
+    "All six catalog families (downlights, emergency, high bays, linear, outdoor, track) render a modelled fixture; a hovered card's lamp brightens and turns to the viewer.",
+    "Layering: the fixed catalog canvas stays under the evidence dialog overlay and under the sticky mobile bar while tiles scroll beneath it. The first version left R3F's pointer-events: auto on the canvas and blocked clicks on every card; fixed before this run.",
+    "The first hub version used drei Html labels and logged React 'synchronously unmount a root' errors; canvas sprite labels replaced them and the errors stopped.",
+    "test_page_review and test_ui_review first failed with page-has-heading-one on a different page each run (connections, overview, new-request): axe ran 700-800 ms after the loading screen's <main> appeared. The scripts now wait up to 15 s for an h1 and still run axe if none appears; both then passed.",
+    "Production build: Three.js absent from the entry chunk (628.27 kB); shared chunk 918.84 kB; FixtureShowroom 14.07 kB, ConnectionHub 5.05 kB, RevisionStack 2.89 kB, LostPendant 2.89 kB."
+  ],
+  "measurements": {
+    "canvas_count_motion": { "catalog": 1, "quotations": 1, "connections": 1, "not_found": 1 },
+    "canvas_count_reduced": { "catalog": 0, "quotations": 0, "connections": 0, "not_found": 0 },
+    "browser_errors": [],
+    "checks": {
+      "typecheck": "passed",
+      "check_frontend": "passed (69 modules)",
+      "test_ui": "66 passed",
+      "test_scene_review": "1 passed",
+      "test_page_review_and_ui_review_after_wait_fix": "2 passed",
+      "test_browser_full": "4 passed"
+    }
+  },
+  "limits": [
+    "Software WebGL only; frame rate on a real GPU and the cost of 72 catalog Views on a low-end device were not measured.",
+    "Scenes are illustrative: no product, photometric or manufacturer claim. The hub reflects displayed statuses only and verifies nothing."
+  ]
+}

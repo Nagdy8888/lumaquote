@@ -60,6 +60,9 @@ async function measure(page) {
 async function reviewView(page, key, report, extra = {}) {
   step = `review ${key}`;
   await page.locator('main, [role="main"]').first().waitFor();
+  // The loading screen is also a <main> without an h1: wait for the page heading, but still run axe
+  // if none appears, so a page that never renders one is reported rather than skipped.
+  await page.locator('h1').first().waitFor({ timeout: 15000 }).catch(() => {});
   await page.waitForTimeout(800);
   const axe = await new AxeBuilder({ page }).analyze();
   const entry = {

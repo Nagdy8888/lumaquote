@@ -1,13 +1,23 @@
 import "./quotations.css";
+import { lazy, Suspense } from "react";
 import { Link } from "react-router-dom";
 import { ArrowUpRight, FileCheck2 } from "lucide-react";
 import { useWorkspaceContext } from "@/shared/api/workspace-context";
 import { Status, money } from "@/shared/ui/status";
 import { DocumentButton } from "@/shared/ui/document-button";
+import { SceneBoundary } from "@/features/overview/SceneBoundary";
+import { useReducedMotion } from "@/features/showcase/reducedMotion";
 
-/** List actual immutable revisions and independent delivery outcomes; previous revisions stay visibly historical. */
+const RevisionStack = lazy(() => import("./RevisionStack"));
+
+/**
+ * List actual immutable revisions and independent delivery outcomes; previous revisions stay visibly
+ * historical. The heading shows a decorative, lazily loaded stack of blank quotation sheets in place
+ * of the icon; reduced motion, a missing WebGL context or a failed chunk all keep the static icon.
+ */
 export function QuotationsPage() {
   const { data, capture } = useWorkspaceContext();
+  const reduced = useReducedMotion();
   return (
     <section>
       <div className="page-heading">
@@ -15,7 +25,18 @@ export function QuotationsPage() {
           <h1>Every detail, considered.</h1>
           <p>Your quotation revisions and their delivery outcomes.</p>
         </div>
-        <FileCheck2 />
+        {reduced ? (
+          <FileCheck2 />
+        ) : (
+          <SceneBoundary fallback={<FileCheck2 />}>
+            <Suspense fallback={<div className="revision-stack" />}>
+              <RevisionStack
+                sheets={data.quotes.length}
+                fallback={<FileCheck2 />}
+              />
+            </Suspense>
+          </SceneBoundary>
+        )}
       </div>
       <div className="quote-register">
         <div className="register-head">

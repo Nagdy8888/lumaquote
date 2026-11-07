@@ -37,6 +37,8 @@ blocks or warns), **review** (checked by reading).
 **Finishing**
 - **R14** A task that changed files ends with deep documentation (next section), one work-log entry in the template, and the narrowest checks that cover the change. *hook (Stop blocks when code changed without a work-log entry)*
 - **R15** Commit and push only at a completed phase or when the user asks. Stage only your own files. Never force-push, rewrite history, bypass hooks or deploy. *hook (blocks force-push, `reset --hard`, deploy)*
+- **R16** Remote CI that GitHub did not start is not a failure and does not block (decision D48). Read the run with `gh run view <id>`: if it ran no steps and says the job "was not started because your account is locked due to a billing issue", do not wait, retry, rerun or edit `.github/workflows/ci.yml`. Run `npm run verify` on the final tree (a superset of the CI steps), write `Remote CI: not started (billing lock, D48); local stand-in npm run verify -> passed` in the PR, and merge if the user asked for it. A CI run whose steps ran and failed still blocks the merge. *review*
+- **R17** One session per checkout (decision D48). At the start of a task run `git status`, `git branch -vv` and `git worktree list`. A second parallel session works in its own `git worktree` on its own branch from `origin/main`. Uncommitted work on a branch that is already merged moves to a new branch from `origin/main` (stash, branch, pop). Dev servers and the worker run from one checkout only. Remove a worktree only after deleting its `.venv`/`node_modules` junctions with `cmd /c rmdir`, so the removal cannot delete the main folder's dependencies. *review*
 
 ## Documentation (decisions D30, D33)
 

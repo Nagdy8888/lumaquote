@@ -21,5 +21,9 @@ Select a branch strategy suited to this repository. Do not introduce main/dev pr
 
 Use [PR description prompts](assets/pr-description-prompts.md) when no repository template exists. Report local checks, external CI, and pushed/unpushed state separately. A passing local build is not proof of remote CI.
 
+Blocked remote CI (AGENTS.md R16, decision D48): when `gh run view <id>` shows no steps and the annotation "The job was not started because your account is locked due to a billing issue", the run was not started; it did not fail. Do not wait, rerun or edit the workflow. Run `npm run verify` on the final tree, write `Remote CI: not started (billing lock, D48); local stand-in npm run verify -> passed` in the PR, and merge if the user asked for it. A run whose steps executed and failed still blocks.
+
+Parallel sessions (R17): before branching, run `git status`, `git branch -vv` and `git worktree list`; move uncommitted work on a merged branch to a new branch from `origin/main`; one session per checkout; delete worktree junctions before `git worktree remove`. Steps are in `docs/reference/TOOLING_AND_TESTS.md` (Git workflow).
+
 Commit, push, create/publish a PR, change repository settings, or merge only when authorized by the actual task. Preserve user edits, use repository-local configuration when requested, and never change global git settings from this skill.
 

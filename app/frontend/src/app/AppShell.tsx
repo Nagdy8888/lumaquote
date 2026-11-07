@@ -85,6 +85,7 @@ export function AppShell() {
             <NavLink
               key={item.to}
               to={item.to}
+              viewTransition
               aria-label={item.label}
               end={item.end}
               className={({ isActive }) =>
@@ -104,8 +105,12 @@ export function AppShell() {
             <Menu />
           </summary>
           <nav aria-label="Additional workspace navigation">
-            <Link to="/catalog">Catalog & evidence</Link>
-            <Link to="/integrations">Connections</Link>
+            <Link to="/catalog" viewTransition>
+              Catalog & evidence
+            </Link>
+            <Link to="/integrations" viewTransition>
+              Connections
+            </Link>
             <button onClick={() => auth.auth.signOut()}>Sign out</button>
           </nav>
         </details>

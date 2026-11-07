@@ -134,8 +134,27 @@ do not copy commands from an unrelated Next.js or RAG project.
   `.github/pull_request_template.md`; list skipped checks as skipped.
 - CI (`.github/workflows/ci.yml`) runs on every push and pull request. Local results and remote
   CI are reported separately.
-- Merge with a merge commit after CI passes, then delete the branch and update `main`:
+- Blocked CI (R16, D48): while the GitHub account has a billing lock (D45), every run fails in
+  about 3 seconds with no steps and the annotation "The job was not started because your account
+  is locked due to a billing issue". Confirm with `gh run view <id>`. That run is "not started",
+  not failed: do not wait, rerun or edit the workflow. `npm run verify` runs every CI step
+  (lint, architecture, frontend, diagrams, typecheck, unit, UI, build) plus docs, skills and
+  secret checks, so run it on the final tree and report both lines in the PR. A run whose steps
+  executed and failed still blocks the merge. Only the user can clear the lock, in GitHub billing.
+- Merge with a merge commit after CI passes (or after the R16 local stand-in passes), then delete
+  the branch and update `main`:
   `git switch main && git pull --ff-only && git branch -d <branch>`.
+- Parallel sessions (R17, D48): one session per checkout. Start every task with `git status`,
+  `git branch -vv` and `git worktree list`. A second session uses
+  `git worktree add ../Demo_Project_4-<topic> -b <type>/<topic> origin/main`. Uncommitted work
+  found on an already-merged branch moves to a new branch: `git stash push -u`,
+  `git switch -c <type>/<topic> origin/main`, `git stash pop`, then resolve conflicts
+  (`docs/WORK_LOG.md`: keep both sides; `graphify-out/`: take `main` and run `npm run graph:update`).
+  Run the API, worker and UI from one checkout only, because all checkouts share one local
+  database and the default ports. To remove a worktree, first delete its junctions
+  (`cmd /c rmdir <worktree>\.venv`, `<worktree>\node_modules`, `<worktree>\app\frontend\node_modules`),
+  then `git worktree remove <worktree>`; removing it with the junctions in place can delete the main
+  folder's dependencies.
 - Branch protection, required reviewers and CODEOWNERS are not set up; adding them needs a
   decision in `docs/DECISIONS.md`.
 
