@@ -1,3 +1,4 @@
+from http.cookiejar import CookieJar, DefaultCookiePolicy
 from typing import Annotated
 from uuid import UUID
 
@@ -19,11 +20,14 @@ def auth_client() -> httpx.Client:
     A fresh `httpx.get` builds a new client and TLS context per call, which cost about 0.25-0.55 s
     per request on the Windows development machine (measured 2026-11-08) and starved the 120-reads
     per minute test; a shared client reuses connections and answers in about 4 ms. The client has
-    no base URL, credentials or cookies, so every call still passes its own headers. Thread-safe.
+    no base URL or credentials, and its cookie jar refuses every cookie, so no state set by one
+    staff member's response can ride along on another's request. Every call passes its own
+    headers. Thread-safe.
     """
     global _auth_client
     if _auth_client is None:
-        _auth_client = httpx.Client(timeout=5)
+        refuse_all = CookieJar(policy=DefaultCookiePolicy(allowed_domains=[]))
+        _auth_client = httpx.Client(timeout=5, cookies=refuse_all)
     return _auth_client
 
 
