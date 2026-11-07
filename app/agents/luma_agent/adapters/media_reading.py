@@ -10,7 +10,7 @@ from luma.core.errors import DomainError
 from openai import OpenAI
 from pydantic import Field
 
-from ..observability import masked_or_off, model_call, set_outputs
+from ..observability import masked_or_off, model_call, set_outputs, set_usage
 
 
 class PhotoReading(StrictModel):
@@ -82,6 +82,7 @@ def read_media(config, kind, normalized, metadata):
                 )
                 languages = [language.code for language in response.languages or []]
                 text = response.text.strip()
+                set_usage(call, flat_cost_usd=float(metadata["duration"]) * 0.0045 / 60)
                 set_outputs(call, {"text": text, "languages": languages})
             ready = (
                 bool(text)
@@ -168,6 +169,13 @@ def _read_label(client, config, normalized):
                 }
             ],
             text_format=PhotoReading,
+        )
+        set_usage(
+            call,
+            input_tokens=response.usage.input_tokens,
+            output_tokens=response.usage.output_tokens,
+            input_usd_per_million=0.10,
+            output_usd_per_million=0.50,
         )
         set_outputs(
             call,

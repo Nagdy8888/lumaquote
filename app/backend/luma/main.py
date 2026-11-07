@@ -1,8 +1,10 @@
+import httpx
+import psycopg
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from luma.core.errors import DomainError
-from luma.core.http import domain_error, response_boundaries
+from luma.core.http import dependency_unavailable, domain_error, response_boundaries
 from luma.features.catalog.routes import router as catalog
 from luma.features.conversations.routes import router as conversations
 from luma.features.media.routes import router as media
@@ -17,6 +19,8 @@ app.add_middleware(
     allow_headers=["Authorization", "Content-Type", "Idempotency-Key", "Expected-Version"],
 )
 app.add_exception_handler(DomainError, domain_error)
+app.add_exception_handler(psycopg.OperationalError, dependency_unavailable)
+app.add_exception_handler(httpx.TransportError, dependency_unavailable)
 app.middleware("http")(response_boundaries)
 for router in (conversations, quotations, catalog, workspace, media):
     app.include_router(router)

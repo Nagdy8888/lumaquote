@@ -1,5 +1,6 @@
 from functools import lru_cache
 from pathlib import Path
+from typing import Literal
 
 from pydantic import SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -32,6 +33,19 @@ class Settings(BaseSettings):
     whatsapp_company_id: str = ""
     whatsapp_test_recipients: str = ""
     whatsapp_graph_version: str = "v26.0"
+    # "meta" (Graph Cloud API, D11) or "twilio" (Twilio WhatsApp Sandbox, D43).
+    whatsapp_provider: Literal["meta", "twilio"] = "meta"
+    twilio_account_sid: str = ""
+    twilio_auth_token: SecretStr = SecretStr("")
+    # Sender in E.164 digits, for example the shared sandbox number 14155238886.
+    twilio_whatsapp_from: str = ""
+    # Public HTTPS origin of the tunnelled gateway (no trailing slash); Twilio signs exact URLs.
+    public_gateway_url: str = ""
+    # Telegram bot channel (D44): free Bot API, long polling from the worker, no tunnel.
+    telegram_bot_token: SecretStr = SecretStr("")
+    telegram_company_id: str = ""
+    # Comma-separated numeric Telegram user ids allowed to talk to the bot; empty admits nobody.
+    telegram_allowed_users: str = ""
     google_sheet_id: str = ""
     google_callback_secret: SecretStr = SecretStr("")
     google_company_id: str = ""
@@ -40,6 +54,7 @@ class Settings(BaseSettings):
     reservation: float = 0.25
     enable_paid_ai: bool = False
     enable_live_whatsapp: bool = False
+    enable_live_telegram: bool = False
 
 
 @lru_cache

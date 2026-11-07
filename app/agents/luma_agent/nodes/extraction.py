@@ -8,7 +8,7 @@ from openai import OpenAI
 
 from ..budget import reserve
 from ..lease import assert_job
-from ..observability import masked_or_off, model_call, set_outputs
+from ..observability import masked_or_off, model_call, set_outputs, set_usage
 from ..requirements import clarification_for
 from ..schemas import Extraction, RequestedLine
 from ..written_requests import parse_written_request
@@ -96,6 +96,13 @@ def extract(state):
                     instructions=EXTRACTION_INSTRUCTIONS,
                     input=text,
                     text_format=Extraction,
+                )
+                set_usage(
+                    call,
+                    input_tokens=response.usage.input_tokens,
+                    output_tokens=response.usage.output_tokens,
+                    input_usd_per_million=0.10,
+                    output_usd_per_million=0.50,
                 )
                 set_outputs(
                     call,

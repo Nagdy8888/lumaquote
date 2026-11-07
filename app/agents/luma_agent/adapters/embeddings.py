@@ -6,7 +6,7 @@ from luma.core.errors import DomainError
 from luma.features.catalog.semantic import vector_literal
 from openai import OpenAI
 
-from ..observability import masked_or_off, model_call, set_outputs
+from ..observability import masked_or_off, model_call, set_outputs, set_usage
 
 
 def validate_embedding_provider(config):
@@ -38,6 +38,11 @@ def embed_texts(config, texts: list[str]) -> tuple[list[list[float]], Decimal]:
     ):
         response = client.embeddings.create(
             model=config.embedding_model, input=texts, dimensions=1536, encoding_format="float"
+        )
+        set_usage(
+            call,
+            input_tokens=response.usage.total_tokens,
+            input_usd_per_million=0.02,
         )
         set_outputs(
             call,

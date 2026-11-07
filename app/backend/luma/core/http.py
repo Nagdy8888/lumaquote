@@ -21,6 +21,21 @@ async def domain_error(request: Request, exc: DomainError):
     )
 
 
+async def dependency_unavailable(request: Request, exc: Exception):
+    """Answer a retryable 503 when PostgreSQL or Storage cannot be reached, hiding hosts, ports and credentials.
+
+    Covers `psycopg.OperationalError` and `httpx.TransportError` raised inside a route. The request
+    transaction has already rolled back, so nothing is half-written; callers retry with the same
+    idempotency key. The exception text is never returned or logged here because connection errors
+    can echo a DSN. Authentication outages keep their own 503 in `staff`.
+    """
+    return JSONResponse(
+        {"detail": "A required service is temporarily unavailable. Try again shortly."},
+        status_code=503,
+        headers={"Retry-After": "30"},
+    )
+
+
 async def response_boundaries(request: Request, call_next):
     """Reject oversized declared requests and attach private-cache, content-type, referrer, and framing controls."""
     length = request.headers.get("content-length", "0")

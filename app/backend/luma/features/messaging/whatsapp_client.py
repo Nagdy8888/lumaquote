@@ -21,19 +21,15 @@ import httpx
 
 from luma.core.config import settings
 
+from .errors import ProviderError
+
 GRAPH_HOST = "https://graph.facebook.com"
 MEDIA_HOST_SUFFIXES = (".fbsbx.com", ".facebook.com", ".fbcdn.net")
 TIMEOUT = httpx.Timeout(20.0, connect=5.0)
-CODE = re.compile(r"[^0-9a-z_]")
 
 
-class GraphError(Exception):
-    """A classified Graph API failure carrying only a short opaque code, never provider payloads."""
-
-    def __init__(self, kind: str, code: str):
-        """Record the classification (`rejected`, `unreachable` or `unknown`) and a bounded code."""
-        super().__init__(kind)
-        self.kind, self.code = kind, CODE.sub("", code.lower())[:40] or "error"
+class GraphError(ProviderError):
+    """A classified Graph API failure; same `kind`/`code` contract as every provider error."""
 
 
 def make_client() -> httpx.Client:
@@ -128,6 +124,26 @@ def send_document(to: str, media_id: str, filename: str, caption: str) -> str:
         },
     )
     return message_id(response)
+
+
+def ready() -> bool:
+    """True when the Graph token and phone id needed for a live send are configured."""
+    config = settings()
+    return bool(config.whatsapp_token.get_secret_value() and config.whatsapp_phone_id)
+
+
+def send_pdf(to: str, data: bytes, filename: str, caption: str, reference: str) -> str:
+    """Upload the PDF, then send it as a document; an upload failure is a definite non-send.
+
+    `reference` (the outbox id) is unused by Graph, which accepts uploaded bytes; it exists so
+    both providers share one signature. Upload errors are re-raised as `rejected` with an
+    `upload_` code because no message can have reached the customer before the send call.
+    """
+    try:
+        media = upload_pdf(data, filename)
+    except GraphError as error:
+        raise GraphError("rejected", f"upload_{error.code}") from None
+    return send_document(to, media, filename, caption)
 
 
 def media_host_allowed(url: str) -> bool:

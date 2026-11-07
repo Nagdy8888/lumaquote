@@ -115,11 +115,16 @@ def tracing_enabled() -> bool:
 
 @lru_cache(maxsize=1)
 def masked_client() -> Client:
-    """Build the one LangSmith client used for every exported run, with masking on all payloads."""
+    """Build the one LangSmith client used for every exported run, with masking on all payloads.
+
+    `anonymizer` is what langsmith 0.14.14 applies to a run's `error` string (the exception repr and
+    traceback, which can echo request data); `hide_*` alone never touch it.
+    """
     config = settings()
     return Client(
         api_key=config.langsmith_api_key.get_secret_value(),
         api_url=config.langsmith_endpoint,
+        anonymizer=mask,
         hide_inputs=mask,
         hide_outputs=mask,
         hide_metadata=mask,
@@ -218,7 +223,12 @@ def model_call(name: str, model: str, inputs: dict) -> Iterator[Any]:
     if not tracing_enabled():
         yield None
         return
-    with trace(name, "llm", inputs={"model": model, **inputs}, metadata={"ls_model_name": model}) as run:
+    with trace(
+        name,
+        "llm",
+        inputs={"model": model, **inputs},
+        metadata={"ls_provider": "openai", "ls_model_name": model},
+    ) as run:
         yield run
 
 
@@ -226,3 +236,41 @@ def set_outputs(run: Any, outputs: dict) -> None:
     """Attach outputs to a model-call run when tracing is active; a no-op otherwise."""
     if run is not None:
         run.end(outputs=outputs)
+
+
+def set_usage(
+    run: Any,
+    *,
+    input_tokens: int = 0,
+    output_tokens: int = 0,
+    input_usd_per_million: float = 0.0,
+    output_usd_per_million: float = 0.0,
+    flat_cost_usd: float = 0.0,
+) -> None:
+    """Show tokens and an estimated USD cost on a model-call run in LangSmith; no-op when tracing is off.
+
+    Purpose: LangSmith's Tokens/Cost columns and project totals read `usage_metadata`; the
+    configured model (`gpt-6-luna`) has no built-in LangSmith price, so the cost is sent
+    explicitly. Inputs are the provider's reported token counts, the project's own per-million-token
+    allowance rates (the same ones used for settlement) and an optional flat cost for per-minute
+    pricing. Side effect: sets `usage_metadata` on the run; call it before `set_outputs`, which ends
+    the run. The figure is the project's estimate, never provider billing. Errors: a failure here
+    is logged by class name and never fails the job.
+    """
+    if run is None:
+        return
+    input_cost = input_tokens * input_usd_per_million / 1_000_000
+    output_cost = output_tokens * output_usd_per_million / 1_000_000
+    usage: dict[str, Any] = {"total_cost": input_cost + output_cost + flat_cost_usd}
+    if input_tokens or output_tokens:
+        usage.update(
+            input_tokens=input_tokens,
+            output_tokens=output_tokens,
+            total_tokens=input_tokens + output_tokens,
+            input_cost=input_cost,
+            output_cost=output_cost,
+        )
+    try:
+        run.set(usage_metadata=usage)
+    except Exception as failure:
+        logger.warning("Trace usage failed: %s", type(failure).__name__)

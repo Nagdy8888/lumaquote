@@ -11,6 +11,7 @@ from luma.core.database import database
 from luma.core.errors import DomainError
 from luma.core.http import Staff
 from luma.core.identity import membership
+from luma.features.messaging.provider import ready as channel_ready
 
 from .queries import workspace as get_workspace
 from .schemas import WorkspaceView
@@ -30,9 +31,8 @@ def workspace(user: Staff):
             "ai": "enabled"
             if config.enable_paid_ai and config.openai_api_key.get_secret_value()
             else "disabled",
-            "whatsapp": "configured_unverified"
-            if config.whatsapp_token.get_secret_value()
-            else "not_connected",
+            "whatsapp": "configured_unverified" if channel_ready("whatsapp") else "not_connected",
+            "telegram": "configured_unverified" if channel_ready("telegram") else "not_connected",
             "google": "configured_unverified"
             if config.google_sheet_id
             and config.google_company_id == str(member["company_id"])
