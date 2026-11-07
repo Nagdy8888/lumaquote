@@ -46,6 +46,9 @@ class Settings(BaseSettings):
     telegram_company_id: str = ""
     # Comma-separated numeric Telegram user ids allowed to talk to the bot; empty admits nobody.
     telegram_allowed_users: str = ""
+    # Gmail channel through Apps Script (D47): comma-separated sender addresses allowed to reach the
+    # agent by email; empty admits nobody. Mail reaches the gateway signed with the Google secret.
+    email_allowed_senders: str = ""
     google_sheet_id: str = ""
     google_callback_secret: SecretStr = SecretStr("")
     google_company_id: str = ""
@@ -55,6 +58,7 @@ class Settings(BaseSettings):
     enable_paid_ai: bool = False
     enable_live_whatsapp: bool = False
     enable_live_telegram: bool = False
+    enable_live_email: bool = False
 
 
 @lru_cache

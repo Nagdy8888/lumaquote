@@ -116,7 +116,8 @@ def test_controlled_provider_cannot_invent_customer_confirmation(environment, mo
     monkeypatch.setattr(extraction, "OpenAI", client_fixture)
     process_conversation(job)
     finish_job(job, "done")
-    assert seen == [written]
+    # D45: the model reads the catalog listing and conversation; the current turn is the last line.
+    assert len(seen) == 1 and seen[0].endswith(f"CONVERSATION:\nCustomer: {written}")
     detail = get_detail(env, cid)
     assert detail["quote"] is None and pending(env, cid) == ("clarify",)
     assert all(item["kind"] == "reply" for item in detail["delivery"])

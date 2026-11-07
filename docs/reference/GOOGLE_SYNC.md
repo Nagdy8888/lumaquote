@@ -85,7 +85,9 @@ it authenticates exact callback bytes with the configured shared HMAC secret.
   reads, signs a full snapshot and manages the owned approximate one-minute timer.
 - `Exports.gs`: pull-based Drive export poller (see the Drive export section). It
   needs the added `drive` scope and a private folder id in `LUMA_DRIVE_FOLDER_ID`.
-- `appsscript.json`: V8, Africa/Cairo timezone and Sheets, Drive, script-trigger and
+- `Mail.gs`: Gmail channel (D47): pushes mails under one label and sends queued replies; see
+  [email channel](EMAIL.md). It needs the added `https://mail.google.com/` and `userinfo.email` scopes.
+- `appsscript.json`: V8, Africa/Cairo timezone and Sheets, Drive, Gmail, script-trigger and
   external-request scopes. Declaring a scope does not authorize it: the user must
   re-authorize the script after this change, and no Drive copy has been made live.
 

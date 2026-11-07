@@ -26,7 +26,7 @@ layer map and one request traced end to end), start at [docs/layers](layers/READ
 ```mermaid
 flowchart TB
   accTitle: LumaQuote process and trust boundaries
-  accDescr: Staff uses native React and FastAPI. When Auth, PostgreSQL or Storage is unreachable the API answers a safe retryable 503. A native worker shares local private business storage and runs an offline parser. A separate signed gateway accepts GAS snapshots and signed WhatsApp webhooks from Meta or Twilio, and serves Twilio a signed, expiring quotation PDF link. The worker sends through the configured WhatsApp provider only when live sending is enabled, and long-polls a Telegram bot directly (no inbound endpoint), storing updates before confirming them. OpenAI and masked LangSmith job tracing are optional.
+  accDescr: Staff uses native React and FastAPI. When Auth, PostgreSQL or Storage is unreachable the API answers a safe retryable 503. A native worker shares local private business storage and runs an offline parser. A separate signed gateway accepts GAS snapshots and signed WhatsApp webhooks from Meta or Twilio, and serves Twilio a signed, expiring quotation PDF link. The worker sends through the configured WhatsApp provider only when live sending is enabled, and long-polls a Telegram bot directly (no inbound endpoint), storing updates before confirming them. Apps Script also pushes signed Gmail mails from one label to the gateway and pulls queued email replies, which it sends from Gmail. OpenAI and masked LangSmith job tracing are optional.
   Staff["Salesperson"] --> UI["React staff workspace"]
   UI -->|Sign-in| Auth["Supabase Auth :55321"]
   UI -->|Bearer requests| API["Native staff API :8001"]
@@ -43,6 +43,9 @@ flowchart TB
   Worker -. "Gated live sends (ENABLE_LIVE_WHATSAPP)" .-> WA
   WA -. "Twilio fetches signed 15-minute PDF link" .-> Gateway
   Worker -->|"Long poll getUpdates, gated sends (ENABLE_LIVE_TELEGRAM)"| TG["Telegram Bot API"]
+  Gmail["Gmail label LumaQuote"] -->|Read by| GAS
+  GAS -->|"Signed mail push; claims queued replies (ENABLE_LIVE_EMAIL)"| Gateway
+  GAS -. "Sends claimed replies and PDFs" .-> Gmail
   %% This process-level view is complemented by exact Auth checks in staff-operation.
   %% Auth, PostgreSQL and Storage run in local Supabase Docker; application processes are native.
 ```

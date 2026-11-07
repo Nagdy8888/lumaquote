@@ -1,4 +1,4 @@
-"""Worker-side processing of persisted WhatsApp and Telegram events: inbound messages and delivery receipts.
+"""Worker-side processing of persisted WhatsApp, Telegram and email events: inbound messages and receipts.
 
 Each `luma.inbox` row is claimed under a two-minute lease, processed and finished as `done`,
 `ignored` (a deliberate non-action such as a sender outside the test allowlist) or `failed`.
@@ -7,7 +7,8 @@ recorded) requeue with a short delay up to five attempts. Provider payloads and 
 are never logged; only opaque codes are stored.
 
 Authority: a sender is trusted only if it is on its channel's allowlist (`WHATSAPP_TEST_RECIPIENTS`
-numbers, or `TELEGRAM_ALLOWED_USERS` user ids; an empty list admits nobody). Events carry a
+numbers, `TELEGRAM_ALLOWED_USERS` user ids, or `EMAIL_ALLOWED_SENDERS` addresses that Gmail also
+authenticated; an empty list admits nobody). Events carry a
 `channel` field (absent means WhatsApp), which picks the allowlist and the conversation channel. Inbound content can create or extend a customer conversation and queue
 the same agent job as any other customer message; it can never approve, price, send or change
 ownership. Media is fetched only through the restricted client of the provider that
@@ -121,6 +122,9 @@ def handle_message(row) -> tuple[str, str | None]:
     """Apply one inbound customer message; returns the inbox outcome and an optional opaque code."""
     event, company = row["payload"], row["company_id"]
     channel = event.get("channel", "whatsapp")
+    if channel == "email" and not event.get("authenticated"):
+        # From is easy to fake; Gmail's own authentication result must vouch for it (D47).
+        return "ignored", "sender_unauthenticated"
     if event["from"] not in allowed(channel):
         return "ignored", "sender_not_allowed"
     kind = event["type"]
@@ -142,6 +146,8 @@ def handle_message(row) -> tuple[str, str | None]:
             if channel == "telegram" and event["text"].strip().split()[0].split("@")[0] == "/start":
                 queue_notice(conn, company, current, GREETING, f"inbound-notice:{event['id']}")
                 return "done", None
+            if channel == "email" and event.get("attachments"):
+                add_message(conn, company, current["id"], "system", "Email attachments are not processed yet.")
             try:
                 accept_customer_text(conn, company, current, event["text"], provider_id=event["id"])
             except DomainError as error:

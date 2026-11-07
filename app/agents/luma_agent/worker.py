@@ -74,13 +74,14 @@ def main():
     """Poll durable jobs until interrupted, or perform one bounded tick for tests and local diagnostics.
 
     When a Telegram bot is configured (and not in `--once` mode) a poller thread feeds the
-    inbox; the `httpx` request logger stays at WARNING because Bot API URLs contain the token.
+    inbox; the `httpx` and `httpx2` request loggers stay at WARNING because Bot API URLs contain the token.
     """
     parser = argparse.ArgumentParser(description="LumaQuote durable worker")
     parser.add_argument("--once", action="store_true")
     args = parser.parse_args()
     logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
-    logging.getLogger("httpx").setLevel(logging.WARNING)
+    for name in ("httpx", "httpx2"):  # openai 3.x sends through httpx2, which logs request URLs at INFO
+        logging.getLogger(name).setLevel(logging.WARNING)
     if not args.once and provider.ready("telegram"):
         threading.Thread(target=poll_telegram, args=(threading.Event(),), daemon=True, name="telegram").start()
         logger.info("Telegram polling started")

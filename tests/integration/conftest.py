@@ -148,6 +148,7 @@ def environment(monkeypatch):
             for table in (
                 "operations",
                 "approvals",
+                "email_dispatch",
                 "outbox",
                 "jobs",
                 "usage",

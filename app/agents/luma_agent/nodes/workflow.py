@@ -16,7 +16,11 @@ from ..requirements import has_explicit_lines
 
 
 def ask(state):
-    """Persist one scoped clarification intent; interrupted-node replay never runs this node again."""
+    """Persist one scoped clarification intent; interrupted-node replay never runs this node again.
+
+    A model-written reply (D45, `brain_reply`) is sent as is; otherwise verified catalog
+    candidates replace the fixed question.
+    """
     question = state["clarification"]
     with database(worker=True) as conn:
         assert_job(conn, state)
@@ -24,14 +28,15 @@ def ask(state):
         if current["owner"] != "agent":
             raise DomainError("Automation paused.")
         assert_request_version(current, state)
-        proposed = [CatalogHit.model_validate(value) for value in state.get("catalog_candidates", [])[:5]]
+        brain = bool(state.get("brain_reply"))
+        proposed = [] if brain else [CatalogHit.model_validate(value) for value in state.get("catalog_candidates", [])[:5]]
         verified = []
         for hit in proposed:
             current_hits = search_catalog(conn, state["company_id"], CatalogSearch(query=hit.sku))
             if current_hits and current_hits[0] == hit:
                 verified.append(hit)
         question = candidate_question(verified) or question
-        if not proposed and not has_explicit_lines(state.get("extraction")):
+        if not brain and not proposed and not has_explicit_lines(state.get("extraction")):
             latest = conn.execute(
                 "select body from luma.messages where company_id=%s and conversation_id=%s and actor='customer' order by created_at desc,id desc limit 1",
                 (state["company_id"], state["conversation_id"]),

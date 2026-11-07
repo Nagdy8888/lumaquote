@@ -1,7 +1,7 @@
 flowchart TD
   accTitle: Durable LumaQuote agent graph
-  accDescr: Extraction reads only the latest customer turn and independently checks a complete positive written order against model fields. Unconfirmed, negated or missing requirements create a durable clarification intent and customer interrupt. Confirmed explicit lines call the backend draft service and pause for a persisted staff decision when a quote exists. No graph node sends a message.
-  Start(["Trusted conversation job"]) --> Extract["extract: latest turn + written-field gate"]
+  accDescr: Extraction reads the latest customer turn. Without paid AI only a complete positive written order confirms. With paid AI the model reads the conversation and writes the reply, but only a deterministic YES to a code-built restatement, or a written order the model agrees with, confirms. Unconfirmed, negated or missing requirements create a durable clarification intent and customer interrupt. Confirmed explicit lines call the backend draft service and pause for a persisted staff decision when a quote exists. No graph node sends a message.
+  Start(["Trusted conversation job"]) --> Extract["extract: written order, YES to restatement, or AI reply"]
   Extract --> Retrieve["retrieve: current evidence candidates"]
   Retrieve --> Question{"Clarification required?"}
   Question -->|Yes| Ask["ask: persist reply intent"]

@@ -128,7 +128,7 @@ export function InboxPage() {
             <Inbox />
             <h2>Your next conversation starts here.</h2>
             <p>
-              Create a local request or connect Telegram or WhatsApp to receive requests.
+              Create a local request or connect Telegram, Gmail or WhatsApp to receive requests.
             </p>
             <Link to="/requests/new">Create your first request</Link>
           </div>

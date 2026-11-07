@@ -63,6 +63,26 @@ freshness. The script lock coordinates this script, not human/API writers. Doubl
 reads detect changes during capture but cannot provide an atomic multi-tab Sheets
 transaction; avoid simultaneous multi-tab administrative updates during import.
 
+## Gmail channel (D47)
+
+`Mail.gs` reads only mails under one Gmail label and sends the replies the backend queues. Setup:
+
+1. In Gmail, create the label `LumaQuote` and a filter that applies it to customer requests, for
+   example mails sent to `your.address+quotes@gmail.com`. A different label name goes in the Script
+   Property `LUMA_GMAIL_LABEL`.
+2. Push the project (the manifest now includes the `https://mail.google.com/` scope), run
+   `installLumaMail` once and approve the new Gmail permission.
+3. Test from a different address than the script's account: the script skips its own messages.
+   With only one account, run `enableMailSelfTest` (accepts own mails sent to the `+quotes` alias)
+   and `disableMailSelfTest` afterwards.
+
+The manifest also needs `userinfo.email` so `Session.getEffectiveUser()` can return the account
+address; approve both new permissions when the editor asks.
+
+`pollLumaMail` and `sendLumaMail` run every minute. Status codes only are kept in
+`LUMA_LAST_MAIL_STATUS` and `LUMA_LAST_MAIL_SEND_STATUS`. See
+[email channel](../docs/reference/EMAIL.md).
+
 ## Local receiver
 
 `node scripts/python.cjs -m uvicorn luma.google_gateway:app --host 127.0.0.1 --port 8002 --no-access-log`

@@ -98,7 +98,8 @@ this app are tighter: 10 MB audio, 5 MB images.
 
 Every Bot API URL contains the token (`/bot<token>/...`). The client never logs URLs, converts
 exceptions to codes `from None`, and holds the `httpx` logger at WARNING because its INFO line
-prints the request URL. `test_bot_token_never_reaches_logs` fails if that guard is removed
+prints the request URL. The worker also holds `httpx2` at WARNING: the OpenAI SDK 3.x sends through that
+package, which logs its own request lines. `test_bot_token_never_reaches_logs` fails if that guard is removed
 (mutation-checked). `telegram:check` prints user ids and first names, never tokens or message text.
 
 ## Failures and recovery

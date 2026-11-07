@@ -33,6 +33,9 @@ def workspace(user: Staff):
             else "disabled",
             "whatsapp": "configured_unverified" if channel_ready("whatsapp") else "not_connected",
             "telegram": "configured_unverified" if channel_ready("telegram") else "not_connected",
+            "email": "configured_unverified"
+            if channel_ready("email") and config.google_company_id == str(member["company_id"])
+            else "not_connected",
             "google": "configured_unverified"
             if config.google_sheet_id
             and config.google_company_id == str(member["company_id"])

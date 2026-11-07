@@ -1,4 +1,4 @@
-"""Development recipient allowlists shared by messaging ingress and egress (WhatsApp and Telegram)."""
+"""Development recipient allowlists shared by messaging ingress and egress (WhatsApp, Telegram, email)."""
 
 from luma.core.config import settings
 
@@ -21,6 +21,19 @@ def allowed_telegram_users() -> set[str]:
     return {value.strip() for value in settings().telegram_allowed_users.split(",") if value.strip().isdigit()}
 
 
+def allowed_email_senders() -> set[str]:
+    """Parse `EMAIL_ALLOWED_SENDERS` (comma-separated addresses, compared lowercase); empty admits nobody.
+
+    The same list gates who can open an email conversation and who the agent may reply to.
+    An address only counts when Gmail also reports the sender as authenticated (`email_ingress`).
+    """
+    return {value.strip().lower() for value in settings().email_allowed_senders.split(",") if "@" in value}
+
+
 def allowed(channel: str) -> set[str]:
-    """Return the allowlist for a messaging channel (`whatsapp` or `telegram`)."""
-    return allowed_telegram_users() if channel == "telegram" else allowed_senders()
+    """Return the allowlist for a messaging channel (`whatsapp`, `telegram` or `email`)."""
+    if channel == "telegram":
+        return allowed_telegram_users()
+    if channel == "email":
+        return allowed_email_senders()
+    return allowed_senders()

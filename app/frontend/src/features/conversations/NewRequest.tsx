@@ -103,7 +103,7 @@ export function NewRequest() {
         </FieldGroup>
       </form>
       <p className="form-footnote">
-        This does not contact a real customer. Telegram and WhatsApp requests
+        This does not contact a real customer. Telegram, Gmail and WhatsApp requests
         will appear here once a test connection is configured.
       </p>
     </section>
