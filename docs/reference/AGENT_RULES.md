@@ -68,7 +68,7 @@ a review item under the [deep documentation standard](../../.agents/skills/proje
 | R10 plan ticks need evidence; phase 4 needs `live` | script | `scripts/check_docs.py` |
 | R11 scoring rules pinned before a run | script | `tests/integration/test_live_evaluation.py`, `scripts/summarize_agent_run.py` |
 | R12 honest gate claims | review | `scripts/verify.cjs` summary |
-| R13 no secrets or phone numbers | script | `check:secrets`; trace masking tests (planned with D24) |
+| R13 no secrets or phone numbers | script | `check:secrets`; `tests/unit/test_trace_masking.py` |
 | R14 docs and work log with every change | hook (blocking) | `scripts/hooks/guard.py stop` |
 | R15 no history rewrite, hook bypass or deploy | hook (blocking) | `scripts/hooks/guard.py bash` |
 

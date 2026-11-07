@@ -1,0 +1,22 @@
+flowchart TB
+  accTitle: Who may reach which store in the data layer
+  accDescr: The browser reaches only Supabase Auth and has no grants on luma tables. The staff API connects as luma_api, whose row policies check active membership of the verified user. The worker connects as luma_worker with broader worker policies and also owns the LangGraph checkpoints. Private Storage objects are read and written by backend processes with the service key. The privileged setup DSN is for migrations, provisioning and tests only.
+  subgraph Who["Identities"]
+    Browser["Browser: anon key and staff session"]
+    API["Staff API"]
+    Worker["Worker"]
+    Setup["npm run setup, tests, drills"]
+  end
+  subgraph Stores["Local Supabase"]
+    AuthS["Supabase Auth"]
+    Tables[("luma schema: 23 tables")]
+    Ckpt[("LangGraph checkpoints")]
+    Bucket[("Storage bucket luma-private")]
+  end
+  Browser -->|"sign-in only, no grants on luma tables"| AuthS
+  API -->|"luma_api role, RLS claim from verified user"| Tables
+  API -->|"service key, backend only"| Bucket
+  Worker -->|"luma_worker role, worker policies"| Tables
+  Worker -->|"luma_worker DSN"| Ckpt
+  Worker -->|"service key, backend only"| Bucket
+  Setup -->|"privileged DATABASE_URL, 15 ordered migrations"| Tables

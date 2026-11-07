@@ -1,0 +1,25 @@
+sequenceDiagram
+  accTitle: One staff request traced through every layer
+  accDescr: A new local-test request travels from the browser through the Vite proxy, the staff API admission steps and the conversations feature into one PostgreSQL transaction that also queues an agent job. The worker later claims the job, runs the graph inside a masked trace and writes an outbox intent. The browser learns the result by polling.
+  autonumber
+  participant UI as React workspace
+  participant API as Staff API :8001
+  participant Auth as Supabase Auth
+  participant DB as PostgreSQL luma
+  participant W as Worker
+  UI->>API: POST /api/conversations with bearer and Idempotency-Key
+  API->>API: response_boundaries rejects bodies over 11 MiB
+  API->>Auth: staff() verifies the bearer token
+  Auth-->>API: user id, or 401 invalid and 503 outage
+  API->>DB: database(user) opens one transaction with the RLS claim
+  API->>DB: membership, rate_limit, then operation lock and replay lookup
+  API->>DB: intake writes conversation, message and queued agent job
+  DB-->>API: commit makes all rows visible together
+  API-->>UI: canonical JSON, the same body on an identical replay
+  UI->>UI: invalidate workspace and conversation queries
+  W->>DB: claim_job under the capacity lock, fence and 120 s lease
+  W->>W: job_trace runs the graph and model calls in one masked trace
+  W->>DB: checkpoint, clarification or draft and outbox intent
+  W->>DB: finish_job only if the fence still matches
+  UI->>API: polling GET /api/workspace and /api/conversations/{id}
+  API-->>UI: new state, never shown as approved or sent early

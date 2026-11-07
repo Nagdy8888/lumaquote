@@ -10,7 +10,8 @@ This is the process/module overview. Detailed call contracts live in the
 [catalog](reference/CATALOG.md), [frontend](reference/FRONTEND.md) and
 [Google synchronization](reference/GOOGLE_SYNC.md) references. Configuration and
 verification have [their own guide](reference/CONFIGURATION.md) and
-[test map](reference/TOOLING_AND_TESTS.md).
+[test map](reference/TOOLING_AND_TESTS.md). For a guided tour by layer (with a
+layer map and one request traced end to end), start at [docs/layers](layers/README.md).
 
 ## Processes and trust boundaries
 
@@ -25,17 +26,23 @@ verification have [their own guide](reference/CONFIGURATION.md) and
 ```mermaid
 flowchart TB
   accTitle: LumaQuote process and trust boundaries
-  accDescr: Staff uses native React and FastAPI. A native worker shares local private business storage and runs an offline parser. A separate signed gateway accepts GAS snapshots. OpenAI and masked LangSmith job tracing are optional, with no live WhatsApp sender shown.
+  accDescr: Staff uses native React and FastAPI. When Auth, PostgreSQL or Storage is unreachable the API answers a safe retryable 503. A native worker shares local private business storage and runs an offline parser. A separate signed gateway accepts GAS snapshots and signed WhatsApp webhooks from Meta or Twilio, and serves Twilio a signed, expiring quotation PDF link. The worker sends through the configured WhatsApp provider only when live sending is enabled, and long-polls a Telegram bot directly (no inbound endpoint), storing updates before confirming them. OpenAI and masked LangSmith job tracing are optional.
   Staff["Salesperson"] --> UI["React staff workspace"]
   UI -->|Sign-in| Auth["Supabase Auth :55321"]
   UI -->|Bearer requests| API["Native staff API :8001"]
   API -->|Authorized data and files| Data[("Local PostgreSQL and private Storage")]
+  API -. "Auth, database or Storage unreachable: safe 503 with retry guidance" .-> UI
   Worker["Native Python worker"] -->|Durable jobs and private bytes| Data
   Worker --> Parser["Offline parser container"]
   Worker -. Optional inference .-> OpenAI["Reserved OpenAI calls"]
   Worker -. Opt-in masked job traces .-> Traces["LangSmith: full detail, secrets and phones masked"]
   GAS["Authorized Apps Script"] -->|Signed full tables| Gateway["Native callback gateway :8002"]
   Gateway -->|Validated snapshot| Data
+  WA["WhatsApp provider: Meta Graph or Twilio Sandbox"] -->|Signed webhooks| Gateway
+  Gateway -->|Deduplicated inbox events| Data
+  Worker -. "Gated live sends (ENABLE_LIVE_WHATSAPP)" .-> WA
+  WA -. "Twilio fetches signed 15-minute PDF link" .-> Gateway
+  Worker -->|"Long poll getUpdates, gated sends (ENABLE_LIVE_TELEGRAM)"| TG["Telegram Bot API"]
   %% This process-level view is complemented by exact Auth checks in staff-operation.
   %% Auth, PostgreSQL and Storage run in local Supabase Docker; application processes are native.
 ```

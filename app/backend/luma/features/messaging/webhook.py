@@ -125,9 +125,13 @@ def extract_events(payload: dict) -> list[tuple[str, str, dict]]:
     return events
 
 
-def persist(events: list[tuple[str, str, dict]]) -> int:
-    """Store events idempotently under the configured company; return how many were new."""
-    company = UUID(settings().whatsapp_company_id)
+def persist(events: list[tuple[str, str, dict]], company_id: str | None = None) -> int:
+    """Store events idempotently under `company_id` (default: the WhatsApp company); return how many were new.
+
+    Shared by the Meta and Twilio webhooks and the Telegram poller; the caller has already
+    verified the provider and resolved the company from configuration, never from the payload.
+    """
+    company = UUID(company_id or settings().whatsapp_company_id)
     new = 0
     try:
         with database(worker=True) as conn:
@@ -143,16 +147,22 @@ def persist(events: list[tuple[str, str, dict]]) -> int:
     return new
 
 
-@router.post("/webhooks/whatsapp")
-async def receive(request: Request):
-    """Verify the raw-body signature, persist valid events and acknowledge only after the commit."""
-    configured()
+async def read_limited(request: Request) -> bytes:
+    """Read the raw request body, refusing with 413 as soon as it exceeds `MAX_BODY`; shared by both providers."""
     body = bytearray()
     async for chunk in request.stream():
         body.extend(chunk)
         if len(body) > MAX_BODY:
             raise DomainError("Webhook body is too large.", 413)
-    if not valid_signature(bytes(body), request.headers.get("X-Hub-Signature-256", "")):
+    return bytes(body)
+
+
+@router.post("/webhooks/whatsapp")
+async def receive(request: Request):
+    """Verify the raw-body signature, persist valid events and acknowledge only after the commit."""
+    configured()
+    body = await read_limited(request)
+    if not valid_signature(body, request.headers.get("X-Hub-Signature-256", "")):
         raise DomainError("Invalid webhook signature.", 401)
     try:
         payload = json.loads(bytes(body))

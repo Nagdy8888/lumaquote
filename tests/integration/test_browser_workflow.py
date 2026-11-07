@@ -117,7 +117,7 @@ def test_complete_native_browser_workflow(environment):
                 env=child_environment,
                 capture_output=True,
                 text=True,
-                timeout=90,
+                timeout=300 if os.environ.get("LUMA_RECORD_DIR") else 90,
             )
             assert result.returncode == 0, result.stderr[:2500]
             report = json.loads(result.stdout)

@@ -242,6 +242,10 @@
       "turns": [
         {
           "kind": "text",
+          "text": "Do you have a 31W 3000K IP44 track spotlight?"
+        },
+        {
+          "kind": "text",
           "text": "Please quote 2 TR-007"
         }
       ]
@@ -275,6 +279,10 @@
       "modality": "text",
       "split": "development",
       "turns": [
+        {
+          "kind": "text",
+          "text": "Do you have emergency bulkheads, 8W 3000K IP44?"
+        },
         {
           "kind": "text",
           "text": "8 EM-001"
@@ -514,6 +522,10 @@
       "turns": [
         {
           "kind": "text",
+          "text": "Looking for a 50W 4000K IP65 outdoor floodlight"
+        },
+        {
+          "kind": "text",
           "text": "Please quote 6 OD-002."
         }
       ]
@@ -610,7 +622,7 @@
       "turns": [
         {
           "kind": "text",
-          "text": "Hi, I think I need four of the DL-002 downlight, can you price that?"
+          "text": "Hi, I think I need four 18W 4000K downlights, can you price that?"
         },
         {
           "kind": "text",
@@ -952,6 +964,10 @@
       "turns": [
         {
           "kind": "text",
+          "text": "Need downlights, 21W 5000K IP44"
+        },
+        {
+          "kind": "text",
           "text": "10 DL-006"
         }
       ]
@@ -1235,6 +1251,10 @@
       "turns": [
         {
           "kind": "text",
+          "text": "Do you stock an 18W 4000K IP44 downlight?"
+        },
+        {
+          "kind": "text",
           "text": "Please quote 4 DL-002."
         }
       ]
@@ -1384,6 +1404,10 @@
       "modality": "text",
       "split": "development",
       "turns": [
+        {
+          "kind": "text",
+          "text": "Looking for an 11W 3000K IP44 emergency bulkhead"
+        },
         {
           "kind": "text",
           "text": "Please quote 8 EM-004"

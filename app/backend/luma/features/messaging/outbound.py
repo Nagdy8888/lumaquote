@@ -1,14 +1,19 @@
-"""Live WhatsApp submission in three phases so no database lock is held across the network.
+"""Live WhatsApp and Telegram submission in three phases so no database lock is held across the network.
 
-1. `begin` (inside the dispatcher's authorized transaction): the live gate, recipient allowlist
-   and 24-hour service window are checked and the intent moves to `submitting`, then the
-   transaction commits. Whatever is not permitted is `blocked` with a code, never queued again.
-2. `submit` (no transaction): one Graph call (a text message, or a PDF upload then a document
-   message). There is no provider idempotency key, so the `submitting` marker is the only
-   guard against a second submission, and an uncertain outcome is never retried.
-3. `record` (new transaction): the outcome is stored as `submitted` (accepted, with the WhatsApp
+1. `begin` (inside the dispatcher's authorized transaction): the channel's live gate, recipient
+   allowlist and, for WhatsApp only, the 24-hour service window are checked and the intent moves
+   to `submitting`, then the transaction commits. Whatever is not permitted is `blocked` with a
+   code, never queued again. Telegram has no service window; the bot can only reach users who
+   started it, and the allowlist limits that further.
+2. `submit` (no transaction): one submission through the channel's adapter (`provider.adapter`):
+   Meta uploads the PDF then sends a document; Twilio sends a signed, expiring gateway link to the
+   PDF; Telegram uploads the PDF with `sendDocument`. No provider offers an idempotency key, so the
+   `submitting` marker is the only guard against a second submission, and an uncertain outcome is
+   never retried.
+3. `record` (new transaction): the outcome is stored as `submitted` (accepted, with the provider
    message id), `failed` (definitely not sent) or `unknown` (may have been sent). HTTP success is
-   only acceptance; delivery and read state arrive later as receipts (`inbound.apply_status`).
+   only acceptance; WhatsApp delivery and read state arrive later as receipts
+   (`inbound.apply_status`). Telegram's Bot API has no receipts, so its sends stay `submitted`.
 
 Boundary: ownership, approval, revision and freshness were rechecked in `begin`'s transaction.
 A takeover after the `submitting` commit cannot recall a call already in flight; the message
@@ -18,12 +23,12 @@ may still reach the customer, which the audit trail and status make visible.
 import re
 
 from luma.core.audit import audit
-from luma.core.config import settings
 from luma.features.conversations.service import add_message
 from luma.features.quotations.documents import stored_quotation_pdf
 
-from .allowlist import allowed_senders
-from .whatsapp_client import GraphError, send_document, send_text, upload_pdf
+from . import provider
+from .allowlist import allowed
+from .errors import ProviderError
 
 SAFE = re.compile(r"[^A-Za-z0-9._-]")
 
@@ -38,23 +43,22 @@ def block(conn, item, code: str) -> None:
 
 def begin(conn, item, current, quote) -> dict | None:
     """Apply the live-send gates and mark the intent `submitting`; return the submission plan or None if blocked."""
-    config = settings()
-    if not (
-        config.enable_live_whatsapp and config.whatsapp_token.get_secret_value() and config.whatsapp_phone_id
-    ):
+    channel = current["channel"]
+    if not (provider.live_enabled(channel) and provider.ready(channel)):
         block(conn, item, "live_adapter_not_enabled")
         return None
     recipient = current["recipient"]
-    if recipient not in allowed_senders():
+    if recipient not in allowed(channel):
         block(conn, item, "recipient_not_allowed")
         return None
-    window = conn.execute(
-        "select now() - last_customer_at > interval '24 hours' as closed from luma.conversations where id=%s",
-        (current["id"],),
-    ).fetchone()
-    if window["closed"]:
-        block(conn, item, "outside_service_window")
-        return None
+    if channel == "whatsapp":
+        window = conn.execute(
+            "select now() - last_customer_at > interval '24 hours' as closed from luma.conversations where id=%s",
+            (current["id"],),
+        ).fetchone()
+        if window["closed"]:
+            block(conn, item, "outside_service_window")
+            return None
     conn.execute("update luma.outbox set status='submitting',updated_at=now() where id=%s", (item["id"],))
     audit(conn, item["company_id"], "worker", "delivery.submitting", item["id"])
     text = item["payload"].get("text")
@@ -64,26 +68,24 @@ def begin(conn, item, current, quote) -> dict | None:
             f"Total USD {quote['content']['total']} (tax excluded). Staff-approved; valid until "
             f"{quote['valid_until'].strftime('%d %b %Y')}."
         )
-    return {"item": item, "to": recipient, "quote": quote, "text": text}
+    return {"item": item, "to": recipient, "quote": quote, "text": text, "channel": channel}
 
 
 def submit(plan: dict) -> dict:
     """Perform the single network submission and classify the result without raising."""
-    quote = plan["quote"]
+    quote, sender = plan["quote"], provider.adapter(plan["channel"])
     try:
         if quote:
             filename = SAFE.sub("-", f"{quote['number']}-r{quote['revision']}")[:80] + ".pdf"
             try:
-                media = upload_pdf(stored_quotation_pdf(quote), filename)
-            except GraphError as error:
-                return {"status": "failed", "code": f"upload_{error.code}"[:40]}
+                document = stored_quotation_pdf(quote)
             except Exception:
                 return {"status": "failed", "code": "document_unavailable"}
-            wamid = send_document(plan["to"], media, filename, plan["text"])
+            sent = sender.send_pdf(plan["to"], document, filename, plan["text"], str(plan["item"]["id"]))
         else:
-            wamid = send_text(plan["to"], plan["text"])
-        return {"status": "submitted", "provider_id": wamid}
-    except GraphError as error:
+            sent = sender.send_text(plan["to"], plan["text"])
+        return {"status": "submitted", "provider_id": sent}
+    except ProviderError as error:
         return {"status": "unknown" if error.kind == "unknown" else "failed", "code": error.code}
     except Exception:
         return {"status": "unknown", "code": "internal_error"}

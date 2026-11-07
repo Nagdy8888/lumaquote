@@ -256,15 +256,40 @@ def _check_outcome(item: dict, entry: dict, catalog: dict) -> list[str]:
 
 
 def _check_retrieval(item: dict, entry: dict, catalog: dict) -> list[str]:
-    """Check that labeled retrieval targets are current catalog models matching the stated specification."""
+    """Check a retrieval label against the catalog and, for text, against what the customer wrote.
+
+    A label is `spec` (watts, cct and optionally ip) plus `target_skus`. The targets must be current
+    models and exactly the current models that match the spec, so the label is unambiguous. A text
+    first turn must state the spec's numbers and no model code; voice and photo turns are checked
+    against the catalog only because their wording lives in the media specification.
+    """
     target = entry["retrieval"]
     if target is None:
         return []
     errors = []
+    sid, spec = item["id"], target.get("spec")
     for sku in target["target_skus"]:
         product = catalog.get(sku)
         if product is None or product["discontinued"]:
-            errors.append(f"{item['id']}: retrieval target {sku} is not a current model")
+            errors.append(f"{sid}: retrieval target {sku} is not a current model")
+    if not isinstance(spec, dict) or not {"watts", "cct"} <= set(spec) <= {"watts", "cct", "ip"}:
+        return [*errors, f"{sid}: retrieval label needs a spec with watts and cct (ip optional)"]
+    matching = sorted(
+        sku
+        for sku, product in catalog.items()
+        if not product["discontinued"]
+        and product["watts"] == spec["watts"]
+        and product["cct"] == spec["cct"]
+        and spec.get("ip", product["ip"]) == product["ip"]
+    )
+    if matching != sorted(target["target_skus"]):
+        errors.append(f"{sid}: spec matches {matching}, label says {sorted(target['target_skus'])}")
+    first = item["turns"][0]
+    if first["kind"] == "text":
+        text = first["text"].upper()
+        stated = [f"{spec['watts']}W", f"{spec['cct']}K", *([spec["ip"]] if "ip" in spec else [])]
+        if any(part not in text for part in stated) or SKU.search(text):
+            errors.append(f"{sid}: first turn must state {stated} and no model code")
     return errors
 
 

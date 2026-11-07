@@ -48,6 +48,7 @@ def captured(monkeypatch):
         api_url="http://127.0.0.1:9",
         session=session,
         auto_batch_tracing=False,
+        anonymizer=obs.mask,
         hide_inputs=obs.mask,
         hide_outputs=obs.mask,
         hide_metadata=obs.mask,
@@ -166,9 +167,136 @@ def test_tracing_is_forced_off_outside_a_job_trace(captured, monkeypatch):
     assert captured.bodies == []
 
 
+def test_model_call_exports_tokens_and_estimated_cost(captured):
+    """A model-call run carries token counts, an estimated USD cost and the provider/model for LangSmith."""
+    job = {"id": "00000000-0000-0000-0000-000000000003", "kind": "agent", "company_id": "c"}
+    with obs.job_trace(job) as run:
+        with obs.model_call("openai.responses.extraction", "gpt-6-luna", {"input": "x"}) as call:
+            obs.set_usage(
+                call,
+                input_tokens=1000,
+                output_tokens=200,
+                input_usd_per_million=0.10,
+                output_usd_per_million=0.50,
+            )
+            obs.set_outputs(call, {"ok": True})
+        obs.finish(run, "done")
+    obs.masked_client().flush()
+    sent = "\n".join(captured.bodies).replace(" ", "")
+    assert '"input_tokens":1000' in sent and '"output_tokens":200' in sent and '"total_tokens":1200' in sent
+    assert '"total_cost":0.0002' in sent
+    assert '"ls_provider":"openai"' in sent and '"ls_model_name":"gpt-6-luna"' in sent
+
+
+def test_set_usage_is_a_noop_without_a_run():
+    """Tracing off yields no run; recording usage must not raise."""
+    obs.set_usage(None, input_tokens=5)
+
+
 def test_disabled_tracing_exports_nothing(monkeypatch):
     """With tracing off, job_trace yields None and forces the context off."""
     monkeypatch.setattr(obs, "tracing_enabled", lambda: False)
     with obs.job_trace({"id": "1", "kind": "agent"}) as run:
         assert run is None
         assert get_tracing_context()["enabled"] is False
+
+
+def _job() -> dict:
+    """Return a minimal worker job for the nested-leak probes below."""
+    return {
+        "id": "00000000-0000-0000-0000-000000000002",
+        "kind": "agent",
+        "company_id": "c",
+        "conversation_id": "v",
+    }
+
+
+def _assert_no_canaries(sent: str) -> None:
+    """Fail when any planted secret or phone fragment appears anywhere in the exported request bodies."""
+    assert sent, "nothing was exported"
+    for leaked in ("canary", "0199", "configured-literal"):
+        assert leaked not in sent, f"{leaked!r} reached the exporter"
+
+
+def test_nested_tool_and_subgraph_runs_are_masked(captured):
+    """Canaries in a traceable tool, a nested subgraph and deep payloads never reach the exporter."""
+    from langsmith import traceable
+
+    @traceable(run_type="tool", name="lookup_tool")
+    def lookup_tool(query: str, extra: dict) -> dict:
+        """Echo the query and a nested payload like a catalog tool would."""
+        return {"hits": [{"query": query, "deep": {"level": [extra]}}]}
+
+    def inner(state: State) -> dict:
+        """Subgraph node that calls the tool with canaries nested several levels deep."""
+        lookup_tool(state["text"], {"a": {"b": [{"c": f"{SECRET_CANARY} {PHONE_CANARY}"}]}})
+        return {"notes": [f"inner saw {PHONE_CANARY}"]}
+
+    sub = StateGraph(State)
+    sub.add_node("inner", inner)
+    sub.add_edge(START, "inner")
+    sub.add_edge("inner", END)
+    outer = StateGraph(State)
+    outer.add_node("sub", sub.compile())
+    outer.add_edge(START, "sub")
+    outer.add_edge("sub", END)
+    graph = outer.compile()
+    with obs.job_trace(_job()) as run:
+        with obs.masked_or_off():
+            graph.invoke({"text": f"order for {PHONE_CANARY} key {SECRET_CANARY}", "notes": []})
+        obs.finish(run, "done")
+    obs.masked_client().flush()
+    sent = "\n".join(captured.bodies)
+    _assert_no_canaries(sent)
+    assert "lookup_tool" in sent and "inner" in sent
+
+
+def test_exception_text_and_error_field_are_masked(captured):
+    """A node that raises with canaries in its message exports neither the message nor the traceback unmasked."""
+
+    def boom(state: State) -> dict:
+        """Fail the way a provider or database error can, echoing request data in the message."""
+        raise RuntimeError(
+            f"provider rejected {SECRET_CANARY} for {PHONE_CANARY} configured-literal-secret-value"
+        )
+
+    builder = StateGraph(State)
+    builder.add_node("boom", boom)
+    builder.add_edge(START, "boom")
+    builder.add_edge("boom", END)
+    graph = builder.compile()
+    with obs.job_trace(_job()) as run:
+        try:
+            with obs.masked_or_off():
+                graph.invoke({"text": "x", "notes": []})
+        except RuntimeError as failure:
+            obs.finish(run, "failed", str(failure))
+    obs.masked_client().flush()
+    _assert_no_canaries("\n".join(captured.bodies))
+
+
+def test_metadata_tags_and_job_payload_are_masked(captured):
+    """Canaries in the job payload and in run metadata set by callers are masked like inputs."""
+    job = {
+        **_job(),
+        "payload": {"from": PHONE_CANARY, "note": SECRET_CANARY, "nested": {"x": [PHONE_CANARY]}},
+    }
+    with obs.job_trace(job) as run:
+        with obs.model_call("probe", "m", {"input": "hello", PHONE_CANARY: SECRET_CANARY}) as call:
+            obs.set_outputs(call, {"ok": True})
+        obs.finish(run, "done")
+    obs.masked_client().flush()
+    _assert_no_canaries("\n".join(captured.bodies))
+
+
+def test_production_client_masks_every_exported_field(monkeypatch):
+    """The real client factory must mask inputs, outputs, metadata and the error string, or the probes above prove nothing."""
+    seen = {}
+    monkeypatch.setattr(obs, "Client", lambda **options: seen.update(options) or object())
+    obs.reset()
+    try:
+        obs.masked_client()
+    finally:
+        obs.reset()
+    for option in ("anonymizer", "hide_inputs", "hide_outputs", "hide_metadata"):
+        assert seen[option] is obs.mask, option

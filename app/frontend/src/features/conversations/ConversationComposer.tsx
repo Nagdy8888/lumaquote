@@ -101,7 +101,7 @@ export function ConversationComposer({
             : mode === "reply"
               ? conversation.channel === "local_test"
                 ? "Queues a reply in the local test channel."
-                : "Queues a WhatsApp reply as your sales team."
+                : `Queues a ${conversation.channel === "telegram" ? "Telegram" : "WhatsApp"} reply as your sales team.`
               : "Simulated customer input. No real customer is contacted."}
         </span>
         <Button

@@ -1,0 +1,22 @@
+flowchart TB
+  accTitle: Staff API request pipeline and the response each check produces
+  accDescr: Each staff request passes size and header middleware, CORS, bearer verification, a database transaction with the RLS claim, membership, a fixed-window rate limit, the scoped idempotency lock and the feature callback. Each step has its own failure response. Database or Storage transport failures become a safe retryable 503 on the staff API only.
+  Req["Browser request"] --> Size{"Declared length over 11 MiB or malformed?"}
+  Size -->|yes| E413["413 Request too large"]
+  Size -->|no| Cors["CORS: only the two local Vite origins"]
+  Cors --> Staff{"staff(): Auth verifies bearer"}
+  Staff -->|invalid| E401["401 session invalid"]
+  Staff -->|Auth down| E503A["503 Auth unavailable"]
+  Staff -->|user id| Tx["database(user): one transaction, RLS claim"]
+  Tx --> Member{"Active membership?"}
+  Member -->|no| E403["403 membership required"]
+  Member -->|yes| Rate{"rate_limit within window?"}
+  Rate -->|no| E429["429, denial committed"]
+  Rate -->|yes| Op{"operation: same scoped key seen?"}
+  Op -->|same input| Replay["Stored response returned"]
+  Op -->|different input| E409["409 key reused"]
+  Op -->|new| Feature["Feature callback, may enqueue"]
+  Feature -->|DomainError| EDom["Safe business status: 404, 409, 413, 422 or 503 queue full"]
+  Feature -->|ok| Commit["Commit effects and replay record together"]
+  Feature -. "psycopg or httpx transport error" .-> E503D["503 Retry-After 30, no host or DSN"]
+  Commit --> Headers["no-store, nosniff, no-referrer, frame deny"]

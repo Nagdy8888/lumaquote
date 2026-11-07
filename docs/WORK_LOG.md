@@ -857,6 +857,184 @@ these entries were logged during the original steps or freshly rerun today.
 - Evidence: `docs/evidence/langsmith-trace-canary-2026-11-03.json` (label `live`).
 - Open: customer names are not masked by design; pattern masking can miss phone numbers written in words; LangSmith cloud retention is outside this app's control.
 
+### 2026-11-03 - Browser-driven Google/Meta setup decided (docs only)
+- Why: user decided Claude performs the live Google and Meta setup in the browser (D37).
+- Changed: `docs/DECISIONS.md` (D37), `docs/IMPLEMENTATION_PLAN.md` (remaining-work heading), `docs/MORNING_ACTIONS.md` (intro).
+- Checked: `npm run check:docs` passed. No code changed; nothing run in Google or Meta yet.
+- Evidence: none.
+- Open: the live setup itself, handed to a fresh session; these edits are uncommitted.
+
+### 2026-11-03 - Live Google/Meta setup started; blocked by internet provider (phase 4, live)
+- Why: user asked Claude to connect GAS and Meta in the browser (D37).
+- Changed: `docs/MORNING_ACTIONS.md` (blocker note). Pushed GAS source to the Apps Script project (6 files incl. manifest with the Drive scope) using `clasp push --force` directly, because `npm run google:push` printed "Skipping push." (clasp skips a changed manifest without a terminal prompt). Started the signed gateway on 127.0.0.1:8002.
+- Checked: gateway started ("Application startup complete"). ngrok 3.39.8 failed: "failed to fetch CRL ... timed out"; plain HTTP to crl.ngrok.com and example.com is redirected to megaplusredirection.tedata.net/VDSL-Redirection_100.html and HTTPS to example.com timed out, so the network, not the app, blocks the tunnel. ngrok stopped. Nothing was changed in Google or Meta accounts.
+- Evidence: none (no live step completed).
+- Open: user resolves the provider redirection; then tunnel, Script Properties, installSupplierSynchronization, Drive export, Meta setup. `npm run google:push` cannot push a changed manifest; a `--force` option for the wrapper is a follow-up.
+
+### 2026-11-03 - Pre-freeze Recall@5 relabel: 7 to 14 retrieval cases (phase 6, local)
+- Why: plan "Remaining work" item 1, decisions D22 and D38 (you chose text anchors only).
+- Changed: `tests/fixtures/evaluation/scenarios.json` (first message of e016, e078, e054, e069, e035, e030, e014 rewritten into spec descriptions; later written-order turn unchanged), `oracle.json` (those seven labeled, a `spec` added to all 14 labels), `scripts/evaluation_dataset.py` (`_check_retrieval` now requires targets to equal the current models matching the spec and a text request to state the spec and no model code), `tests/unit/test_evaluation_dataset.py` (4 tests), fixture README, `docs/DECISIONS.md` (D38), plan, morning actions, `docs/reference/TOOLING_AND_TESTS.md`, new evidence file. `scenarios.json`, `oracle.json` and the fixture README were CRLF in the working tree and are now LF (R8); the diff is the content change only.
+- Checked: dataset tests 20 passed; offline baseline over 30 development text scenarios 30/30, ambiguity 18/18, retrieval 7/7, unsupported lines 0 (`local`); the validator caught my own e035 spec lacking "IP44" before I fixed it. Not run: paid development re-run, voice/photo, holdout (none exists), `verify:full`.
+- Evidence: `docs/evidence/evaluation-relabel-baseline-2026-11-03.json` (label `local`).
+- Open: runs 1 and 2 predate the rewrite (post-hoc, R11), so a paid development re-run needs your approval; holdout still has only 5 labeled cases; voice and photo scenarios were not rewritten; the four docs files from the Google/Meta session remain uncommitted.
+
+### 2026-11-03 - Nested trace-redaction check found and fixed an error-field leak (phase 3, local-substitute)
+- Why: plan "Remaining work" item 2; `docs/TESTING_PLAN.md` section 10 (canaries in nested tools, model calls, exceptions).
+- Changed: `app/agents/luma_agent/observability.py` (`masked_client` now passes `anonymizer=mask`), `tests/unit/test_trace_masking.py` (4 new tests), `docs/reference/AGENT_RUNTIME.md`, `TOOLING_AND_TESTS.md`, `AGENT_RULES.md`, new evidence file.
+- Checked: trace masking tests 22 passed; before the fix the exception probe failed because langsmith 0.14.14 sends a run's `error` (exception repr and traceback) through `anonymizer` only, so a planted secret and phone were exported; ruff and format clean. Not run: live canary again (paid), `verify:full`.
+- Evidence: `docs/evidence/trace-redaction-nested-2026-11-03.json` (label `local-substitute`).
+- Open: the earlier live canary predates the fix; logs, browser assets and attachments are not covered by this check; Phase 3 boxes stay unticked because they also need transcription, reservation and limit evidence.
+
+### 2026-11-03 - Send tokens and estimated cost to LangSmith model-call runs (phase 3, local)
+- Why: user asked to see the tokens and cost consumed in LangSmith traces; usage was only inside a custom `usage` output dict, which LangSmith's Tokens/Cost columns ignore.
+- Changed: `app/agents/luma_agent/observability.py` (new `set_usage`, `ls_provider` metadata), `nodes/extraction.py`, `adapters/media_reading.py`, `adapters/embeddings.py`, `tests/unit/test_trace_masking.py` (2 tests), `docs/reference/AGENT_RUNTIME.md`.
+- Checked: trace masking tests 24 passed (`local`); not run: live trace in LangSmith (paid call, needs approval), `verify:full`.
+- Evidence: none.
+- Open: confirm the columns in the LangSmith UI after the next paid worker run; estimated rates are duplicated in settlement code and call sites.
+
+### 2026-11-03 - Rate, quota and capacity limit tests; failed-request gap found (phase 5, local)
+- Why: plan "Remaining work" item 3 (the remaining rate/quota/capacity tests).
+- Changed: new `tests/integration/test_admission_limits.py` (8 passing tests plus 1 strict xfail), `docs/reference/BACKEND.md` (limit table and the gap).
+- Checked: 8 passed, 1 xfailed in 182 s against the isolated local Supabase: reads 120, catalog search 30, staff replies 10, decisions 10, voice uploads 6, per-conversation customer messages 6 (first denial at the 7th), queue cap 503 at 100, denied attempts keep counting, keys are isolated. Not run: the full integration suite, `verify:full`.
+- Finding: 14 stale-revision decisions (limit 10) all returned 409 and never 429, because the counter increment rolls back with the failed request transaction; failing requests are never limited. Left as a strict xfail test, not fixed: it changes admission/security behavior (R2). The 100-job queue cap is global across companies.
+- Evidence: none yet (the test file is the evidence; no `docs/evidence` entry written).
+- Open: user decision on committing the counter independently; Google/Meta public ingress rate profiles; scheduled counter retention.
+
+### 2026-11-03 - Outage injection and migration checks; database outage now a safe 503 (phase 5, local)
+- Why: plan "Remaining work" item 3 (outage and migration checks; `docs/TESTING_PLAN.md` sections 10-11).
+- Changed: `app/backend/luma/core/http.py` (`dependency_unavailable`) and `app/backend/luma/main.py` (registered for `psycopg.OperationalError` and `httpx.TransportError`); new `tests/integration/test_outages.py` (2 tests) and `tests/integration/test_migrations.py` (2 tests); `docs/reference/BACKEND.md`, `DATA_MODEL.md`.
+- Checked: outage tests 2 passed (database unreachable: 503, `Retry-After: 30`, no DSN or host in the body, recovery; Storage transport error during a voice upload: 503, no message/media/job rows, retry succeeds). Migration tests 2 passed: all 15 files apply cleanly and the schema equals the live local schema; negative check (last file omitted) fails the comparison; a pending job survives the later five files. Before this change a database outage returned a bare 500. Not run: full integration suite, `verify:full`.
+- Side effect to report: my first `ruff format app` also reformatted four untouched messaging files; I reverted those with `git checkout -- app/backend/luma/features/messaging/` (formatting only, nothing else was in them). Another session is concurrently editing tracing files (`set_usage` in `observability.py`, `embeddings.py`, `media_reading.py`, `extraction.py`); I did not touch or revert that work.
+- Evidence: none yet beyond the test files.
+- Open: an orphan Storage object after a failed commit has no cleanup; pending approvals/quotes across an upgrade are untested; poison-job and provider-429 retry bounds are covered only by the existing recovery tests.
+
+### 2026-11-03 - Frontend work plan for Sonnet execution (phase 5, local)
+- Why: user asked for a frontend plan that Sonnet can implement.
+- Changed: new `docs/proposals/2026-11-03-frontend-plan.md` (gaps G1-G9, execution protocol, tasks F0-F9 with files, steps, done-when and checks); `docs/IMPLEMENTATION_PLAN.md` (phase 5 link to the plan). No application code changed.
+- Checked: code read of `app/frontend/src`, backend view schemas, `/api/events` and auth dependency (bearer header required, so `EventSource` cannot be used), job status values in migrations, browser test selectors; `npm run check:rules` -> passed (docs 62 files, skills 19). Not run: frontend tests (no code change).
+- Evidence: none.
+- Open: two user questions in the plan (Overview hero copy; keep fallback polling after SSE). Plan not started.
+
+### 2026-11-03 - 3D scene review and 14-view accessibility/layout review; defects fixed (phase 5, local-substitute)
+- Why: plan "Remaining work" item 3 (3D keyboard/performance/capture review, visual/accessibility review).
+- Changed: `app/frontend/src/features/overview/LightingScene.tsx` (`role="img"` on the canvas wrapper), `app/frontend/src/features/conversations/InboxPage.tsx` (singular "conversation"), `shell.css`, `overview.css`, `conversations.css` (24 px minimum target size on small buttons and links; `conversations.css` was CRLF and is now LF); new `tests/browser/scene-review.cjs`, `tests/browser/page-review.cjs`, `tests/integration/browser_servers.py`, `test_scene_review.py`, `test_page_review.py`; `package.json` (`test:browser` now also runs the two reviews) and `scripts/verify.cjs` (browser gate timeout 420 s, Python 900 s); `docs/reference/FRONTEND.md`, plan; two evidence files and four synthetic screenshots in `docs/evidence/screenshots/2026-11-03/`.
+- Checked: scene review passed after the fix (before it: serious axe `aria-prohibited-attr`, which the 2026-11-02 runs missed because they used reduced motion and never rendered the canvas); page review passed on 14 views (6 pages plus a populated conversation, 1440 px and 430 px): zero axe violations, no overflow, one main landmark, named controls, no control under 24 px (before: a 14 px icon button, a 23 px remove button and eight 18 px text links). `check:frontend`, `tsc` build and `test:ui` (5 passed) pass. Not run: screen reader, real device, production-build performance on real hardware.
+- Evidence: `docs/evidence/scene-review-2026-11-03.json`, `docs/evidence/page-accessibility-review-2026-11-03.json` (label `local-substitute`: headless Chromium with software WebGL).
+- Side effect: a directory-wide `ruff format tests/integration` also reformatted two untouched test files; reverted with `git checkout` (formatting only).
+- Open: the orbit control is pointer-only by decision (decorative); the lazy scene chunk (934 kB, 248 kB gzip) triggers Vite's 700 kB warning, the entry chunk (616 kB) does not; approved/delivered/failed-media page states are not in the axe run.
+
+### 2026-11-03 - Branch, PR and merge workflow added to the frontend plan (phase 5, local)
+- Why: user asked that the frontend plan run on a separate branch, go to GitHub through a PR, merge after checks and delete the branch.
+- Changed: `docs/proposals/2026-11-03-frontend-plan.md` (new "Branch, pull request and merge" section: worktree, per-task commits, draft PR, CI watch, merge gate, merge-commit merge, cleanup; F0 and F9 rewritten), `docs/DECISIONS.md` (D39). No application code changed.
+- Checked: `git remote -v`, `gh auth status`, `gh repo view` (main, no branch protection), `.github/workflows/ci.yml` (no browser or Supabase tests), `scripts/hooks/guard.py` (blocks rebase and force-push, so the plan uses `git merge` and `gh pr merge --merge`); `npm run check:rules` -> passed (docs 64 files, skills 19).
+- Evidence: none.
+- Open: nothing committed or pushed yet; the main tree keeps uncommitted edits from other sessions, so the plan forbids pulling into it after merge until they are reconciled.
+
+### 2026-11-03 - Run-to-completion rules added to the frontend plan (phase 5, local)
+- Why: user asked that Sonnet not stop until everything in the plan is finished.
+- Changed: `docs/proposals/2026-11-03-frontend-plan.md` (new "How to start" prompt and "Run to completion" section: no check-ins, R2-only questions, blocker ladder, hook handling, progress in PR body, resume after context loss, two allowed end states; stop rules in the protocol, merge conflicts, F0 and F9 rewritten to match), `docs/DECISIONS.md` (D40). No application code changed.
+- Checked: `npm run check:rules` -> passed (docs 64 files, skills 19).
+- Evidence: none.
+- Open: plan not started.
+
+### 2026-11-03 - Surface inventory test, outage diagram edge and verify:full attempts (phase 5, local)
+- Why: plan "Remaining work" items 3 and 4 (reviewed ledger inputs, one green full gate).
+- Changed: new `tests/unit/test_surface_inventory.py` (staff API 18 operations, gateway 6, only health unsecured); `docs/diagrams/system-boundaries.mmd` (edge for the safe 503 on Auth, database or Storage outage) and re-rendered SVGs and manifest; `docs/reference/BACKEND.md` surface inventory table.
+- Checked: `npm run diagrams:check` -> passed after re-render (18 diagrams, system-boundaries SVG viewed). `npm run verify:full` run 1 -> failed at `diagrams:check` (stale `system-boundaries` binding after `main.py` and `http.py` edits; fixed). Run 2 -> passed lint:python, check:architecture, check:docs, skills:check, check:frontend, test:diagrams, diagrams:check, typecheck, test:python (643 s), test:ui; the harness killed it for low memory before test:browser, build and check:secrets. Not run: those three steps in a verify:full run, so there is no complete green run yet (R12).
+- Evidence: `docs/evidence/python-suite-2026-11-03.json` (separate full Python suite run: 361 passed, 66 skipped opt-in paid live tests, 1 expected failure).
+- Open: rerun `npm run verify:full` when memory allows; write the checkpoint evidence file from that run; then apply the reviewed ledger update (B22, B25-B28, B34, B39, B42 to Covered). Not restarted without a user request, per the harness note.
+
+### 2026-11-03 - First complete green verify:full and reviewed coverage ledger (phase 5, local)
+- Why: plan "Remaining work" items 3 and 4; user asked to run the gate again.
+- Changed: `docs/evidence/checkpoint-2026-11-03.json` (new); `docs/engineering/coverage.json` (B22, B25, B26, B27, B28, B34, B39, B42 now Covered with code, suite and checkpoint evidence and stated limits; reasons refreshed for Planned B01, B15, B17, B18, B40); `docs/DECISIONS.md` (D41: paid development re-run capped at 40 of 60 scenarios).
+- Checked: `npm run verify:full` -> 13 of 13 steps passed in one run (test:python 364 passed, 66 skipped opt-in paid tests, 3 deselected, 1 expected failure, 591 s; test:browser 3 passed, 98 s; build; check:secrets). Ledger validator -> valid (Covered 11, Planned 29, NotApplicable 2). Docs-only edits after the run were re-checked with `check:docs`/`check:rules`. Not run: paid live tests, live Google/Meta, holdout.
+- Evidence: `docs/evidence/checkpoint-2026-11-03.json`.
+- Open: paid `dev-run-3` (40 scenarios) in progress; Google/Meta need the tunnel; holdout needs the user's confirmation that the agent is final.
+
+### 2026-11-03 - Evaluation runs must be traced in LangSmith (phase 5, local)
+- Why: user instruction "every run must be traced in langsmith" (D42); the live evaluation test forced tracing off and called the graph without the worker's root trace.
+- Changed: `tests/integration/test_live_evaluation.py` (each drained job runs inside `observability.job_trace` with `finish` and `flush`; the traced copy of the job carries `evaluation_run` and `evaluation_scenario`; tracing is switched on and the test asserts it is enabled before any paid call); `docs/DECISIONS.md` (D42).
+- Checked: `ruff check`/`ruff format --check` on the file -> pass. One-scenario paid smoke (`trace-check`, e016) -> 2 root traces `luma.job.agent` in the LangSmith project with 17 nested runs and no errors (queried by run tag; counts only). The earlier untraced `dev-run-3` was stopped at 18 of 40 scenarios (about USD 0.005) and set aside; it is not reported.
+- Evidence: none yet (the 40-scenario run is in progress).
+- Open: `docs/reference/TOOLING_AND_TESTS.md` still says nothing about tracing for the live test; update when the run finishes.
+
+### 2026-11-03 - Paid development re-run dev-run-3, 40 of 60 scenarios, traced (phase 5, synthetic)
+- Why: user approved a re-run capped at 40 scenarios to lower cost (D41) and required LangSmith tracing for every run (D42).
+- Changed: `docs/evidence/evaluation-development-agent-run3-2026-11-03.json` (new, common header added by hand because the summarizer omits it), `docs/MORNING_ACTIONS.md`, `docs/IMPLEMENTATION_PLAN.md`.
+- Checked: `pytest tests/integration/test_live_evaluation.py` with `LUMA_EVAL_IDS` (40 ids, 20 text, 12 voice, 8 photo) -> 41 passed in 313 s. Summarized with `scripts/summarize_agent_run.py` (fixtures unchanged since the pin, so not post-hoc): 39/40 workflow success, 34/40 exact primary action, ambiguity acted on 34/34, Recall@5 6/7, 0 unsupported final lines, 0 unauthorized sends, estimated USD 0.00867 (app estimate, not billing), median 6.4 s, p95 11.5 s. A LangSmith query found 100 root traces tagged `dev-run-3` (the query cap), no trace errors. Not run: the other 20 development scenarios, the holdout.
+- Evidence: the file above. Same 40 scenarios in `dev-run-2`: 35 exact, 40 workflow pass. All five rewritten scenarios matched. New miss e003 (photo, agent re-asked after reading OD-001 50W 3000K IP65); unchanged misses e008, e023, e040, e041, e064. One run per scenario, so e003 may be model variance.
+- Open: e003 and the five older misses are not yet diagnosed; this is not a claim about the 20 scenarios left out.
+
+### 2026-11-03 - Local showcase recording and private-data review (phase 5, local-substitute)
+- Why: plan "Remaining work" item 8.
+- Changed: `tests/browser/manual-workflow.cjs` (in recording mode capture mode is switched off while the synthetic upload controls and PDF viewer are used, because the app hides them in capture mode; the first attempt timed out waiting for the voice-note control, the second for "View PDF"); `docs/evidence/showcase-recording-2026-11-03.json` (new). Recording file `.local/showcase/lumaquote-local-walkthrough-2026-11-03.webm` is ignored by git.
+- Checked: `LUMA_RECORD_DIR` run of `test_browser_workflow.py` -> 1 passed, 66 s video; in-script private-pattern scan (credentials, JWTs, emails, phones) passed at every pause; 13 frames sampled every 6 s and viewed: no secret, email, phone or real name, only the fixture supplier and customer names. Not run: narration, trimming, a recording with transcription on (paid AI).
+- Evidence: `docs/evidence/showcase-recording-2026-11-03.json`.
+- Open: video is silent and 66 s, with a blank first frame and a grey area in the portrait segment; the shot list's shot 3 (agent clarification) is not in it. The normal (non-recording) browser test path is unchanged but should be covered by the next full `verify:full`.
+
+### 2026-11-03 - Per-layer documentation with nine new diagrams (docs only, local)
+- Why: user asked to document the repo's recent updates for every layer, with Mermaid diagrams, adding folders or files where useful.
+- Changed: new `docs/layers/` (README plus frontend, transport, business-features, agent-worker, core, data, integrations, verification guides: what each layer owns, code paths, diagram, 2026-11-03 changes, tests, open gaps, rules for extending); nine new canonical views `docs/diagrams/{layer-map,request-trace,frontend-layer,api-pipeline,backend-modules,worker-tick,data-access,integrations-map,verify-gate}.mmd` with code bindings in `catalog.json` and rendered SVGs; `staff-operation` also embedded in `docs/layers/core.md`; links from `docs/README.md`, `docs/ARCHITECTURE.md`, `docs/diagrams/README.md`. `docs/reference/TOOLING_AND_TESTS.md`: removed a duplicated retention paragraph, corrected the gate timeouts (python 1500 s, browser 420 s; the doc still said 600 s), added `test_admission_limits`, `test_outages`, `test_migrations`, `test_surface_inventory`, the scene/page reviews and `browser_servers.py`, the `LUMA_RECORD_DIR` showcase recording mode, the D38 retrieval checks, the `anonymizer`/`set_usage` probes and the 2026-11-03 checkpoint; dropped the stale "no voice/photo asset exists". `docs/reference/BACKEND.md`: the gateway has no `dependency_unavailable` handler, so its database outages are a generic 500 (found while writing the transport guide; not changed in code). `app/backend/luma/core/storage.py` had only CRLF line endings in the working tree; restored LF, so it no longer differs from HEAD.
+- Checked: claims compared with source (`main.py`, `google_gateway.py`, `core/*`, `worker.py`, `runtime/jobs.py`, `runtime/delivery.py`, `observability.py`, `App.tsx`, `client.ts`, feature `api.ts`, `verify.cjs`, migrations). `npm run test:diagrams` -> 4 passed; `npm run diagrams:render` then `npm run diagrams:check` -> 27 diagrams passed; all nine new PNG previews viewed, `frontend-layer`, `backend-modules`, `data-access`, `integrations-map` and `verify-gate` re-laid out after the first look (too wide, crossing edges, a misleading stop edge); `npm run check:rules` -> docs 77 files and 19 skills passed; a local anchor check found 0 broken `#` links in the edited guides. Not run: `verify:full`, `npm run graph:update` (no code module added, moved or deleted).
+- Evidence: none (documentation only).
+- Open: the gateway outage handler gap needs a code change and test; the layer guides are a 2026-11-03 snapshot over uncommitted work from other sessions; nothing committed.
+
+### 2026-11-05 - Provider redirect cleared, live Google snapshot sync verified (phase 4, live)
+- Why: user said the earlier permission covers the ISP-redirect-blocked Google, Drive and Meta steps (D37) and asked to continue.
+- Changed: `docs/evidence/google-live-sync-2026-11-05.json` (new), `docs/MORNING_ACTIONS.md`. No code changed. Started Docker Desktop, `npm run db:start`, the gateway (`luma.google_gateway:app`, port 8002) and `ngrok http 8002 --inspect=false`; the tunnel domain is the same as before, so no Script Property changed.
+- Checked: `curl` HTTP and HTTPS to example.com -> 200 (redirect gone). Public forged POST to `/callbacks/google` -> 401. Ran `installSupplierSynchronization` in the Apps Script editor -> "Supplier snapshot accepted by backend validation." `luma.google_sync_state` has 1 row, and `observed_at` advanced about 57 s later (one timer refresh seen). `luma.drive_exports` already holds one `done` row from 2026-11-03 and the private Drive folder holds its PDF. Also ran lint, architecture, frontend checks, 203 unit tests and 5 UI tests before this: all passed. Not run: `verify:full`, integration, browser.
+- Evidence: [google-live-sync-2026-11-05.json](evidence/google-live-sync-2026-11-05.json)
+- Open: plan checkboxes stay unticked (the items also cover Meta and a Drive export started today, plus longer timer observation). Meta WhatsApp setup needs the user's Meta account. The failed-request rate-limit decision and the final-agent/holdout call are still the user's.
+
+### 2026-11-05 - Meta WhatsApp setup blocked at business portfolio (phase 4, live)
+- Why: continue the D37 browser-driven Meta setup after the Google sync step.
+- Changed: `docs/MORNING_ACTIONS.md` (blocker note). Nothing created on Meta: the browser was signed in to Meta for Developers with no apps; the create-app wizard reached the Business step and shows "No businesses available".
+- Checked: `npm run check:rules` -> passed. Not run: any Meta API call, `verify:full`.
+- Evidence: none (blocker only).
+- Open: user decides whether to create a Meta Business portfolio (a new account); then the app, WhatsApp product, test number, `.env.local` values and webhook registration follow.
+
+### 2026-11-07 - Meta developer account and portfolio created; app creation blocked by advertising restriction (phase 4, live)
+- Why: user approved creating the Meta business portfolio (D37) and continued the WhatsApp setup.
+- Changed: `docs/MORNING_ACTIONS.md` (blocker note replaced). In the browser: the user added the phone number in Accounts Center and finished developer registration; the portfolio `LumaQuote Test` was created (submitted by the user's session; "Verify later" chosen). No app was created.
+- Checked: create-app wizard (name `LumaQuote Test`, WhatsApp use case) lists the portfolio as disabled; Meta's tooltip reads "This business can't claim apps because it's restricted from advertising." Not run: any Meta API call, `npm run check:rules` after this edit.
+- Evidence: none (blocker only).
+- Open: user checks Business Suite account quality / Security Centre and requests review of the restriction; then rerun the wizard.
+
+### 2026-11-07 - Meta app creation rechecked; still blocked, unblock paths recorded (phase 4, live)
+- Why: user asked Claude to fix the Meta WhatsApp connection through Claude in Chrome (D37).
+- Changed: `docs/MORNING_ACTIONS.md` (recheck result and three unblock paths). Nothing created on Meta; the wizard was abandoned at the Business step.
+- Checked: create-app wizard still greys out `LumaQuote Test`; the WhatsApp use case is labelled "Business portfolio required". The Chrome extension is denied on `facebook.com` and `business.facebook.com`, so Account Quality could not be opened. `npm run check:rules` -> passed. Not run: any Meta API call, `verify:full`.
+- Evidence: none (blocker only).
+- Open: user requests restriction review, allows the extension on the Meta business domains, or signs in with the login that owns `Nagdy AI`.
+
+### 2026-11-07 - Twilio WhatsApp Sandbox provider added beside Meta (phase 4, local-substitute)
+- Why: Meta refuses app creation for the restricted `LumaQuote Test` portfolio; user chose the Twilio Sandbox as the easier route (D43).
+- Changed: `app/backend/luma/features/messaging/{errors,provider,twilio_client,twilio_webhook,media_links}.py` (new); `whatsapp_client.py` (`GraphError` now subclasses `ProviderError`, adds `ready`, `send_pdf`), `webhook.py` (shared `read_limited`), `inbound.py`, `outbound.py` (go through `provider`), `core/config.py` (`WHATSAPP_PROVIDER`, `TWILIO_*`, `PUBLIC_GATEWAY_URL`), `google_gateway.py` (three new routes), `workspace/routes.py` (status uses the active provider); tests `tests/unit/test_twilio_signature.py`, `tests/integration/test_twilio.py` (new), `tests/unit/test_surface_inventory.py` (gateway inventory adds the three routes); docs `docs/reference/WHATSAPP.md`, `docs/reference/CONFIGURATION.md`, `docs/DECISIONS.md` (D43), `docs/MORNING_ACTIONS.md`, `docs/diagrams/system-boundaries.mmd` + rendered SVG; `graphify-out/`.
+- Checked: `npm run lint:python` -> passed; `npm run check:architecture` -> passed (92 modules); `npm run test:python` -> 382 passed, 66 skipped, 3 deselected, 1 xfailed; `npm run diagrams:render` + `diagrams:check` -> passed (27); `npm run graph:update` -> rebuilt (`graphify-out/GRAPH_REPORT.md` and `manifest.json` lose lines because they are regenerated, not hand-edited); `npm run check:rules` -> passed. Twilio signature code matches twilio-python's published vector. Not run: `verify:full`, browser tests, any real Twilio call; the rendered SVG was not looked at (local screenshot helper failed).
+- Evidence: none (local-substitute tests only).
+- Open: user creates the Twilio trial, joins the sandbox, fills `.env.local` and sets the inbound webhook URL (steps in `docs/MORNING_ACTIONS.md`); then a live text and quotation round trip is still unproven.
+
+### 2026-11-07 - Telegram bot channel added (phase 4, local-substitute)
+- Why: user asked to move the agent to Telegram because Twilio is not free in Egypt and Meta is blocked (D44).
+- Changed: new `app/backend/luma/features/messaging/{telegram_client,telegram_ingress}.py`, `supabase/migrations/20261107010000_telegram_channel.sql`, `scripts/telegram_check.py` (+ `telegram:check` in `package.json`), `tests/integration/test_telegram.py`, `docs/reference/TELEGRAM.md`; updated `messaging/{provider,inbound,outbound,allowlist,webhook}.py`, `core/config.py`, `workspace/routes.py`, `app/agents/luma_agent/{worker.py,runtime/delivery.py}`, frontend channel labels and the Telegram connection card (`Overview.tsx`, `ConversationThread.tsx`, `ConversationComposer.tsx`, `ReviewActions.tsx`, `InboxPage.tsx`, `NewRequest.tsx`, `ConnectionsPage.tsx`), docs `README.md`, `reference/{CONFIGURATION,BACKEND,DATA_MODEL}.md`, `DECISIONS.md` (D44), `MORNING_ACTIONS.md`, `diagrams/system-boundaries.mmd` + rendered SVG, `graphify-out/`. Local DB: the new migration was applied with psql because the CLI migration history does not track earlier files.
+- Checked: `npm run lint:python` -> passed; `npm run check:architecture` -> passed; `npm run check:frontend` -> passed (46); frontend `typecheck` -> passed; `npm run test:ui` -> 5 passed; `tests/integration/test_telegram.py` -> 17 passed; mutation check (httpx log guard removed -> token test failed; file restored and compared); `diagrams:render` + `diagrams:check` -> passed (27); `graph:update` -> rebuilt; full `npm run test:python` -> 399 passed, 66 skipped, 3 deselected, 1 xfailed. Not run: `verify:full`, browser tests, any real Telegram call.
+- Evidence: none (local-substitute tests only).
+- Open: user creates the bot in @BotFather and fills `.env.local` (steps in `docs/MORNING_ACTIONS.md`); then a live round trip to a phone is still unproven.
+
+### 2026-11-07 - Telegram live smoke test (phase 4, live)
+- Why: user created `@luma_quote_bot` and asked to connect it.
+- Changed: ignored `.env.local` (Telegram token, company, allowlist, live switch; values never printed); `docs/MORNING_ACTIONS.md`, `docs/reference/TELEGRAM.md` (live status).
+- Checked: `npm run telegram:check` -> bot identity confirmed and one private sender found; worker log -> "Telegram polling started"; `luma.inbox` -> 2 Telegram text rows `done`; `luma.outbox` -> 2 Telegram replies `submitted`. Not run: quotation PDF send, voice/photo media, automated tests (no code changed).
+- Evidence: none (database status read by query; no evidence file).
+- Open: user confirms the replies arrived on the phone, then tests a quotation request and PDF; the token was pasted in chat and should be rotated with `/revoke`.
+
+### 2026-11-07 - Showcase 3D: track-light showroom on Overview, pendant field on sign-in (phase 5, local-substitute)
+- Why: user asked for 3D components so the app looks striking in a LinkedIn / social post.
+- Changed: new `app/frontend/src/features/showcase/{sceneKit.ts,PendantField.tsx}`; rewrote `app/frontend/src/features/overview/LightingScene.tsx` (R6: 92 lines removed on purpose, because the static luminaire with OrbitControls is replaced by the animated showroom); `SceneBoundary.tsx` (optional `fallback`); `overview.css` (hero 310 -> 380 px); `app/frontend/src/features/auth/{SignIn.tsx,auth.css}` (pendant canvas, scrim, headline moved to the bottom); `docs/reference/FRONTEND.md`; `docs/evidence/scene-review-2026-11-07.json`; `graphify-out/` (`npm run graph:update`). Pre-existing uncommitted edits in `Overview.tsx` and `overview.css` (Telegram label, 24 px targets) were left as they were.
+- Checked: frontend `tsc --noEmit` -> passed; `npm run check:frontend` -> passed (48 modules); `npm run test:ui` -> 5 passed; `pytest tests/integration/test_scene_review.py -m browser` -> 1 passed; `vite build` -> passed (entry 616.81 kB unchanged); screenshots at 1440 px and 390 px, motion and reduced motion, checked by eye. Not run: `verify:full`, `test:browser` page review, real-GPU frame rate.
+- Evidence: `docs/evidence/scene-review-2026-11-07.json`.
+- Open: frame rate on a real GPU is unmeasured; the sign-in page now loads the Three.js chunk; for the post, record the screen from a real browser, because headless capture is software-rendered and choppy.
+
 ### 2026-11-03 - Frontend phase 5 plan added on its own branch and worktree (phase 5, local)
 - Why: user asked to execute `docs/proposals/2026-11-03-frontend-plan.md` unattended (D39, D40); task F0.
 - Changed: worktree `C:\Nagdy\Mustafa\Work\Upwork\lumaquote-frontend` on `feat/frontend-phase5` from `origin/main` (853147d); `docs/proposals/2026-11-03-frontend-plan.md` (copied from the main folder), `docs/IMPLEMENTATION_PLAN.md` (phase 5 plan link), `docs/DECISIONS.md` (rows D39 and D40 only; D37 and D38 stay in the main folder's uncommitted edits, so the table has a gap until that work is committed).
@@ -935,3 +1113,10 @@ these entries were logged during the original steps or freshly rerun today.
 - Checked (`local`): `diagrams:render` and `diagrams:check` passed (19 diagrams). The complete `verify:full` for the new tip is in the PR body.
 - Evidence: none.
 - Open: none.
+
+### 2026-11-07 - Commit pending work and merge origin/main (git housekeeping, local)
+- Why: user asked to fix git and commits; main was 12 commits behind origin (PR #1, frontend phase 5) with 125 uncommitted files.
+- Changed: new branch `work/messaging-channels-and-scene` with 4 grouped commits plus a merge of `origin/main`; conflicts in ReviewActions, package.json, verify.cjs, manual-workflow, browser_servers, docs; diagrams and graphify-out regenerated. Local `main` untouched and nothing pushed.
+- Checked: `check:rules`, `check:secrets` (no leaks), `check:frontend`, `test:ui` (66 passed), `diagrams:check` -> pass; not run: `test:python`, `test:browser`, `verify:full`.
+- Evidence: none.
+- Open: run `npm run verify:full` on this branch; decide push and PR; fast-forward local `main` after merge.

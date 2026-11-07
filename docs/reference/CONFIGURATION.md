@@ -92,6 +92,22 @@ is the master gate for real sending. The adapter is implemented but verified onl
 Graph transport; see [WhatsApp channel](WHATSAPP.md). These fields do not create a free-message
 entitlement or an authorized recipient.
 
+`WHATSAPP_PROVIDER` selects the adapter: `meta` (default, Graph Cloud API, D11) or `twilio`
+(Twilio WhatsApp Sandbox, D43); any other value fails settings validation at startup. With
+`twilio`, the Meta-only fields are unused and these apply: `TWILIO_ACCOUNT_SID` (`AC` + 32 hex),
+`TWILIO_AUTH_TOKEN` (backend-only secret; signs webhooks, authenticates API calls and derives the
+media-link key), `TWILIO_WHATSAPP_FROM` (sender digits, for the shared sandbox `14155238886`) and
+`PUBLIC_GATEWAY_URL` (the HTTPS tunnel origin with no trailing slash; Twilio signs the exact URL, so
+this must equal what is entered in the Twilio Console). `WHATSAPP_COMPANY_ID`,
+`WHATSAPP_TEST_RECIPIENTS` and `ENABLE_LIVE_WHATSAPP` keep the same meaning for both providers.
+The Twilio webhooks answer 503 until all Twilio fields and the company are set.
+
+Telegram (D44) uses `TELEGRAM_BOT_TOKEN` (backend-only secret from @BotFather; it is part of every
+Bot API URL, so URLs are never logged), `TELEGRAM_COMPANY_ID` (the tenant for every update),
+`TELEGRAM_ALLOWED_USERS` (comma-separated numeric user ids; empty admits nobody; find ids with
+`npm run telegram:check`) and `ENABLE_LIVE_TELEGRAM` (default false; master switch for real sends).
+The worker polls only when the token and company are set. See [Telegram channel](TELEGRAM.md).
+
 `GOOGLE_SHEET_ID`, `GOOGLE_COMPANY_ID` and `GOOGLE_CALLBACK_SECRET` bind the signed
 receiver to one approved workbook/company. The secret is backend-only and must
 match private GAS Script Properties. Current workspace status requires all three

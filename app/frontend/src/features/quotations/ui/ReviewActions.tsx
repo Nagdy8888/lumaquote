@@ -85,7 +85,9 @@ export function ReviewActions({
   const channel =
     conversation.channel === "local_test"
       ? "the local test channel"
-      : "WhatsApp";
+      : conversation.channel === "telegram"
+        ? "Telegram"
+        : "WhatsApp";
   const customer = capture ? "this customer" : conversation.customer_name;
   return (
     <footer className="quotation-actions">

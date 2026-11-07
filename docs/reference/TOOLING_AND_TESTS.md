@@ -83,13 +83,11 @@ flowchart LR
 - `tests/integration/test_live_evaluation.py` + `scripts/summarize_agent_run.py`: **opt-in paid**
   (`LUMA_RUN_LIVE_EVAL=1`; `LUMA_EVAL_IDS`, `LUMA_EVAL_RUN`, `LUMA_EVAL_MAX_USD` default 3) agent run of
   the development scenarios through the real API, media upload, transcription/vision/Responses,
-  graph and jobs, in an isolated tenant seeded with the 72-model catalog. Staff approval and
+  graph and jobs, in an isolated tenant seeded with the 72-model catalog. Every job runs inside the
+  worker's masked LangSmith root trace (decision D42), tagged with the run name and scenario id in
+  the trace inputs; the test asserts tracing is enabled before any paid call. Staff approval and
   delivery are never run. It records measurements, not assertions, and cannot select the holdout.
   It must not be run without the user's go-ahead for paid calls; routine gates skip it.
-- `scripts/retention.py`: operator retention (7-day runtime media, 90-day business data); dry run
-  unless `--execute`; see [data model](DATA_MODEL.md#checkpoints-retention-and-preservation).
-  `scripts/backup_restore_drill.py`: dump, scratch restore, comparison and object round trip.
-  Both refuse any target but the local database and need an explicit company id.
 - `scripts/retention.py`: operator retention (7-day runtime media, 90-day business data); dry run
   unless `--execute`; see [data model](DATA_MODEL.md#checkpoints-retention-and-preservation).
   `scripts/backup_restore_drill.py`: dump, scratch restore, comparison and object round trip.
@@ -112,14 +110,34 @@ flowchart LR
   direction and local import cycles. Generated declarations are excluded; this
   is not a complete semantic audit of every anonymous callback or UX state.
 - `scripts/verify.cjs`: sequential gate orchestration, private per-command logs and
-  summary and first-failure stop. Commands have a 180-second timeout except the
-  full Python integration suite, which has a bounded 600-second allowance (raised from 420 after the suite grew to about 345 s) after
-  an observed 180-second timeout during cold local verification. The summary
-  records the effective deadline and process error code; timeout is a failure.
+  summary and first-failure stop. Commands have a 180-second timeout except two:
+  the full Python integration suite (`test:python`) has 1500 seconds and the browser
+  suite (`test:browser`) 420 seconds. Both were raised on 2026-11-03 after the suite
+  grew (the green run took 591 s for Python and 98 s for the browser) and the
+  browser suite gained the scene and page reviews. The summary records the
+  effective deadline and process error code; timeout is a failure. The step order is
+  drawn in the [verify gate view](../layers/verification.md#the-verify-gate).
 
 Package scripts in root `package.json` are the canonical runnable names. Vite,
 Vitest, browser and Python wrappers keep their own configured working directories;
 do not copy commands from an unrelated Next.js or RAG project.
+
+## Git workflow
+
+- `main` is the integration branch; do not commit work directly to it. Start each change on a
+  branch from an up-to-date `main`: `feat/<topic>`, `fix/<topic>`, `docs/<topic>`, `test/<topic>`
+  or `chore/<topic>`.
+- Commits use Conventional Commits (`feat(scope): ...`) and are grouped by concern. Stage only
+  your own files (R15). Never force-push or rewrite pushed history.
+- Before a PR: `npm run check:rules`, `npm run check:secrets`, the narrow checks for the change,
+  and `npm run verify:full` for anything that touches behavior (R12). The PR body uses
+  `.github/pull_request_template.md`; list skipped checks as skipped.
+- CI (`.github/workflows/ci.yml`) runs on every push and pull request. Local results and remote
+  CI are reported separately.
+- Merge with a merge commit after CI passes, then delete the branch and update `main`:
+  `git switch main && git pull --ff-only && git branch -d <branch>`.
+- Branch protection, required reviewers and CODEOWNERS are not set up; adding them needs a
+  decision in `docs/DECISIONS.md`.
 
 ## Offline and full gates
 
@@ -185,17 +203,27 @@ failure; do not infer the fixture is a universal crash-proof garbage collector.
   family table equal to `luma.setup.bootstrap`) and the validator rejects a wrong
   subtotal, a quote for unsupported stock, a family crossing the boundary, media
   advancing past clarification and a missing oracle entry. It also scans `app/`,
-  `gas/` and `supabase/` to ensure nothing reads the fixtures. It proves dataset
-  coherence only; no voice/photo asset exists and no agent is run.
+  `gas/` and `supabase/` to ensure nothing reads the fixtures. Every media turn has a
+  hashed synthetic asset that stays unconfirmed. Since 2026-11-03 (decision D38) the
+  retrieval denominator is 14 (5 in the holdout): each Recall@5 label carries a `spec`,
+  its targets must equal the current models matching that spec, and a text request must
+  state the spec without naming a model code. It proves dataset coherence only; no agent is run.
 - `test_trace_masking.py` (replaced `test_trace_privacy.py` on 2026-11-03, decision D24):
   masking rules, kept business content, dropped media, and a real `langsmith.Client` with a
   fake HTTP session exporting a root, a LangGraph step and a model call without the planted
-  secret/phone; tracing forced off outside a job trace. Live proof: opt-in
+  secret/phone; nested probes (traceable tool, subgraph, exception text, job payload, metadata
+  keys) and the production client's masking options, including `anonymizer` for a run's `error`
+  field (the exception probe leaked before that fix, 2026-11-03); tokens and estimated cost on
+  model-call runs (`set_usage`); tracing forced off outside a job trace. Live proof: opt-in
   `tests/integration/test_trace_canary.py` (`LUMA_RUN_TRACE_CANARY=1`).
 - `test_embedding_contracts.py`: vector shape/value validation, shared conservative
   constraints and provider index correlation without network/database calls.
 - `test_catalog_questions.py`: malicious descriptive/catalog prose cannot become
   commercial instructions in the fixed candidate confirmation question.
+- `test_surface_inventory.py` (2026-11-03): the staff API exposes exactly the reviewed 18
+  operations (17 bearer-protected plus health), the gateway exactly its 6 signed receivers with
+  no documentation or staff route, and only health and FastAPI's documentation are mounted
+  directly. A route change fails it until the [surface inventory](BACKEND.md#surface-inventory-reviewed-2026-11-03) is reviewed.
 - `useQuotationDraft.test.tsx`: dirty edit/version behavior across server changes.
 - `VoiceNoteUpload.test.tsx`: stable selected file/key/version retry behavior in
   shared MediaUpload despite the historical test filename.
@@ -226,7 +254,11 @@ estimated spend USD 0.013 (app estimate, not billing). The one failure is a mode
 "1 OD-001" as quantity unknown. The run also showed the model returns a null-SKU placeholder line
 for descriptive requests, which suppressed candidate suggestions; that bug is fixed
 (`requirements.has_explicit_lines`) with unit tests but not re-measured because paid calls were
-stopped. Not done: any holdout run, human speech or real photos, the plan's pooled targets (they
+stopped. On 2026-11-03, before any freeze, seven plain text scenarios were rewritten into
+spec descriptions and labeled, so the set now has 14 retrieval cases (9 development, 5 holdout)
+and each label is checked against the catalog by `evaluation_dataset.validate`; runs 1 and 2
+predate that change ([relabel evidence](../evidence/evaluation-relabel-baseline-2026-11-03.json),
+offline baseline 30/30, retrieval 7/7 on the development text cases, `local`). Not done: any holdout run, human speech or real photos, the plan's pooled targets (they
 need the holdout), and a measured agent-versus-baseline comparison beyond the text subset.
 
 ## Integration coverage by responsibility
@@ -281,6 +313,17 @@ need the holdout), and a measured agent-versus-baseline comparison beyond the te
   submission, four failure classes, all gates, monotonic receipts, early receipt, exact PDF bytes).
   Mutation checks removing the allowlist, signature and media-host checks each failed the matching test.
   It never contacts Meta; see [WhatsApp channel](WHATSAPP.md) for what is unproven.
+- `test_admission_limits.py` (2026-11-03): every per-minute limit through the real API (reads 120,
+  catalog search 30, staff replies 10, decisions 10, voice uploads 6, 6 customer messages per
+  conversation), the denial counter surviving its own 429, key isolation and the 100-job queue cap
+  (503). One strict xfail records that a request failing after admission (409, 404) rolls its
+  increment back; see [backend admission](BACKEND.md#admission-and-repeat-submissions).
+- `test_outages.py` (2026-11-03): database unreachable gives 503 with `Retry-After: 30` and no host or
+  DSN in the body, then recovers; a Storage transport error during a voice upload leaves no message,
+  media or job row and the retry succeeds. Staff API only; the gateway has no outage handler.
+- `test_migrations.py` (2026-11-03): all 15 migrations apply cleanly to an empty database and equal the
+  live local schema (a negative check with the last file omitted fails); `anon` and `authenticated`
+  have no grants on `luma` tables; a pending job survives the later five files.
 - `test_api_boundaries.py`: 13 tests of the real staff API and gateway: missing/malformed/forged bearer tokens
   and an Auth outage fail closed; CORS grants only the exact local origins (lookalike, null, other-port and https
   origins get nothing; DELETE and unlisted headers fail preflight); every response of both processes is
@@ -335,6 +378,23 @@ It checks browser exceptions, Axe findings on the tested desktop and portrait
 flow, and horizontal overflow at 390px. It uses reduced motion. It does not
 establish interactive WebGL performance, every route's accessibility, live
 transcription/photo accuracy or WhatsApp receipts.
+
+`npm run test:browser` also runs two reviews through `tests/integration/browser_servers.py`, which
+starts isolated API and Vite servers on free loopback ports for a fixture tenant and always stops them:
+
+- `test_scene_review.py` + `tests/browser/scene-review.cjs`: the 3D overview scene rendered with
+  software WebGL (not reduced motion), its accessible name, keyboard path, fallback and capture mode.
+  [Evidence](../evidence/scene-review-2026-11-03.json), `local-substitute`.
+- `test_page_review.py` + `tests/browser/page-review.cjs`: axe, horizontal overflow, one main landmark,
+  named controls and a 24 px minimum target on 14 views (six pages plus a populated conversation, at
+  1440 px and 430 px). [Evidence](../evidence/page-accessibility-review-2026-11-03.json),
+  `local-substitute`. Approved, delivered and failed-media states are not in this run.
+
+Showcase recording: with `LUMA_RECORD_DIR` set, `manual-workflow.cjs` records a 1280x800 video into that
+folder, pauses between steps so a viewer can read them, signs in on a throwaway page (deleted afterwards)
+so the email and password never appear, turns on capture mode and fails if a credential, email or phone
+pattern becomes visible. The Python wrapper then allows 300 s instead of 90 s. The normal test is
+unchanged when the variable is unset.
 
 Screenshots are ignored local artifacts, including photo intake, stale editor,
 delivered quote and portrait capture. Inspect the actual screenshot before making
@@ -407,6 +467,12 @@ four skipped paid canaries, five UI tests, the separate browser, build, inline
 contracts and all 15 diagrams passed. The 40-case development policy actions
 and 15 focused graph/restart checks have separate scope/denominators in that
 artifact; neither is a frozen 80-case media result or real-provider accuracy.
+
+[The November 3 checkpoint](../evidence/checkpoint-2026-11-03.json) records the first complete green
+`verify:full` (13 of 13 steps): 364 Python tests passed, 66 opt-in paid tests skipped, 3 deselected and
+1 expected failure in 591 s; 3 browser tests in 98 s; build and secret scan. A separate full Python
+run is in [python-suite-2026-11-03.json](../evidence/python-suite-2026-11-03.json). Later same-day
+edits are not covered by either run.
 
 GitHub CI runs Ubuntu Node 22/Python 3.12 with static checks, unit/UI tests and build.
 It does not start the local Supabase/sandbox/browser suite or authorize live

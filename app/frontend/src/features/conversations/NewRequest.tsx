@@ -103,8 +103,8 @@ export function NewRequest() {
         </FieldGroup>
       </form>
       <p className="form-footnote">
-        This does not contact a real customer. WhatsApp requests will appear
-        here once your test connection is configured.
+        This does not contact a real customer. Telegram and WhatsApp requests
+        will appear here once a test connection is configured.
       </p>
     </section>
   );

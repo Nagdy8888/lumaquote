@@ -1,0 +1,35 @@
+flowchart TB
+  accTitle: LumaQuote layers and allowed dependency direction
+  accDescr: Seven layers. The React app calls only the staff API through the Vite proxy. The staff API and the signed gateway delegate to business features. Features and the worker use core infrastructure, which alone talks to PostgreSQL and private Storage. The worker calls feature business interfaces and reaches optional external providers. External services reach the system only through the signed gateway.
+  subgraph P["1 Presentation: app/frontend/src"]
+    AppC["app: providers, routes, shell"] --> Feat["features: pages, queries, mutations"]
+    Feat --> Shared["shared: API client, session, UI kit"]
+  end
+  subgraph T["2 Transport: two FastAPI processes"]
+    StaffAPI["Staff API main.py :8001"]
+    Gateway["Signed gateway google_gateway.py :8002"]
+  end
+  subgraph B["3 Business features: luma/features"]
+    Features["conversations, quotations, catalog, media, workspace, messaging, google_sync"]
+  end
+  subgraph W["4 Agent worker: app/agents/luma_agent"]
+    Worker["worker tick, runtime, graph, nodes, adapters, observability"]
+  end
+  subgraph C["5 Core: luma/core"]
+    Core["config, database, identity, http, admission, idempotency, storage, audit, errors"]
+  end
+  subgraph D["6 Data: local Supabase"]
+    Data[("PostgreSQL luma schema, graph checkpoints, private Storage")]
+  end
+  subgraph X["7 External, optional and gated"]
+    Ext["OpenAI, LangSmith, Meta Graph, Google Apps Script"]
+  end
+  Shared -->|"/api with bearer token"| StaffAPI
+  StaffAPI --> Features
+  Gateway --> Features
+  Worker -->|"business interfaces"| Features
+  Features --> Core
+  Worker --> Core
+  Core --> Data
+  Worker -. "reserved paid calls, masked traces, gated sends" .-> Ext
+  Ext -. "signed callbacks and webhooks" .-> Gateway

@@ -1,0 +1,245 @@
+{
+  "date": "2026-11-03",
+  "commit": "853147d plus uncommitted change",
+  "label": "local-substitute",
+  "command": "node scripts/python.cjs -m pytest tests/integration/test_page_review.py -m browser",
+  "result": "passed",
+  "scope": "Seven staff views (overview, inbox, new request, quotations, catalog, connections, one populated conversation with a draft quotation) at 1440 px and 430 px, reduced motion, axe-core in headless Chromium on a synthetic tenant. 14 views.",
+  "findings": [
+    "Zero axe violations, no horizontal overflow, exactly one main landmark and an h1, and no unnamed controls on all 14 views.",
+    "WCAG 2.2 target size (24 x 24 minimum): the 'Capture mode' icon button was 14 x 14 in portrait, the quote line remove button 23 x 23, and eight text links 18 px high. Fixed with min-width/min-height 24 px in shell.css, overview.css and conversations.css; the test now fails on any smaller control.",
+    "Copy: the inbox header read '1 conversations'; now singular.",
+    "Focus order starts with 'Skip to workspace', then the brand link and the sidebar."
+  ],
+  "views": {
+    "overview-desktop": {
+      "axe": [],
+      "horizontal_overflow": false,
+      "main_landmarks": 1,
+      "h1_count": 1,
+      "small_targets": [],
+      "unnamed_controls": 0,
+      "focus_order_first_stops": [
+        "a:Skip to workspace",
+        "a:LumaQuote.",
+        "a:Overview",
+        "a:Inbox",
+        "a:Quotations",
+        "a:Catalog & evidence"
+      ]
+    },
+    "inbox-desktop": {
+      "axe": [],
+      "horizontal_overflow": false,
+      "main_landmarks": 1,
+      "h1_count": 1,
+      "small_targets": [],
+      "unnamed_controls": 0,
+      "focus_order_first_stops": [
+        "a:Skip to workspace",
+        "a:LumaQuote.",
+        "a:Overview",
+        "a:Inbox",
+        "a:Quotations",
+        "a:Catalog & evidence"
+      ]
+    },
+    "new-request-desktop": {
+      "axe": [],
+      "horizontal_overflow": false,
+      "main_landmarks": 1,
+      "h1_count": 1,
+      "small_targets": [],
+      "unnamed_controls": 0,
+      "focus_order_first_stops": [
+        "a:Skip to workspace",
+        "a:LumaQuote.",
+        "a:Overview",
+        "a:Inbox",
+        "a:Quotations",
+        "a:Catalog & evidence"
+      ]
+    },
+    "quotations-desktop": {
+      "axe": [],
+      "horizontal_overflow": false,
+      "main_landmarks": 1,
+      "h1_count": 1,
+      "small_targets": [],
+      "unnamed_controls": 0,
+      "focus_order_first_stops": [
+        "a:Skip to workspace",
+        "a:LumaQuote.",
+        "a:Overview",
+        "a:Inbox",
+        "a:Quotations",
+        "a:Catalog & evidence"
+      ]
+    },
+    "catalog-desktop": {
+      "axe": [],
+      "horizontal_overflow": false,
+      "main_landmarks": 1,
+      "h1_count": 1,
+      "small_targets": [],
+      "unnamed_controls": 0,
+      "focus_order_first_stops": [
+        "a:Skip to workspace",
+        "a:LumaQuote.",
+        "a:Overview",
+        "a:Inbox",
+        "a:Quotations",
+        "a:Catalog & evidence"
+      ]
+    },
+    "connections-desktop": {
+      "axe": [],
+      "horizontal_overflow": false,
+      "main_landmarks": 1,
+      "h1_count": 1,
+      "small_targets": [],
+      "unnamed_controls": 0,
+      "focus_order_first_stops": [
+        "a:Skip to workspace",
+        "a:LumaQuote.",
+        "a:Overview",
+        "a:Inbox",
+        "a:Quotations",
+        "a:Catalog & evidence"
+      ]
+    },
+    "conversation-desktop": {
+      "axe": [],
+      "horizontal_overflow": false,
+      "main_landmarks": 1,
+      "h1_count": 1,
+      "small_targets": [],
+      "unnamed_controls": 0,
+      "focus_order_first_stops": [
+        "a:Skip to workspace",
+        "a:LumaQuote.",
+        "a:Overview",
+        "a:Inbox",
+        "a:Quotations",
+        "a:Catalog & evidence"
+      ]
+    },
+    "overview-portrait": {
+      "axe": [],
+      "horizontal_overflow": false,
+      "main_landmarks": 1,
+      "h1_count": 1,
+      "small_targets": [],
+      "unnamed_controls": 0,
+      "focus_order_first_stops": [
+        "a:Skip to workspace",
+        "a:LumaQuote.",
+        "a:Overview",
+        "a:Inbox",
+        "a:Quotations",
+        "summary:More workspace navigation"
+      ]
+    },
+    "inbox-portrait": {
+      "axe": [],
+      "horizontal_overflow": false,
+      "main_landmarks": 1,
+      "h1_count": 1,
+      "small_targets": [],
+      "unnamed_controls": 0,
+      "focus_order_first_stops": [
+        "a:Skip to workspace",
+        "a:LumaQuote.",
+        "a:Overview",
+        "a:Inbox",
+        "a:Quotations",
+        "summary:More workspace navigation"
+      ]
+    },
+    "new-request-portrait": {
+      "axe": [],
+      "horizontal_overflow": false,
+      "main_landmarks": 1,
+      "h1_count": 1,
+      "small_targets": [],
+      "unnamed_controls": 0,
+      "focus_order_first_stops": [
+        "a:Skip to workspace",
+        "a:LumaQuote.",
+        "a:Overview",
+        "a:Inbox",
+        "a:Quotations",
+        "summary:More workspace navigation"
+      ]
+    },
+    "quotations-portrait": {
+      "axe": [],
+      "horizontal_overflow": false,
+      "main_landmarks": 1,
+      "h1_count": 1,
+      "small_targets": [],
+      "unnamed_controls": 0,
+      "focus_order_first_stops": [
+        "a:Skip to workspace",
+        "a:LumaQuote.",
+        "a:Overview",
+        "a:Inbox",
+        "a:Quotations",
+        "summary:More workspace navigation"
+      ]
+    },
+    "catalog-portrait": {
+      "axe": [],
+      "horizontal_overflow": false,
+      "main_landmarks": 1,
+      "h1_count": 1,
+      "small_targets": [],
+      "unnamed_controls": 0,
+      "focus_order_first_stops": [
+        "a:Skip to workspace",
+        "a:LumaQuote.",
+        "a:Overview",
+        "a:Inbox",
+        "a:Quotations",
+        "summary:More workspace navigation"
+      ]
+    },
+    "connections-portrait": {
+      "axe": [],
+      "horizontal_overflow": false,
+      "main_landmarks": 1,
+      "h1_count": 1,
+      "small_targets": [],
+      "unnamed_controls": 0,
+      "focus_order_first_stops": [
+        "a:Skip to workspace",
+        "a:LumaQuote.",
+        "a:Overview",
+        "a:Inbox",
+        "a:Quotations",
+        "summary:More workspace navigation"
+      ]
+    },
+    "conversation-portrait": {
+      "axe": [],
+      "horizontal_overflow": false,
+      "main_landmarks": 1,
+      "h1_count": 1,
+      "small_targets": [],
+      "unnamed_controls": 0,
+      "focus_order_first_stops": [
+        "a:Skip to workspace",
+        "a:LumaQuote.",
+        "a:Overview",
+        "a:Inbox",
+        "a:Quotations",
+        "summary:More workspace navigation"
+      ]
+    }
+  },
+  "limits": [
+    "Automated axe finds roughly a third of WCAG issues; no screen-reader, zoom/reflow at 400%, voice-control or real-device review.",
+    "Pages beyond an empty tenant were only reviewed for the one populated conversation; approved, delivered, failed-media and error states are not in this run.",
+    "Screenshots in docs/evidence/screenshots/2026-11-03/ show synthetic data only."
+  ]
+}

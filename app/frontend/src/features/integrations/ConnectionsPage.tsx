@@ -4,6 +4,7 @@ import {
   Database,
   FileSpreadsheet,
   MessageCircle,
+  Send,
   ShieldCheck,
   Workflow,
 } from "lucide-react";
@@ -18,7 +19,16 @@ const connections = [
     description:
       "Customer messages, English voice notes, label photos, and quotation delivery.",
     requirement:
-      "Requires your Meta app, test number, authorized recipient, and a verified webhook.",
+      "Requires a Meta app or the Twilio Sandbox, an authorized recipient, and a verified webhook.",
+  },
+  {
+    key: "telegram",
+    name: "Telegram",
+    icon: Send,
+    description:
+      "Customer messages, voice notes, label photos, and quotation PDFs through your bot.",
+    requirement:
+      "Requires a bot token from BotFather and the allowed customer user ids. No tunnel needed.",
   },
   {
     key: "google",

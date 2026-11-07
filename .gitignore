@@ -21,3 +21,6 @@ playwright-report/
 # graphify: keep graph.json, graph.html and GRAPH_REPORT.md; the extraction cache is per machine.
 graphify-out/cache/
 graphify-out/.graphify_*
+
+# Playwright MCP browser snapshots and console logs (may contain account data)
+.playwright-mcp/

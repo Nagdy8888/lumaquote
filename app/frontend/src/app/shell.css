@@ -212,6 +212,9 @@
   display: flex;
   gap: 6px;
   align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  min-height: 24px;
   font-size: 12px;
 }
 .capture-button svg {
@@ -277,6 +280,9 @@
   display: flex;
   align-items: center;
   gap: 6px;
+}
+.app-footer a {
+  min-height: 24px;
 }
 .app-footer svg {
   width: 12px;
@@ -405,6 +411,8 @@
   padding: 5px;
   margin-left: auto;
   flex-shrink: 0;
+  min-width: 24px;
+  min-height: 24px;
 }
 .icon-button > svg {
   width: 13px;
@@ -441,6 +449,11 @@
 .large-empty a {
   font-size: 12px;
   color: #5f6956;
+}
+.large-empty a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
 }
 .out-of-stock {
   font-size: 12px;

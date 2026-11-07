@@ -23,6 +23,7 @@ import pytest
 from luma.core.config import settings
 from luma.core.errors import DomainError
 from luma.setup.bootstrap import FAMILIES
+from luma_agent import observability as tracing
 from luma_agent.runtime.audio import process_audio
 from luma_agent.runtime.conversations import process_conversation
 from luma_agent.runtime.jobs import finish_job
@@ -148,8 +149,13 @@ def seed_catalog(env):
                 )
 
 
-def drain(env, cid, errors):
-    """Run this conversation's queued jobs in-process like `worker.tick`, never touching another tenant."""
+def drain(env, cid, errors, scenario):
+    """Run this conversation's queued jobs in-process like `worker.tick`, never touching another tenant.
+
+    Every job runs inside the worker's masked LangSmith root trace (`observability.job_trace`), so the
+    evaluation is traced exactly like production; the traced copy of the job also names the evaluation
+    run and scenario so each trace can be found. The copy is used for tracing only.
+    """
     for _ in range(10):
         with psycopg.connect(env["dsn"], row_factory=dict_row) as conn:
             job = conn.execute(
@@ -161,19 +167,33 @@ def drain(env, cid, errors):
             ).fetchone()
         if not job:
             return
-        try:
-            if job["kind"] == "agent":
-                process_conversation(job)
-            elif job["kind"] == "transcribe":
-                process_audio(job)
-            elif job["kind"] == "read_photo":
-                process_media(job, "image")
-            else:
-                raise DomainError("Unexpected job kind.")
-            finish_job(job, "done")
-        except Exception as error:
-            errors.append(type(error).__name__)
-            finish_job(job, "blocked" if isinstance(error, DomainError) else "failed", type(error).__name__)
+        traced = {
+            **job,
+            "payload": {
+                **(job.get("payload") or {}),
+                "evaluation_run": os.environ.get("LUMA_EVAL_RUN", "unnamed"),
+                "evaluation_scenario": scenario,
+            },
+        }
+        with tracing.job_trace(traced) as run:
+            outcome, failure = "done", None
+            try:
+                if job["kind"] == "agent":
+                    process_conversation(job)
+                elif job["kind"] == "transcribe":
+                    process_audio(job)
+                elif job["kind"] == "read_photo":
+                    process_media(job, "image")
+                else:
+                    raise DomainError("Unexpected job kind.")
+                finish_job(job, "done")
+            except Exception as error:
+                outcome = "blocked" if isinstance(error, DomainError) else "failed"
+                failure = type(error).__name__
+                errors.append(failure)
+                finish_job(job, outcome, failure)
+            tracing.finish(run, outcome, failure)
+        tracing.flush()
 
 
 def observe(env, cid):
@@ -217,7 +237,7 @@ def run_turns(env, item, errors):
             data = (dataset.FIXTURES / turn["spec"]["asset"]).read_bytes()
             sent = (upload if turn["kind"] == "audio" else upload_photo)(env, cid, data)
             assert sent.status_code == 200, sent.text
-        drain(env, cid, errors)
+        drain(env, cid, errors, item["id"])
         observed.append(observe(env, cid)[0])
     detail = get_detail(env, cid)
     for message in detail["messages"]:
@@ -242,8 +262,12 @@ def test_agent_on_development_scenario(environment, monkeypatch, item):
         pytest.skip(f"run spend cap USD {MAX_USD} reached")
     seed_catalog(env)
     monkeypatch.setenv("ENABLE_PAID_AI", "true")
-    monkeypatch.setenv("LANGSMITH_TRACING", "false")
+    monkeypatch.setenv("LANGSMITH_TRACING", "true")
     settings.cache_clear()
+    tracing.reset()
+    assert tracing.tracing_enabled(), (
+        "Every evaluation run must be traced: set LANGSMITH_API_KEY in .env or .env.local"
+    )
     errors: list[str] = []
     try:
         cid, observed, subtotal, replies, readings, milliseconds = run_turns(env, item, errors)

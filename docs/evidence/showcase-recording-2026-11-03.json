@@ -1,0 +1,20 @@
+{
+  "date": "2026-11-03",
+  "commit": "853147d plus uncommitted change",
+  "label": "local-substitute",
+  "command": "LUMA_RECORD_DIR=.local/showcase npm-equivalent: python -m pytest tests/integration/test_browser_workflow.py (tests/browser/manual-workflow.cjs, headless Chromium, 1280x800)",
+  "result": "1 passed; 66 s silent screen recording of the local workflow; private-pattern scan passed at every pause; 13 sampled frames reviewed, no credential, email, phone, token or real name visible.",
+  "file": ".local/showcase/lumaquote-local-walkthrough-2026-11-03.webm (ignored by git, 7.6 MB; not committed)",
+  "what_it_shows": [
+    "Overview in capture mode, new local request, synthetic voice note and label photo in the thread (unconfirmed, 'needs staff' because automatic transcription and reading were off in this run)",
+    "Quotation draft ($97.05 for 3 x DL-001), catalog evidence, take over, staff reply delivered in local test, stale-edit conflict and discard, revision 2 ($129.40), PDF view, approval of the exact revision, 'Delivery queued'",
+    "Portrait width of the inbox"
+  ],
+  "limits": [
+    "Local substitute: local test channel, local Supabase, fixture worker steps; no live WhatsApp, Google or model call.",
+    "Voice and photo were not transcribed or read in this recording (paid AI off), so shot 3 (agent clarification) is not shown; the written-confirmation rule is evidenced by tests, not this video.",
+    "Silent, about 66 s against the 90-120 s outline; no narration or closing card. The portrait segment leaves a grey area beside the narrow viewport. The first second is a blank loading frame. Trim and add narration before publishing.",
+    "Capture mode is off while the synthetic upload controls and PDF viewer are used (the app hides them in capture mode); all names in that stretch are synthetic fixture names.",
+    "Sign-in used a throwaway page; no staff email or password was recorded."
+  ]
+}

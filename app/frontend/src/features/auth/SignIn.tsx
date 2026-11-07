@@ -1,10 +1,13 @@
 import "./auth.css";
-import { useState, type FormEvent } from "react";
+import { lazy, Suspense, useState, type FormEvent } from "react";
 import { ArrowRight, Layers3, LockKeyhole } from "lucide-react";
 import { auth } from "@/shared/auth/client";
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
 import { Field, FieldGroup, FieldLabel } from "@/shared/ui/field";
+import { SceneBoundary } from "@/features/overview/SceneBoundary";
+
+const PendantField = lazy(() => import("@/features/showcase/PendantField"));
 
 /** Authenticate actual local staff; no hard-coded credential or automatic account creation reaches the browser. */
 export function SignIn() {
@@ -28,6 +31,11 @@ export function SignIn() {
   return (
     <main className="signin">
       <section className="signin-story">
+        <SceneBoundary fallback={null}>
+          <Suspense fallback={null}>
+            <PendantField />
+          </Suspense>
+        </SceneBoundary>
         <div className="brand">
           <Layers3 />
           <span>

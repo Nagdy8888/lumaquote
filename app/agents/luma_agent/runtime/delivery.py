@@ -45,7 +45,7 @@ def deliver_one(company_id=None):
         plan = None
         try:
             current, quote = authorize_outbound(conn, item)
-            if current["channel"] == "whatsapp":
+            if current["channel"] in ("whatsapp", "telegram"):
                 # Authorized and gated under the conversation lock; the network call
                 # happens after this transaction commits (see messaging.outbound).
                 plan = begin(conn, item, current, quote)

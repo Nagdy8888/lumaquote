@@ -129,6 +129,11 @@
       "expected_subtotal": "160.00",
       "retrieval": {
         "kind": "descriptive",
+        "spec": {
+          "watts": 18,
+          "cct": 3000,
+          "ip": "IP44"
+        },
         "target_skus": [
           "DL-001"
         ]
@@ -294,6 +299,11 @@
       "expected_subtotal": "290.00",
       "retrieval": {
         "kind": "descriptive",
+        "spec": {
+          "watts": 120,
+          "cct": 3000,
+          "ip": "IP65"
+        },
         "target_skus": [
           "HB-001"
         ]
@@ -305,6 +315,11 @@
       "checkpoints": [
         {
           "after_turn": 0,
+          "action": "clarify",
+          "reason": "descriptive_candidates"
+        },
+        {
+          "after_turn": 1,
           "action": "draft_quote",
           "reason": "complete_written_order"
         }
@@ -316,8 +331,18 @@
         }
       ],
       "expected_subtotal": "148.00",
-      "retrieval": null,
-      "consequential_ambiguity": false,
+      "retrieval": {
+        "kind": "descriptive",
+        "spec": {
+          "watts": 31,
+          "cct": 3000,
+          "ip": "IP44"
+        },
+        "target_skus": [
+          "TR-007"
+        ]
+      },
+      "consequential_ambiguity": true,
       "notes": ""
     },
     "e015": {
@@ -359,6 +384,11 @@
       "checkpoints": [
         {
           "after_turn": 0,
+          "action": "clarify",
+          "reason": "descriptive_candidates"
+        },
+        {
+          "after_turn": 1,
           "action": "draft_quote",
           "reason": "complete_written_order"
         }
@@ -370,8 +400,18 @@
         }
       ],
       "expected_subtotal": "384.00",
-      "retrieval": null,
-      "consequential_ambiguity": false,
+      "retrieval": {
+        "kind": "descriptive",
+        "spec": {
+          "watts": 8,
+          "cct": 3000,
+          "ip": "IP44"
+        },
+        "target_skus": [
+          "EM-001"
+        ]
+      },
+      "consequential_ambiguity": true,
       "notes": ""
     },
     "e017": {
@@ -683,6 +723,11 @@
       "checkpoints": [
         {
           "after_turn": 0,
+          "action": "clarify",
+          "reason": "descriptive_candidates"
+        },
+        {
+          "after_turn": 1,
           "action": "draft_quote",
           "reason": "complete_written_order"
         }
@@ -694,8 +739,18 @@
         }
       ],
       "expected_subtotal": "564.00",
-      "retrieval": null,
-      "consequential_ambiguity": false,
+      "retrieval": {
+        "kind": "descriptive",
+        "spec": {
+          "watts": 50,
+          "cct": 4000,
+          "ip": "IP65"
+        },
+        "target_skus": [
+          "OD-002"
+        ]
+      },
+      "consequential_ambiguity": true,
       "notes": ""
     },
     "e031": {
@@ -720,6 +775,11 @@
       "expected_subtotal": "158.00",
       "retrieval": {
         "kind": "descriptive",
+        "spec": {
+          "watts": 36,
+          "cct": 4000,
+          "ip": "IP44"
+        },
         "target_skus": [
           "LN-002"
         ]
@@ -813,7 +873,7 @@
         {
           "after_turn": 0,
           "action": "clarify",
-          "reason": "prose_not_exact_order"
+          "reason": "descriptive_candidates"
         },
         {
           "after_turn": 1,
@@ -828,7 +888,16 @@
         }
       ],
       "expected_subtotal": "128.00",
-      "retrieval": null,
+      "retrieval": {
+        "kind": "descriptive",
+        "spec": {
+          "watts": 18,
+          "cct": 4000
+        },
+        "target_skus": [
+          "DL-002"
+        ]
+      },
       "consequential_ambiguity": true,
       "notes": ""
     },
@@ -1237,6 +1306,11 @@
       "checkpoints": [
         {
           "after_turn": 0,
+          "action": "clarify",
+          "reason": "descriptive_candidates"
+        },
+        {
+          "after_turn": 1,
           "action": "draft_quote",
           "reason": "complete_written_order"
         }
@@ -1248,8 +1322,18 @@
         }
       ],
       "expected_subtotal": "400.00",
-      "retrieval": null,
-      "consequential_ambiguity": false,
+      "retrieval": {
+        "kind": "descriptive",
+        "spec": {
+          "watts": 21,
+          "cct": 5000,
+          "ip": "IP44"
+        },
+        "target_skus": [
+          "DL-006"
+        ]
+      },
+      "consequential_ambiguity": true,
       "notes": ""
     },
     "e055": {
@@ -1366,6 +1450,10 @@
       "expected_subtotal": "174.00",
       "retrieval": {
         "kind": "descriptive",
+        "spec": {
+          "watts": 25,
+          "cct": 5000
+        },
         "target_skus": [
           "TR-003"
         ]
@@ -1490,6 +1578,11 @@
       "expected_subtotal": "435.00",
       "retrieval": {
         "kind": "descriptive",
+        "spec": {
+          "watts": 120,
+          "cct": 5000,
+          "ip": "IP65"
+        },
         "target_skus": [
           "HB-003"
         ]
@@ -1522,6 +1615,11 @@
       "expected_subtotal": "188.00",
       "retrieval": {
         "kind": "descriptive",
+        "spec": {
+          "watts": 50,
+          "cct": 3000,
+          "ip": "IP65"
+        },
         "target_skus": [
           "OD-001"
         ]
@@ -1623,6 +1721,11 @@
       "checkpoints": [
         {
           "after_turn": 0,
+          "action": "clarify",
+          "reason": "descriptive_candidates"
+        },
+        {
+          "after_turn": 1,
           "action": "draft_quote",
           "reason": "complete_written_order"
         }
@@ -1634,8 +1737,18 @@
         }
       ],
       "expected_subtotal": "128.00",
-      "retrieval": null,
-      "consequential_ambiguity": false,
+      "retrieval": {
+        "kind": "descriptive",
+        "spec": {
+          "watts": 18,
+          "cct": 4000,
+          "ip": "IP44"
+        },
+        "target_skus": [
+          "DL-002"
+        ]
+      },
+      "consequential_ambiguity": true,
       "notes": ""
     },
     "e070": {
@@ -1844,6 +1957,11 @@
       "checkpoints": [
         {
           "after_turn": 0,
+          "action": "clarify",
+          "reason": "descriptive_candidates"
+        },
+        {
+          "after_turn": 1,
           "action": "draft_quote",
           "reason": "complete_written_order"
         }
@@ -1855,8 +1973,18 @@
         }
       ],
       "expected_subtotal": "448.00",
-      "retrieval": null,
-      "consequential_ambiguity": false,
+      "retrieval": {
+        "kind": "descriptive",
+        "spec": {
+          "watts": 11,
+          "cct": 3000,
+          "ip": "IP44"
+        },
+        "target_skus": [
+          "EM-004"
+        ]
+      },
+      "consequential_ambiguity": true,
       "notes": ""
     },
     "e079": {
@@ -1903,6 +2031,11 @@
       "expected_subtotal": "480.00",
       "retrieval": {
         "kind": "descriptive",
+        "spec": {
+          "watts": 8,
+          "cct": 4000,
+          "ip": "IP44"
+        },
         "target_skus": [
           "EM-002"
         ]

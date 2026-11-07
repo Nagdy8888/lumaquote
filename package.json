@@ -30,12 +30,13 @@
     "db:configure": "node scripts/configure-local.cjs",
     "verify": "node scripts/verify.cjs",
     "verify:full": "node scripts/verify.cjs --full",
-    "test:browser": "node scripts/python.cjs -m pytest tests/integration/test_browser_workflow.py tests/integration/test_ui_review.py -q --tb=short",
+    "test:browser": "node scripts/python.cjs -m pytest tests/integration/test_browser_workflow.py tests/integration/test_scene_review.py tests/integration/test_page_review.py tests/integration/test_ui_review.py -q --tb=short",
     "check:docs": "node scripts/python.cjs scripts/check_docs.py",
     "skills:sync": "node scripts/python.cjs scripts/skills.py sync",
     "skills:check": "node scripts/python.cjs scripts/skills.py check",
     "skills:manifest": "node scripts/python.cjs scripts/skills.py manifest",
     "check:rules": "npm run check:docs && npm run skills:check",
+    "telegram:check": "node scripts/python.cjs scripts/telegram_check.py",
     "graph:update": "graphify update ."
   },
   "devDependencies": {
