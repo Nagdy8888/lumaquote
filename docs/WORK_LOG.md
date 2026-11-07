@@ -1197,3 +1197,10 @@ these entries were logged during the original steps or freshly rerun today.
 - Checked: CI step list run locally on the PR tree (`lint:python`, `check:architecture`, `check:frontend`, `test:diagrams`, `diagrams:check`, `typecheck`, `test:unit`, `test:ui`, `build`) -> all passed; `npm run verify` on the final tree (R16 local stand-in, includes docs, skills and secret checks) -> passed. Not run: remote CI (billing lock), `verify:full`, `test:browser`.
 - Evidence: none.
 - Open: the user clears the billing lock in GitHub billing; until then R16 applies to every PR.
+
+### 2026-11-07 - Plan for stock, customer orders and purchasing (phase 7, local)
+- Why: user saw the agent send quotations but no stock control, shortage view or purchase records; asked to clarify hidden choices, then have Opus plan and direct Sonnet subagents.
+- Changed: `docs/DECISIONS.md` (D49); new `docs/proposals/2026-11-07-stock-orders-plan.md`; `docs/IMPLEMENTATION_PLAN.md` (new section 7, unchecked).
+- Checked: `npm run check:docs` -> passed (85 files). Not run: code checks (no code changed).
+- Evidence: none.
+- Open: tasks T1-T7 of the plan on branch `feat/stock-orders`.

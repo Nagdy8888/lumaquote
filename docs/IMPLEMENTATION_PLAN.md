@@ -52,6 +52,13 @@ only separate project docs. Root AGENTS.md defines the enforceable conventions.
 - [ ] All consequential ambiguity asks/escalates; measured latency and estimated usage reported honestly.
 - [ ] Screenshots, truthful 90-120 s shot list, reproducible local setup and verified release evidence.
 
+## 7. Stock, customer orders and purchasing (D49, [plan](proposals/2026-11-07-stock-orders-plan.md))
+- [ ] Stock ledger is the master: on-hand, reserved, available per SKU; Sheets syncs Products and Prices only.
+- [ ] Approved quotations reserve stock; release on expiry, supersede, decline, cancel, failed/blocked delivery.
+- [ ] Customer accepts/declines (Telegram buttons, "accept"/"decline" reply) bound by code to the latest valid revision; pending order.
+- [ ] Salesperson confirms/cancels orders; admin purchase orders, receipts, adjustments, reorder levels; shortage and low-stock alerts.
+- [ ] Inventory page with Download Excel and Export to Google Sheets (Apps Script pull).
+
 ## Fixed business defaults
 
 USD, tax excluded, separately listed shipping; seven-day validity; no default
