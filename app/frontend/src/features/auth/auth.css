@@ -4,14 +4,40 @@
   grid-template-columns: 1fr 1fr;
 }
 .signin-story {
-  background: #202727;
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background:
+    radial-gradient(120% 70% at 50% 0%, #2c3431 0%, transparent 70%),
+    #202727;
   color: #f2f2e7;
   padding: 50px 65px;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  gap: 60px;
+  gap: 32px;
   min-height: 100vh;
+}
+/* Decorative pendant canvas sits behind the copy; the scrim keeps the headline readable. */
+.pendant-field {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+.signin-story::after {
+  content: "";
+  position: absolute;
+  inset: 45% 0 0;
+  z-index: 0;
+  pointer-events: none;
+  background: linear-gradient(to bottom, transparent, #202727 72%);
+}
+.signin-story > :not(.pendant-field) {
+  position: relative;
+  z-index: 1;
+  pointer-events: none;
+}
+.signin-story > .brand + div {
+  margin-top: auto;
 }
 .signin-story .brand {
   padding: 0;
@@ -93,7 +119,7 @@
     grid-template-columns: 1fr;
   }
   .signin-story {
-    min-height: auto;
+    min-height: 420px;
     padding: 27px;
     gap: 40px;
   }

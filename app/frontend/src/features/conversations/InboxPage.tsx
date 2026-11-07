@@ -33,7 +33,8 @@ export function InboxPage() {
           <p>From the first question to the quotation you can stand behind.</p>
         </div>
         <span className="page-count">
-          {data.conversations.length} conversations
+          {data.conversations.length}{" "}
+          {data.conversations.length === 1 ? "conversation" : "conversations"}
         </span>
       </div>
       <div className="inbox-workspace">
@@ -109,7 +110,7 @@ export function InboxPage() {
             <Inbox />
             <h2>Your next conversation starts here.</h2>
             <p>
-              Create a local request or connect WhatsApp to receive requests.
+              Create a local request or connect Telegram or WhatsApp to receive requests.
             </p>
             <Link to="/requests/new">Create your first request</Link>
           </div>

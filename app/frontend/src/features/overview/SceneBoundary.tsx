@@ -14,7 +14,7 @@ export function LightingFallback() {
 
 /** Contain optional rendering failures so the sales workflow never depends on Three.js or WebGL. */
 export class SceneBoundary extends Component<
-  { children: ReactNode },
+  { children: ReactNode; fallback?: ReactNode },
   { failed: boolean }
 > {
   state = { failed: false };
@@ -26,8 +26,9 @@ export class SceneBoundary extends Component<
   componentDidCatch(_error: Error, _info: ErrorInfo) {
     /* The static scene remains usable. */
   }
-  /** Render the lazy child or the accessible static alternative after an optional-scene failure. */
+  /** Render the lazy child, or the caller's fallback (default: the lighting fallback) after a failure. */
   render() {
-    return this.state.failed ? <LightingFallback /> : this.props.children;
+    if (!this.state.failed) return this.props.children;
+    return this.props.fallback ?? <LightingFallback />;
   }
 }

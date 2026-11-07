@@ -148,7 +148,11 @@ export function Overview() {
                 <Status value={c.status} />
                 <span className="channel-label">
                   <MessageSquareText />
-                  {c.channel === "local_test" ? "Local test" : "WhatsApp"}
+                  {c.channel === "local_test"
+                    ? "Local test"
+                    : c.channel === "telegram"
+                      ? "Telegram"
+                      : "WhatsApp"}
                 </span>
                 <ArrowUpRight />
               </Link>

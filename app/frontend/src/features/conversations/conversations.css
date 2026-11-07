@@ -263,6 +263,11 @@
 .inbox-empty a {
   font-size: 12px;
 }
+.inbox-empty a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+}
 .new-request {
   max-width: 650px;
   margin: 0 auto;
@@ -271,6 +276,7 @@
   display: flex;
   align-items: center;
   gap: 6px;
+  min-height: 24px;
   font-size: 12px;
   text-decoration: none;
   color: #5e6954;

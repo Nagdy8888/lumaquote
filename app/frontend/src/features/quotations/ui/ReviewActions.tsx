@@ -40,7 +40,9 @@ export function ReviewActions({
             It will queue delivery through{" "}
             {conversation.channel === "local_test"
               ? "the local test channel"
-              : "WhatsApp"}
+              : conversation.channel === "telegram"
+                ? "Telegram"
+                : "WhatsApp"}
             .
           </div>
           <Button
