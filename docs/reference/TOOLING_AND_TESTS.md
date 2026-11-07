@@ -122,6 +122,23 @@ Package scripts in root `package.json` are the canonical runnable names. Vite,
 Vitest, browser and Python wrappers keep their own configured working directories;
 do not copy commands from an unrelated Next.js or RAG project.
 
+## Git workflow
+
+- `main` is the integration branch; do not commit work directly to it. Start each change on a
+  branch from an up-to-date `main`: `feat/<topic>`, `fix/<topic>`, `docs/<topic>`, `test/<topic>`
+  or `chore/<topic>`.
+- Commits use Conventional Commits (`feat(scope): ...`) and are grouped by concern. Stage only
+  your own files (R15). Never force-push or rewrite pushed history.
+- Before a PR: `npm run check:rules`, `npm run check:secrets`, the narrow checks for the change,
+  and `npm run verify:full` for anything that touches behavior (R12). The PR body uses
+  `.github/pull_request_template.md`; list skipped checks as skipped.
+- CI (`.github/workflows/ci.yml`) runs on every push and pull request. Local results and remote
+  CI are reported separately.
+- Merge with a merge commit after CI passes, then delete the branch and update `main`:
+  `git switch main && git pull --ff-only && git branch -d <branch>`.
+- Branch protection, required reviewers and CODEOWNERS are not set up; adding them needs a
+  decision in `docs/DECISIONS.md`.
+
 ## Offline and full gates
 
 The diagram pipeline in `scripts/diagrams` maintains canonical Mermaid, exact guide
