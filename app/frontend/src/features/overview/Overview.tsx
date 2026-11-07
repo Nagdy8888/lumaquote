@@ -159,7 +159,9 @@ export function Overview() {
                     ? "Local test"
                     : c.channel === "telegram"
                       ? "Telegram"
-                      : "WhatsApp"}
+                      : c.channel === "email"
+                        ? "Email"
+                        : "WhatsApp"}
                 </span>
                 <ArrowUpRight />
               </Link>

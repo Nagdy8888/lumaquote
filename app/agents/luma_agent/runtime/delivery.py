@@ -6,6 +6,7 @@ from luma.core.errors import DomainError
 from luma.features.conversations.repository import conversation
 from luma.features.conversations.service import add_message
 from luma.features.messaging.authorization import authorize_outbound
+from luma.features.messaging.email_dispatch import queue as queue_email
 from luma.features.messaging.outbound import begin, record, submit
 
 
@@ -19,12 +20,15 @@ def deliver_one(company_id=None):
     intent, and message plus local_delivered status commit together. Return True
     when an intent was handled (including blocked), False when none was selected;
     neither value is a live provider receipt or an instruction to retry unknowns.
+    Email intents are queued for Apps Script (D47) and excluded from the stale-submitting sweep;
+    their lease and expiry rules live in `messaging.email_dispatch`.
     """
     with database(worker=True) as conn:
         conn.execute(
             """update luma.outbox set status='unknown',error_code='submission_interrupted',updated_at=now()
             where status='submitting' and updated_at<now()-interval '2 minutes'
-            and (%s::uuid is null or company_id=%s)""",
+            and (%s::uuid is null or company_id=%s)
+            and not exists(select 1 from luma.email_dispatch d where d.outbox_id=luma.outbox.id)""",
             (company_id, company_id),
         )
         candidate = conn.execute(
@@ -45,6 +49,13 @@ def deliver_one(company_id=None):
         plan = None
         try:
             current, quote = authorize_outbound(conn, item)
+            if current["channel"] == "email":
+                # Gated like any channel, then handed to Apps Script, which pulls and sends it
+                # (messaging.email_dispatch); the 2-minute sweep above skips these rows.
+                plan = begin(conn, item, current, quote)
+                if plan is not None:
+                    queue_email(conn, plan)
+                return True
             if current["channel"] in ("whatsapp", "telegram"):
                 # Authorized and gated under the conversation lock; the network call
                 # happens after this transaction commits (see messaging.outbound).

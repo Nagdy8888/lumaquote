@@ -65,6 +65,8 @@ reference for the module you are changing:
   and the (mock-only) proof boundary.
 - [Telegram channel](reference/TELEGRAM.md): bot long polling with persist-before-confirm offsets,
   private-chat allowlist, media download limits, gated sends and the token-in-URL logging guard (D44).
+- [Email channel](reference/EMAIL.md): Gmail label pushed and replies pulled by Apps Script, signed
+  gateway, Gmail sender authentication, claim-once replies and the stand-in-only proof boundary (D47).
 - [Configuration and operation](reference/CONFIGURATION.md): actual safe variable
   inventory/defaults, precedence/cache behavior, process/port ownership and private
   generated files.

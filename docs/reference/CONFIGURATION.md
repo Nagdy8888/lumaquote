@@ -112,6 +112,10 @@ Bot API URL, so URLs are never logged), `TELEGRAM_COMPANY_ID` (the tenant for ev
 `npm run telegram:check`) and `ENABLE_LIVE_TELEGRAM` (default false; master switch for real sends).
 The worker polls only when the token and company are set. See [Telegram channel](TELEGRAM.md).
 
+Email (D47) uses `EMAIL_ALLOWED_SENDERS` (comma-separated addresses, compared lowercase; empty admits
+nobody) and `ENABLE_LIVE_EMAIL` (default false). It has no credential of its own: Apps Script pushes and
+pulls through the signed Google gateway below. See [email channel](EMAIL.md).
+
 `GOOGLE_SHEET_ID`, `GOOGLE_COMPANY_ID` and `GOOGLE_CALLBACK_SECRET` bind the signed
 receiver to one approved workbook/company. The secret is backend-only and must
 match private GAS Script Properties. Current workspace status requires all three

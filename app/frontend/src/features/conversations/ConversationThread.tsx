@@ -57,7 +57,9 @@ export function ConversationThread({
                   ? "Local test channel"
                   : conversation.channel === "telegram"
                     ? "Telegram"
-                    : "WhatsApp"}
+                    : conversation.channel === "email"
+                      ? "Email"
+                      : "WhatsApp"}
               </span>
             </p>
           </div>

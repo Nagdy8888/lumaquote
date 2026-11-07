@@ -80,6 +80,15 @@ so the GAS-only adapter includes a one-minute reconciliation trigger. Its instal
 and live execution remain pending. Apps Script scheduling is approximate; stale
 commercial evidence continues to block finalization.
 
+## Gmail requests (D47)
+
+Done 2026-11-07: label `LumaQuote` and a filter on mail to `mustafaalnagdy26+quotes@gmail.com`
+created, `gas/` pushed, `installLumaMail` run and the Gmail permissions approved, test sender
+`mustafaalnagdy90@gmail.com` allowlisted, `ENABLE_LIVE_EMAIL=true`. A live request and in-thread
+"yes" produced quotation `LQ-F54A748B`; after approval its PDF arrived by email in the same thread
+(19:25). The gateway (port 8002), ngrok tunnel and worker must keep running from the
+`feat/gmail-channel` worktree until that branch is merged.
+
 ## Paid AI brain (D46)
 
 Done 2026-11-07: the OpenAI key is in the ignored `.env`, `ENABLE_PAID_AI=true` is in `.env.local`,

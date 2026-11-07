@@ -39,6 +39,10 @@ GATEWAY_OPERATIONS = {
     "POST /webhooks/twilio",
     "POST /webhooks/twilio/status",
     "GET /media/quotations/{outbox_id}/{expires}/{supplied}/quotation.pdf",
+    # D47 Gmail through Apps Script: signed mail push, reply claim and reply receipt.
+    "POST /callbacks/google/mail/inbound",
+    "POST /callbacks/google/mail/claim",
+    "POST /callbacks/google/mail/receipt",
 }
 
 

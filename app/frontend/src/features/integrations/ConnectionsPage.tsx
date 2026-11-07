@@ -3,6 +3,7 @@ import {
   AudioLines,
   Database,
   FileSpreadsheet,
+  Mail,
   MessageCircle,
   Send,
   ShieldCheck,
@@ -29,6 +30,15 @@ const connections = [
       "Customer messages, voice notes, label photos, and quotation PDFs through your bot.",
     requirement:
       "Requires a bot token from BotFather and the allowed customer user ids. No tunnel needed.",
+  },
+  {
+    key: "email",
+    name: "Gmail",
+    icon: Mail,
+    description:
+      "Customer requests sent to your Gmail under the LumaQuote label, with replies and quotation PDFs sent from Gmail.",
+    requirement:
+      "Runs through your Apps Script project and the signed gateway. Only allowlisted senders that Gmail authenticates reach the agent.",
   },
   {
     key: "google",
