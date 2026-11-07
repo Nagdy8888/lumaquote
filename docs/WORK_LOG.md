@@ -1113,3 +1113,10 @@ these entries were logged during the original steps or freshly rerun today.
 - Checked (`local`): `diagrams:render` and `diagrams:check` passed (19 diagrams). The complete `verify:full` for the new tip is in the PR body.
 - Evidence: none.
 - Open: none.
+
+### 2026-11-07 - Commit pending work and merge origin/main (git housekeeping, local)
+- Why: user asked to fix git and commits; main was 12 commits behind origin (PR #1, frontend phase 5) with 125 uncommitted files.
+- Changed: new branch `work/messaging-channels-and-scene` with 4 grouped commits plus a merge of `origin/main`; conflicts in ReviewActions, package.json, verify.cjs, manual-workflow, browser_servers, docs; diagrams and graphify-out regenerated. Local `main` untouched and nothing pushed.
+- Checked: `check:rules`, `check:secrets` (no leaks), `check:frontend`, `test:ui` (66 passed), `diagrams:check` -> pass; not run: `test:python`, `test:browser`, `verify:full`.
+- Evidence: none.
+- Open: run `npm run verify:full` on this branch; decide push and PR; fast-forward local `main` after merge.
