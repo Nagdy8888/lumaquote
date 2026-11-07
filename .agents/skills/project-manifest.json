@@ -248,7 +248,7 @@
       "source_archive": "../skill-source-archives/user-supplied-2026-10-29",
       "adaptation": "Project-specific integration; original notices preserved in non-active archive",
       "files": {
-        "SKILL.md": "497346dcf04d4a4740fbb248edcdfd8c8baea3ff40378529387d003835bd37be",
+        "SKILL.md": "36f7a4f84b45d15e55062a83928629d2e7f50a93713bf705866d436057531b7f",
         "assets/pr-description-prompts.md": "ebe7350bdbdf8aea6f34306519a792f0a22195d750c8468ba4ae36903e22746d"
       },
       "active_path": "contribution-workflow"

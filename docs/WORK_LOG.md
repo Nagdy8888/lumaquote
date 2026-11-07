@@ -1190,3 +1190,10 @@ these entries were logged during the original steps or freshly rerun today.
 - Checked: `npm run check:rules` -> passed (84 files, 19 skills); `npm run lint:python` -> passed; `npm run check:architecture` -> passed (98 modules); `npm run check:frontend` -> passed (72 modules); frontend `typecheck` -> passed; frontend `build` -> passed; `npm run test:ui` -> 66 passed; `npm run graph:update` -> rebuilt (3649 nodes). `npm run test:python` -> 481 passed, 66 skipped, 4 deselected, 1 xfailed. Not run: `verify:full`, `test:browser`.
 - Evidence: none.
 - Open: commit `feat/page-scenes` and open a PR when the user asks; restart dev servers from this folder only (`npm run dev:api`, `npm run dev:worker`, `npm run dev:ui`); the ngrok tunnel for the Gmail gateway must be restarted before live Gmail tests.
+
+### 2026-11-07 - Rules for blocked remote CI and parallel sessions (phase 5, local)
+- Why: user asked for a rule so Claude sessions no longer get stuck on remote CI (blocked by the GitHub billing lock) or on each other's checkouts; recorded as D48.
+- Changed: `AGENTS.md` (R16 blocked remote CI, R17 one session per checkout); `docs/DECISIONS.md` (D48); `docs/reference/TOOLING_AND_TESTS.md` (Git workflow: blocked-CI and parallel-session steps); `.agents/skills/contribution-workflow/SKILL.md` and its `.claude/skills/` mirror via `skills:manifest` + `skills:sync`. PR #5 CI runs 42413722415 and 42413728517 failed in 2-3 s with "The job was not started because your account is locked due to a billing issue"; the last successful run was 2026-11-03.
+- Checked: CI step list run locally on the PR tree (`lint:python`, `check:architecture`, `check:frontend`, `test:diagrams`, `diagrams:check`, `typecheck`, `test:unit`, `test:ui`, `build`) -> all passed; `npm run verify` on the final tree (R16 local stand-in, includes docs, skills and secret checks) -> passed. Not run: remote CI (billing lock), `verify:full`, `test:browser`.
+- Evidence: none.
+- Open: the user clears the billing lock in GitHub billing; until then R16 applies to every PR.
