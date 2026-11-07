@@ -1,4 +1,5 @@
 import "./connections.css";
+import { lazy, Suspense } from "react";
 import {
   AudioLines,
   Database,
@@ -11,6 +12,22 @@ import {
 } from "lucide-react";
 import { useWorkspaceContext } from "@/shared/api/workspace-context";
 import { Status, money } from "@/shared/ui/status";
+import { SceneBoundary } from "@/features/overview/SceneBoundary";
+import { useReducedMotion } from "@/features/showcase/reducedMotion";
+
+const ConnectionHub = lazy(() => import("./ConnectionHub"));
+
+/**
+ * Translate a displayed integration status into the hub scene's light level. Pure. Only statuses
+ * that already claim a working connection reach 1; "configured_unverified" stays half lit, so the
+ * scene never looks more verified than the status badge beside it.
+ */
+function levelOf(status: string) {
+  if (["not_connected", "disabled", "failed", "blocked"].includes(status))
+    return 0;
+  if (status.includes("unverified")) return 0.5;
+  return 1;
+}
 
 const connections = [
   {
@@ -69,9 +86,22 @@ const connections = [
   },
 ];
 
-/** Display configured versus verified integration state honestly without exposing credentials or diagnostic payloads. */
+/**
+ * Display configured versus verified integration state honestly without exposing credentials or
+ * diagnostic payloads. A decorative, lazily loaded hub scene mirrors the same statuses as light;
+ * under reduced motion it is not requested and the list alone remains.
+ */
 export function ConnectionsPage() {
   const { data } = useWorkspaceContext();
+  const reduced = useReducedMotion();
+  const nodes = [
+    { key: "supabase", name: "Supabase", level: 1 },
+    ...connections.map((connection) => ({
+      key: connection.key,
+      name: connection.name,
+      level: levelOf(data.integrations[connection.key] ?? "not_connected"),
+    })),
+  ];
   return (
     <section>
       <div className="page-heading">
@@ -81,6 +111,13 @@ export function ConnectionsPage() {
         </div>
         <ShieldCheck />
       </div>
+      {!reduced && (
+        <SceneBoundary fallback={null}>
+          <Suspense fallback={null}>
+            <ConnectionHub nodes={nodes} />
+          </Suspense>
+        </SceneBoundary>
+      )}
       <div className="local-connection">
         <Database />
         <div>

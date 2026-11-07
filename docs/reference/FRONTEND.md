@@ -59,6 +59,16 @@ to the native backend. `LUMA_API_PROXY_TARGET` changes that local development
 proxy, including isolated browser-test ports. It is not a browser-selected API
 destination or a production deployment topology.
 
+When multiple checkouts are running, verify the browser's port belongs to the
+intended checkout. A server on 5173 may be serving another worktree's source.
+From this repository root, `npm run dev --workspace @lumaquote/frontend -- --port 5174`
+starts a separate native development server at `http://127.0.0.1:5174`; use that
+exact origin to see this checkout's changes. Restart only the Vite process whose
+entry path and port match the intended checkout. Existing servers for other
+checkouts can keep running. A different port is a different browser origin, so
+the staff session may require signing in again. Development source updates do
+not require rebuilding `dist`; a production preview serves its last build.
+
 ## Live updates over an authenticated event stream
 
 ### Authenticated live updates with polling fallback
@@ -341,13 +351,21 @@ See [Google synchronization](GOOGLE_SYNC.md) and `gas/README.md` for the contrac
 
 ## Optional 3D and presentation limits
 
-Two lazy scenes exist. Both are decorative showcase surfaces. Neither carries information
-the working screens need.
+Seven lazy scenes and one interactive inspector exist. The scenes are decorative. None carries information the working screens need,
+and every one is hidden from assistive technology or labelled as illustrative. The inbox, the
+conversation thread, quotation editing and the new-request form have no 3D: they are working
+surfaces.
 
 | Scene | Where | What it shows | Interaction |
 |---|---|---|---|
 | `features/overview/LightingScene.tsx` | Overview hero, right half (380 px tall, 250 px under 680 px width) | Three brass track heads on a rail wash a fluted wall with light scallops over a glossy floor. Beams are additive cones and floor pools are additive glow planes. | On load the heads ignite in sequence (0.6 s delay, 0.45 s stagger, short flicker). They sweep slowly and aim toward the pointer. The camera drifts and follows the pointer slightly. The warm/neutral/cool radios cross-fade the light colour. |
 | `features/showcase/PendantField.tsx` | Sign-in story panel, full bleed behind the copy (`aria-hidden`) | 15 brass dome pendants on cords, in a fixed layout so captures repeat. The headline sits at the bottom under a CSS scrim. | Bulbs ignite in a left-to-right wave, sway gently and brighten near the pointer. |
+| `features/catalog/FixtureShowroom.tsx` | Catalog: the visual area of every product tile (`aria-hidden`) | One modelled fixture per family, chosen from the SKU prefix: downlight (DL), track spot (TR), high bay (HB), linear (LN), emergency (EM), wall lantern (OD); unknown prefixes show the downlight. Brass reflects a procedural studio map. | Lamps ignite in a quick stagger and turn slowly. Hovering or focusing a card brightens its lamp and turns it to face the viewer. |
+| `features/overview/MetricRail.tsx` | Overview, a 110 px band above the metric strip (hidden under 900 px; `aria-hidden`) | A track rail with one lamp over each metric column. Lamp brightness (`brightness`: 0 is an ember, 10 or more is full) and a row of up to 12 beads follow the stored count printed below. | Lamps ignite left to right, beads light one by one, and two light pulses run along the rail and flare each lamp they pass. |
+| `features/catalog/FixtureInspector.tsx` | Catalog, a native modal `<dialog>` opened by the "Inspect in 3D" button on a tile (shown only once the tile stage is live) | The product's family model installed at full size over a floor, with a light cone and floor pool for downward lamps (downlight, high bay, linear) and a point light for the others. | Drag to orbit, wheel or pinch to zoom (drei `OrbitControls`, no pan, slow auto-rotate until first touch). Real controls: light on/off, colour temperature 2700/3000/4000/5000 K (opens at the value nearest the product CCT), exploded view, and "Turn 45°" for keyboard users. Escape or the close button closes it; the tile canvas pauses while it is open. |
+| `features/integrations/ConnectionHub.tsx` | Connections, a 280 px band under the heading (230 px under 680 px; `aria-hidden`) | The workspace as a brass ring with a glowing core, and Supabase plus the five services as nodes with cables. Each node is lit from the same status the list shows: 1 for a connected status, 0.5 for `configured_unverified`, 0 for `not_connected`, `disabled`, `failed` or `blocked` (`levelOf` in `ConnectionsPage.tsx`). Lit cables carry light pulses toward the hub; half-lit ones pulse slower and dimmer. Labels are canvas-texture sprites. | Nodes ignite in order. The camera drifts and follows the pointer. |
+| `features/quotations/RevisionStack.tsx` | Quotations heading, in place of the icon (250 x 150 px; hidden under 680 px; `aria-hidden`) | Up to four blank quotation sheets (one per listed revision) and a brass seal. The sheet texture has no names, prices or products, so capture mode needs nothing from it. | Sheets deal in one by one, the seal presses down, then the stack floats and leans toward the pointer. |
+| `features/not-found/LostPendant.tsx` | 404 page, a 340 px panel under the buttons (260 px under 680 px; `aria-hidden`) | One pendant whose bulb has nearly gone out. | The lamp swings slowly; the bulb sputters on a fixed, repeatable pattern. |
 
 Shared mechanics live in `features/showcase/sceneKit.ts`:
 - `useScenePlayback` reports the live reduced-motion preference. It sets `frameloop="never"`
@@ -355,18 +373,52 @@ Shared mechanics live in `features/showcase/sceneKit.ts`:
   no GPU.
 - `glowTexture` caches one radial-gradient texture for halos.
 - `ignition` is the pure easing for the staggered switch-on.
+- `studioEnvironment` builds three's procedural `RoomEnvironment` once per renderer, prefilters it
+  and caches it, so brass has reflections without a network HDRI.
+- `kelvinColour` turns a colour temperature into a display colour (Tanner Helland's curve fit),
+  for the inspector's light; it is a tint, not colorimetry.
+
+`features/catalog/fixtureModels.tsx` holds the six family models and their poses; the tiles and the
+inspector share it. The inspector's exploded view moves every mesh outward from the model centre
+along its own offset (further for the lens), computed once from the mounted model, so a new model
+needs no explode data. Its dialog opens with `showModal()` in an effect with no cleanup: closing in
+a cleanup fired `close` under StrictMode and unmounted the inspector at once.
+
+Page transitions: sidebar and mobile-menu links pass react-router's `viewTransition`, so
+navigation runs inside `document.startViewTransition`. Only `.workspace-main`
+(`view-transition-name: workspace-page`) animates: the old page fades up and out in 150 ms, the new
+one rises and un-blurs in 320 ms. Browsers without the API navigate instantly; reduced motion sets
+every transition animation to none (`shell.css`).
+
+`features/showcase/reducedMotion.ts` holds `useReducedMotion`, which imports no Three.js. Pages
+use it to decide whether to request a 3D chunk at all; `useScenePlayback` uses it too.
+
+The catalog draws all tiles through one canvas. `FixtureCanvas` is fixed to the viewport at
+`z-index: 5`, under the sticky mobile bar (10) and dialogs, and has `pointer-events: none` on its
+own wrapper (R3F otherwise sets `auto` and the canvas swallows every click). Each tile renders a
+drei `View` that tunnels its scene into that canvas, which scissor-renders it into the tile's
+rectangle every frame; tiles off screen are skipped. Each View paints an opaque background, which
+also clears its rectangle. The View sits 6 px inside the tile so its square corners never cover
+the card's rounded ones. Once the WebGL context exists, `onReady` sets `data-stage="on"` on the
+grid, which darkens the tiles and lifts the family label above the canvas. Without WebGL it never
+fires and the CSS fixtures stay.
 
 All animation mutates Three.js objects inside `useFrame`. React state never changes per frame.
 Device pixel ratio is capped at 1.75.
 
 Reduced motion creates no canvas. `Overview` shows the static `LightingFallback`. `SignIn` shows
-the plain panel gradient. `tests/integration/test_scene_review.py` enforces this. Each scene
-sits inside `SceneBoundary`, which now takes an optional `fallback` (`SignIn` passes `null`).
+the plain panel gradient. The catalog keeps its CSS fixtures, Quotations keeps its icon, and
+Connections and the 404 page show nothing extra; these pages do not even request the 3D chunk.
+`tests/integration/test_scene_review.py` enforces this for Overview; the other pages were
+checked by script (zero canvases on all four, desktop and mobile). Each scene sits inside
+`SceneBoundary`, which takes an optional `fallback` (`null` for most; Quotations passes its icon).
 The canvas `fallback` covers missing WebGL. The geometry and temperature controls are
 illustrative, not manufacturer specifications or photometric simulation.
 
-Bundle: Three.js and both scenes load in lazy chunks. The shared chunk is 917 kB (244 kB gzip).
-The entry chunk is unchanged. The sign-in page now requests the shared chunk, so the first
+Bundle: Three.js and every scene load in lazy chunks. The shared chunk is 919 kB. Scene chunks:
+FixtureShowroom 14.1 kB, ConnectionHub 5.1 kB, RevisionStack 2.9 kB, LostPendant 2.9 kB,
+PendantField 55.8 kB. The entry chunk holds no Three.js (628 kB on 2026-11-07 after the merges;
+only page wiring and `useReducedMotion` were added to it). The sign-in page now requests the shared chunk, so the first
 paint of sign-in no longer avoids Three.js. drei's `MeshReflectorMaterial` was tried and dropped:
 it rendered black under software WebGL, and nobody verified it on a real GPU.
 
@@ -378,6 +430,21 @@ it rendered black under software WebGL, and nobody verified it on a real GPU.
 - OrbitControls was removed, so the pointer is the only scene input.
 
 Frame rate on a real GPU was not measured.
+
+**Inspector, rail and transitions (2026-11-07, `local-substitute`).** Inspector screenshotted at
+1440 x 900 and 390 x 844 (lit at 3000 K; exploded at 5000 K), Escape closed it, no console errors.
+Overview rail and a mid-transition frame captured. Reduced motion: zero canvases, no rail and no
+inspect buttons. Ideas came from public references: lighting-brand configurators rebuilt in React
+Three Fiber with animated part assembly (Bock Lighting case study), lamp-viewer briefs asking for a
+glow on/off toggle, and dashboard-plus-3D and data-flow entries on Awwwards.
+
+**More scenes (2026-11-07, `local-substitute`).** Catalog, Connections, Quotations and 404 were
+screenshotted at 1440 x 900 and 390 x 844 in headless Chromium with software WebGL, with motion on
+and reduced. All six fixture families were captured. The catalog canvas stayed under the evidence
+dialog's overlay and under the sticky mobile bar while scrolling. No console errors. The first hub
+version used drei `Html` labels, which logged React "synchronously unmount a root" errors; canvas
+sprite labels replaced them. Not measured: frame rate on a real GPU, and the cost of 72 Views on a
+low-end device.
 
 **Review (2026-11-03, `local-substitute`).** `tests/integration/test_scene_review.py` drives
 headless Chromium with software WebGL through `tests/browser/scene-review.cjs`
@@ -395,6 +462,10 @@ at 1440 px and 430 px) for axe violations, overflow, landmarks, unnamed controls
 size of at least 24 x 24 px ([evidence](../evidence/page-accessibility-review-2026-11-03.json)). It
 found undersized controls (a 14 px icon button, a 23 px remove button, 18 px text links), now
 fixed in CSS and enforced by the test. Automated axe is not a screen-reader review.
+Before axe runs, `page-review.cjs` and `ui-review.cjs` wait up to 15 s for an `h1`. The app's
+loading screen is also a `<main>` without one, and a fixed 700-800 ms wait sometimes scanned it and
+reported `page-has-heading-one` on a random page (seen 2026-11-07). If no `h1` appears, axe still
+runs and the test still fails.
 
 Capture mode changes displayed customer labels and hides media upload/previews.
 It does not comprehensively redact messages, PDFs or every potential identifier.

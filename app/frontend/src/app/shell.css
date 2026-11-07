@@ -782,3 +782,35 @@
     font-size: 10px;
   }
 }
+/* Page transitions: sidebar navigation uses the View Transitions API (react-router
+   `viewTransition`). Only the workspace content moves; the sidebar stays still. Browsers
+   without the API navigate instantly. Reduced motion turns the animation off. */
+.workspace-main {
+  view-transition-name: workspace-page;
+}
+@keyframes page-leave {
+  to {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+}
+@keyframes page-enter {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+    filter: blur(3px);
+  }
+}
+::view-transition-old(workspace-page) {
+  animation: 150ms ease-in both page-leave;
+}
+::view-transition-new(workspace-page) {
+  animation: 320ms cubic-bezier(0.2, 0.7, 0.2, 1) 60ms both page-enter;
+}
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}

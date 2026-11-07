@@ -1,14 +1,22 @@
+import "./not-found.css";
+import { lazy, Suspense } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/shared/ui/button";
+import { SceneBoundary } from "@/features/overview/SceneBoundary";
+import { useReducedMotion } from "@/features/showcase/reducedMotion";
+
+const LostPendant = lazy(() => import("./LostPendant"));
 
 /**
  * Tell signed-in staff that the address matches no page and offer the two
  * working starting points. Inputs: none. Output: static markup rendered inside
  * the authenticated shell for any unmatched route. Side effects: none, no data
  * is requested. Authority: none; the page names no resource, so it cannot
- * reveal whether a record exists.
+ * reveal whether a record exists. A decorative flickering-pendant scene loads
+ * lazily below the actions, except under reduced motion (no canvas).
  */
 export function NotFoundPage() {
+  const reduced = useReducedMotion();
   return (
     <section>
       <div className="page-heading">
@@ -28,6 +36,13 @@ export function NotFoundPage() {
           <Link to="/inbox">Open inbox</Link>
         </Button>
       </div>
+      {!reduced && (
+        <SceneBoundary fallback={null}>
+          <Suspense fallback={null}>
+            <LostPendant />
+          </Suspense>
+        </SceneBoundary>
+      )}
     </section>
   );
 }
