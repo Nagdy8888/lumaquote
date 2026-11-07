@@ -122,8 +122,10 @@ def send_text(to: str, body: str) -> str:
     return create_message(to, {"Body": body})
 
 
-def send_pdf(to: str, data: bytes, filename: str, caption: str, reference: str) -> str:
+def send_pdf(to: str, data: bytes, filename: str, caption: str, reference: str, buttons=None) -> str:
     """Send the PDF as media fetched by Twilio from a signed, expiring gateway URL for outbox `reference`.
+
+    `buttons` is ignored (only Telegram attaches inline buttons).
 
     The bytes are not transmitted here; they are used only to refuse a document above Twilio's
     documented non-image limit before any send. `filename` is unused because Twilio names the

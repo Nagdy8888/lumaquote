@@ -18,16 +18,15 @@ sandboxed decoder and written-confirmation gate as an uploaded file.
 
 from uuid import uuid4
 
-from psycopg.types.json import Jsonb
-
 from luma.core.audit import audit
 from luma.core.database import database
 from luma.core.errors import DomainError
-from luma.features.conversations.participation import accept_customer_text
+from luma.features.conversations.participation import accept_customer_text, accept_quote_button
 from luma.features.conversations.repository import conversation
-from luma.features.conversations.service import add_message
+from luma.features.conversations.service import add_message, queue_notice
 from luma.features.media.intake import store_media
 
+from . import telegram_client
 from .allowlist import allowed
 from .errors import ProviderError
 from .provider import fetch_media
@@ -107,17 +106,6 @@ def open_conversation(conn, company, sender: str, name: str, channel: str = "wha
     return conversation(conn, company, cid, lock=True)
 
 
-def queue_notice(conn, company, current, text: str, key: str) -> None:
-    """Queue one fixed, customer-visible notice, only while the agent (not staff) owns the conversation."""
-    if current["owner"] != "agent":
-        return
-    conn.execute(
-        """insert into luma.outbox(id,company_id,conversation_id,kind,payload,action_key)
-        values(%s,%s,%s,'reply',%s,%s) on conflict(action_key) do nothing""",
-        (uuid4(), company, current["id"], Jsonb({"text": text}), key),
-    )
-
-
 def handle_message(row) -> tuple[str, str | None]:
     """Apply one inbound customer message; returns the inbox outcome and an optional opaque code."""
     event, company = row["payload"], row["company_id"]
@@ -150,6 +138,17 @@ def handle_message(row) -> tuple[str, str | None]:
                 add_message(conn, company, current["id"], "system", "Email attachments are not processed yet.")
             try:
                 accept_customer_text(conn, company, current, event["text"], provider_id=event["id"])
+            except DomainError as error:
+                if error.status == 429:
+                    raise Retry("rate_limited") from None
+                raise
+        elif kind == "quote_answer":
+            if channel != "telegram":
+                return "ignored", "answer_channel_denied"
+            try:
+                accept_quote_button(
+                    conn, company, current, event["answer"], event["quote_id"], provider_id=event["id"]
+                )
             except DomainError as error:
                 if error.status == 429:
                     raise Retry("rate_limited") from None
@@ -206,13 +205,30 @@ def process_next() -> bool:
     row = claim()
     if not row:
         return False
+    settled = True
+    outcome = "failed"
     try:
         outcome, code = handle_message(row) if row["kind"] == "message" else apply_status(row)
         finish(row, outcome, code)
     except Retry as retry:
+        settled = False
         finish(row, "failed", retry.code, delay=RETRY_SECONDS)
     except DomainError as error:
         finish(row, "failed", f"http_{error.status}"[:40])
     except Exception as error:
         finish(row, "failed", type(error).__name__[:40])
+    if settled:
+        acknowledge_button(row, outcome)
     return True
+
+
+def acknowledge_button(row, outcome: str) -> None:
+    """Stop a Telegram button's spinner once its inbox row is settled; best effort, after the commit.
+
+    Runs outside any database transaction (the row is already finished) and only for a settled
+    `quote_answer` event: "Recorded" when the press was processed, no text otherwise. The call
+    is never retried, and a failure is logged as an opaque code only by the adapter.
+    """
+    event = row["payload"]
+    if row["kind"] == "message" and event.get("type") == "quote_answer" and event.get("callback_id"):
+        telegram_client.answer_callback(event["callback_id"], "Recorded" if outcome == "done" else "")

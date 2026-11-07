@@ -80,7 +80,7 @@ def send_text(to: str, body: str) -> str:
     raise ProviderError("rejected", "email_is_pulled")
 
 
-def send_pdf(to: str, data: bytes, filename: str, caption: str, reference: str) -> str:
+def send_pdf(to: str, data: bytes, filename: str, caption: str, reference: str, buttons=None) -> str:
     """Email is pulled by Apps Script; a direct send is a programming error, reported as a refusal."""
     raise ProviderError("rejected", "email_is_pulled")
 

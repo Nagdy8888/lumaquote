@@ -28,6 +28,8 @@ sources and [catalog.json](catalog.json) are the maintained source of truth.
 - [Signed GAS snapshots](rendered/google-snapshot.svg).
 - [Drive export of approved PDFs](rendered/drive-export.svg).
 - [WhatsApp ingress and gated egress](rendered/whatsapp-channel.svg).
+- [Quotation answer and order lifecycle](rendered/order-lifecycle.svg): accept, decline, expiry,
+  pending order and the stock hold.
 - [Verification scopes](rendered/verification-scope.svg).
 - [Working-rule enforcement](rendered/rule-enforcement.svg).
 

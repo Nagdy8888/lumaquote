@@ -36,6 +36,7 @@ class Bot:
         self.next_message = 100
         self.send_error = None
         self.poll_error = None
+        self.fail_answer = False
         self.file = {"file_id": "x", "file_unique_id": "u", "file_size": 100, "file_path": "voice/file_1.oga"}
         self.file_bytes = b""
 
@@ -58,6 +59,10 @@ class Bot:
                 return self.send_error
             self.next_message += 1
             return httpx.Response(200, json={"ok": True, "result": {"message_id": self.next_message}})
+        if method == "answerCallbackQuery":
+            if self.fail_answer:
+                return httpx.Response(400, json={"ok": False, "error_code": 400})
+            return httpx.Response(200, json={"ok": True, "result": True})
         if method == "getFile":
             return httpx.Response(200, json={"ok": True, "result": self.file})
         return httpx.Response(404, json={"ok": False, "error_code": 404})
@@ -157,7 +162,7 @@ def test_updates_are_stored_before_the_offset_confirms_them(environment, bot):
     assert count[0]["n"] == 2
     bot.poll_error = httpx.ConnectError("down")
     assert poll_once(12, timeout=0) == 12
-    assert json.loads(bot.calls("getUpdates")[0].content)["allowed_updates"] == ["message"]
+    assert json.loads(bot.calls("getUpdates")[0].content)["allowed_updates"] == ["message", "callback_query"]
 
 
 def test_allowlisted_user_opens_a_telegram_conversation_and_others_are_ignored(environment, bot):

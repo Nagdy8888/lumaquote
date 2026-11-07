@@ -7,7 +7,7 @@
    started it, and the allowlist limits that further.
 2. `submit` (no transaction): one submission through the channel's adapter (`provider.adapter`):
    Meta uploads the PDF then sends a document; Twilio sends a signed, expiring gateway link to the
-   PDF; Telegram uploads the PDF with `sendDocument`. No provider offers an idempotency key, so the
+   PDF; Telegram uploads the PDF with `sendDocument` and attaches Accept and Decline inline buttons. No provider offers an idempotency key, so the
    `submitting` marker is the only guard against a second submission, and an uncertain outcome is
    never retried.
 3. `record` (new transaction): the outcome is stored as `submitted` (accepted, with the provider
@@ -32,6 +32,7 @@ from .allowlist import allowed
 from .errors import ProviderError
 
 SAFE = re.compile(r"[^A-Za-z0-9._-]")
+ANSWER_HINT = "Reply ACCEPT to accept or DECLINE to decline."
 
 
 def release_hold(conn, item, reason: str) -> int:
@@ -89,9 +90,22 @@ def begin(conn, item, current, quote) -> dict | None:
         text = (
             f"Quotation {quote['number']}, revision {quote['revision']}. "
             f"Total USD {quote['content']['total']} (tax excluded). Staff-approved; valid until "
-            f"{quote['valid_until'].strftime('%d %b %Y')}."
+            f"{quote['valid_until'].strftime('%d %b %Y')}. {ANSWER_HINT}"
         )
     return {"item": item, "to": recipient, "quote": quote, "text": text, "channel": channel}
+
+
+def answer_buttons(plan: dict) -> list[tuple[str, str]] | None:
+    """Return the Accept and Decline inline buttons for a Telegram quotation send, else None.
+
+    Each button is `(label, callback_data)` with callback data `acc:<quote id>` or
+    `dec:<quote id>` (40 bytes, within Telegram's 64). The data only names the quotation; the
+    ingress and `orders.service.answer_quote` decide whether the sender may answer it.
+    """
+    quote = plan["quote"]
+    if not quote or plan["channel"] != "telegram":
+        return None
+    return [("Accept", f"acc:{quote['id']}"), ("Decline", f"dec:{quote['id']}")]
 
 
 def submit(plan: dict) -> dict:
@@ -104,7 +118,9 @@ def submit(plan: dict) -> dict:
                 document = stored_quotation_pdf(quote)
             except Exception:
                 return {"status": "failed", "code": "document_unavailable"}
-            sent = sender.send_pdf(plan["to"], document, filename, plan["text"], str(plan["item"]["id"]))
+            sent = sender.send_pdf(
+                plan["to"], document, filename, plan["text"], str(plan["item"]["id"]), answer_buttons(plan)
+            )
         else:
             sent = sender.send_text(plan["to"], plan["text"])
         return {"status": "submitted", "provider_id": sent}

@@ -1,0 +1,25 @@
+stateDiagram-v2
+  accTitle: Quotation answer and order lifecycle with stock holds
+  accDescr: An approved and sent quotation holds its stock. The customer can accept it by typing a fixed phrase or pressing the Telegram button, or decline it. Acceptance creates a pending order and keeps the hold. Decline, expiry and a new revision release the hold. Staff confirmation and cancellation of the pending order are planned in task T4 and are not built yet.
+  [*] --> approved: Staff approve and stock is held
+  approved --> accepted: Customer accepts the newest sent quotation
+  approved --> declined: Customer declines and hold is released
+  approved --> expired: Valid-until passes and worker releases the hold
+  approved --> superseded: Any other customer text or a new revision
+  accepted --> order_pending: Pending order SO number copies quotation lines
+  order_pending --> confirmed: Staff confirm and held stock leaves on-hand
+  order_pending --> cancelled: Staff cancel and hold is released
+  declined --> [*]
+  expired --> [*]
+  superseded --> [*]
+  confirmed --> [*]
+  cancelled --> [*]
+  note right of approved
+    Refused when unsent, expired, not the newest
+    revision, wrong sender or stock not held.
+    A refusal alerts staff and changes nothing else.
+  end note
+  note right of order_pending
+    Confirm and cancel are planned
+    in task T4 and not built yet.
+  end note

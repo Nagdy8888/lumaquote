@@ -69,11 +69,16 @@ def purge_media(conn, company: UUID, now: datetime, execute: bool) -> dict:
 
 
 def idle_conversations(conn, company: UUID, now: datetime) -> tuple[list[UUID], list[UUID]]:
-    """Split conversations idle for 90+ days into (deletable, skipped because work is unfinished)."""
+    """Split conversations idle for 90+ days into (deletable, skipped because work is unfinished).
+
+    A conversation with an order is always skipped: an order is a business record that references
+    its conversation and quotation (decision D49), so retention never deletes it.
+    """
     rows = conn.execute(
         """select c.id,
         exists(select 1 from luma.jobs j where j.conversation_id=c.id and j.status in ('queued','running'))
         or exists(select 1 from luma.outbox o where o.conversation_id=c.id and o.status in ('queued','submitting'))
+        or exists(select 1 from luma.orders od where od.conversation_id=c.id)
         or exists(select 1 from luma.drive_exports d join luma.quotes q on q.id=d.quote_id and q.company_id=d.company_id
                   where q.conversation_id=c.id and d.status in ('queued','claimed')) as busy
         from luma.conversations c where c.company_id=%s and c.updated_at < %s""",
@@ -104,6 +109,7 @@ def purge_conversations(conn, company: UUID, ids: list[UUID], execute: bool) -> 
             ("delete from luma.drive_exports where quote_id=any(%s)", quotes),
             ("delete from luma.approvals where quote_id=any(%s)", quotes),
             ("delete from luma.stock_reservations where quote_id=any(%s)", quotes),
+            ("delete from luma.stock_alerts where conversation_id=any(%s)", ids),
             ("delete from luma.outbox where conversation_id=any(%s)", ids),
             ("delete from luma.jobs where conversation_id=any(%s)", ids),
             ("delete from luma.media where conversation_id=any(%s)", ids),

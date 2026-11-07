@@ -7,7 +7,7 @@ from luma.features.conversations.repository import conversation
 from luma.features.conversations.service import add_message
 from luma.features.messaging.authorization import authorize_outbound
 from luma.features.messaging.email_dispatch import queue as queue_email
-from luma.features.messaging.outbound import begin, record, release_hold, submit
+from luma.features.messaging.outbound import ANSWER_HINT, begin, record, release_hold, submit
 
 
 def deliver_one(company_id=None):
@@ -93,7 +93,7 @@ def _deliver_local(conn, item, quote):
     text = (
         item["payload"].get("text")
         if not quote
-        else f"{quote['number']}, revision {quote['revision']}, is available in the local test channel. Total USD {quote['content']['total']}."
+        else f"{quote['number']}, revision {quote['revision']}, is available in the local test channel. Total USD {quote['content']['total']}. {ANSWER_HINT}"
     )
     # Message identity is tied to the outbox intent; one database transaction
     # contains the local-channel effect and completion.

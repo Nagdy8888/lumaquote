@@ -1,11 +1,12 @@
 # Inventory: the stock ledger
 
 Decision [D49](../DECISIONS.md), plan [stock, orders and purchasing](../proposals/2026-11-07-stock-orders-plan.md).
-This guide describes what is implemented in tasks T1 and T2: the tables, the single writer
+This guide describes what is implemented in tasks T1, T2 and T3: the tables, the single writer
 (`app/backend/luma/features/inventory/ledger.py`), the read queries, how the rest of
 the application reads stock, and the reservation lifecycle (hold at approval, release on
-every exit, the dispatch check and the worker's reconcile). Customer acceptance, orders,
-purchase orders, exports and the UI are later tasks; they are listed under
+every exit, the dispatch check and the worker's reconcile) and customer acceptance (the
+pending order a customer's Accept creates). Order confirmation and cancellation, purchase
+orders, exports and the UI are later tasks; they are listed under
 [Open gaps](#open-gaps) and are not described as working.
 
 ## Purpose and ownership
@@ -180,6 +181,114 @@ The authoritative record of a hold is `luma.stock_reservations`. The PDF sentenc
 "Availability is a snapshot. Stock is held for this quotation until it expires." (the PDF is not
 part of the content hash). PDFs already stored for earlier quotes keep their old wording.
 
+## Customer acceptance and orders (task T3)
+
+<!-- diagram:order-lifecycle:start -->
+![Quotation answer and order lifecycle with stock holds](../diagrams/rendered/order-lifecycle.svg)
+
+[Open full-size SVG](../diagrams/rendered/order-lifecycle.svg) · [Editable Mermaid](../diagrams/order-lifecycle.mmd)
+
+<details>
+<summary>Mermaid source</summary>
+
+```mermaid
+stateDiagram-v2
+  accTitle: Quotation answer and order lifecycle with stock holds
+  accDescr: An approved and sent quotation holds its stock. The customer can accept it by typing a fixed phrase or pressing the Telegram button, or decline it. Acceptance creates a pending order and keeps the hold. Decline, expiry and a new revision release the hold. Staff confirmation and cancellation of the pending order are planned in task T4 and are not built yet.
+  [*] --> approved: Staff approve and stock is held
+  approved --> accepted: Customer accepts the newest sent quotation
+  approved --> declined: Customer declines and hold is released
+  approved --> expired: Valid-until passes and worker releases the hold
+  approved --> superseded: Any other customer text or a new revision
+  accepted --> order_pending: Pending order SO number copies quotation lines
+  order_pending --> confirmed: Staff confirm and held stock leaves on-hand
+  order_pending --> cancelled: Staff cancel and hold is released
+  declined --> [*]
+  expired --> [*]
+  superseded --> [*]
+  confirmed --> [*]
+  cancelled --> [*]
+  note right of approved
+    Refused when unsent, expired, not the newest
+    revision, wrong sender or stock not held.
+    A refusal alerts staff and changes nothing else.
+  end note
+  note right of order_pending
+    Confirm and cancel are planned
+    in task T4 and not built yet.
+  end note
+```
+
+</details>
+<!-- diagram:order-lifecycle:end -->
+
+**Actors and authority.** A customer on Telegram, Gmail or WhatsApp (or the staff-operated local
+test reply) may accept or decline the newest sent quotation of their own conversation. No AI is
+involved. The agent and the worker only record the answer; they cannot confirm an order or move
+on-hand stock. Staff confirm or cancel an order in task T4.
+
+**Recognizing the answer** (`orders/acceptance.py`, `parse_answer`). Lowercase, trim, collapse
+spaces, strip trailing `.` and `!`; the whole message (at most 40 characters) must equal one phrase.
+Accept: `accept`, `i accept`, `accepted`, `yes i accept`, `yes, i accept`, `accept quotation`,
+`accept the quotation`, `i accept the quotation`. Decline: `decline`, `i decline`, `declined`,
+`reject`, `no thanks`, `decline quotation`. Plain `yes` is not an acceptance (D46 uses YES to confirm
+an order restatement). Anything else, such as "accept but change qty to 20", is ordinary text and
+supersedes the offer as before. Unit table: `tests/unit/test_acceptance_phrases.py`.
+
+**Call flow.** `participation.accept_customer_text` (typed text, every channel) and
+`participation.accept_quote_button` (Telegram button) run under the caller's conversation lock,
+rate limit (six per minute per conversation) and message store (`provider_id` dedupe). A phrase
+match goes to `orders/service.answer_quote` and the function returns before the supersede update,
+so an answer never supersedes a quotation or queues an agent job.
+
+**Binding rules** (`service.refusal_reason`, then `answer_quote`). The target is the newest
+revision of the conversation (row-locked). It is answerable only when all hold: status `approved`;
+`valid_until > now()`; `recipient` equals the conversation's recipient; a quotation outbox row is
+`submitted`, `delivered`, `read` or `local_delivered` (not `queued`, `blocked`, `failed`, `unknown`);
+and every product still has a `held` reservation equal to its line quantity. A button's `quote_id`
+must equal that target. Otherwise the answer is refused with an opaque reason (`no_quotation`,
+`not_current_quotation`, `not_open`, `expired`, `recipient_mismatch`, `not_sent`, `stock_not_held`).
+
+| Outcome | Writes (one transaction, no commit here) |
+|---|---|
+| `accepted` | quote -> `accepted`; `orders` row (`pending`, `SO-0001` from `document_counters` under a row lock, created on first use) and `order_lines` copied from the immutable quote content (prices, names, total, currency never recomputed; customer name and company from the conversation); hold kept; conversation `order_pending`; audit `order.accepted`; notice |
+| `already_accepted` (accept again) | no new order; conversation status restated; the same confirmation notice is queued again for the new message |
+| `declined` | quote -> `declined`; `ledger.release_quote(..., 'declined')`; conversation `declined`; audit `quotation.declined`; notice |
+| `refused` | `stock_alerts` row `acceptance_refused` (open); conversation `needs_staff`; audit `order.acceptance_refused` with the reason code and the path (`reply` or `telegram_button`); the refusal notice; nothing superseded, no agent job |
+
+A decline of an already accepted quote is refused (`not_open`): the order and its hold stay.
+Order numbers are gap-tolerant (a rolled-back acceptance rolls its increment back too).
+
+**Fixed notices** (English, `orders/service.py`), queued only while the agent owns the conversation
+through the outbox pattern of `conversations/service.queue_notice` (moved there from
+`messaging/inbound` so orders can use it without an import cycle; action key
+`inbound-notice:<provider id>`, so a redelivered message queues one). Under staff ownership the
+answer is applied (an order can still be created from a delivered quotation) and the conversation
+becomes `needs_staff`; no notice is queued.
+
+- Accepted: "Thank you. Your acceptance of quotation {number}, revision {n}, is recorded. Our sales team will confirm your order."
+- Declined: "Thank you. Quotation {number} is declined. Send a new request any time."
+- Refused: "This quotation can no longer be accepted. Our sales team will contact you."
+
+**Revising an accepted quotation.** `quotations/drafting.draft` refuses (409) a new revision while
+the latest one is `accepted`. Otherwise the draft would mark the accepted quotation `superseded`
+and the next `ledger.reconcile` would release the order's reservation. Staff handle the order first
+(cancel is task T4).
+
+**Delivery wording.** The quotation caption ends with "Reply ACCEPT to accept or DECLINE to
+decline." in `outbound.begin` (WhatsApp, Telegram, Gmail body) and in the local-test text
+(`runtime/delivery._deliver_local`). Telegram also attaches inline buttons; see
+[TELEGRAM](TELEGRAM.md#quotation-buttons-accept-and-decline-d49).
+
+**Retention.** `scripts/retention.py` skips a conversation that has an order (a business record) and
+deletes the `stock_alerts` of the conversations it removes.
+
+**Failures.** A database error rolls the whole answer back (the customer message too) and the inbox
+row is retried or failed by the normal rules; a refusal is a value, never an exception, so the
+inbox row finishes `done`. Rate limiting returns 429 for typed local replies and requeues inbox rows.
+Tests: `tests/integration/test_stock_acceptance.py` (label `local`; the Telegram and Gmail parts are
+`local-substitute`).
+
 ## How the rest of the application reads stock
 
 Every former reader of `products.available` now joins `stock_levels` and computes
@@ -229,10 +338,16 @@ cursor), and `open_alerts`.
   `QuoteSummary.tsx` is only reworded; the inventory UI is task T6.
 - A WhatsApp `failed` delivery receipt does not release at once; reconcile does within a tick.
 - Quotes approved and queued before T2 have no hold and are blocked at dispatch.
-- Release on customer decline and on order cancel belong to tasks T3 and T4.
-- `scripts/retention.py` handles reservations only; when orders and alerts exist (tasks T3-T4) it must also delete or keep them, because they reference quotes and conversations.
-- Orders, acceptance, purchase orders, adjustments and reorder-level routes, alerts, exports
-  and the UI are not built (tasks T3-T6); their tables exist and are empty.
+- Release on order cancel belongs to task T4. Release on customer decline is done (T3).
+- A pending order has no staff screen or route yet. Confirm, cancel, acknowledging
+  `acceptance_refused` alerts and the status labels `order_pending` and `declined` in the UI are
+  tasks T4 and T6 (the UI falls back to "order pending" and "declined" text, and the overview
+  counts those conversations as open).
+- A customer who accepted and then writes ordinary text re-opens nothing: the accepted quotation
+  stays, the agent is queued, and its draft is refused with a 409 until staff handle the order.
+- An accept typed with extra words or an email signature ("Accept, thanks") is ordinary text.
+- Purchase orders, adjustments and reorder-level routes, exports and the UI are not built
+  (tasks T4-T6); their tables exist and are empty.
 - Google sync still requires the `Inventory` table to be present (task T5 makes it optional).
 - No automatic repair of a ledger/level mismatch and no stock-take reconciliation workflow.
 - Diagrams for the ledger and order state machine are task T7.

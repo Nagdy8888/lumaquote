@@ -85,6 +85,19 @@ outbox left `submitting` -> `failed` (`outbox_changed`). The outbox mirrors thes
 waiting or claimed, then `submitted`, `failed` or `unknown`. Email has no delivery or read receipts.
 The dispatcher's two-minute stale-`submitting` sweep skips rows that have an email dispatch.
 
+## Accepting or declining by reply (D49)
+
+The quotation mail body (the caption built in `outbound.begin`, reused by `email_dispatch.queue`)
+ends with "Reply ACCEPT to accept or DECLINE to decline." A customer replies in the same thread.
+`email_ingress.reduce_mail` cuts the quoted history (`strip_quoted`), so the event text is only the
+new text, for example `Accept`; the `Re: Quotation ...` subject is used only when the body is empty
+and plays no part in the decision. `inbound.handle_message` sends the text through
+`accept_customer_text`, where an exact phrase (`orders.acceptance.parse_answer`) is routed to
+`orders.service.answer_quote` (see [INVENTORY](INVENTORY.md#customer-acceptance-and-orders-task-t3)).
+The sender must already be authenticated and allowlisted. The confirmation notice is an ordinary
+email reply queued through the same gated pull dispatch. A reply with a signature line or a second
+sentence ("Accept, thanks") is not an exact phrase and is treated as ordinary text (re-quote).
+
 ## Database writes and transactions
 
 Migration `20261107020000_email_channel.sql` adds `email` to `conversations_channel_check` and the
@@ -128,7 +141,8 @@ the user must re-authorize the script.
 | `ENABLE_LIVE_EMAIL=false`, Google not configured, recipient not allowed | outbox `blocked` before any dispatch row |
 | Apps Script crashes after claiming | lease expires, outbox `unknown`, never resent |
 | PDF digest mismatch in Apps Script | receipt `failed` (`gmail_transfer_corrupt`) |
-| Nobody collects a reply for 24 hours | outbox `failed` (`mail_not_collected`) |
+| Nobody collects a reply for 24 hours | outbox `failed` (`mail_not_collected`); a quotation reply also releases its stock reservation (`delivery_failed`, D49) |
+| A quotation PDF over 5 MiB at claim time | dispatch and outbox `failed` (`pdf_too_large`), the mail is never offered, and the stock reservation is released (`delivery_failed`, D49) |
 | Another trigger holds the script lock | `pollLumaMail`/`sendLumaMail` wait up to `LOCK_WAIT_MS` (25 s); on timeout the run throws (shows Failed). Before 2026-11-07 they used `tryLock(1000)` and returned silently, so a reply stayed `waiting` while the run showed Completed |
 
 ## Configuration (names only)
@@ -145,7 +159,8 @@ test. See [configuration](CONFIGURATION.md).
 ## Tests and evidence
 
 `tests/unit/test_email_ingress.py` (28 tests): address parsing, each authentication mechanism and
-seven refusal cases, quoted-reply stripping in English and Arabic, reduction. `tests/integration/test_email.py`
+seven refusal cases, quoted-reply stripping in English and Arabic, reduction. The Accept-by-reply path is
+tested in `tests/integration/test_stock_acceptance.py` (`test_gmail_reply_with_quoted_history_accepts_the_quotation`). `tests/integration/test_email.py`
 (10 tests, real PostgreSQL and Storage, label `local-substitute`): stored once and deduplicated; forged
 and unconfigured pushes; unauthenticated and unlisted senders; claim once, in-thread reply id, sent
 receipt and replay; expired claim becomes `unknown`; failed receipt; live switch off; approved

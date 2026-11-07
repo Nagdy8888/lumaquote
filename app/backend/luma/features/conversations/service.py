@@ -1,5 +1,7 @@
 from uuid import uuid4
 
+from psycopg.types.json import Jsonb
+
 from luma.core.admission import enqueue
 from luma.core.audit import audit
 
@@ -36,3 +38,19 @@ def add_message(conn, company, cid, actor, body, kind="text", object_path=None, 
         (cid, company),
     )
     return inserted["id"]
+
+
+def queue_notice(conn, company, current, text: str, key: str) -> None:
+    """Queue one fixed, customer-visible notice, only while the agent (not staff) owns the conversation.
+
+    `key` is the outbox `action_key` (unique); a repeated key is ignored, so a redelivered inbound
+    message queues its notice once. The text must be fixed product wording, never customer
+    content. The notice goes through the normal dispatcher gates (allowlist, live switch).
+    """
+    if current["owner"] != "agent":
+        return
+    conn.execute(
+        """insert into luma.outbox(id,company_id,conversation_id,kind,payload,action_key)
+        values(%s,%s,%s,'reply',%s,%s) on conflict(action_key) do nothing""",
+        (uuid4(), company, current["id"], Jsonb({"text": text}), key),
+    )

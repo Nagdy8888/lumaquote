@@ -376,6 +376,21 @@
       ]
     },
     {
+      "id": "order-lifecycle",
+      "title": "Quotation answer and order lifecycle with stock holds",
+      "scope": "Accept, decline, expiry and pending order are implemented (task T3, local tests). Confirm and cancel are planned (task T4) and not built.",
+      "embeds": [
+        "docs/reference/INVENTORY.md"
+      ],
+      "bindings": [
+        "app/backend/luma/features/orders/acceptance.py",
+        "app/backend/luma/features/orders/service.py",
+        "app/backend/luma/features/conversations/participation.py",
+        "app/backend/luma/features/inventory/ledger.py",
+        "supabase/migrations/20261107030000_stock_ledger.sql"
+      ]
+    },
+    {
       "id": "integrations-map",
       "title": "External integrations, their gates and current proof level",
       "scope": "Gates from configuration; proof levels from dated evidence, not live verification of WhatsApp or Google",
