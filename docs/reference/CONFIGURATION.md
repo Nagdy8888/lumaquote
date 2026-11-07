@@ -56,6 +56,10 @@ Do not expose Supabase administration or the staff API through a callback tunnel
 - `RESERVATION`: estimated USD 0.25 primary/run maximum. Retrieval gets at most
   USD 0.01 within that same maximum, not additional unlimited allowance.
 
+With `ENABLE_PAID_AI=true` and `OPENAI_API_KEY` set, the model also writes the agent's replies and
+reads free-wording orders (decision D46, [agent runtime](AGENT_RUNTIME.md#paid-conversational-brain-d46));
+transcription and photo reading switch on with the same flag.
+
 These defaults are Settings values, not necessarily explicitly present in the
 minimal template. Model adapters reject unsupported configured models rather than
 silently selecting a costlier fallback. Changing a string does not establish a

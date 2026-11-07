@@ -80,6 +80,13 @@ so the GAS-only adapter includes a one-minute reconciliation trigger. Its instal
 and live execution remain pending. Apps Script scheduling is approximate; stale
 commercial evidence continues to block finalization.
 
+## Paid AI brain (D46)
+
+Done 2026-11-07: the OpenAI key is in the ignored `.env`, `ENABLE_PAID_AI=true` is in `.env.local`,
+and a live Telegram test passed ("i want 5 dl-001" -> restatement, "yes" -> quotation `LQ-DA457964`
+in review). Still open: approve that quotation and confirm the PDF arrives in Telegram. Spending
+stays under USD 25 total and USD 5 per day.
+
 ## Telegram bot connection (D44, recommended)
 
 Status 2026-11-07: steps 1-4 are done. Bot `@luma_quote_bot` is configured, the user is

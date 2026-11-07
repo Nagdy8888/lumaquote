@@ -26,9 +26,10 @@ def retrieve(state):
     returns bounded serialized hits; denied/uncertain provider work returns an
     unavailable/no-match result and retains unresolved usage. This node cannot
     select a final quotation line or grant approval; ask rechecks each hit again.
+    A model-written reply (D45, `brain_reply`) already saw the catalog, so no search runs.
     """
     empty = {"catalog_candidates": [], "retrieval_status": "not_needed"}
-    if not state.get("clarification") or has_explicit_lines(state.get("extraction")):
+    if state.get("brain_reply") or not state.get("clarification") or has_explicit_lines(state.get("extraction")):
         return empty
     config = settings()
     with database(worker=True) as conn:

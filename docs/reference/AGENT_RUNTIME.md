@@ -17,8 +17,8 @@ checkpoint or resume command is never an approval credential.
 ```mermaid
 flowchart TD
   accTitle: Durable LumaQuote agent graph
-  accDescr: Extraction reads only the latest customer turn and independently checks a complete positive written order against model fields. Unconfirmed, negated or missing requirements create a durable clarification intent and customer interrupt. Confirmed explicit lines call the backend draft service and pause for a persisted staff decision when a quote exists. No graph node sends a message.
-  Start(["Trusted conversation job"]) --> Extract["extract: latest turn + written-field gate"]
+  accDescr: Extraction reads the latest customer turn. Without paid AI only a complete positive written order confirms. With paid AI the model reads the conversation and writes the reply, but only a deterministic YES to a code-built restatement, or a written order the model agrees with, confirms. Unconfirmed, negated or missing requirements create a durable clarification intent and customer interrupt. Confirmed explicit lines call the backend draft service and pause for a persisted staff decision when a quote exists. No graph node sends a message.
+  Start(["Trusted conversation job"]) --> Extract["extract: written order, YES to restatement, or AI reply"]
   Extract --> Retrieve["retrieve: current evidence candidates"]
   Retrieve --> Question{"Clarification required?"}
   Question -->|Yes| Ask["ask: persist reply intent"]
@@ -103,6 +103,41 @@ boundary cases also verify that malformed quantities/oversized lists clarify
 instead of causing structured-output validation errors. See
 [tooling and tests](TOOLING_AND_TESTS.md#unit-and-component-coverage) for execution
 and the separate persisted graph regression scope.
+
+### Paid conversational brain (D46)
+
+With `ENABLE_PAID_AI=true`, `brain.py` makes the model the agent's reader and writer, while code
+keeps consent. Per customer turn `extract` decides in this order:
+
+1. **YES to the restatement, no model call.** The latest customer message is text, the whole
+   message is a plain agreement word (`brain.is_yes`: `yes`, `ok`, `confirm`, `sure`, and common
+   Egyptian Arabic words such as `نعم` and `تمام`), and the customer message just before it is the
+   one the restatement answered (`pending_after`). Then the restated pairs in `pending_order` are
+   confirmed and go to `prepare`. A YES after any newer customer message does not confirm.
+2. **Model turn.** Otherwise the primary reservation is taken and one structured call reads
+   `brain.model_input`: a CATALOG section (current, not discontinued products by SKU, name, watts,
+   CCT and IP rating; lexical hits for the latest text first, then the first 30 SKUs; never price
+   or stock) and a CONVERSATION section (last 12 customer, agent and staff messages oldest first,
+   each cut to 1000 characters; media bodies are marked as transcripts or photo text). The output
+   shape is still `Extraction`; `clarification` is now the model's reply in its own words.
+3. **Decision in code.** A written order that `parse_written_request` accepts and the model reads
+   identically is confirmed (the D20 path). Otherwise the proposal is the customer's own written
+   pairs when present, else the model's pairs (`brain.valid_lines`: certain, `AA-000` SKUs,
+   quantities, no duplicates). A proposal with a SKU outside the current catalog gets the fixed
+   `unknown_reply`. A valid proposal gets the model's reply plus the fixed `restatement`
+   ("To confirm, your order is: 5 x DL-001. Reply YES to confirm, or send the corrected order.")
+   and is saved as `pending_order`. With no proposal the model's reply is sent.
+4. **Reply filter.** `brain.safe_reply` drops a model reply over 700 characters or one containing a
+   currency sign or code, a percentage, a link, or the words approve, discount, guarantee or
+   "without review"; the restatement or the fixed `QUESTION` is sent instead.
+
+Model-written turns set `brain_reply`, so `retrieve` skips catalog search and `ask` sends the text
+unchanged. Every turn resets `pending_order`, `pending_after` and `brain_reply`, so a stale
+restatement can never be confirmed later. Prices, totals, stock checks, staff approval and sending
+are unchanged. With paid AI off nothing here runs and D20 applies alone. Tests:
+`tests/unit/test_brain.py` and `tests/integration/test_agent_brain.py` (scripted provider,
+`local-substitute`; the YES-ordering guard and the approval filter were mutation-checked). Not
+proven: the real model's reply quality, language handling or cost per turn.
 
 `nodes/retrieval.retrieve` acts only when clarification is needed and no explicit
 lines exist. "Explicit" means at least one extracted line with a non-empty SKU
