@@ -1,12 +1,13 @@
 # Inventory: the stock ledger
 
 Decision [D49](../DECISIONS.md), plan [stock, orders and purchasing](../proposals/2026-11-07-stock-orders-plan.md).
-This guide describes what is implemented in tasks T1, T2 and T3: the tables, the single writer
+This guide describes what is implemented in tasks T1 to T4: the tables, the single writer
 (`app/backend/luma/features/inventory/ledger.py`), the read queries, how the rest of
 the application reads stock, and the reservation lifecycle (hold at approval, release on
 every exit, the dispatch check and the worker's reconcile) and customer acceptance (the
-pending order a customer's Accept creates). Order confirmation and cancellation, purchase
-orders, exports and the UI are later tasks; they are listed under
+pending order a customer's Accept creates) and the staff routes (confirm and cancel orders,
+purchase orders and receipts, adjustments, reorder levels, alerts). Exports and the UI are
+later tasks (T5, T6); they are listed under
 [Open gaps](#open-gaps) and are not described as working.
 
 ## Purpose and ownership
@@ -25,8 +26,9 @@ a ledger, not a number someone overwrites:
 - Available is `on_hand - reserved`. It is never stored; every reader computes it.
 
 `ledger.py` is the only code allowed to write the first three tables. Other code calls its
-functions inside its own transaction. Authorization is not decided here: routes (task T4)
-check the role (admin-only adjustments and receipts) before calling the ledger.
+functions inside its own transaction. Authorization is not decided here: the services behind
+the staff routes check the role (admin-only adjustments, reorder levels and purchase orders)
+before calling the ledger.
 
 ## Invariants
 
@@ -122,7 +124,7 @@ only; an unknown-delivery quote that passes `valid_until` is still released and 
 
 A quotation's stock is held from its approval until it is released or converted:
 `review` -> approve -> `approved` with `held` reservations -> `released` (superseded, blocked,
-failed, expired, taken over) or `converted` (order confirmed, task T4).
+failed, expired, taken over) or `converted` (order confirmed, see [staff actions](#staff-actions-purchasing-and-alerts-task-t4)).
 
 **Hold.** `quotations/approval.decide` calls `ledger.reserve_quote` right after
 `check_snapshot` and before it writes the approval, the quotation outbox row or the Drive
@@ -194,7 +196,7 @@ part of the content hash). PDFs already stored for earlier quotes keep their old
 ```mermaid
 stateDiagram-v2
   accTitle: Quotation answer and order lifecycle with stock holds
-  accDescr: An approved and sent quotation holds its stock. The customer can accept it by typing a fixed phrase or pressing the Telegram button, or decline it. Acceptance creates a pending order and keeps the hold. Decline, expiry and a new revision release the hold. Staff confirmation and cancellation of the pending order are planned in task T4 and are not built yet.
+  accDescr: An approved and sent quotation holds its stock. The customer can accept it by typing a fixed phrase or pressing the Telegram button, or decline it. Acceptance creates a pending order and keeps the hold. Decline, expiry and a new revision release the hold. Staff confirm the pending order, which moves the stock out of on-hand, or cancel it, which releases the hold. A confirmed order can still be cancelled and its stock returns.
   [*] --> approved: Staff approve and stock is held
   approved --> accepted: Customer accepts the newest sent quotation
   approved --> declined: Customer declines and hold is released
@@ -206,6 +208,7 @@ stateDiagram-v2
   declined --> [*]
   expired --> [*]
   superseded --> [*]
+  confirmed --> cancelled: Staff cancel and an order_cancel movement returns the stock
   confirmed --> [*]
   cancelled --> [*]
   note right of approved
@@ -214,8 +217,9 @@ stateDiagram-v2
     A refusal alerts staff and changes nothing else.
   end note
   note right of order_pending
-    Confirm and cancel are planned
-    in task T4 and not built yet.
+    Confirm needs the hold to still exist.
+    Cancel needs a reason of 3 to 200 characters.
+    Both are idempotent staff actions.
   end note
 ```
 
@@ -225,7 +229,7 @@ stateDiagram-v2
 **Actors and authority.** A customer on Telegram, Gmail or WhatsApp (or the staff-operated local
 test reply) may accept or decline the newest sent quotation of their own conversation. No AI is
 involved. The agent and the worker only record the answer; they cannot confirm an order or move
-on-hand stock. Staff confirm or cancel an order in task T4.
+on-hand stock. Staff confirm or cancel an order through the T4 routes below.
 
 **Recognizing the answer** (`orders/acceptance.py`, `parse_answer`). Lowercase, trim, collapse
 spaces, strip trailing `.` and `!`; the whole message (at most 40 characters) must equal one phrase.
@@ -272,8 +276,9 @@ becomes `needs_staff`; no notice is queued.
 
 **Revising an accepted quotation.** `quotations/drafting.draft` refuses (409) a new revision while
 the latest one is `accepted`. Otherwise the draft would mark the accepted quotation `superseded`
-and the next `ledger.reconcile` would release the order's reservation. Staff handle the order first
-(cancel is task T4).
+and the next `ledger.reconcile` would release the order's reservation. Staff cancel the order first:
+`orders/management.cancel` then marks the accepted quotation `superseded`, which unblocks a new
+revision (and turns a later customer "accept" into a refusal instead of a second order).
 
 **Delivery wording.** The quotation caption ends with "Reply ACCEPT to accept or DECLINE to
 decline." in `outbound.begin` (WhatsApp, Telegram, Gmail body) and in the local-test text
@@ -288,6 +293,127 @@ row is retried or failed by the normal rules; a refusal is a value, never an exc
 inbox row finishes `done`. Rate limiting returns 429 for typed local replies and requeues inbox rows.
 Tests: `tests/integration/test_stock_acceptance.py` (label `local`; the Telegram and Gmail parts are
 `local-substitute`).
+
+## Staff actions, purchasing and alerts (task T4)
+
+<!-- diagram:purchase-order-lifecycle:start -->
+![Supplier purchase order lifecycle](../diagrams/rendered/purchase-order-lifecycle.svg)
+
+[Open full-size SVG](../diagrams/rendered/purchase-order-lifecycle.svg) · [Editable Mermaid](../diagrams/purchase-order-lifecycle.mmd)
+
+<details>
+<summary>Mermaid source</summary>
+
+```mermaid
+stateDiagram-v2
+  accTitle: Supplier purchase order lifecycle
+  accDescr: An administrator records a purchase order in status ordered. Each receipt raises stock and moves the order to partially received until every line is complete, then to received. An order with nothing received can be cancelled. Received goods can only be corrected with a stock adjustment.
+  [*] --> ordered: Administrator creates PO number
+  ordered --> partially_received: Receipt of part of a line or some lines
+  ordered --> received: Receipt completes every line
+  ordered --> cancelled: Cancel while nothing is received
+  partially_received --> partially_received: Further receipt, total never above ordered
+  partially_received --> received: Receipt completes every line
+  received --> [*]
+  cancelled --> [*]
+  note right of partially_received
+    Each receipt appends a receipt movement
+    and raises on-hand. Cancel is refused here.
+  end note
+```
+
+</details>
+<!-- diagram:purchase-order-lifecycle:end -->
+
+**Actors and authority.** Every route needs a verified staff session and an active membership; the
+role is read from `luma.memberships.role` on each request. Salespeople and administrators may read
+everything, confirm or cancel orders and acknowledge alerts. Only administrators adjust stock, set
+reorder levels and write purchase orders (`core/identity.require_admin`, answered with 403 "Only an
+administrator can ..."). The customer, the agent and the worker can do none of these.
+
+| Method and path | Role | Effect |
+|---|---|---|
+| `GET /api/inventory/stock` | staff | Stock table rows plus `low_count` |
+| `GET /api/inventory/movements?product_id=&limit=&before=` | staff | Newest-first keyset page (limit 1-200, default 50); `next` is an opaque cursor (`<microseconds since 1970>_<uuid>`), pass it back as `before` |
+| `POST /api/inventory/adjustments` | admin | `ledger.apply_movement(kind='adjustment')`; body `product_id`, `delta` (-100000..100000, not 0), `reason` (3-200) |
+| `POST /api/inventory/reorder-levels` | admin | `ledger.set_reorder_level`; body `product_id`, `reorder_level` 0..100000; no movement |
+| `GET /api/inventory/alerts` | staff | Open stored alerts (shortage, acceptance_refused) with SKU, name, conversation, plus the live low-stock list and counts |
+| `POST /api/inventory/alerts/{id}/acknowledge` | staff | open -> acknowledged; 409 when already, 404 when unknown |
+| `GET /api/orders?status=` | staff | Orders with lines, newest first, at most 200; 422 for an unknown status |
+| `POST /api/orders/{id}/confirm` | staff | pending -> confirmed |
+| `POST /api/orders/{id}/cancel` `{reason 3-200}` | staff | pending -> cancelled, or confirmed -> cancelled |
+| `GET /api/purchase-orders` | staff | Purchase orders with lines (SKU, name), newest first, at most 200 |
+| `POST /api/purchase-orders` | admin | Create `ordered`; 1-100 lines, distinct products, quantity 1..100000, `unit_cost` 0..1,000,000 with at most two decimals, supplier 1-120, notes at most 500, optional `expected_on` |
+| `POST /api/purchase-orders/{id}/receive` `{lines:[{product_id, quantity}]}` | admin | Receipt per line |
+| `POST /api/purchase-orders/{id}/cancel` | admin | Only while nothing is received |
+
+All request bodies reject undeclared fields and use strict integers (a float for a quantity is a
+422). Response models (`core/contracts.ResponseModel`) drop undeclared database columns, so company
+and actor ids never reach the browser; the OpenAPI document lists every route with its response
+schema.
+
+**Call flow of a mutation.** `Staff` (bearer verified with Supabase Auth) -> `membership` ->
+`rate_limit(f"{user}:mutation", 30)` -> `operation()` (company, user, action and `Idempotency-Key`
+lock; a replay of the same payload returns the stored response, a changed payload under the same key
+is a 409) -> service function -> audit event -> response model. The service, the stock change and
+the idempotency record commit together or not at all. Reads use their own bucket
+`f"{user}:stock-read"` (120 per minute) so they do not starve the workspace refresh.
+
+**Order confirm** (`orders/management.confirm`). Lock order: conversation, quote, order, then
+stock levels in ascending product-id order (inside the ledger). Checks: order `pending` (else 409
+"already confirmed/cancelled") and the quotation's held reservations equal the order's line
+quantities (else 409 "The stock held for this order is no longer reserved. Cancel the order and
+re-quote."). Then `ledger.convert_quote` converts each hold into one `order` movement (negative
+delta, `reference_id` = the order) and lowers `reserved` by the same amount, so available does not
+change; the order becomes `confirmed` (`confirmed_by`, `confirmed_at`), the conversation `ordered`,
+audit `order.confirmed`. When the agent owns the conversation, one fixed notice is queued: "Your
+order {number} is confirmed. Our sales team will contact you about delivery." (no prices, no
+dates; outbox action key `order-confirmed:<order id>`). A replay with the same key returns the
+stored body and moves nothing.
+
+**Order cancel** (`orders/management.cancel`). Same locks. Pending: `ledger.release_quote(...,
+'order_cancelled')`, on-hand unchanged. Confirmed: one `order_cancel` movement per line (positive
+delta, reference = the order), levels locked first in product-id order. In both cases the order
+becomes `cancelled` with `cancelled_by`, `cancelled_at` and the reason (3-200 characters, trimmed),
+the accepted quotation becomes `superseded`, the conversation `needs_staff`, audit `order.cancelled`
+(the reason text stays on the order, not in the audit). Already cancelled: 409. No customer notice.
+
+**Purchase orders** (`purchasing/service.py`). Numbers `PO-0001` come from `core/numbering.next_number`
+(the same serialized counter table as `SO-0001`; the old `orders.service.next_order_number` was moved
+there). Create writes the order (`ordered`), its lines and audit `purchase_order.created`; every
+product must exist in the company (422). Receive locks the order, its lines, then the levels: a
+cancelled or fully received order is a 409, a product not on the order is a 422, and a line that would
+push cumulative received above ordered is a 409 with nothing written. Each line then appends a
+`receipt` movement (reference = the purchase order) and raises `quantity_received`; the status is
+`received` when every line is complete, else `partially_received`. Cancel is allowed only for
+status `ordered` with zero received (409 otherwise; correct received goods with an adjustment).
+
+**Adjustments and reorder levels** (`inventory/service.py`). An adjustment below the quantity
+reserved for quotations, or below zero, is the ledger's 409; an unknown product is a 404. The
+reason (3-200 characters) is stored on the movement and is not copied into the audit detail.
+`ledger.set_reorder_level` is the one addition to the single writer for T4: it updates only
+`reorder_level` and writes no movement.
+
+**Alerts.** Shortage alerts are written by the agent's `prepare` node
+(`nodes/workflow.raise_shortage_alert`): a known, non-discontinued SKU whose available is below
+the requested quantity inserts a `stock_alerts` row (`shortage`, product, conversation, requested,
+available) in the same transaction as today's system message and `needs_staff`. At most one open
+alert per conversation and product, so a retried job adds none; the customer is not told (D49).
+An unknown or discontinued SKU keeps today's behavior without an alert. Low-stock entries are the
+live query (`available <= reorder_level`) and are never stored or acknowledged. `acceptance_refused`
+alerts come from the T3 acceptance path. Acknowledging is one conditional update, so two staff
+members racing produce one success and one 409.
+
+**Failures and recovery.** Any `DomainError` rolls the whole request back (stock, audit, idempotency
+record). The same key and body after a transient failure retries safely; a replay after success
+returns the stored response. A 429 is not recorded as an operation.
+
+**Tests.** `tests/integration/test_stock_staff_routes.py` (label `local`): confirm once and
+replay, hold gone, cancel pending and confirmed, list filters, purchase-order partial and full
+receipt, over-receipt, cancel rules, input validation table, adjustments (including below reserved),
+reorder levels and the live low list, movement paging, shortage alert via the real `prepare`,
+acknowledge, salesperson 403 on every admin route, salesperson allowed actions, cross-company 404,
+OpenAPI coverage.
 
 ## How the rest of the application reads stock
 
@@ -338,16 +464,24 @@ cursor), and `open_alerts`.
   `QuoteSummary.tsx` is only reworded; the inventory UI is task T6.
 - A WhatsApp `failed` delivery receipt does not release at once; reconcile does within a tick.
 - Quotes approved and queued before T2 have no hold and are blocked at dispatch.
-- Release on order cancel belongs to task T4. Release on customer decline is done (T3).
-- A pending order has no staff screen or route yet. Confirm, cancel, acknowledging
-  `acceptance_refused` alerts and the status labels `order_pending` and `declined` in the UI are
-  tasks T4 and T6 (the UI falls back to "order pending" and "declined" text, and the overview
-  counts those conversations as open).
+- Release on order cancel and on customer decline is done (T4, T3).
+- Confirm, cancel, acknowledging alerts, purchase orders, adjustments and reorder levels are API
+  routes (T4). They have no screen yet: the status labels `order_pending`, `declined` and
+  `ordered`, the Inventory page and the nav badge are task T6 (the UI falls back to plain text, and
+  the overview counts those conversations as open).
 - A customer who accepted and then writes ordinary text re-opens nothing: the accepted quotation
   stays, the agent is queued, and its draft is refused with a 409 until staff handle the order.
 - An accept typed with extra words or an email signature ("Accept, thanks") is ordinary text.
-- Purchase orders, adjustments and reorder-level routes, exports and the UI are not built
-  (tasks T4-T6); their tables exist and are empty.
+- Excel and Google Sheets exports and the UI are not built (tasks T5, T6).
+- Confirming a pending order whose stock hold was released by some other path is a 409; the
+  staff member must cancel the order (there is no "re-reserve" action).
+- A confirmed order queues one customer notice (action key `order-confirmed:<order id>`); a
+  cancelled order sends none. Neither carries prices or dates.
+- Purchase-order receipts cannot be reversed; a mistaken receipt is corrected with an adjustment.
+- No supplier records, landed cost or stock valuation: `unit_cost` on a purchase-order line is
+  informational and never changes a product price.
+- A shortage alert is raised only by the agent's `prepare` node (a staff-drafted quote over
+  available stock is refused by the rules engine and raises none).
 - Google sync still requires the `Inventory` table to be present (task T5 makes it optional).
 - No automatic repair of a ledger/level mismatch and no stock-take reconciliation workflow.
 - Diagrams for the ledger and order state machine are task T7.

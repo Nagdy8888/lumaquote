@@ -378,14 +378,29 @@
     {
       "id": "order-lifecycle",
       "title": "Quotation answer and order lifecycle with stock holds",
-      "scope": "Accept, decline, expiry and pending order are implemented (task T3, local tests). Confirm and cancel are planned (task T4) and not built.",
+      "scope": "Accept, decline, expiry, pending order (task T3) and staff confirm and cancel with their stock effect (task T4); local tests only.",
       "embeds": [
         "docs/reference/INVENTORY.md"
       ],
       "bindings": [
         "app/backend/luma/features/orders/acceptance.py",
         "app/backend/luma/features/orders/service.py",
+        "app/backend/luma/features/orders/management.py",
         "app/backend/luma/features/conversations/participation.py",
+        "app/backend/luma/features/inventory/ledger.py",
+        "supabase/migrations/20261107030000_stock_ledger.sql"
+      ]
+    },
+    {
+      "id": "purchase-order-lifecycle",
+      "title": "Supplier purchase order lifecycle",
+      "scope": "Create, partial and full receipt, and cancel of supplier purchase orders (task T4); administrator-only, local tests only.",
+      "embeds": [
+        "docs/reference/INVENTORY.md"
+      ],
+      "bindings": [
+        "app/backend/luma/features/purchasing/service.py",
+        "app/backend/luma/features/purchasing/routes.py",
         "app/backend/luma/features/inventory/ledger.py",
         "supabase/migrations/20261107030000_stock_ledger.sql"
       ]

@@ -29,7 +29,9 @@ sources and [catalog.json](catalog.json) are the maintained source of truth.
 - [Drive export of approved PDFs](rendered/drive-export.svg).
 - [WhatsApp ingress and gated egress](rendered/whatsapp-channel.svg).
 - [Quotation answer and order lifecycle](rendered/order-lifecycle.svg): accept, decline, expiry,
-  pending order and the stock hold.
+  pending order, staff confirm and cancel, and the stock hold.
+- [Supplier purchase order lifecycle](rendered/purchase-order-lifecycle.svg): ordered, partial and full
+  receipt, cancel.
 - [Verification scopes](rendered/verification-scope.svg).
 - [Working-rule enforcement](rendered/rule-enforcement.svg).
 

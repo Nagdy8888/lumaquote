@@ -18,7 +18,7 @@
       "source_sha256": "6b9dae3182b004b90f5eb72345c9af4d9c7f1e717841e4526fb9e7d239e08340",
       "renderer_sha256": "44f5712d92cb37910338d84507da5b3e04fe9603fb0fe445335fa85ef56cffb5",
       "bindings": {
-        "app/backend/luma/main.py": "2adaceda3a45336ef28473e3cc91969e93a2146856260e2a86a5b7efa6cdfa4a",
+        "app/backend/luma/main.py": "cb338a950d6126952163798e29c08098c421b7d333947e11b2436f47898a4961",
         "app/backend/luma/google_gateway.py": "4f6567b97c419ca31cc861a96b50f65fdd2839c8b9fdd56c1d36fdc3213d4d11",
         "app/agents/luma_agent/worker.py": "87ceb963a36270b1457cfe0daf52cb363e4d440e4e9edba96679130205a3c504",
         "app/backend/luma/features/media/sandbox.py": "06cb6f35183a0cc5953e5d23cf65202f99e845470985a11adffe8a98d72f531a",
@@ -45,7 +45,7 @@
       "source_sha256": "3a6c35ec599535fc8e8d1b3bb2cdb1337ffc45b4339292baefefa7fabe9863bd",
       "renderer_sha256": "44f5712d92cb37910338d84507da5b3e04fe9603fb0fe445335fa85ef56cffb5",
       "bindings": {
-        "app/backend/luma/core/http.py": "7cf5806a1d3dcfcebffc29e03711b50d08083cc50e8f3f2c878e5849edb4d87f",
+        "app/backend/luma/core/http.py": "1bc1a3fd7b5efcc07c2298508173f23f262d11dd03cf26096d761bde87181764",
         "app/backend/luma/core/database.py": "cb484e8c146a1aadd9453bad2cdc2ae0900229c3eb7ac1050d7b03987065850b",
         "app/backend/luma/core/idempotency.py": "e489b6c162716f4cc659f7030e4b59d46c89fe7fe44519f9fc83470a994d0055",
         "app/backend/luma/features/quotations/routes.py": "1b5303c7b6aa4a3d24d2e902a87beec83e980ee4a1ab07943d77ff7b34f06d86"
@@ -61,7 +61,7 @@
         "supabase/migrations/20261029010000_quotation_domain.sql": "65b37c4e9358aa488174bf842b52c1100b2e83a44170c1b862fc9f25a75b2db6",
         "supabase/migrations/20261029131000_versioned_embeddings.sql": "71b6e35515d12ad5f116019b330790f6fdf00f4fc6162b38054b98b245f57e17"
       },
-      "svg_sha256": "775d000be33317ab28c3bb4e17af8a619d02c28e987ce6d30b34ba5bb471cbde",
+      "svg_sha256": "cd6f968c3dd68455b43f789adbea854c00d029c7833a4ac272271122fdb61424",
       "width": 842.09,
       "height": 998.25
     },
@@ -72,7 +72,7 @@
         "supabase/migrations/20261029010000_quotation_domain.sql": "65b37c4e9358aa488174bf842b52c1100b2e83a44170c1b862fc9f25a75b2db6",
         "supabase/migrations/20261029100000_immutable_quotation_content.sql": "acd5b9a206ff4a23277a00499cfa6941217096edcbec3ba5c66db07d3e21078a"
       },
-      "svg_sha256": "941aa2b69f0841cea4dd98d57d750d51e394af6e9686e26d2fc384953e952fe8",
+      "svg_sha256": "71fa4c8d19585bdcc5b37845ad084f5c025d2116d64e93c5ce243e7c7d0aae53",
       "width": 729.36,
       "height": 825
     },
@@ -84,7 +84,7 @@
         "supabase/migrations/20261029110000_voice_intake.sql": "60b4f99ab5d0ea74677e5c2522807539222a31cd5a3e8aae2dabf5850031bde0",
         "supabase/migrations/20261029111000_media_message_binding.sql": "369cc2db1bd77d42a170d32f2e1d2269207cf7c7c1b53b140ce489ea72140e52"
       },
-      "svg_sha256": "f13d41502d13762dd7e8d4aea75e923eb6b0243424aed907b24d304374f93dc4",
+      "svg_sha256": "3a032674466e3fcc4264d615e618e6409c4959f3080398e6351bf985b33b76f3",
       "width": 846.89,
       "height": 896.5
     },
@@ -96,10 +96,10 @@
         "app/agents/luma_agent/nodes/extraction.py": "818d81628e6d2be029a170f50bf40ff6338b28d73b0aa8606aa390c54d0b65f3",
         "app/agents/luma_agent/requirements.py": "64a2485f616272ee87c5e400317ef80bfbec9da150f9a1c94e34f384ec5a9aa4",
         "app/agents/luma_agent/written_requests.py": "f7ba5157d5d5ac6e00951d7e06c64916aaca2ec12a61a1054c5025ed71a921bf",
-        "app/agents/luma_agent/nodes/workflow.py": "d08e2354d2fd40161686ff1ef225f33d26eb5428c3cbe8a5e89779fb4aad8e6d",
+        "app/agents/luma_agent/nodes/workflow.py": "27a7d902236459c1c684327a57aba755609c83b008a1cbcc09c3cfb103a95556",
         "app/agents/luma_agent/runtime/conversations.py": "b5afbb3cf434a52320b4be14b5fa3e42a2877111f902574eccf4f174ddb0e8c1"
       },
-      "svg_sha256": "081ceb089d30366121a76b799f814e10ecfe9dd76a95e025be0b32c1b4fdfa4f",
+      "svg_sha256": "33ea50d431d6c5508c887db7fced03129a679c17bc58b711ec07002659c32921",
       "width": 685.62,
       "height": 888.34
     },
@@ -136,7 +136,7 @@
         "app/agents/luma_agent/runtime/media.py": "2491f1eed267ccd8a39c92d67bcadabd5fd09aa04afcb8552a0da8c84e7020c6",
         "app/agents/luma_agent/runtime/recovery.py": "3c51108e0b3c6277eaa6a0746114a43d0938775b101f94c021f937ea96f8e0e7"
       },
-      "svg_sha256": "6c276e75539a36b26b28c5ca0b8780261adb96670f0d879e15e8e958fcd489ac",
+      "svg_sha256": "28be0a0848549f42fbdfafe2ff051c485142a84c5f5a9bfc2110c71115e56aaf",
       "width": 1317.98,
       "height": 693.8
     },
@@ -148,7 +148,7 @@
         "app/backend/luma/features/catalog/retrieval.py": "594f4b24652e4e423b467b91c3038900de0ce563c83da9b21e692f42726ea050",
         "app/backend/luma/features/catalog/semantic.py": "c21c6f91f26e90fe8dd79fd6b14dae32ec637c49905a70e44bf777be4d5b08b6",
         "app/agents/luma_agent/nodes/retrieval.py": "5ba1f29db99fb10245f7cab12957b3020e02c835c3c5c8d0e15aa92750f97cfd",
-        "app/agents/luma_agent/nodes/workflow.py": "d08e2354d2fd40161686ff1ef225f33d26eb5428c3cbe8a5e89779fb4aad8e6d"
+        "app/agents/luma_agent/nodes/workflow.py": "27a7d902236459c1c684327a57aba755609c83b008a1cbcc09c3cfb103a95556"
       },
       "svg_sha256": "cc4c6f8c3fa85f34099b9d42927ef9f880910d6bb5b11c466fc71b97d35115cc",
       "width": 713.14,
@@ -253,7 +253,7 @@
       "source_sha256": "2638a4f20e1d96bc5c4f2ace22c18fcab81d1c07a5d578546aff62710f6bc007",
       "renderer_sha256": "44f5712d92cb37910338d84507da5b3e04fe9603fb0fe445335fa85ef56cffb5",
       "bindings": {
-        "app/backend/luma/main.py": "2adaceda3a45336ef28473e3cc91969e93a2146856260e2a86a5b7efa6cdfa4a",
+        "app/backend/luma/main.py": "cb338a950d6126952163798e29c08098c421b7d333947e11b2436f47898a4961",
         "app/backend/luma/google_gateway.py": "4f6567b97c419ca31cc861a96b50f65fdd2839c8b9fdd56c1d36fdc3213d4d11",
         "app/agents/luma_agent/worker.py": "87ceb963a36270b1457cfe0daf52cb363e4d440e4e9edba96679130205a3c504",
         "scripts/check_architecture.py": "172fdf26debdb86534ce4d4e08c81083ef3084aad05e3c68fe104e782cec8cf2",
@@ -297,9 +297,9 @@
       "source_sha256": "8a592e8ff64ac9c9c8e16bbf847a46ccc38081a16d9390ecd8bb7c786664bade",
       "renderer_sha256": "44f5712d92cb37910338d84507da5b3e04fe9603fb0fe445335fa85ef56cffb5",
       "bindings": {
-        "app/backend/luma/main.py": "2adaceda3a45336ef28473e3cc91969e93a2146856260e2a86a5b7efa6cdfa4a",
-        "app/backend/luma/core/http.py": "7cf5806a1d3dcfcebffc29e03711b50d08083cc50e8f3f2c878e5849edb4d87f",
-        "app/backend/luma/core/identity.py": "ca0bdee6fba35fc9993dc914755c10fb1ba66a6b1467e95675c6d8eabed6de41",
+        "app/backend/luma/main.py": "cb338a950d6126952163798e29c08098c421b7d333947e11b2436f47898a4961",
+        "app/backend/luma/core/http.py": "1bc1a3fd7b5efcc07c2298508173f23f262d11dd03cf26096d761bde87181764",
+        "app/backend/luma/core/identity.py": "217fd08437e4226f5a22fa52eca221c06b0b3e65b2ec50b9bd37ba24298d2729",
         "app/backend/luma/core/admission.py": "3b78a983824972ae3efcedc9d9964ec89bbc8c4d5e13f5230621082e8c99adcd",
         "app/backend/luma/core/idempotency.py": "e489b6c162716f4cc659f7030e4b59d46c89fe7fe44519f9fc83470a994d0055",
         "app/backend/luma/core/errors.py": "afcc3eaf5187663e51b0487f6401947ad6ea354f91a1ee273b50269c3ba2f9d1"
@@ -312,7 +312,7 @@
       "source_sha256": "5bc63a8601fdd3412aaeb4eed5e15380816544b29577c54679ee5248c63c7689",
       "renderer_sha256": "44f5712d92cb37910338d84507da5b3e04fe9603fb0fe445335fa85ef56cffb5",
       "bindings": {
-        "app/backend/luma/main.py": "2adaceda3a45336ef28473e3cc91969e93a2146856260e2a86a5b7efa6cdfa4a",
+        "app/backend/luma/main.py": "cb338a950d6126952163798e29c08098c421b7d333947e11b2436f47898a4961",
         "app/backend/luma/google_gateway.py": "4f6567b97c419ca31cc861a96b50f65fdd2839c8b9fdd56c1d36fdc3213d4d11",
         "app/agents/luma_agent/worker.py": "87ceb963a36270b1457cfe0daf52cb363e4d440e4e9edba96679130205a3c504",
         "app/agents/luma_agent/runtime/delivery.py": "cc10c36e44f35507ab888980f91d259b5c768a4dfdcba0830a8b4233ec67a288",
@@ -350,18 +350,32 @@
       "height": 358.63
     },
     "order-lifecycle": {
-      "source_sha256": "f3d8cd873eb3dcf2b102f6c4d9df6dc0a12784d5abf532c195cf51884d592364",
+      "source_sha256": "beb8c1d19e66fd5f54cc16936434bbea8e6023b09c3b7314cf1ec321c9431c94",
       "renderer_sha256": "44f5712d92cb37910338d84507da5b3e04fe9603fb0fe445335fa85ef56cffb5",
       "bindings": {
         "app/backend/luma/features/orders/acceptance.py": "7111bebf2a16e1f547543364053aeb93346e144bfacb8037143e3b777b0f76e2",
-        "app/backend/luma/features/orders/service.py": "d70026c0a1b580bfd5d4d28faf3b5eae02cf15ac8933b8cd6cf26a3df67a5ac4",
+        "app/backend/luma/features/orders/service.py": "5b7744582bf91c90a5500850c9a9f31f6e2494fab0edd4fe7ee291ea09485d6b",
+        "app/backend/luma/features/orders/management.py": "f45af9806e9930a4cc2af1b2d14ece8441e9a9a76d444b3e824d0e04bde5e74c",
         "app/backend/luma/features/conversations/participation.py": "f0078064965e49dd19d6f56075b56e54a6dd1aa6cc95c707a6942855dda22294",
-        "app/backend/luma/features/inventory/ledger.py": "96bf1a747a16df51f02c910188c4949a7f9e2560558a4b6f1b78b3014fb9150e",
+        "app/backend/luma/features/inventory/ledger.py": "642f3ded1b9c0558c50b3f75dc1878c02a92df7a0659264feac57028e86606c5",
         "supabase/migrations/20261107030000_stock_ledger.sql": "ef33242ec456563ecfae028ec3963cbb481232cc99a2ff8172c93642d69ed3e1"
       },
-      "svg_sha256": "a921644fa4d26e72252c7d906e2e2460bc94d55a8dc4285a5a08d4ef753fb946",
-      "width": 1482.03,
-      "height": 831.6
+      "svg_sha256": "be99b51c1276ba7f2b337721365452ef37cef3d872d2ad0c31a46936542b6d83",
+      "width": 1460.96,
+      "height": 1029.2
+    },
+    "purchase-order-lifecycle": {
+      "source_sha256": "252430286f557a3f8ded4481ccda74601606412296621d5080598f5e9e7dd5a7",
+      "renderer_sha256": "44f5712d92cb37910338d84507da5b3e04fe9603fb0fe445335fa85ef56cffb5",
+      "bindings": {
+        "app/backend/luma/features/purchasing/service.py": "8f6bf367ad4ec6d701bf2a0bdcc61bf778788edf6500ee8d7453cf8f3df65893",
+        "app/backend/luma/features/purchasing/routes.py": "90e336e91c54c27c97ef53984cd2337bca5be3a07728fe44502c0881e7a9bd75",
+        "app/backend/luma/features/inventory/ledger.py": "642f3ded1b9c0558c50b3f75dc1878c02a92df7a0659264feac57028e86606c5",
+        "supabase/migrations/20261107030000_stock_ledger.sql": "ef33242ec456563ecfae028ec3963cbb481232cc99a2ff8172c93642d69ed3e1"
+      },
+      "svg_sha256": "529921b07e671ec2648d4f5aa561d5ab4d9ea7144a0db548e48eeaf66fb07e8c",
+      "width": 911.29,
+      "height": 619.8
     },
     "integrations-map": {
       "source_sha256": "48d487c1d711f67a195f2ba37f93e82409eeaf32b29e3b2c5689968d99419538",

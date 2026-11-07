@@ -107,14 +107,14 @@ reach its normal response path. This coarse declaration check does not replace
 the actual-byte limits implemented by media and callback routes. CORS accepts the
 two configured loopback Vite origins and explicit headers; it is not authorization.
 
-## Surface inventory (reviewed 2026-11-03)
+## Surface inventory (reviewed 2026-11-08)
 
 Two processes, two different exposures. `tests/unit/test_surface_inventory.py` fails when either
 list changes without this table being reviewed.
 
 | Process | Reachable from | Operations |
 |---|---|---|
-| Staff API `luma.main:app` (port 8001) | this machine only; never tunneled | 17 operations under `/api/` (workspace, events, conversations and their draft/decision/ownership/reply/messages/customer-reply/audio/image actions, media preview, quote and source PDFs, catalog search) all behind a bearer credential, plus unauthenticated `GET /api/health`. FastAPI's `/docs`, `/redoc` and `/openapi.json` are also served unauthenticated, acceptable only because the process is local; disable them before any non-local exposure. |
+| Staff API `luma.main:app` (port 8001) | this machine only; never tunneled | 30 operations under `/api/` (workspace, events, conversations and their draft/decision/ownership/reply/messages/customer-reply/audio/image actions, media preview, quote and source PDFs, catalog search, and the D49 stock, order, purchase-order and alert routes listed in [INVENTORY](INVENTORY.md#staff-actions-purchasing-and-alerts-task-t4)) all behind a bearer credential, plus unauthenticated `GET /api/health`. FastAPI's `/docs`, `/redoc` and `/openapi.json` are also served unauthenticated, acceptable only because the process is local; disable them before any non-local exposure. |
 | Signed gateway `luma.google_gateway:app` (port 8002) | the internet, through a tunnel, once live | `POST /callbacks/google`, `/callbacks/google/snapshot`, `/callbacks/google/exports/claim`, `/callbacks/google/exports/receipt` (HMAC and nonce) and `GET`/`POST /webhooks/whatsapp` (verify token and raw-body signature). No staff route and no documentation endpoints. |
 | Direct Supabase paths | the browser, by design only Auth | `anon` and `authenticated` hold no grants on any `luma` table (asserted against the clean-install schema in `test_migrations.py`); the `luma-private` Storage bucket is private. Business data is reached only through the staff API. |
 | Outbound adapters | this machine to providers | OpenAI (Responses, transcription, vision, embeddings), LangSmith export, Meta Graph (fixed host), Google through Apps Script callbacks (no backend Google credentials), local Supabase Auth and Storage. |
@@ -130,7 +130,7 @@ approval, attachment-type and conversation-turn keys. It is a fixed-window count
 not a sliding-window limiter. Counter retention and all public ingress profiles
 are not yet complete.
 
-Limits per user per minute: reads 120, catalog search 30, mutations 30, staff replies 10,
+Limits per user per minute: reads 120 (the stock, order, purchase-order and alert reads use their own `stock-read` bucket of 120), catalog search 30, mutations 30, staff replies 10,
 decisions 10, voice or photo uploads 6 each; per conversation 6 customer messages or media
 (a shared key for the staff-operated reply, WhatsApp ingress and uploads). Each is exercised
 through the real API by `tests/integration/test_admission_limits.py` (the n-th request passes,

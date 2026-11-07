@@ -26,6 +26,20 @@ STAFF_OPERATIONS = {
     "GET /api/quotes/{qid}/pdf",
     "GET /api/sources/{sid}/pdf",
     "POST /api/catalog/search",
+    # D49 stock, orders and purchasing (task T4). Administrator-only writes are enforced in services.
+    "GET /api/inventory/stock",
+    "GET /api/inventory/movements",
+    "POST /api/inventory/adjustments",
+    "POST /api/inventory/reorder-levels",
+    "GET /api/inventory/alerts",
+    "POST /api/inventory/alerts/{alert_id}/acknowledge",
+    "GET /api/orders",
+    "POST /api/orders/{order_id}/confirm",
+    "POST /api/orders/{order_id}/cancel",
+    "GET /api/purchase-orders",
+    "POST /api/purchase-orders",
+    "POST /api/purchase-orders/{order_id}/receive",
+    "POST /api/purchase-orders/{order_id}/cancel",
 }
 GATEWAY_OPERATIONS = {
     "POST /callbacks/google",

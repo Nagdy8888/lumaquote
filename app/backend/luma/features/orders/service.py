@@ -16,6 +16,7 @@ from decimal import Decimal
 from uuid import uuid4
 
 from luma.core.audit import audit
+from luma.core.numbering import next_number
 from luma.features.conversations.service import queue_notice
 from luma.features.inventory import ledger
 
@@ -59,22 +60,6 @@ def refusal_reason(conn, current, quote, quote_id) -> str | None:
     return None if held == wanted else "stock_not_held"
 
 
-def next_order_number(conn, company) -> str:
-    """Return the next `SO-0001` style number for the company, serialized by a row lock.
-
-    The counter row is created on first use. The increment is a single upsert, so two concurrent
-    acceptances queue on the row lock and receive different numbers. Numbers are gap-tolerant:
-    a rolled-back transaction rolls the increment back with it.
-    """
-    row = conn.execute(
-        """insert into luma.document_counters(company_id,kind,next_value) values(%s,'order',2)
-        on conflict(company_id,kind) do update set next_value=document_counters.next_value+1
-        returning next_value""",
-        (company,),
-    ).fetchone()
-    return f"SO-{row['next_value'] - 1:04d}"
-
-
 def create_order(conn, company, current, quote, via: str) -> dict:
     """Insert the pending order and its lines from the accepted quotation's stored content.
 
@@ -89,7 +74,7 @@ def create_order(conn, company, current, quote, via: str) -> dict:
         (
             uuid4(),
             company,
-            next_order_number(conn, company),
+            next_number(conn, company, "order"),
             current["id"],
             quote["id"],
             quote["revision"],

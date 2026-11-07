@@ -118,6 +118,26 @@ def apply_movement(conn, company, product_id, delta, kind, actor, reference_id=N
     return _move(conn, company, product_id, delta, kind, actor, reference_id, reason, 0)
 
 
+def set_reorder_level(conn, company, product_id, reorder_level: int) -> dict:
+    """Set a product's low-stock threshold (0..100000) and return the updated level row.
+
+    Not a stock movement: on-hand and reserved are unchanged and nothing is appended. Creates the
+    level row for a product that has none, locks it, and answers 404 for a product outside the
+    company and 422 for a value out of range. Authority (administrators only) is the caller's.
+    Side effect: one `stock_levels` update, no commit.
+    """
+    if type(reorder_level) is not int or not 0 <= reorder_level <= 100000:
+        raise DomainError("The reorder level must be between 0 and 100000.", 422)
+    ensure_level(conn, company, product_id)
+    if UUID(str(product_id)) not in lock_levels(conn, company, [product_id]):
+        raise DomainError("Product not found.", 404)
+    return conn.execute(
+        """update luma.stock_levels set reorder_level=%s,updated_at=now()
+        where company_id=%s and product_id=%s returning *""",
+        (reorder_level, company, product_id),
+    ).fetchone()
+
+
 def seed_opening(conn, company, product_id, quantity: int, actor: str = "seed") -> bool:
     """Give a new product its level row and, when quantity > 0, an `opening` movement.
 

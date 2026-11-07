@@ -69,6 +69,27 @@ def clarify(state):
     return Command(update={"job_id": answer["job_id"], "fence": answer["fence"]}, goto="extract")
 
 
+def raise_shortage_alert(conn, state, product, requested) -> None:
+    """Record a staff-only shortage alert for a known, current product the customer asked too much of.
+
+    Inserts one `stock_alerts` row (`kind='shortage'`, product, conversation, requested, available)
+    unless an open alert already exists for the same conversation and product, so a retried or
+    repeated request does not pile up alerts. The customer is not told (decision D49). Runs in the
+    caller's worker transaction and the caller holds the conversation lock.
+    """
+    exists = conn.execute(
+        """select 1 from luma.stock_alerts where company_id=%s and conversation_id=%s and product_id=%s
+        and kind='shortage' and status='open'""",
+        (state["company_id"], state["conversation_id"], product["id"]),
+    ).fetchone()
+    if not exists:
+        conn.execute(
+            """insert into luma.stock_alerts(company_id,kind,product_id,conversation_id,requested,available)
+            values(%s,'shortage',%s,%s,%s,%s)""",
+            (state["company_id"], product["id"], state["conversation_id"], requested, max(product["available"], 0)),
+        )
+
+
 def prepare(state):
     """Match explicit SKUs to authoritative records and create a staff-review draft; unsupported requests escalate."""
     with database(worker=True) as conn:
@@ -84,6 +105,8 @@ def prepare(state):
                 (state["company_id"], line["sku"].upper()),
             ).fetchone()
             if not p or p["discontinued"] or p["available"] < line["quantity"]:
+                if p and not p["discontinued"]:
+                    raise_shortage_alert(conn, state, p, line["quantity"])
                 add_message(
                     conn,
                     state["company_id"],
