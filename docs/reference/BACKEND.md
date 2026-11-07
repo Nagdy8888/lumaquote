@@ -233,7 +233,8 @@ this decision; discount authorization is a separate admin rule.
 snapshots can finalize only on the local-test channel. Google observations must
 be no more than 90 seconds old. Every persisted line must still refer to an active
 source and matching product snapshot, source ID, page and unit price, with valid
-pack quantity, sufficient available stock and a non-discontinued product. A
+pack quantity, sufficient available stock (on hand minus reserved, from the stock ledger,
+[Inventory](INVENTORY.md)) and a non-discontinued product. A
 failure requires reviewing a fresh revision; it is not a reason to silently
 substitute a model or rewrite an approved price.
 

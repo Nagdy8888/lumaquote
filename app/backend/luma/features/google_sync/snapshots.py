@@ -22,7 +22,9 @@ def receive_snapshot(body: bytes, signature: str):
     """Verify a complete signed snapshot, then serialize imports and replay decisions per company.
 
     No product is inserted without catalog evidence. Unchanged snapshots refresh
-    observation time; changed business data creates a new evidence version.
+    observation time; changed business data creates a new evidence version. The
+    Inventory table is still validated and part of the digest, but stock is owned
+    by the web app's ledger (D49): no stock level or movement is ever written here.
     """
     verify_signature(body, signature)
     try:
@@ -91,11 +93,10 @@ def receive_snapshot(body: bytes, signature: str):
             for row in catalog:
                 sku = row["sku"]
                 conn.execute(
-                    "update luma.products set price=%s,available=%s,pack_size=%s,discontinued=%s,snapshot_id=%s "
+                    "update luma.products set price=%s,pack_size=%s,discontinued=%s,snapshot_id=%s "
                     "where id=%s and company_id=%s",
                     (
                         prices[sku].unit_price,
-                        inventory[sku].available,
                         products[sku].pack_size,
                         products[sku].discontinued,
                         sid,

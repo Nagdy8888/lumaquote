@@ -61,8 +61,10 @@ does not need a Google OAuth client/refresh token. GAS still needs the user's
 Google authorization for its declared scopes; Apps Script-only does not mean
 anonymous access to Sheets.
 
-The workbook supplies commercial prices, observed stock and allowed product policy
-fields. Independently ingested catalog evidence supplies supported specifications.
+The workbook supplies commercial prices and allowed product policy fields. Since D49 it
+no longer supplies stock: the `Inventory` table is still validated and part of the
+snapshot digest, but its values are ignored and stock lives in the web app's ledger
+(see [Inventory](INVENTORY.md)). Independently ingested catalog evidence supplies supported specifications.
 The receiver cannot treat a newly typed SKU/specification as automatically backed
 by a PDF. Quotes, approvals and delivery states remain backend-owned.
 
@@ -145,7 +147,8 @@ Product name/family/watts/lumens/CCT/IP must match already ingested catalog reco
 Input pack size and discontinued state can update as validated policy fields.
 Stock is a bounded nonnegative strict integer; prices are finite nonnegative USD
 decimals with at most two decimal places and no future effective date in Cairo.
-Location is recorded input, not a delivery guarantee or stock reservation.
+Location is recorded input, not a delivery guarantee or stock reservation. Neither value
+is written anywhere by the receiver.
 
 Policies must contain exactly the approved values and primitive types: synthetic
 dataset disclosure, USD, tax excluded, seven-day validity, max admin discount 10,

@@ -46,6 +46,9 @@ reference for the module you are changing:
 - [Data model and migrations](reference/DATA_MODEL.md): each table's ownership,
   keys/foreign keys, grants/RLS, media/vector bindings, precision, checkpoint
   separation and every migration's purpose.
+- [Inventory](reference/INVENTORY.md): the stock ledger (movements, levels,
+  reservations), its single writer and invariants, reconcile rules, how readers
+  compute available stock and what later D49 tasks still add.
 - [Agent runtime](reference/AGENT_RUNTIME.md): state fields, graph edges and each
   node, durable resume, duplicate work, capacity/fences, budget reservation,
   interrupted work and trace privacy.

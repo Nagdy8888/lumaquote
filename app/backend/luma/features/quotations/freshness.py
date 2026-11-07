@@ -9,8 +9,8 @@ def check_snapshot(conn, quote, current):
 
     Synthetic observations are eligible only on local_test; other observations
     must be at most 90 seconds old. Each line must retain its snapshot, active
-    source/page, price, valid pack quantity and sufficient available stock, with
-    no discontinued product. Raise DomainError before approval/dispatch on any
+    source/page, price, valid pack quantity and sufficient available stock (on hand
+    minus reserved, read from the stock ledger), with no discontinued product. Raise DomainError before approval/dispatch on any
     mismatch. This check neither reserves stock nor mutates/reprices an offer;
     the caller must require a new reviewed revision when evidence changed.
     """
@@ -28,7 +28,7 @@ def check_snapshot(conn, quote, current):
         raise DomainError("Price and stock sync is stale. Refresh Google Sheets before finalizing.")
     ids = [line["product_id"] for line in quote["content"]["lines"]]
     products = conn.execute(
-        "select p.*,s.retired_at from luma.products p join luma.sources s on s.id=p.source_id and s.company_id=p.company_id where p.company_id=%s and p.id=any(%s::uuid[])",
+        "select p.*,s.retired_at,coalesce(sl.on_hand-sl.reserved,0) as available from luma.products p join luma.sources s on s.id=p.source_id and s.company_id=p.company_id left join luma.stock_levels sl on sl.company_id=p.company_id and sl.product_id=p.id where p.company_id=%s and p.id=any(%s::uuid[])",
         (quote["company_id"], ids),
     ).fetchall()
     lookup = {str(p["id"]): p for p in products}

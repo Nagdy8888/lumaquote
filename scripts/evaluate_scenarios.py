@@ -39,7 +39,9 @@ SCOPE = (
 def load_catalog(conn, company: UUID) -> dict[str, dict]:
     """Read current products from non-retired sources, the same visibility rule `prepare` uses."""
     rows = conn.execute(
-        """select p.* from luma.products p join luma.sources s on s.company_id=p.company_id and s.id=p.source_id
+        """select p.*,coalesce(sl.on_hand-sl.reserved,0) as available from luma.products p
+        join luma.sources s on s.company_id=p.company_id and s.id=p.source_id
+        left join luma.stock_levels sl on sl.company_id=p.company_id and sl.product_id=p.id
         where p.company_id=%s and s.retired_at is null""",
         (company,),
     ).fetchall()

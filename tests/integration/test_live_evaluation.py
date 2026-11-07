@@ -22,6 +22,7 @@ import psycopg
 import pytest
 from luma.core.config import settings
 from luma.core.errors import DomainError
+from luma.features.inventory.ledger import seed_opening
 from luma.setup.bootstrap import FAMILIES
 from luma_agent import observability as tracing
 from luma_agent.runtime.audio import process_audio
@@ -118,19 +119,22 @@ MAX_USD = float(os.environ.get("LUMA_EVAL_MAX_USD", "3.00"))
 
 def seed_catalog(env):
     """Replace the fixture's three products with the 72-model synthetic catalog using the bootstrap formulas."""
-    with psycopg.connect(env["dsn"]) as conn:
+    with psycopg.connect(env["dsn"], row_factory=dict_row) as conn:
+        for table in ("stock_reservations", "stock_movements", "stock_levels"):
+            conn.execute(f"delete from luma.{table} where company_id=%s", (env["company"],))
         conn.execute("delete from luma.products where company_id=%s", (env["company"],))
         for family, prefix, label, watts, lumens, base_price in FAMILIES:
             for i in range(12):
                 sku, cct = f"{prefix}-{i + 1:03d}", [3000, 4000, 5000][i % 3]
+                pid = uuid4()
                 power, light = watts + (i // 3) * 3, lumens + (i // 3) * 250
                 ip = "IP65" if prefix in ("OD", "HB") else "IP44"
                 conn.execute(
                     """insert into luma.products(id,company_id,sku,name,family,description,watts,lumens,cct,
-                    ip_rating,price,available,discontinued,source_id,page,snapshot_id)
-                    values(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,1,%s)""",
+                    ip_rating,price,discontinued,source_id,page,snapshot_id)
+                    values(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,1,%s)""",
                     (
-                        uuid4(),
+                        pid,
                         env["company"],
                         sku,
                         f"{label} {power}W / {cct}K",
@@ -141,12 +145,12 @@ def seed_catalog(env):
                         cct,
                         ip,
                         base_price + (i // 3) * 8,
-                        0 if i == 10 else 180 - i * 9,
                         i == 11,
                         env["source"],
                         env["snapshot"],
                     ),
                 )
+                seed_opening(conn, env["company"], pid, 0 if i == 10 else 180 - i * 9, "test")
 
 
 def drain(env, cid, errors, scenario):

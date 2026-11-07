@@ -16,7 +16,10 @@ from psycopg.rows import dict_row
 
 
 def test_complete_snapshot_import_and_rejections(environment, monkeypatch):
-    """Atomic imports update stock/price, preserve catalog identity, refresh unchanged data and reject unsafe input."""
+    """Atomic imports update price, preserve catalog identity, refresh unchanged data and reject unsafe input.
+
+    Stock belongs to the ledger (D49): the Inventory table is validated but never changes stock.
+    """
     company = environment["company"]
     secret = "synthetic-gas-key-" + "x" * 32
     monkeypatch.setenv("GOOGLE_COMPANY_ID", str(company))
@@ -25,7 +28,10 @@ def test_complete_snapshot_import_and_rejections(environment, monkeypatch):
     settings.cache_clear()
     with psycopg.connect(environment["dsn"], row_factory=dict_row) as conn:
         rows = conn.execute(
-            "select * from luma.products where company_id=%s order by sku", (company,)
+            """select p.*,coalesce(sl.on_hand-sl.reserved,0) as available from luma.products p
+            left join luma.stock_levels sl on sl.company_id=p.company_id and sl.product_id=p.id
+            where p.company_id=%s order by p.sku""",
+            (company,),
         ).fetchall()
     fields = ("sku", "name", "family", "watts", "lumens", "cct", "ip_rating", "pack_size", "discontinued")
     tables = dict(
@@ -83,10 +89,15 @@ def test_complete_snapshot_import_and_rejections(environment, monkeypatch):
     assert send(changed).status_code == 202
     with psycopg.connect(environment["dsn"]) as conn:
         row = conn.execute(
-            "select price,available,snapshot_id from luma.products where company_id=%s and sku=%s",
+            """select p.price,coalesce(sl.on_hand-sl.reserved,0),p.snapshot_id,
+            (select count(*) from luma.stock_movements m where m.company_id=p.company_id) from luma.products p
+            left join luma.stock_levels sl on sl.company_id=p.company_id and sl.product_id=p.id
+            where p.company_id=%s and p.sku=%s""",
             (company, rows[0]["sku"]),
         ).fetchone()
-        assert str(row[0]) == "47.29" and row[1] == 17 and row[2] != first
+        # The changed Inventory value (17) is ignored: stock stays what the ledger holds.
+        assert str(row[0]) == "47.29" and row[1] == rows[0]["available"] != 17 and row[2] != first
+        assert row[3] == 2  # only the two fixture opening movements (DL-011 has no stock)
     assert send({**heartbeat, "nonce": str(uuid4())}).status_code == 409
     for mutation in ("duplicate", "missing", "policy", "future", "specification"):
         bad = deepcopy(changed)

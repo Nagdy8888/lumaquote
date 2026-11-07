@@ -123,7 +123,8 @@ erDiagram
   its observation time without inventing a changed price version.
 - `products`: company-local SKU identity, descriptive specifications, current
   commercial fields, source/page and snapshot references. Company-plus-ID foreign
-  keys prevent linking a product to another tenant's source or snapshot.
+  keys prevent linking a product to another tenant's source or snapshot. Stock is
+  not a product column: it lives in the ledger tables below (D49).
 
 The original `products.embedding` vector column exists, but the current semantic
 repository uses `catalog_embeddings`. Do not populate the legacy column and assume
@@ -217,6 +218,33 @@ stored while becoming unusable immediately; deletion is not the freshness contro
 Index publication re-reads its bounded input before upserting. See
 [catalog retrieval](CATALOG.md) for exact search/filter limits.
 
+## Stock, order and purchasing records
+
+Added by migration 18 (D49). The full contract, invariants and failure behavior are in
+[Inventory](INVENTORY.md); this section lists ownership and privileges.
+
+- `stock_levels` `(company_id, product_id)`: `on_hand`, `reserved`, `reorder_level` (default 20)
+  and `updated_at`; `reserved <= on_hand` is a table check. Available is never stored.
+- `stock_movements`: append-only ledger rows (`opening`, `adjustment`, `receipt`, `order`,
+  `order_cancel`), non-zero `delta`, optional `reference_id`, `reason` (required, 3-200
+  characters, for adjustments) and `actor`. Checks fix the sign per kind. `luma_api` has
+  select/insert, `luma_worker` select only; nobody can update or delete a row.
+- `stock_reservations`: one row per (quote, product), `held`, `released` or `converted`;
+  `closed_at` is set exactly when the status is not `held`.
+- `orders` / `order_lines`: pending, confirmed or cancelled customer order copied from an
+  accepted immutable quotation (unique per quote, number unique per company); lines are
+  insert-only. Written from task T3 on.
+- `purchase_orders` / `purchase_order_lines`: supplier orders (ordered, partially received,
+  received, cancelled); `quantity_received <= quantity_ordered`. The API role writes them; the
+  worker role reads them for the Sheets export gateway.
+- `stock_alerts`: stored shortage and refused-acceptance alerts. Low-stock alerts are a live query.
+- `sheet_exports`: a staff-requested Google Sheets export; a partial unique index allows at most
+  one `queued` or `claimed` row per company.
+- `document_counters`: per-company `next_value` for `order` and `purchase_order` numbers.
+
+All ten tables have row-level security with `staff_scope` (active membership) for `luma_api` and
+`worker_scope` for `luma_worker`; grants to public, anon and authenticated are revoked.
+
 ## Google synchronization records
 
 `google_edit_receipts` and `google_snapshot_receipts` use company/nonce uniqueness
@@ -277,6 +305,11 @@ The ordered files introduce:
 13. `20261102000000`: `drive_exports`, one Drive copy per approved quotation revision.
 14. `20261102010000`: durable WhatsApp inbox state (`kind`, `status`, `attempts`, `error_code`, `lease_until`) on `luma.inbox`.
 15. `20261102020000`: `luma.media.purged_at`, stamped when runtime media objects are deleted by retention.
+16. `20261107010000`: Telegram as a conversation channel (D44).
+17. `20261107020000`: Gmail as a conversation channel and `email_dispatch` (D47).
+18. `20261107030000`: stock ledger, customer orders, purchasing, alerts, Sheets exports and
+    document counters (D49); extends `quotes.status` with `accepted` and `declined`, copies
+    `products.available` into the ledger and drops that column. See [Inventory](INVENTORY.md).
 
 `npm run setup` invokes the guarded bootstrap at `127.0.0.1:55322`. It checks both
 `public.luma_migrations` and the Supabase CLI migration ledger before applying a
@@ -292,10 +325,12 @@ repair history, drop tables or reset the database just to suppress that error.
 Clean installation and a simple upgrade are now tested by
 `tests/integration/test_migrations.py` in a disposable database (`luma_migration_check`,
 always dropped) that has only stand-ins for `auth.users`, `auth.uid()`, `storage.buckets` and the
-`extensions` schema: all 15 files apply in order, and the resulting `luma` schema (columns,
+`extensions` schema: every file applies in order, and the resulting `luma` schema (columns,
 constraints, indexes, policies, grants, functions, triggers, RLS flags) equals the live local
 schema, so a reset cannot drift (negative check: omitting the last file fails the comparison).
-A pending job and conversation created under the first ten files survive the last five. Migrations
+A pending job and conversation created under the first ten files survive the later ones, and the
+stock migration is upgraded separately: products with stock planted before it get equal ledger
+levels and opening movements, and the column is gone afterwards. Migrations
 are one-shot and are not idempotent (re-applying the second file fails on `companies`, by design
 of the ledger check above). Not covered: a pending approval or quote across the upgrade, data
 transforms on a populated production-size database, and production rollback or restore.
