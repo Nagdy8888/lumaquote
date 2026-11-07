@@ -1120,3 +1120,10 @@ these entries were logged during the original steps or freshly rerun today.
 - Checked: `check:rules`, `check:secrets` (no leaks), `check:frontend`, `test:ui` (66 passed), `diagrams:check` -> pass; not run: `test:python`, `test:browser`, `verify:full`.
 - Evidence: none.
 - Open: run `npm run verify:full` on this branch; decide push and PR; fast-forward local `main` after merge.
+
+### 2026-11-07 - Merge PR #2 and make the repository public (git housekeeping, local)
+- Why: user asked to merge after a failed local gate, then to make the repo public because Actions were billing-blocked (D45).
+- Changed: PR #2 merged into `main` (ca01acf), work branch deleted; repo visibility set to public; `docs/DECISIONS.md` (D45). No application code changed by this task.
+- Checked: full git-history secret scan -> placeholders and canaries only; `npm run verify:full` -> FAILED at `test:python` (30 failed, 369 passed; mostly 409 "This request changed" from `drafting.py`), so `test:browser`, `build` and `check:secrets` did not run; remote CI -> blocked by the GitHub account billing lock (`startup_failure`), not a test result.
+- Evidence: none.
+- Open: user clears the GitHub billing lock, then rerun `ci.yml`; `test:python` failures uncaused so far (suspect dev worker/uvicorn/vite sharing the local database, unconfirmed); uncommitted edits in `app/agents/luma_agent/{brain,state}.py`, `nodes/{extraction,retrieval,workflow}.py` and `tests/integration/test_written_confirmation.py` were made by another session, not this task; at user request they are stashed as `stash@{0}` (restore with `git stash pop`) and are not documented here.
