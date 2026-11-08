@@ -16,6 +16,7 @@ Detailed contracts: [FRONTEND reference](../reference/FRONTEND.md).
 | [`src/features/conversations/`](../../app/frontend/src/features/conversations) | Inbox, thread, composer, new request, voice/photo upload, private media preview, conversation queries and mutations |
 | [`src/features/quotations/`](../../app/frontend/src/features/quotations) | Quotation panel, product selections, totals, review actions, `useQuotationDraft` (local dirty edits) |
 | [`src/features/overview/`](../../app/frontend/src/features/overview) | Overview page and the optional lazy 3D `LightingScene` with its error boundary |
+| [`src/features/inventory/`](../../app/frontend/src/features/inventory) | Inventory page (stock, customer orders, purchase orders, alerts), export toolbar, order banner, overview stock card, nav count, their queries and mutations (D49) |
 | `src/features/{catalog,integrations,workspace,auth}/` | Catalog search page, connection status page, workspace read model hook, sign-in |
 | [`src/shared/`](../../app/frontend/src/shared) | Business-independent API client, generated OpenAPI types, Supabase session, UI kit (shadcn-based) |
 
@@ -30,6 +31,7 @@ the adjacent JSDoc contracts (rule R4).
 | `/inbox/:id?` | Inbox, with the selected conversation and its quotation panel |
 | `/requests/new` | New local-test request |
 | `/quotations` | Quotation list |
+| `/inventory` | Stock, customer orders, purchase orders, alerts (lazy loaded) |
 | `/catalog` | Catalog search |
 | `/integrations` | Connections status |
 | anything else | Overview (no not-found page yet, gap G8) |
@@ -47,20 +49,25 @@ the adjacent JSDoc contracts (rule R4).
 ```mermaid
 flowchart TB
   accTitle: Frontend composition, server state and API boundary
-  accDescr: main.tsx installs the query cache and session provider. App shows sign-in until a session exists, then the shell routes to six feature pages. Feature hooks poll the workspace and conversation, send mutations with a stable operation key and invalidate caches after the server confirms. Quotation edits stay local until saved. The shared client adds the bearer token and calls the staff API through the Vite proxy.
+  accDescr: main.tsx installs the query cache and session provider. App shows sign-in until a session exists, then the shell routes to seven feature pages. Feature hooks poll the workspace, conversation and inventory (stock, orders, alerts), send mutations with a stable operation key and invalidate caches after the server confirms. Quotation edits stay local until saved. The shared client adds the bearer token and calls the staff API through the Vite proxy.
   Main["main.tsx: QueryClient, SessionProvider"] --> App["App: session gate"]
   App -->|"no session"| SignIn["SignIn"]
   App -->|"session"| Shell["AppShell routes"]
-  Shell --> Pages["Overview, Inbox, New request, Quotations, Catalog, Integrations"]
+  Shell --> Pages["Overview, Inbox, New request, Quotations, Inventory, Catalog, Integrations"]
   Pages --> Hooks["Feature hooks"]
   Hooks --> WS["useWorkspace: poll 8 s"]
   Hooks --> Conv["useConversation: poll 5 s"]
   Hooks --> Act["useConversationAction: mutation with operation key"]
+  Hooks --> Inv["useStock, useOrders, useAlerts: inventory queries"]
   Hooks --> Draft["useQuotationDraft: dirty edits stay local"]
   WS --> Client["shared/api request: bearer, Idempotency-Key"]
   Conv --> Client
   Act --> Client
   Draft --> Client
+  Inv --> Client
+  InvAct["useCommand mutations: adjust, orders, purchases, alerts"] --> Client
+  Hooks --> InvAct
+  InvAct -. "on success: invalidate inventory, workspace, conversation" .-> WS
   Act -. "on success: invalidate workspace and conversation" .-> WS
   Pages --> Doc["documentUrl: private PDF or media as object URL"]
   Doc --> Client

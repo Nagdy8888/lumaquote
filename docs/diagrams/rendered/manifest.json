@@ -61,7 +61,7 @@
         "supabase/migrations/20261029010000_quotation_domain.sql": "65b37c4e9358aa488174bf842b52c1100b2e83a44170c1b862fc9f25a75b2db6",
         "supabase/migrations/20261029131000_versioned_embeddings.sql": "71b6e35515d12ad5f116019b330790f6fdf00f4fc6162b38054b98b245f57e17"
       },
-      "svg_sha256": "1a9705a07b5aa87a8a273fdcec717be3c1909dfed23db3a5e268a06b31dc4e10",
+      "svg_sha256": "78c6739c24193f3afcd55bc9acbb1867d11bc05b683fff68a3570d979cc6047a",
       "width": 842.09,
       "height": 998.25
     },
@@ -72,7 +72,7 @@
         "supabase/migrations/20261029010000_quotation_domain.sql": "65b37c4e9358aa488174bf842b52c1100b2e83a44170c1b862fc9f25a75b2db6",
         "supabase/migrations/20261029100000_immutable_quotation_content.sql": "acd5b9a206ff4a23277a00499cfa6941217096edcbec3ba5c66db07d3e21078a"
       },
-      "svg_sha256": "fa06a59cba5f9e98d28dd31827fab24462d9686e6671962b2c7d8ba06d257068",
+      "svg_sha256": "d68ee983b70ea1392c1bdeec3f63515279fce8f33a71c498d7a782459baad880",
       "width": 729.36,
       "height": 825
     },
@@ -84,7 +84,7 @@
         "supabase/migrations/20261029110000_voice_intake.sql": "60b4f99ab5d0ea74677e5c2522807539222a31cd5a3e8aae2dabf5850031bde0",
         "supabase/migrations/20261029111000_media_message_binding.sql": "369cc2db1bd77d42a170d32f2e1d2269207cf7c7c1b53b140ce489ea72140e52"
       },
-      "svg_sha256": "930afbaaf47c0cc6f7d39ff53bf6594ad4b9c4d1f79f8d195f163568be7307ab",
+      "svg_sha256": "e28a286eef08df708a4f520f2ec47a83fa0debdf4016a6809b77a7cd56cb0a92",
       "width": 846.89,
       "height": 896.5
     },
@@ -99,7 +99,7 @@
         "app/agents/luma_agent/nodes/workflow.py": "27a7d902236459c1c684327a57aba755609c83b008a1cbcc09c3cfb103a95556",
         "app/agents/luma_agent/runtime/conversations.py": "b5afbb3cf434a52320b4be14b5fa3e42a2877111f902574eccf4f174ddb0e8c1"
       },
-      "svg_sha256": "fdfdce6d6831cc30602663a7b8decddd8f52098a397f1faf721c8b544cbdc191",
+      "svg_sha256": "8a58beaaff083e64c82d9033e4e41dec25469f83179da8841a9ced00f62eefb9",
       "width": 685.62,
       "height": 888.34
     },
@@ -136,7 +136,7 @@
         "app/agents/luma_agent/runtime/media.py": "2491f1eed267ccd8a39c92d67bcadabd5fd09aa04afcb8552a0da8c84e7020c6",
         "app/agents/luma_agent/runtime/recovery.py": "3c51108e0b3c6277eaa6a0746114a43d0938775b101f94c021f937ea96f8e0e7"
       },
-      "svg_sha256": "d80a378d270cd0d66e40c5e65c6f317bf76f8cb62de749211f3a9ba94ca6c850",
+      "svg_sha256": "7237afd5247e24919af4ed9844a98b163292b2dd85914663eb55fcd9d67776f3",
       "width": 1317.98,
       "height": 693.8
     },
@@ -159,7 +159,7 @@
       "renderer_sha256": "44f5712d92cb37910338d84507da5b3e04fe9603fb0fe445335fa85ef56cffb5",
       "bindings": {
         "app/frontend/src/features/quotations/useQuotationDraft.ts": "a3b5fc6fbd2c5fc0ebbe724b5f456d09cdfe0d9b31fe9f1c96173ae1c42714cc",
-        "app/frontend/src/features/quotations/QuotationPanel.tsx": "647818f847e2e0d261fc9d1a01006f5ff45ebf858bb9a8d8d58a333b24cefcff",
+        "app/frontend/src/features/quotations/QuotationPanel.tsx": "97c83b535ad194ba7db51a4083a7d23e42298eb92c29c0623946307a286b9bc7",
         "app/frontend/src/features/conversations/api.ts": "86511115b93e0f25d7f5d7d49ff71d30bb6579ebffb98bf18b3027d7abd707df"
       },
       "svg_sha256": "f5087910192b970202175a66971b2843c634dac6c0734c74f759857c64ede9ea",
@@ -171,7 +171,7 @@
       "renderer_sha256": "44f5712d92cb37910338d84507da5b3e04fe9603fb0fe445335fa85ef56cffb5",
       "bindings": {
         "app/frontend/src/shared/api/events.ts": "75b65c9d5c89c0c573f017852fb8f9861e1e922037b904294832dc6f9e28feed",
-        "app/frontend/src/features/workspace/useLiveUpdates.ts": "5e0779e41dd2b6883b2f21823cbdd8703a807f0e867b856473fcbdfeaeb27fcc",
+        "app/frontend/src/features/workspace/useLiveUpdates.ts": "f0d8c74c996e146c0bacda9096752fcef0f463a35c09363a1e970acb3a8ad2a7",
         "app/frontend/src/features/workspace/api.ts": "fd3be47ebe2d488201e2147b40f45273a080fec14069eb6e7b29e9420453ce75",
         "app/backend/luma/features/workspace/routes.py": "e6086f28066b9eea695d94713594ae3601f3f192aa5ca9fa61f9712db813e45f"
       },
@@ -282,7 +282,7 @@
       "source_sha256": "4603bec6498d0a1058dd43b795bed62c870d75507b744c2ccbae450a5451d4cd",
       "renderer_sha256": "44f5712d92cb37910338d84507da5b3e04fe9603fb0fe445335fa85ef56cffb5",
       "bindings": {
-        "app/frontend/src/shared/api/client.ts": "2ec3c07d979e82fb744abcff258722a21755316ec4d8b3aeb5863f6bfd131748",
+        "app/frontend/src/shared/api/client.ts": "7aca215e0f0327f7fdce2c68e325683bb9aaec9ee057059909ce2d172a1bbbab",
         "app/backend/luma/features/conversations/routes.py": "bb89a51b27841c3bc1ea961a02a0964fd4464d272656c9da4df7d4ad5f1a734c",
         "app/backend/luma/features/conversations/service.py": "0b88ed54bad58c33fe27c516d34e3b2e8e388b510e40b9c838a90c3ac323fa56",
         "app/backend/luma/core/admission.py": "3b78a983824972ae3efcedc9d9964ec89bbc8c4d5e13f5230621082e8c99adcd",
@@ -294,19 +294,19 @@
       "height": 1151
     },
     "frontend-layer": {
-      "source_sha256": "6d955e5be1a9b41d34acfd7e017827cbd2deceaf70bbc6d72491ffcef211104c",
+      "source_sha256": "3c721b0889f56b181e1bc121eb388762052dfb442195a255219c7ae0aa6e3afd",
       "renderer_sha256": "44f5712d92cb37910338d84507da5b3e04fe9603fb0fe445335fa85ef56cffb5",
       "bindings": {
         "app/frontend/src/main.tsx": "2f91bfa33cc8967540eea0fc8beca4273a007fc556016889f9bd979c5b0b83de",
-        "app/frontend/src/app/App.tsx": "7dcc3f3ba17ba4ccb46ae4e5dc1b7e372be2323d1fc952454dcd34e9d11ce1f8",
-        "app/frontend/src/shared/api/client.ts": "2ec3c07d979e82fb744abcff258722a21755316ec4d8b3aeb5863f6bfd131748",
+        "app/frontend/src/app/App.tsx": "e079e914f9b73fccdc98e99ec2d1e01f6bce005a7ee9095f81766078a78cead0",
+        "app/frontend/src/shared/api/client.ts": "7aca215e0f0327f7fdce2c68e325683bb9aaec9ee057059909ce2d172a1bbbab",
         "app/frontend/src/features/workspace/api.ts": "fd3be47ebe2d488201e2147b40f45273a080fec14069eb6e7b29e9420453ce75",
         "app/frontend/src/features/conversations/api.ts": "86511115b93e0f25d7f5d7d49ff71d30bb6579ebffb98bf18b3027d7abd707df",
         "app/frontend/vite.config.ts": "98e9be3bf7f0d4be3930eb1b6d86c9b88c87b86d45b82cbfad80d6031e875770"
       },
-      "svg_sha256": "747ef7733b9efc0d63c7044bd58775acbbb8e5b76899737788f8e8ea4f708fb8",
-      "width": 1113.25,
-      "height": 1002.8
+      "svg_sha256": "36deed43a15a2d4249446feeb6e7cc71617d0f0ab7fd69cbab24d9f61f615683",
+      "width": 1475.69,
+      "height": 1038
     },
     "api-pipeline": {
       "source_sha256": "8a592e8ff64ac9c9c8e16bbf847a46ccc38081a16d9390ecd8bb7c786664bade",
@@ -375,7 +375,7 @@
         "app/backend/luma/features/inventory/ledger.py": "642f3ded1b9c0558c50b3f75dc1878c02a92df7a0659264feac57028e86606c5",
         "supabase/migrations/20261107030000_stock_ledger.sql": "ef33242ec456563ecfae028ec3963cbb481232cc99a2ff8172c93642d69ed3e1"
       },
-      "svg_sha256": "1ca610afab6030822df9623e63fdb2f49897e6bfc440a68af8939aef7ee37691",
+      "svg_sha256": "e3a686a77572c03519c2bb5bbf1c8b89107f8162c4e790eaf6e8c711e33a637b",
       "width": 1460.96,
       "height": 1029.2
     },
@@ -388,7 +388,7 @@
         "app/backend/luma/features/inventory/ledger.py": "642f3ded1b9c0558c50b3f75dc1878c02a92df7a0659264feac57028e86606c5",
         "supabase/migrations/20261107030000_stock_ledger.sql": "ef33242ec456563ecfae028ec3963cbb481232cc99a2ff8172c93642d69ed3e1"
       },
-      "svg_sha256": "738e6528cd8f51a7a63aae2f7be17cc974e60e2c9cc595e0efbf0e1f289134cc",
+      "svg_sha256": "9e75f56c49efbc9829a020e60b7305d828a64526b591c42729b429c23fd9e065",
       "width": 911.29,
       "height": 619.8
     },

@@ -85,7 +85,7 @@ describe("reconnectDelay", () => {
 });
 
 describe("useLiveUpdates", () => {
-  /** Only a changed revision invalidates the workspace and conversation queries; the flag follows the stream. */
+  /** Only a changed revision invalidates the workspace, conversation and inventory queries; the flag follows the stream. */
   it("invalidates only when the revision changes", async () => {
     const { streams } = installStreams();
     const { result, invalidate } = renderLive();
@@ -96,13 +96,15 @@ describe("useLiveUpdates", () => {
       streams[0].push('event: refresh\ndata: {"revision": 3}\n\n');
       streams[0].push('event: refresh\ndata: {"revision": 4}\n\n');
     });
-    await waitFor(() => expect(invalidate).toHaveBeenCalledTimes(4));
+    await waitFor(() => expect(invalidate).toHaveBeenCalledTimes(6));
     const keys = invalidate.mock.calls.map((call) => call[0]?.queryKey?.[0]);
     expect(keys).toEqual([
       "workspace",
       "conversation",
+      "inventory",
       "workspace",
       "conversation",
+      "inventory",
     ]);
   });
 

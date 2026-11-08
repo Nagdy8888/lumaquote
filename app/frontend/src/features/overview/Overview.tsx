@@ -16,7 +16,9 @@ import {
 import { captureText } from "@/shared/lib/mask";
 import { Status, money } from "@/shared/ui/status";
 import { Button } from "@/shared/ui/button";
+import { StockCard } from "@/features/inventory/StockCard";
 import { useReducedMotion } from "@/features/showcase/reducedMotion";
+import { isOpenConversation } from "./conversationGroups";
 import { LightingFallback, SceneBoundary } from "./SceneBoundary";
 
 const LightingScene = lazy(() => import("./LightingScene"));
@@ -30,7 +32,9 @@ const MetricRail = lazy(() => import("./MetricRail"));
 export function Overview() {
   const { data, capture } = useWorkspaceContext();
   const reduced = useReducedMotion();
-  const open = data.conversations.filter((c) => c.status !== "quoted").length;
+  const open = data.conversations.filter((c) =>
+    isOpenConversation(c.status),
+  ).length;
   const awaiting = data.quotes.filter((q) => q.status === "review").length;
   const quoted = data.conversations.filter((c) => c.status === "quoted").length;
   const running = data.jobs.filter((job) => job.status === "running").length;
@@ -119,6 +123,7 @@ export function Overview() {
           <small>Among the 20 newest jobs</small>
         </div>
       </section>
+      <StockCard />
       <div className="overview-lower">
         <section className="request-section">
           <div className="section-heading">
