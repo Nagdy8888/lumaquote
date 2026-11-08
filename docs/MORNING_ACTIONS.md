@@ -80,6 +80,15 @@ so the GAS-only adapter includes a one-minute reconciliation trigger. Its instal
 and live execution remain pending. Apps Script scheduling is approximate; stale
 commercial evidence continues to block finalization.
 
+## Stock export to Google Sheets (D49, task T5)
+
+- [ ] Push `gas/Stock.gs` (and the changed `Exports.gs`, `Synchronization.gs`, `Notifications.gs`,
+  `Workbook.gs`) with `npm run google:push`, run `installStockExport` once in the editor (it keeps the
+  one-minute `exportApprovedQuotations` trigger; no Drive folder needed), then press Export to Google
+  Sheets once in the app (after task T6 adds the button; until then `POST /api/inventory/sheet-exports`)
+  and confirm the `Stock`, `Customer Orders` and `Purchase Orders` tabs fill and `latest` shows `done`.
+  Claude may do this in the browser (D37). Not done: the script has never run in Google.
+
 ## Gmail requests (D47)
 
 Done 2026-11-07: label `LumaQuote` and a filter on mail to `mustafaalnagdy26+quotes@gmail.com`

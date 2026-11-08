@@ -1,20 +1,20 @@
 # Inventory: the stock ledger
 
 Decision [D49](../DECISIONS.md), plan [stock, orders and purchasing](../proposals/2026-11-07-stock-orders-plan.md).
-This guide describes what is implemented in tasks T1 to T4: the tables, the single writer
+This guide describes what is implemented in tasks T1 to T5: the tables, the single writer
 (`app/backend/luma/features/inventory/ledger.py`), the read queries, how the rest of
 the application reads stock, and the reservation lifecycle (hold at approval, release on
 every exit, the dispatch check and the worker's reconcile) and customer acceptance (the
 pending order a customer's Accept creates) and the staff routes (confirm and cancel orders,
-purchase orders and receipts, adjustments, reorder levels, alerts). Exports and the UI are
-later tasks (T5, T6); they are listed under
-[Open gaps](#open-gaps) and are not described as working.
+purchase orders and receipts, adjustments, reorder levels, alerts) and the Excel and Google
+Sheets exports (T5). The UI is a later task (T6); it is listed under
+[Open gaps](#open-gaps) and is not described as working.
 
 ## Purpose and ownership
 
 The web app is the stock master. Google Sheets still syncs Products and Prices but no
-longer supplies stock; the `Inventory` tab is still validated and hashed into the snapshot
-digest, and its values are ignored (`google_sync/snapshots.py` writes no stock). Stock is
+longer supplies stock; the `Inventory` tab is optional and ignored (accepted from older
+Apps Script versions, never validated, hashed or stored; `google_sync/snapshots.py` writes no stock). Stock is
 a ledger, not a number someone overwrites:
 
 - `luma.stock_movements` is the append-only history (kinds `opening`, `adjustment`,
@@ -415,6 +415,175 @@ reorder levels and the live low list, movement paging, shortage alert via the re
 acknowledge, salesperson 403 on every admin route, salesperson allowed actions, cross-company 404,
 OpenAPI coverage.
 
+## Excel and Google Sheets export (task T5)
+
+Two read-only views of the ledger leave the application: an Excel file a staff member downloads,
+and three Google Sheets tabs that Apps Script pulls. Both come from the same table definitions
+(`inventory/exports.py`, `COLUMNS`), so they cannot drift apart. Neither can change stock, orders,
+quotations or approvals.
+
+**Actors and authority.** Any active staff member (administrator or salesperson) can download the
+Excel file, queue a Sheets export and read its status. The signed gateway acts as the company's
+Apps Script (`ACTOR = "google-apps-script"`) and can only claim and complete exports of the one
+configured company and workbook (same envelope rules as the Drive export, see
+[Google synchronization](GOOGLE_SYNC.md)).
+
+### Excel download
+
+`GET /api/inventory/export.xlsx` (staff). Own admission bucket `{user}:stock-export`, 10 requests per
+minute (the file reads thousands of rows), apart from the 120-per-minute stock-read bucket. Response:
+media type `application/vnd.openxmlformats-officedocument.spreadsheetml.sheet`,
+`Content-Disposition: attachment; filename="lumaquote-stock-YYYYMMDD.xlsx"` (UTC day). Audit event
+`inventory.exported` with `format` and the row count per sheet.
+
+| Sheet | Columns | Rows |
+|---|---|---|
+| `Stock` | sku, name, family, on_hand, reserved, available, reorder_level, status (`OK`, `Low`, `Out`) | every current product, family then SKU |
+| `Movements` | date_utc, sku, kind, delta, reason, reference (order or purchase order id) | newest 5,000 |
+| `Customer Orders` | order_number, status, accepted_at, confirmed_at, customer_name, customer_company, sku, name, quantity, unit_price, line_total, order_total | one row per order line, newest order first, at most 20,000 |
+| `Purchase Orders` | po_number, status, supplier, expected_on, sku, quantity_ordered, quantity_received, unit_cost | one row per line, newest order first, at most 20,000 |
+
+Format: bold frozen header row; column widths follow content (8 to 62 characters); quantities and
+money are numeric cells (money `#,##0.00`); `accepted_at`, `confirmed_at` and `date_utc` are UTC
+date-time cells (`yyyy-mm-dd hh:mm`, Excel has no time zones); `expected_on` is a date cell; empty
+values are empty cells. `status` is `Out` when available is 0 or less, `Low` at or below the reorder
+level (discontinued products are never `Low`), otherwise `OK`.
+
+### Formula-injection guard
+
+Customer names and companies come from chats and Gmail, product names from catalog PDFs, suppliers
+and reasons from staff typing; all are untrusted when a spreadsheet opens them. One function,
+`exports.safe_text(value)`, protects both outputs: a string starting with `=`, `+`, `-`, `@`, tab or
+carriage return gets a leading apostrophe, so Excel and Sheets show it as text instead of evaluating
+it (`=HYPERLINK("http://x","y")` is stored as `'=HYPERLINK("http://x","y")`). It also removes control
+characters a spreadsheet file cannot hold (NUL and the rest of C0 except tab, line feed and carriage
+return, which would crash the writer) and cuts text at 30,000 characters (Excel's limit is 32,767).
+Numbers, dates and empty values are never touched, so numeric cells stay numeric. Every text cell is
+guarded: sku, name, family, status, kind, reason, reference, order and PO numbers, customer, supplier.
+The apostrophe stays visible in the cell; that is the accepted cost of a guard the reader cannot
+bypass. Excel cells are also written with an explicit string type. Tested with the canaries
+`=HYPERLINK("http://x","y")`, `@SUM(1)`, `+1`, `-2+3`, tab+`=1`
+(`tests/unit/test_safe_text.py`, `tests/integration/test_stock_exports.py`).
+
+### Google Sheets export (pull)
+
+<!-- diagram:stock-sheet-export:start -->
+![Stock export to Google Sheets, pulled by Apps Script](../diagrams/rendered/stock-sheet-export.svg)
+
+[Open full-size SVG](../diagrams/rendered/stock-sheet-export.svg) · [Editable Mermaid](../diagrams/stock-sheet-export.mmd)
+
+<details>
+<summary>Mermaid source</summary>
+
+```mermaid
+sequenceDiagram
+  accTitle: Stock export to Google Sheets, pulled by Apps Script
+  accDescr: A staff member presses Export to Google Sheets and the web app queues one export row; a second press returns the same row. The one-minute Apps Script trigger sends a signed claim. The gateway checks the signature, window, nonce, company and workbook, leases the oldest queued export for five minutes and returns the Stock, Customer Orders and Purchase Orders rows with every text cell formula-guarded. Apps Script writes only those three tabs with plain-text formats and posts a signed receipt with row counts. The backend marks the export done, or requeues it after a reported failure and fails it after five attempts. Live Apps Script execution is unverified.
+  participant Staff as Staff member
+  participant API as Staff API
+  participant DB as PostgreSQL
+  participant GW as Signed callback gateway
+  participant GAS as Authorized Apps Script
+  participant Book as Workbook tabs
+  Staff->>API: Export to Google Sheets
+  API->>DB: Queue one export, or return the open one
+  API-->>Staff: Status queued
+  loop One-minute trigger, local stand-in tested only
+    GAS->>GW: Signed claim envelope
+    GW->>DB: Company lock, nonce check, lease oldest eligible export
+    GW->>DB: Read stock, orders and purchase orders, guard text cells
+    GW-->>GAS: Export id, claim token and rows of three tabs
+    GAS->>Book: Set plain-text format, clear, write Stock, Customer Orders, Purchase Orders
+    GAS->>GW: Signed receipt with row counts, or a short error code
+    alt Stored receipt, claim token current
+      GW->>DB: Mark done with row counts
+    else Reported failure
+      GW->>DB: Requeue, fail after five attempts
+    else Stale claim token or expired lease
+      GW-->>GAS: 409 or reclaimed by the next claim
+    end
+  end
+  Staff->>API: Read latest export status
+  API-->>Staff: done with row counts, or failed with a code
+```
+
+</details>
+<!-- diagram:stock-sheet-export:end -->
+
+Apps Script cannot be called by the backend (D10, no public web app), so it polls, exactly like the
+Drive export.
+
+1. **Queue.** `POST /api/inventory/sheet-exports` (staff, `Idempotency-Key`, mutation rate limit 30
+   per minute) inserts one `luma.sheet_exports` row (`queued`, `requested_by`). If a `queued` or
+   `claimed` row exists, that row is returned instead and nothing is written; the company advisory
+   lock and the partial unique index `sheet_exports_one_open` decide a race, so two simultaneous
+   presses give one row. Audit `inventory.sheet_export_queued` (only for a new row).
+   `GET /api/inventory/sheet-exports/latest` returns `id`, `status` (`none`, `queued`, `claimed`,
+   `done`, `failed`), `requested_at`, `completed_at`, `row_counts` (per tab, when done) and
+   `error_code` (a short code, never cell contents).
+2. **Claim.** `POST /callbacks/google/stock/claim`, event `stock_export_claim`, at most 1 KiB, signed
+   envelope. Under the company lock the gateway records the nonce (a replay is a 409), sets a
+   `claimed` row whose lease expired at the attempt limit to `failed` (`attempts_exhausted`), then
+   leases the oldest `queued` row, or `claimed` row with an expired lease, that has used fewer than
+   5 attempts: `attempts + 1`, a fresh `claim_token`, `lease_until = now() + 5 minutes`. The response
+   is `{"status": "claimed", "export_id", "claim_token", "tabs": {"Stock": [[header...], [row...]],
+   "Customer Orders": ..., "Purchase Orders": ...}, "truncated": [...]}` or `{"status": "idle"}`.
+   Cells are guarded text, ints, floats (money) and UTC date text (`YYYY-MM-DD HH:MM`, `YYYY-MM-DD`);
+   missing values are empty strings. Each tab is capped at 5,000 data rows; a tab that was cut is named
+   in `truncated`. `Movements` is not sent to Sheets.
+3. **Write.** `gas/Stock.gs` `exportStockTabs_()` runs inside `exportApprovedQuotations` (the existing
+   one-minute trigger, under the shared script lock with `waitLock(25 s)`). It checks all three tabs are
+   well formed first, then for each of `Stock`, `Customer Orders`, `Purchase Orders`: creates the tab
+   if missing, `clearContents()`, sets the number format of every text column to plain text `@`
+   **before** writing (numeric columns get `0`, or `#,##0.00` for price, total and cost), writes the
+   values, bolds and freezes the header, auto-resizes columns. It never writes `Products`, `Prices`,
+   `Policies`, `Inventory` or `Quote Register`.
+4. **Receipt.** `POST /callbacks/google/stock/receipt`, event `stock_export_receipt`, at most 2 KiB:
+   `export_id`, `claim_token`, `outcome` `stored` with `row_counts` (all three tabs, integers
+   0..5,000) or `failed` with `error_code` (`[a-z0-9_]`, at most 40; Apps Script sends `bad_response`
+   or `sheet_error`). Only the current claim token may report. `stored` sets `done`, `row_counts`
+   and `completed_at`, clears the token and lease; audit `inventory.sheet_exported`. `failed`
+   requeues (`queued`, `error_code` kept) or, with 5 attempts used, sets `failed` with a completion
+   time; audit `inventory.sheet_export_failed` (code and status only). An identical `stored` receipt
+   for a `done` export returns `{"status": "done"}`; any other late or stale receipt is a 409.
+
+Envelope (`extra="forbid"`): `schema_version` 1, `company_id`, `spreadsheet_id`, `timestamp`
+(within 5 minutes), `nonce`, `event`; HMAC-SHA-256 over the exact bytes in `X-Luma-Signature`;
+company and workbook must equal `GOOGLE_COMPANY_ID` and `GOOGLE_SHEET_ID` (403 otherwise). At most
+120 new envelopes per company per minute are accepted across all Google endpoints. The claim
+response is large (up to three tabs of 5,000 rows) but only ever read-only values.
+
+**Failures and recovery.**
+
+| Failure | Result |
+|---|---|
+| Apps Script crashes or loses the response | Lease expires after 5 minutes; the next claim reclaims with a new token and the old holder's receipt is a 409 |
+| Sheet write throws | Failed receipt `sheet_error`; requeued; five attempts then `failed` |
+| Malformed claim response | Failed receipt `bad_response` before any tab is written |
+| Receipt lost after a good write | Lease expires, the next claim rewrites the same data (idempotent) |
+| Forged signature, stale timestamp, wrong company or workbook, extra fields, replayed nonce | 401 / 401 / 403 / 422 / 409; nothing changes |
+| Database unavailable | 503; Apps Script retries on the next minute |
+| Backend unreachable from Apps Script | The run fails visibly (status code in `LUMA_LAST_STOCK_EXPORT_STATUS`) |
+
+**Configuration.** No new setting. It uses the existing `GOOGLE_COMPANY_ID`, `GOOGLE_SHEET_ID`,
+`GOOGLE_CALLBACK_SECRET` and the Apps Script properties. Migration
+`20261108010000_sheet_export_attempts.sql` adds `sheet_exports.attempts`. Dependency:
+`openpyxl==3.1.5` (with `et-xmlfile==2.0.0`) in `pyproject.toml` and `requirements.lock.txt`.
+
+**Tests (label `local`).** `tests/unit/test_safe_text.py` (canaries, control characters, length,
+numeric types, workbook cell types); `tests/integration/test_stock_exports.py`: the downloaded file
+opens with openpyxl and has four sheets, bold frozen headers, numeric numbers, datetimes and
+text canaries; a salesperson can download; another company's rows are absent from file and claim;
+the export bucket answers 429 after 10; queue dedupe, replay and re-queue after `done`; claim and
+receipt happy path, idle, lease exclusivity, concurrent claims, truncation, forged, stale,
+cross-company, wrong-workbook and replayed envelopes, wrong claim token, malformed counts, retries,
+attempt cap and expired-lease reclaim. A Python stand-in signs envelopes like `Exports.gs`; the script
+has not run inside Google.
+
+**Open gaps.** `gas/Stock.gs` is not pushed or executed in Google (MORNING_ACTIONS). Guarded cells show
+their leading apostrophe. A tab over 5,000 rows is truncated, not paged. There is no import from the
+stock tabs: edits to them are overwritten by the next export and never read.
+
 ## How the rest of the application reads stock
 
 Every former reader of `products.available` now joins `stock_levels` and computes
@@ -472,7 +641,8 @@ cursor), and `open_alerts`.
 - A customer who accepted and then writes ordinary text re-opens nothing: the accepted quotation
   stays, the agent is queued, and its draft is refused with a 409 until staff handle the order.
 - An accept typed with extra words or an email signature ("Accept, thanks") is ordinary text.
-- Excel and Google Sheets exports and the UI are not built (tasks T5, T6).
+- The UI, including the Download Excel and Export to Google Sheets buttons, is not built (task T6);
+  the exports are API routes (T5).
 - Confirming a pending order whose stock hold was released by some other path is a 409; the
   staff member must cancel the order (there is no "re-reserve" action).
 - A confirmed order queues one customer notice (action key `order-confirmed:<order id>`); a
@@ -482,6 +652,6 @@ cursor), and `open_alerts`.
   informational and never changes a product price.
 - A shortage alert is raised only by the agent's `prepare` node (a staff-drafted quote over
   available stock is refused by the rules engine and raises none).
-- Google sync still requires the `Inventory` table to be present (task T5 makes it optional).
+- The first snapshot after T5 gets a new snapshot id once: the digest no longer includes Inventory.
 - No automatic repair of a ledger/level mismatch and no stock-take reconciliation workflow.
 - Diagrams for the ledger and order state machine are task T7.

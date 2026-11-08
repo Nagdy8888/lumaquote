@@ -223,6 +223,22 @@
       ]
     },
     {
+      "id": "stock-sheet-export",
+      "title": "Stock export to Google Sheets, pulled by Apps Script",
+      "scope": "Queue, signed claim, tab write and receipt of the stock export (task T5); backend protocol locally tested with a Python stand-in, Apps Script run in Google unverified",
+      "embeds": [
+        "docs/reference/INVENTORY.md"
+      ],
+      "bindings": [
+        "gas/Stock.gs",
+        "gas/Exports.gs",
+        "app/backend/luma/features/google_sync/stock_exports.py",
+        "app/backend/luma/features/inventory/sheet_queue.py",
+        "app/backend/luma/features/inventory/exports.py",
+        "supabase/migrations/20261108010000_sheet_export_attempts.sql"
+      ]
+    },
+    {
       "id": "verification-scope",
       "title": "Offline, local integration and explicit live evidence boundaries",
       "scope": "Actual runner/CI responsibilities, not a claim that every gate passed in this task",

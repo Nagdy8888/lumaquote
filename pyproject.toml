@@ -2,7 +2,7 @@
 name = "lumaquote"
 version = "0.1.0"
 requires-python = ">=3.12"
-dependencies = ["fastapi", "uvicorn", "pydantic-settings", "psycopg[binary,pool]", "httpx", "python-multipart", "reportlab", "langgraph", "langgraph-checkpoint-postgres", "openai", "langsmith", "pyjwt[crypto]", "pypdf"]
+dependencies = ["fastapi", "uvicorn", "pydantic-settings", "psycopg[binary,pool]", "httpx", "python-multipart", "reportlab", "langgraph", "langgraph-checkpoint-postgres", "openai", "langsmith", "pyjwt[crypto]", "pypdf", "openpyxl"]
 
 [tool.pytest.ini_options]
 pythonpath = ["app/backend", "app/agents"]

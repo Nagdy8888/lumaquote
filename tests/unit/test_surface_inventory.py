@@ -33,6 +33,9 @@ STAFF_OPERATIONS = {
     "POST /api/inventory/reorder-levels",
     "GET /api/inventory/alerts",
     "POST /api/inventory/alerts/{alert_id}/acknowledge",
+    "GET /api/inventory/export.xlsx",
+    "POST /api/inventory/sheet-exports",
+    "GET /api/inventory/sheet-exports/latest",
     "GET /api/orders",
     "POST /api/orders/{order_id}/confirm",
     "POST /api/orders/{order_id}/cancel",
@@ -46,6 +49,8 @@ GATEWAY_OPERATIONS = {
     "POST /callbacks/google/snapshot",
     "POST /callbacks/google/exports/claim",
     "POST /callbacks/google/exports/receipt",
+    "POST /callbacks/google/stock/claim",
+    "POST /callbacks/google/stock/receipt",
     "GET /webhooks/whatsapp",
     "POST /webhooks/whatsapp",
     # D43 Twilio Sandbox: signed (X-Twilio-Signature) inbound and receipt webhooks, plus the

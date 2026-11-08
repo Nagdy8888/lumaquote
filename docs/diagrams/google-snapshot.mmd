@@ -11,7 +11,7 @@ sequenceDiagram
     API-->>GAS: 202 pending, not imported
   end
   GAS->>GAS: Acquire script lock
-  GAS->>Sheet: Read four bounded value-only tables twice
+  GAS->>Sheet: Read three bounded value-only tables twice
   Sheet-->>GAS: Complete records or unstable-read failure
   GAS->>API: HMAC signed full snapshot and observation time
   API->>API: Check signature, mapping, timestamp and schema

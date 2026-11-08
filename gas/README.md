@@ -18,6 +18,11 @@ setup guide so operating instructions have one primary home.
 - `Exports.gs`: polls the backend for approved quotation PDFs, files each in the private
   folder, reads the copy back and reports its SHA-256 (protocol in
   [Google synchronization](../docs/reference/GOOGLE_SYNC.md)).
+- `Stock.gs`: stock export (D49). When a staff member presses Export to Google Sheets, the
+  one-minute `exportApprovedQuotations` trigger claims the export and writes only the `Stock`,
+  `Customer Orders` and `Purchase Orders` tabs (plain-text format first, so nothing is evaluated as a
+  formula), then posts a receipt with row counts. It never touches Products, Prices, Policies,
+  Inventory or Quote Register. `installStockExport` installs the trigger without a Drive folder.
 - `Configuration.gs`: required Script Properties, HTTPS callback destination,
   and SHA-256 HMAC signing of exact UTF-8 request bytes.
 - `Workbook.gs`: non-destructive synthetic initializer and safe workbook/tab
@@ -45,7 +50,8 @@ contains this machine's callback values. Never put the secret in source or chat.
 3. Run `installSupplierSynchronization`. It sends an initial complete snapshot
    and installs an owned one-minute trigger. The installer requires an idle script;
    if another synchronization is running, wait for it to finish and run again.
-4. Manually edit Inventory, then verify backend stock and a fresh sync observation.
+4. Stock is owned by the web app (D49): the `Inventory` tab is no longer read or watched, and an
+   edit to it changes nothing. Edit Prices instead to see a fresh sync observation.
 5. For Drive copies: create a private Drive folder, set Script Property
    `LUMA_DRIVE_FOLDER_ID` to its id, run `installDriveExport` (it asks for the new Drive
    permission and installs an owned one-minute trigger). Do not share the folder publicly.
@@ -95,7 +101,12 @@ using the authorizing Google account; it does not forward Google tokens to the b
 
 ## Backend contracts and persistence
 
-Both routes require `X-Luma-Signature`: lowercase SHA-256 HMAC hex over the exact
+Stock export (D49): `POST /callbacks/google/stock/claim` and `/callbacks/google/stock/receipt` use the
+same signed envelope; see [Inventory](../docs/reference/INVENTORY.md). After pushing `Stock.gs`, run
+`installStockExport` once (or `installDriveExport` if a Drive folder is set) and approve any new
+permission. Push is a live step: `npm run google:push`.
+
+Both snapshot routes require `X-Luma-Signature`: lowercase SHA-256 HMAC hex over the exact
 request body with the shared secret. Version 1 envelopes carry company/workbook
 mapping, timestamp, UUID nonce and event. Timestamp acceptance is five minutes;
 snapshots additionally reject observations over five seconds in the future.
@@ -104,7 +115,7 @@ snapshots additionally reject observations over five seconds in the future.
   A 202 response means durable invalidation receipt, with `sync_status: pending`.
   At most 120 new receipts per company per minute are admitted.
 - `POST /callbacks/google/snapshot`: `supplier_snapshot`, at most 512 KiB.
-  Includes Products, Prices, Inventory and Policies. A 202 response distinguishes
+  Includes Products, Prices and Policies; an old `Inventory` list is accepted and ignored. A 202 response distinguishes
   `validated` from `duplicate`. At most 30 new snapshots per company per minute
   are admitted. Older/equal observations with new nonces are rejected.
 
@@ -151,7 +162,7 @@ Run locally from the repository root:
 npm run check:architecture
 node scripts/python.cjs -m ruff check app/backend/luma/features/google_sync app/backend/luma/google_gateway.py tests/integration/test_google_callback.py tests/integration/test_gas_snapshots.py
 node scripts/python.cjs -m pytest tests/integration/test_google_callback.py tests/integration/test_gas_snapshots.py -q --tb=short
-Get-Content gas/Configuration.gs,gas/Notifications.gs,gas/Synchronization.gs,gas/Workbook.gs | node --check
+Get-Content gas/Configuration.gs,gas/Notifications.gs,gas/Synchronization.gs,gas/Workbook.gs,gas/Exports.gs,gas/Stock.gs | node --check
 ```
 
 These checks cover Python structure/contracts, lint, HTTP/database behavior and GAS

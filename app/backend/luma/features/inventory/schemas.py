@@ -130,3 +130,15 @@ class AlertAck(ResponseModel):
 
     id: UUID
     status: Literal["acknowledged"]
+
+
+class SheetExportView(ResponseModel):
+    """Progress of the Google Sheets stock export: `none` before the first request, then queued,
+    claimed (Apps Script is writing), done (with row counts per tab) or failed (with a short error code)."""
+
+    id: UUID | None
+    status: Literal["none", "queued", "claimed", "done", "failed"]
+    requested_at: datetime | None
+    completed_at: datetime | None
+    row_counts: dict[str, int] | None
+    error_code: str | None

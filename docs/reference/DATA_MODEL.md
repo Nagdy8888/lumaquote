@@ -239,7 +239,9 @@ Added by migration 18 (D49). The full contract, invariants and failure behavior 
   worker role reads them for the Sheets export gateway.
 - `stock_alerts`: stored shortage and refused-acceptance alerts. Low-stock alerts are a live query.
 - `sheet_exports`: a staff-requested Google Sheets export; a partial unique index allows at most
-  one `queued` or `claimed` row per company.
+  one `queued` or `claimed` row per company. `attempts` (migration
+  `20261108010000_sheet_export_attempts.sql`) counts claims; at 5 the export becomes `failed`. The API
+  role inserts and reads; the worker role (signed gateway) claims and completes.
 - `document_counters`: per-company `next_value` for `order` and `purchase_order` numbers.
 
 All ten tables have row-level security with `staff_scope` (active membership) for `luma_api` and
