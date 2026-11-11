@@ -205,7 +205,19 @@ the same thread with the text "Quotation LQ-F54A748B, revision 1. Total USD 160.
 Staff-approved; valid until 14 Nov 2026" and one PDF attachment. **Not proven:** HTML-only mails,
 the `getHeader` occurrence question, quotas, or behavior over days.
 
+Live (2026-11-11, same mailbox): the plain-address reply bug above was found, and after the fix
+(`gas/` pushed with `npm run google:push`) replies to the plain shop address were collected in 16 to
+95 s: YES (the new request in the thread, 15:51), approval of `LQ-F54A748B` revision 4 (4 x LN-005, USD
+348.00, hold 0 -> 4), the PDF mail with the Accept/Decline line (15:52:46), then "Decline" (15:54:14)
+which declined the revision and released the hold. Findings kept as open gaps: an email conversation
+is one per sender, so a sender whose last quotation is `accepted` cannot get a new revision until
+staff cancel the order (the YES was refused with `DomainError` until SO-0003 was cancelled), and one
+later YES drew a "not listed in the catalog" model reply (cause not found). Full numbers:
+[evidence](../evidence/stock-orders-live-google-2026-11-11.json).
+
 ## Open gaps
+
+An accepted quotation blocks a new request from the same sender (one email conversation per sender) until staff cancel the order; the customer then gets no useful reply (the job is `blocked`, `DomainError`). Whether to start a new conversation or answer the customer is a product decision (R2), not made here.
 
 Apps Script lock contention (seen live 2026-11-11, not fixed): the Executions page showed many runs
 failing after about 25-27 s while waiting for the shared script lock. Error rates over the shown

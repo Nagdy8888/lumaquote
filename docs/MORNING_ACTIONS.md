@@ -106,6 +106,14 @@ implemented: one one-minute trigger that runs poll, send, stock export and the s
 sequence under one lock (the sync less often). This changes how the live integration runs, so say
 whether to do it. Details: [email channel](reference/EMAIL.md#open-gaps).
 
+## Decision needed: new request after an accepted quotation (found live 2026-11-11)
+
+An email conversation is one per sender. When its latest quotation is `accepted` (an order exists), a
+new request from that sender makes the agent job fail with `DomainError` ("The customer accepted this
+quotation...") and the customer gets no reply; staff must cancel the order first. Options: open a new
+conversation per request after acceptance, or tell the customer a salesperson will follow up. Not
+changed (R2). Details: [email channel](reference/EMAIL.md#open-gaps).
+
 ## Gmail requests (D47)
 
 Done 2026-11-07: label `LumaQuote` and a filter on mail to `mustafaalnagdy26+quotes@gmail.com`
