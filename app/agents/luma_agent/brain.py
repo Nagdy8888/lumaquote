@@ -49,6 +49,8 @@ MAX_REPLY = 700
 MAX_TURNS = 12
 MAX_BODY = 1000
 CATALOG_ROWS = 30
+MENTIONED_ROWS = 20
+MENTION = re.compile(r"\b[A-Za-z]{2}-[0-9]{3}\b")
 LABELS = {"customer": "Customer", "assistant": "Agent", "staff": "Staff"}
 MEDIA_NOTES = {"audio": " (voice note transcript)", "image": " (text read from a photo)"}
 
@@ -76,12 +78,29 @@ def transcript(conn, company, conversation_id) -> str:
     return "\n".join(lines)
 
 
-def catalog_context(conn, company, latest: str) -> str:
-    """List up to 35 current products by specification only: lexical hits for the latest text, then the first 30 SKUs.
+def catalog_context(conn, company, latest: str, history: str = "") -> str:
+    """List current products by specification only: SKUs named in the recent chat, lexical hits for the latest text, then the first 30 SKUs.
 
-    Prices, stock and supplier costs are never included, so the model cannot quote them.
+    `history` is the rendered recent conversation (`transcript`). Up to 20 distinct SKUs written
+    in it (any letter case) that exist as current, not discontinued products come first. Without
+    them a bare reply such as "YES" matches nothing, and a SKU outside the alphabetical first 30
+    would be missing from the listing, so the model would say a product the customer already
+    named is not in the catalog. Prices, stock and supplier costs are never included, so the
+    model cannot quote them. Read only.
     """
     hits = search_catalog(conn, company, CatalogSearch(query=latest[:500])) if latest.strip() else []
+    mentioned = sorted({m.upper() for m in MENTION.findall(history)})[:MENTIONED_ROWS]
+    named = (
+        conn.execute(
+            """select p.sku,p.name,p.watts,p.cct,p.ip_rating from luma.products p
+            join luma.sources s on s.company_id=p.company_id and s.id=p.source_id
+            where p.company_id=%s and s.retired_at is null and not p.discontinued and p.sku=any(%s::text[])
+            order by p.sku""",
+            (company, mentioned),
+        ).fetchall()
+        if mentioned
+        else []
+    )
     rows = conn.execute(
         """select p.sku,p.name,p.watts,p.cct,p.ip_rating from luma.products p
         join luma.sources s on s.company_id=p.company_id and s.id=p.source_id
@@ -89,9 +108,11 @@ def catalog_context(conn, company, latest: str) -> str:
         (company, CATALOG_ROWS),
     ).fetchall()
     seen, out = set(), []
-    for item in [(h.sku, h.name, h.watts, h.cct, h.ip_rating) for h in hits] + [
-        (r["sku"], r["name"], r["watts"], r["cct"], r["ip_rating"]) for r in rows
-    ]:
+    for item in (
+        [(r["sku"], r["name"], r["watts"], r["cct"], r["ip_rating"]) for r in named]
+        + [(h.sku, h.name, h.watts, h.cct, h.ip_rating) for h in hits]
+        + [(r["sku"], r["name"], r["watts"], r["cct"], r["ip_rating"]) for r in rows]
+    ):
         if item[0] not in seen:
             seen.add(item[0])
             out.append(f"{item[0]} | {item[1]} | {item[2]}W | {item[3]}K | {item[4]}")

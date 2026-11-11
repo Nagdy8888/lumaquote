@@ -116,8 +116,8 @@ keeps consent. Per customer turn `extract` decides in this order:
    confirmed and go to `prepare`. A YES after any newer customer message does not confirm.
 2. **Model turn.** Otherwise the primary reservation is taken and one structured call reads
    `brain.model_input`: a CATALOG section (current, not discontinued products by SKU, name, watts,
-   CCT and IP rating; lexical hits for the latest text first, then the first 30 SKUs; never price
-   or stock) and a CONVERSATION section (last 12 customer, agent and staff messages oldest first,
+   CCT and IP rating; SKUs written in the recent conversation first (up to 20, any letter case),
+   then lexical hits for the latest text, then the first 30 SKUs; never price or stock) and a CONVERSATION section (last 12 customer, agent and staff messages oldest first,
    each cut to 1000 characters; media bodies are marked as transcripts or photo text). The output
    shape is still `Extraction`; `clarification` is now the model's reply in its own words.
 3. **Decision in code.** A written order that `parse_written_request` accepts and the model reads
@@ -319,6 +319,18 @@ sequenceDiagram
 
 </details>
 <!-- diagram:job-recovery:end -->
+
+## Failed agent jobs and pending orders
+
+`worker.tick` stores a raised `DomainError` as job status `blocked` (any other error `failed`) and
+logs only the class. Failed jobs are not retried, so for `kind='agent'` it then calls
+`runtime/escalation.escalate_unanswered`: if the conversation is agent-owned, status `new` and no
+customer message is newer than the job, it appends one system message (failure class only), sets
+`needs_staff` and writes audit `job.escalated`. An escalation error is logged by class and never
+changes the job outcome. Before the graph runs, `runtime/conversations.process_conversation` parks a
+request whose newest quotation is accepted with a `pending` order
+(`orders.service.hold_for_pending_order`: `needs_staff`, one fixed notice, no extraction, no model
+call). Details: [INVENTORY](INVENTORY.md).
 
 ## Interrupted work and unknown outcomes
 

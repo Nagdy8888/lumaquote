@@ -210,14 +210,19 @@ Live (2026-11-11, same mailbox): the plain-address reply bug above was found, an
 95 s: YES (the new request in the thread, 15:51), approval of `LQ-F54A748B` revision 4 (4 x LN-005, USD
 348.00, hold 0 -> 4), the PDF mail with the Accept/Decline line (15:52:46), then "Decline" (15:54:14)
 which declined the revision and released the hold. Findings kept as open gaps: an email conversation
-is one per sender, so a sender whose last quotation is `accepted` cannot get a new revision until
-staff cancel the order (the YES was refused with `DomainError` until SO-0003 was cancelled), and one
-later YES drew a "not listed in the catalog" model reply (cause not found). Full numbers:
+is one per sender, so a sender whose last quotation is `accepted` could not get a new revision (the
+YES was refused with `DomainError` until SO-0003 was cancelled; fixed the same day, see the open
+gaps), and one later YES drew a "not listed in the catalog" model reply (cause: the model's catalog
+listing held only the first 30 SKUs and a bare YES matches nothing; fixed by listing the SKUs named
+in the recent chat). Full numbers:
 [evidence](../evidence/stock-orders-live-google-2026-11-11.json).
 
 ## Open gaps
 
-An accepted quotation blocks a new request from the same sender (one email conversation per sender) until staff cancel the order; the customer then gets no useful reply (the job is `blocked`, `DomainError`). Whether to start a new conversation or answer the customer is a product decision (R2), not made here.
+Resolved 2026-11-11 (repeat requests): one email conversation per sender stays. After staff confirm the
+order a new request drafts the next revision; while the order is pending the customer gets one fixed
+"waiting for confirmation" notice and the conversation is `needs_staff`. See
+[INVENTORY](INVENTORY.md).
 
 Apps Script lock contention (seen live 2026-11-11, not fixed): the Executions page showed many runs
 failing after about 25-27 s while waiting for the shared script lock. Error rates over the shown

@@ -8,6 +8,7 @@ from luma.core.contracts import digest
 from luma.core.errors import DomainError
 from luma.features.conversations.repository import conversation
 from luma.features.inventory import ledger
+from luma.features.orders.service import pending_order
 
 from .repository import latest_quote
 from .rules import calculate
@@ -23,17 +24,22 @@ def draft(conn, member, user, cid, body: DraftInput):
     The new canonical content captures reviewed customer labels and its hash;
     previous revisions and affected queued intents are superseded/blocked in this
     transaction, and a review or approved previous revision releases its stock
-    reservation (D49). An accepted revision cannot be revised (409). Return the latest persisted quote. The caller supplies a
-    verified member and owns transaction commit; no approval or send occurs here.
+    reservation (D49). A revision whose customer-accepted order is still `pending` cannot be
+    revised (409): its stock is held for that order. Once the order is `confirmed` (the stock has
+    left on-hand) the accepted revision stays `accepted` for history and the new request becomes
+    the next revision; a cancelled order already superseded its quote. Return the latest
+    persisted quote. The caller supplies a verified member and owns transaction commit; no
+    approval or send occurs here.
     """
     company = member["company_id"]
     current = conversation(conn, company, cid, lock=True)
     if current["version"] != body.expected_version:
         raise DomainError("This request changed. Refresh before saving a revision.")
     previous = latest_quote(conn, company, cid, lock=True)
-    if previous and previous["status"] == "accepted":
-        # The customer accepted this revision and an order holds its stock; a new revision would
-        # supersede the accepted quotation and let reconcile release the order's reservation.
+    kept = bool(previous) and previous["status"] == "accepted"
+    if kept and pending_order(conn, company, previous["id"]):
+        # A pending order still holds this revision's stock; superseding the quotation would let
+        # reconcile release that reservation.
         raise DomainError("The customer accepted this quotation. Handle the order before revising it.", 409)
     if previous and previous["status"] in ("review", "approved"):
         # The old revision's own hold must not count against the new lines (D49); the release
@@ -69,7 +75,7 @@ def draft(conn, member, user, cid, body: DraftInput):
         (company, cid),
     )
     revision = previous["revision"] + 1 if previous else 1
-    if previous:
+    if previous and not kept:
         conn.execute("update luma.quotes set status='superseded' where id=%s", (previous["id"],))
         conn.execute(
             "update luma.outbox set status='blocked',error_code='revision_changed' where quote_id=%s and status='queued'",

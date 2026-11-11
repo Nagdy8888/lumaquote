@@ -9,7 +9,7 @@ from luma.core.audit import audit
 from luma.core.errors import DomainError
 from luma.features.inventory import ledger
 from luma.features.orders.acceptance import parse_answer
-from luma.features.orders.service import answer_quote
+from luma.features.orders.service import answer_quote, hold_for_pending_order
 from luma.features.workspace.queries import detail
 
 from .repository import conversation
@@ -34,7 +34,11 @@ def accept_customer_text(conn, company, current, text, *, provider_id=None):
     (provider redelivery); otherwise True. Under staff ownership the message is recorded and
     the conversation marked for staff, but no agent job is queued. A message that is exactly an
     accept or decline phrase (`orders.acceptance.parse_answer`) goes to `orders.service.answer_quote`
-    instead and returns True without superseding anything or queuing the agent. Every quotation this
+    instead and returns True without superseding anything or queuing the agent. While the newest
+    quotation's order is still pending, any other text is parked the same way
+    (`orders.service.hold_for_pending_order`: needs_staff, one fixed notice, no agent job); after
+    staff confirm or cancel the order a new request is ordinary and drafts the next revision
+    (the accepted quotation stays `accepted`). Every quotation this
     supersedes releases its stock reservation (reason `superseded`, decision D49) in the same
     transaction, under the caller's conversation lock.
     """
@@ -48,6 +52,11 @@ def accept_customer_text(conn, company, current, text, *, provider_id=None):
         # supersedes the offer and never wakes the agent. answer_quote sets the final status.
         conn.execute("update luma.conversations set last_customer_at=now() where id=%s", (cid,))
         answer_quote(conn, company, current, answer, "reply", provider_id=provider_id)
+        return True
+    if hold_for_pending_order(conn, company, current):
+        # The newest quotation was accepted and its order awaits staff: a new revision is not
+        # allowed yet (its stock is held), so the request is parked before any job or model call.
+        conn.execute("update luma.conversations set last_customer_at=now() where id=%s", (cid,))
         return True
     conn.execute(
         "update luma.conversations set last_customer_at=now(),status=%s where id=%s",

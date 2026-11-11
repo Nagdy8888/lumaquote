@@ -88,7 +88,9 @@ def confirm(conn, member, user, order_id) -> dict:
     longer reserved" when the quotation's reservation was released by some other path (staff should
     cancel and re-quote). Otherwise `ledger.convert_quote` writes one `order` movement per line and
     lowers `reserved` by the same amount. Queues the fixed customer notice (no prices, no dates)
-    only while the agent owns the conversation. Audit `order.confirmed`.
+    only while the agent owns the conversation. A customer message that arrived after the
+    acceptance (a request parked by `service.hold_for_pending_order`) is still unanswered, so the
+    conversation then stays `needs_staff` instead of `ordered`. Audit `order.confirmed`.
     """
     company = member["company_id"]
     current, order = _lock(conn, company, order_id)
@@ -100,7 +102,13 @@ def confirm(conn, member, user, order_id) -> dict:
     conn.execute(
         "update luma.orders set status='confirmed',confirmed_by=%s,confirmed_at=now() where id=%s", (user, order_id)
     )
-    conn.execute("update luma.conversations set status='ordered',updated_at=now() where id=%s", (current["id"],))
+    waiting = conn.execute(
+        "select 1 from luma.orders where id=%s and %s>accepted_at", (order_id, current["last_customer_at"])
+    ).fetchone()
+    conn.execute(
+        "update luma.conversations set status=%s,updated_at=now() where id=%s",
+        ("needs_staff" if waiting else "ordered", current["id"]),
+    )
     queue_notice(conn, company, current, CONFIRMED_NOTICE.format(number=order["number"]), f"order-confirmed:{order_id}")
     audit(conn, company, user, "order.confirmed", order_id, number=order["number"])
     return order_rows(conn, company, order_id=order_id)[0]

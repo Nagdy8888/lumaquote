@@ -196,7 +196,7 @@ part of the content hash). PDFs already stored for earlier quotes keep their old
 ```mermaid
 stateDiagram-v2
   accTitle: Quotation answer and order lifecycle with stock holds
-  accDescr: An approved and sent quotation holds its stock. The customer can accept it by typing a fixed phrase or pressing the Telegram button, or decline it. Acceptance creates a pending order and keeps the hold. Decline, expiry and a new revision release the hold. Staff confirm the pending order, which moves the stock out of on-hand, or cancel it, which releases the hold. A confirmed order can still be cancelled and its stock returns.
+  accDescr: An approved and sent quotation holds its stock. The customer can accept it by typing a fixed phrase or pressing the Telegram button, or decline it. Acceptance creates a pending order and keeps the hold. Decline, expiry and a new revision release the hold. Staff confirm the pending order, which moves the stock out of on-hand, or cancel it, which releases the hold. A confirmed order can still be cancelled and its stock returns. A new customer request while the order is pending is parked for staff with one fixed notice; after the order is confirmed the next request starts a new quotation and the accepted one stays for history.
   [*] --> approved: Staff approve and stock is held
   approved --> accepted: Customer accepts the newest sent quotation
   approved --> declined: Customer declines and hold is released
@@ -220,6 +220,8 @@ stateDiagram-v2
     Confirm needs the hold to still exist.
     Cancel needs a reason of 3 to 200 characters.
     Both are idempotent staff actions.
+    A new customer request is parked: needs_staff,
+    one fixed notice, no draft, no model call.
   end note
 ```
 
@@ -277,12 +279,31 @@ becomes `needs_staff`; no notice is queued.
 - Accepted: "Thank you. Your acceptance of quotation {number}, revision {n}, is recorded. Our sales team will confirm your order."
 - Declined: "Thank you. Quotation {number} is declined. Send a new request any time."
 - Refused: "This quotation can no longer be accepted. Our sales team will contact you."
+- New request while the order is pending: "Your order {SO number} is waiting for confirmation by our sales team. We will reply to your new request after that."
 
-**Revising an accepted quotation.** `quotations/drafting.draft` refuses (409) a new revision while
-the latest one is `accepted`. Otherwise the draft would mark the accepted quotation `superseded`
-and the next `ledger.reconcile` would release the order's reservation. Staff cancel the order first:
-`orders/management.cancel` then marks the accepted quotation `superseded`, which unblocks a new
-revision (and turns a later customer "accept" into a refusal instead of a second order).
+**Repeat requests after an accepted quotation.** A customer whose quotation was accepted can write
+again; what happens depends on the order of the conversation's newest quotation:
+
+| Order | New customer request (any text that is not an exact accept or decline phrase) |
+|---|---|
+| `confirmed` | Ordinary request. The agent drafts revision N+1 over the same conversation (`quotations/drafting.draft` allows it). The accepted quotation **stays `accepted`** for history: it is not superseded, and its reservations are already `converted`, so nothing is released. Revision N+1 follows the normal approve, send and accept path and creates the next order (`SO-0002`; `orders.quote_id` is unique per quotation). |
+| `cancelled` | `orders/management.cancel` already made the quotation `superseded`; the request is ordinary. |
+| `pending` | Parked, not drafted. The stock is still held for that order, so a new revision would supersede the quotation and let `ledger.reconcile` free the hold; `draft` still refuses it with a 409. `orders/service.hold_for_pending_order` runs in `participation.accept_customer_text`, before any job is queued, so no agent job and no paid model call (D46 cost) is created. It sets the conversation `needs_staff`, adds one system message for staff, queues one fixed customer notice (below) while the agent owns the conversation and writes audit `order.request_held`. The notice's action key is `order-waiting:<order id>`: further requests while pending add messages and system notes but no second notice. |
+
+The pending-order check also runs at the start of `runtime/conversations.process_conversation`
+(before the graph): a voice note or photo reaches the agent only after transcription, past the
+text check, and is parked the same way. `accept` and `decline` phrases are handled before the check,
+so for the current quotation they keep the T3 behavior (a second accept restates the confirmation;
+a decline of an accepted quotation is refused and the hold stays). When staff **confirm** an order
+after a request was parked, `orders/management.confirm` keeps the conversation `needs_staff`
+(instead of `ordered`) because a customer message is newer than `accepted_at`; staff reply, or the
+customer's next message drafts the next revision.
+
+**A failed agent job never goes silent.** `worker.tick` calls `runtime/escalation.escalate_unanswered`
+after an agent job ends `blocked` or `failed`: when the conversation is agent-owned, still `new`
+(set by every customer text) and no newer customer message exists, it becomes `needs_staff`, gets
+one system message with the failure class only, and audit `job.escalated` is written. Staff-owned,
+reviewing, clarifying or already escalated conversations are untouched. No customer message is sent.
 
 **Delivery wording.** The quotation caption ends with "Reply ACCEPT to accept or DECLINE to
 decline." in `outbound.begin` (WhatsApp, Telegram, Gmail body) and in the local-test text
@@ -668,8 +689,9 @@ convenience, the 403 sentence is shown inline if a salesperson ever reaches an a
 - Confirm, cancel, acknowledging alerts, purchase orders, adjustments and reorder levels have
   screens since T6 (see the UI section). The status labels `order_pending`, `declined` and
   `ordered` exist, and the overview no longer counts those conversations as open.
-- A customer who accepted and then writes ordinary text re-opens nothing: the accepted quotation
-  stays, the agent is queued, and its draft is refused with a 409 until staff handle the order.
+- Repeat requests are resolved (see "Repeat requests after an accepted quotation"). Still open:
+  the existing rule that new customer text blocks queued replies (`error_code customer_revision`)
+  also blocks an order-confirmed or acceptance notice that has not been delivered yet.
 - An accept typed with any word beyond one courtesy word, or followed by a signature other than a
   `-- ` block or a whole-line mobile client line ("Sent from my iPhone"), is ordinary text.
 - The Download Excel and Export to Google Sheets buttons exist (T6). No real-browser, axe or

@@ -6,6 +6,7 @@ from luma.core.config import settings
 from luma.core.database import database
 from luma.core.errors import DomainError
 from luma.features.conversations.repository import conversation
+from luma.features.orders.service import hold_for_pending_order
 from luma.features.quotations.repository import latest_quote
 
 from ..graph import build_graph
@@ -18,7 +19,9 @@ def process_conversation(job):
     A session advisory lock spans checkpoint commits. Pending media, duplicate
     customer turns and older work already covered by staff/decided quotes return
     without new extraction. Review-only jobs can complete only an existing review
-    pause; customer clarification resumes only on a new customer message. Resume
+    pause; customer clarification resumes only on a new customer message. A request whose
+    conversation has an accepted quotation with a still-pending order is parked (needs_staff, one
+    fixed notice) before the graph runs, so no model call is made. Resume
     commands carry job identity, never approval authority. Persist checkpoints
     synchronously with bounded recursion. Graph steps are traced only inside the
     worker's masked job trace (`observability.job_trace`); otherwise tracing is off. Node/business
@@ -57,6 +60,13 @@ def process_conversation(job):
             # A queued older preparation must not replace a staff-prepared or
             # already approved/rejected revision, or incur another model call.
             return
+        if not job["payload"].get("review_only") and current["owner"] == "agent":
+            with database(worker=True) as conn:
+                locked = conversation(conn, job["company_id"], job["conversation_id"], lock=True)
+                if hold_for_pending_order(conn, job["company_id"], locked):
+                    # Voice and photo requests reach the agent only after transcription, past the
+                    # text-path check: park them here, before any extraction or paid model call.
+                    return
         with (
             PostgresSaver.from_conn_string(settings().luma_worker_database_url.get_secret_value()) as saver,
             masked_or_off(),
