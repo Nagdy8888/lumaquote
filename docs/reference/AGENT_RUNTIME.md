@@ -205,8 +205,10 @@ class, optionally exports an allowlisted outcome trace, then attempts one outbox
 dispatch, one inbound event and one `reconcile_stock` (releases stock reservations that no
 longer protect a live quotation, in its own short transaction; a failure is logged by exception
 class and never stops the loop; see [Inventory](INVENTORY.md#reservation-lifecycle-task-t2)).
-The polling loop sleeps one second between ticks; `--once` performs a
-bounded diagnostic tick. Unsupported integration job kinds fail visibly.
+The polling loop sleeps one second between ticks. An exception escaping a tick (for example
+an outbox row whose conversation no longer exists) is logged by class name only and the loop
+continues after five more seconds instead of exiting; `--once` performs a bounded diagnostic
+tick and still raises. Unsupported integration job kinds fail visibly.
 
 `runtime/jobs.claim_job` holds a global capacity advisory lock, reconciles expired
 jobs, permits at most two running jobs and excludes a second running job for the

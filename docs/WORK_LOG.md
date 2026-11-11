@@ -1316,3 +1316,10 @@ these entries were logged during the original steps or freshly rerun today.
 - Checked: `lint:python`, `check:architecture` (118 modules), `check:frontend` (104 modules), `tsc --noEmit`, frontend build, `diagrams:check` (31), `check:rules` -> passed; `test:ui` -> 21 files, 90 passed; pytest `test_telegram.py`, `test_stock_*.py`, `tests/unit` -> 485 passed (one earlier run hit a flaky Telegram-fixture failure while the live worker shared the database; the rerun passed). Not run: the full `verify`, `test:browser`, a live Telegram press (the keyboard removal is proven only against the mock Bot API).
 - Evidence: none (local tests).
 - Open: the keyboard removal needs one live press; the tests reset tables in the shared local database, so the live rows SO-0001 and PO-0001 may be gone; a press made before this change keeps its keyboard.
+
+### 2026-11-11 - Worker loop survives a failing tick (phase 7, local)
+- Why: orchestrator review of the live test: the long-running worker exited with `DomainError ('Conversation not found.', 404)` from `delivery.deliver_one` after the integration suite deleted a conversation that had a queued outbox row, which stopped Telegram polling and delivery.
+- Changed: `app/agents/luma_agent/worker.py` (`main`: the loop catches an exception from `tick`, logs only its class name, pauses five seconds and continues; `--once` still raises); `docs/reference/AGENT_RUNTIME.md`.
+- Checked: `npm run lint:python` -> passed; `npm run check:architecture` -> passed (118 modules). Not run: worker tests (none drive the endless loop), full suite.
+- Evidence: none.
+- Open: running the test suite against the same database as a live worker remains unsupported (R17); this change only keeps the worker alive.

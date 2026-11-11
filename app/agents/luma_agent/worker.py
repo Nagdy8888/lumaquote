@@ -99,6 +99,8 @@ def main():
 
     When a Telegram bot is configured (and not in `--once` mode) a poller thread feeds the
     inbox; the `httpx` and `httpx2` request loggers stay at WARNING because Bot API URLs contain the token.
+    In the long-running loop an exception from one tick is logged by class name and the loop
+    continues after a short pause; `--once` still raises so tests and diagnostics see the error.
     """
     parser = argparse.ArgumentParser(description="LumaQuote durable worker")
     parser.add_argument("--once", action="store_true")
@@ -110,9 +112,16 @@ def main():
         threading.Thread(target=poll_telegram, args=(threading.Event(),), daemon=True, name="telegram").start()
         logger.info("Telegram polling started")
     while True:
-        tick()
         if args.once:
+            tick()
             return
+        try:
+            tick()
+        except Exception as error:
+            # One failing step (for example an outbox row whose conversation vanished) must not stop
+            # the long-running worker; only the exception class is logged, never payloads or text.
+            logger.warning("Worker tick failed: %s", type(error).__name__)
+            time.sleep(5)
         time.sleep(1)
 
 
