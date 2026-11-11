@@ -1302,3 +1302,10 @@ these entries were logged during the original steps or freshly rerun today.
 - Checked: `npm run verify` -> 12 of 12 passed; `npm run test:python` -> 680 passed, 66 skipped, 4 deselected, 1 xfailed, 0 failed (698 s); `npm run graph:update` -> rebuilt; `check:docs` -> passed. Not run: `verify:full` (needs `test:browser`), live Telegram/Gmail/Apps Script checks.
 - Evidence: `docs/evidence/stock-orders-local-2026-11-11.json`.
 - Open: live checks in Chrome and Telegram (the Claude in Chrome extension was not connected), PR and merge.
+
+### 2026-11-11 - Live Telegram order and Inventory page check (phase 7, live)
+- Why: user asked to test the app, Telegram and Gmail live in the browser with Sonnet doing the work.
+- Changed: `docs/evidence/stock-orders-live-telegram-2026-11-11.json` (new); `docs/IMPLEMENTATION_PLAN.md` section 7 (accept/decline ticked with live Telegram evidence). Restarted API (8001), gateway (8002) and started the worker from this checkout. Pushed `gas/` earlier today. Local rows created by the test: PO-0001 (DL-003 +6), SO-0001 (DL-001 -10), quotation LQ-DA457964 revision 4.
+- Checked: live run (see evidence) -> Telegram request, approval hold, Accept button, pending order, staff confirm and stock movement all passed; Excel download passed; no console or server log errors. Not run: Google Sheets export and Gmail accept (the browser's Google account cannot open the Apps Script project, 403).
+- Evidence: `docs/evidence/stock-orders-live-telegram-2026-11-11.json`.
+- Open: the owner Google account must be signed in to the browser (or run `installStockExport` and `enableMailSelfTest` itself); four small UI/bot issues found (overview alert count, PO picker hides discontinued SKUs silently, Telegram buttons stay after an answer, receipt movements lack the PO number).
