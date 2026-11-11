@@ -96,6 +96,16 @@ commercial evidence continues to block finalization.
   and confirm the `Stock`, `Customer Orders` and `Purchase Orders` tabs fill and `latest` shows `done`.
   Claude may do this in the browser (D37). Not done: the script has never run in Google.
 
+## Decision needed: Apps Script lock contention (seen live 2026-11-11)
+
+The Executions page showed many runs failing after about 25-27 s waiting for the shared script lock
+(error rates over the shown history: `sendLumaMail` 89%, `exportApprovedQuotations` 71%,
+`synchronizeSupplierWorkbook` 97%, `pollLumaMail` 2%). Every time-driven trigger fires each minute and
+all share one `LockService.getScriptLock()`, so they queue behind each other. Possible remedy, not
+implemented: one one-minute trigger that runs poll, send, stock export and the supplier sync in
+sequence under one lock (the sync less often). This changes how the live integration runs, so say
+whether to do it. Details: [email channel](reference/EMAIL.md#open-gaps).
+
 ## Gmail requests (D47)
 
 Done 2026-11-07: label `LumaQuote` and a filter on mail to `mustafaalnagdy26+quotes@gmail.com`

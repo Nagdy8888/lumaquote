@@ -38,13 +38,36 @@ The company is `GOOGLE_COMPANY_ID`, bound to the signed envelope; nothing in a m
 
 ```
 Customer mail -> Gmail filter adds label LumaQuote
-  -> pollLumaMail (every minute): mails newer than the cursor, not from this account, max 5
+  -> pollLumaMail (every minute): labelled threads of the last 8 days, messages newer than the cursor, not from this account, max 5
   -> POST /callbacks/google/mail/inbound (signed) -> luma.inbox 'gm:<message id>' -> cursor moves
   -> inbox worker: Gmail authentication -> allowlist -> email conversation -> agent job
   -> agent reply or approved quotation -> outbox -> dispatcher: outbound.begin gates -> email_dispatch 'waiting'
   -> sendLumaMail (every minute): POST /claim -> reply in the customer's thread (PDF attached) -> POST /receipt
   -> outbox 'submitted' (or 'failed'), assistant message recorded
 ```
+
+## How threads are found (fix of 2026-11-11)
+
+The Gmail filter labels only mail sent to the `+quotes` alias, so only the customer's first mail
+carries `LumaQuote`. A reply in the same thread addressed to the plain shop address (a YES
+confirmation, "Accept, thanks", "Decline") has no label. `pendingMails_` therefore finds threads by
+`label:LumaQuote newer_than:8d` and applies "newer than the cursor, not a draft, not our own message
+(unless self-test)" per message in code. A thread whose newest message is not newer than the cursor
+is skipped without reading its messages, and because Gmail returns threads newest-activity first the
+scan stops at the first such thread (at most 4 pages of 50 threads per run). Mails are sorted oldest
+first and cut to 5, so the cursor never passes an unsent older mail. Other senders inside a labelled
+thread are still checked by the backend allowlist and authentication.
+
+Why 8 days: a quotation is valid 7 days (D49), so an accept or decline can only matter inside that
+window; the extra day absorbs timezone and clock slack. The window and the label are both tested by
+Gmail against the same (labelled) message, so a thread stays visible for 8 days after its labelled
+first mail; a reply after that is not collected.
+
+The earlier query was `label:LumaQuote after:<cursor - 60 s>`. Gmail applies both terms to one
+message, so once the cursor was more than 60 s past the labelled first mail the thread no longer
+matched and plain-address replies were never collected. Found live on 2026-11-11: the stuck
+"Accept, thanks" was collected within seconds after the thread label was re-applied by hand (which
+labels every message in the thread). Re-verification after the fix is in Tests and evidence.
 
 ## Inputs and outputs
 
@@ -146,6 +169,7 @@ the user must re-authorize the script.
 | PDF digest mismatch in Apps Script | receipt `failed` (`gmail_transfer_corrupt`) |
 | Nobody collects a reply for 24 hours | outbox `failed` (`mail_not_collected`); a quotation reply also releases its stock reservation (`delivery_failed`, D49) |
 | A quotation PDF over 5 MiB at claim time | dispatch and outbox `failed` (`pdf_too_large`), the mail is never offered, and the stock reservation is released (`delivery_failed`, D49) |
+| A customer replies to the plain address after the labelled first mail is older than 8 days | not collected (outside the thread window); the quotation has expired by then |
 | Another trigger holds the script lock | `pollLumaMail`/`sendLumaMail` wait up to `LOCK_WAIT_MS` (25 s); on timeout the run throws (shows Failed). Before 2026-11-07 they used `tryLock(1000)` and returned silently, so a reply stayed `waiting` while the run showed Completed |
 
 ## Configuration (names only)
@@ -182,6 +206,14 @@ Staff-approved; valid until 14 Nov 2026" and one PDF attachment. **Not proven:**
 the `getHeader` occurrence question, quotas, or behavior over days.
 
 ## Open gaps
+
+Apps Script lock contention (seen live 2026-11-11, not fixed): the Executions page showed many runs
+failing after about 25-27 s while waiting for the shared script lock. Error rates over the shown
+history: `sendLumaMail` 89%, `exportApprovedQuotations` 71%, `synchronizeSupplierWorkbook` 97%,
+`pollLumaMail` 2%. All time-driven triggers fire each minute and share one lock, so they queue behind
+each other and the sync (8-11 s) starves the others. A possible remedy is one one-minute trigger that
+runs the tasks in sequence under one lock; it is not implemented and is a decision for the user (see
+[morning actions](../MORNING_ACTIONS.md)).
 
 Attachments (photos, voice) are not processed. HTML-only mails depend on Gmail's plain-text version.
 The cursor is time-based; two mails with the same millisecond at a batch edge could be skipped.

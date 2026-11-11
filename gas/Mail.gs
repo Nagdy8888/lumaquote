@@ -50,23 +50,55 @@ function disableMailSelfTest() {
   PropertiesService.getScriptProperties().deleteProperty('LUMA_MAIL_SELF_TEST_TO');
 }
 
-/** Collect up to five labelled mails newer than the cursor, oldest first, skipping the account's own messages. */
+/**
+ * Gmail search window for labelled threads. A quotation is valid for 7 days, so an accept or decline reply can
+ * only matter inside this window; one extra day absorbs clock and timezone slack.
+ */
+var MAIL_THREAD_WINDOW = 'newer_than:8d';
+var MAIL_THREAD_PAGE = 50;
+var MAIL_THREAD_PAGES = 4;
+
+/**
+ * Collect up to five customer mails newer than the cursor, oldest first, skipping the account's own messages.
+ *
+ * Which threads: the Gmail filter labels only the first mail (sent to the +quotes alias). A customer reply to the
+ * plain shop address in the same thread carries no label, and Gmail applies every search term to the same message,
+ * so a per-message date term (`after:`) would drop the thread once the cursor passed the labelled mail. The query
+ * therefore finds threads by label plus a coarse 8-day window only; the exact "newer than the cursor" rule is
+ * applied per message in code, and a thread whose newest message is not newer than the cursor is skipped without
+ * reading its messages. Threads come newest-activity first, so the scan stops at the first quiet thread. Cost:
+ * at most 4 search pages of 50 threads per run (200 threads); in a normal minute it reads one page and stops.
+ * Messages in a labelled thread from other senders are still filtered by the backend allowlist.
+ * Invariant: items are sorted oldest first and cut to MAIL_BATCH, so the cursor never moves past an unsent older
+ * mail. Limit: if more than 200 labelled threads have a message newer than the cursor in one run (not expected:
+ * that is 200 unprocessed threads), the least recently active ones are not read, and an older mail among them
+ * could be passed by the cursor.
+ */
 function pendingMails_(cursor) {
   var me = Session.getEffectiveUser().getEmail().toLowerCase();
   var label = mailLabelName_().replace(/\s+/g, '-');
-  var query = 'label:' + label + ' after:' + Math.floor(cursor / 1000 - 60);
+  var query = 'label:' + label + ' ' + MAIL_THREAD_WINDOW;
   var items = [];
-  GmailApp.search(query, 0, 50).forEach(function eachThread_(thread) {
-    /** Consider every message of a labelled thread; later replies arrive in the same thread. */
-    thread.getMessages().forEach(function eachMessage_(message) {
-      /** Keep only customer messages newer than the cursor. */
-      var at = message.getDate().getTime();
-      var own = mailAddress_(message.getFrom()) === me;
-      if (at > cursor && !message.isDraft() && (!own || isSelfTestMail_(message))) {
-        items.push({ message: message, at: at });
+  var quiet = false;
+  for (var page = 0; page < MAIL_THREAD_PAGES && !quiet; page++) {
+    var threads = GmailApp.search(query, page * MAIL_THREAD_PAGE, MAIL_THREAD_PAGE);
+    for (var index = 0; index < threads.length; index++) {
+      /** Newest activity first: the first thread with nothing newer than the cursor ends the scan. */
+      if (threads[index].getLastMessageDate().getTime() <= cursor) {
+        quiet = true;
+        break;
       }
-    });
-  });
+      threads[index].getMessages().forEach(function eachMessage_(message) {
+        /** Keep only customer messages newer than the cursor, labelled or not. */
+        var at = message.getDate().getTime();
+        var own = mailAddress_(message.getFrom()) === me;
+        if (at > cursor && !message.isDraft() && (!own || isSelfTestMail_(message))) {
+          items.push({ message: message, at: at });
+        }
+      });
+    }
+    if (threads.length < MAIL_THREAD_PAGE) quiet = true;
+  }
   items.sort(function byDate_(a, b) {
     /** Oldest first so the cursor never skips an earlier unsent mail. */
     return a.at - b.at;

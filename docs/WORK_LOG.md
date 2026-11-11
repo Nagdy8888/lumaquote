@@ -1323,3 +1323,10 @@ these entries were logged during the original steps or freshly rerun today.
 - Checked: `npm run lint:python` -> passed; `npm run check:architecture` -> passed (118 modules). Not run: worker tests (none drive the endless loop), full suite.
 - Evidence: none.
 - Open: running the test suite against the same database as a live worker remains unsupported (R17); this change only keeps the worker alive.
+
+### 2026-11-11 - Gmail replies to the plain address are collected; live Google evidence (phase 7, live)
+- Why: live test found that a customer reply ("Accept, thanks") to the plain shop address in a quotation thread was never collected; the user asked for the fix, live re-verification and a PR.
+- Changed: `gas/Mail.gs` (`pendingMails_` searches `label:<name> newer_than:8d`, up to 4 pages of 50 threads, skips a thread whose last message is not newer than the cursor, filters per message by cursor, draft and own-message in code; contract comment states the rule); `gas/README.md`; `docs/reference/EMAIL.md` (new "How threads are found" section, failure row, open gap on Apps Script lock contention); `docs/MORNING_ACTIONS.md` (decision on one sequential trigger, not implemented); `docs/IMPLEMENTATION_PLAN.md` section 7 (Inventory item ticked, accept/decline line links the Google evidence); `docs/evidence/stock-orders-live-google-2026-11-11.json` (new).
+- Checked: `node --check` on every gas file, `npm run check:rules`, `npm run check:secrets`, `npm run lint:python`, `npm run test:unit` (353 passed) -> passed; live re-verification and `npm run verify` are in the following commit and the PR. Not run: Apps Script in a unit test (no stand-in for GmailApp search).
+- Evidence: `docs/evidence/stock-orders-live-google-2026-11-11.json`.
+- Open: lock contention remedy needs the user's decision; reply after more than 8 days to a labelled thread is not collected by design.
