@@ -10,7 +10,7 @@ sequenceDiagram
   Staff->>DB: Approve exact revision
   DB->>DB: Same transaction queues one export per quote
   Note over DB: Delivery and export are independent
-  loop One-minute trigger, local stand-in tested only
+  loop One-minute runLumaMinute trigger (export task), local stand-in tested only
     GAS->>API: Signed claim envelope
     API->>DB: Company lock, nonce check, lease oldest eligible row
     API->>Store: Read or once-create canonical PDF

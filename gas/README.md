@@ -15,22 +15,24 @@ setup guide so operating instructions have one primary home.
 
 - `appsscript.json`: V8 runtime, Cairo timezone, Sheets, Drive, trigger and HTTP scopes.
   The Drive scope was added for `Exports.gs`; re-authorize the script after pushing it.
+- `Scheduler.gs`: the one time-driven trigger `runLumaMinute` (D50), the lock helper used by the manual
+  entry points, and the installer `installLumaMinute` (see "Trigger model" below).
 - `Exports.gs`: polls the backend for approved quotation PDFs, files each in the private
   folder, reads the copy back and reports its SHA-256 (protocol in
   [Google synchronization](../docs/reference/GOOGLE_SYNC.md)).
 - `Stock.gs`: stock export (D49). When a staff member presses Export to Google Sheets, the
-  one-minute `exportApprovedQuotations` trigger claims the export and writes only the `Stock`,
+  minute run (`runLumaMinute`, the export task) claims the export and writes only the `Stock`,
   `Customer Orders` and `Purchase Orders` tabs (plain-text format first, so nothing is evaluated as a
   formula), then posts a receipt with row counts. It never touches Products, Prices, Policies,
-  Inventory or Quote Register. `installStockExport` installs the trigger without a Drive folder.
+  Inventory or Quote Register. `installStockExport` installs the minute trigger without a Drive folder.
 - `Configuration.gs`: required Script Properties, HTTPS callback destination,
   and SHA-256 HMAC signing of exact UTF-8 request bytes.
 - `Workbook.gs`: non-destructive synthetic initializer and safe workbook/tab
   diagnostics through `inspectSupplierWorkbook`.
 - `Notifications.gs`: owned manual-edit trigger, signed invalidation and editor
   test. The updated handler also attempts a full snapshot after notification.
-- `Synchronization.gs`: bounded table capture, stable-read checks, signed full
-  snapshots and the owned one-minute reconciliation trigger.
+- `Synchronization.gs`: bounded table capture, stable-read checks and signed full
+  snapshots (the reconciliation task of the minute run).
 
 The workbook is authoritative for commercial inputs. The ingested catalog remains
 the evidence authority for supported product specifications. Backend validated
@@ -38,6 +40,30 @@ snapshots are synchronized observations, not independent editable price lists.
 The Quote Register tab is initialized with headers; automatic register writes are
 not implemented. Initializer completion preserves existing populated tabs and
 does not by itself prove the intended workbook was filled.
+
+## Trigger model (D50)
+
+Exactly one time-driven trigger exists: `runLumaMinute`, every minute. It takes the script lock once with a
+1 s `tryLock` and, if the previous run still holds it, skips that minute without an error. Otherwise it
+runs these tasks in order, each in its own try/catch (one failure never skips the rest; the first error is
+rethrown at the end so the run shows as Failed):
+
+1. `pollLumaMail_` - push new Gmail messages (customer replies first).
+2. `sendLumaMail_` - claim and send up to three queued replies.
+3. `synchronizeSupplierWorkbook_` - push one signed Products/Prices/Policies snapshot.
+4. `exportApprovedQuotations_` - Drive PDFs (only with `LUMA_DRIVE_FOLDER_ID`), then one stock export.
+
+No new task starts after 4.5 minutes (`MINUTE_BUDGET_MS`) of Apps Script's 6-minute execution limit; skipped
+task names are logged as a warning. The on-edit trigger `notifySupplierEdit` is separate and unchanged.
+
+The public task names (`pollLumaMail`, `sendLumaMail`, `synchronizeSupplierWorkbook`,
+`exportApprovedQuotations`) remain as **manual entry points** for running one task by hand in the editor: each
+takes the script lock itself (waits up to 25 s) and calls the lock-free task above. Do not install them as
+triggers. `installLumaMinute` deletes every project trigger whose handler is `runLumaMinute` or one of those
+four names and creates the one `runLumaMinute` trigger; `installSupplierSynchronization`, `installDriveExport`,
+`installStockExport` and `installLumaMail` call it, so no path recreates parallel triggers. After pushing
+this change, run `installLumaMinute` once and check the Triggers page: one time-driven `runLumaMinute` plus
+the on-edit `notifySupplierEdit`.
 
 ## Account setup
 
@@ -48,13 +74,13 @@ contains this machine's callback values. Never put the secret in source or chat.
 1. Run `initializeSyntheticWorkbook` for an empty dedicated synthetic workbook.
 2. Run `installSupplierEditTrigger` and `verifySupplierCallback`.
 3. Run `installSupplierSynchronization`. It sends an initial complete snapshot
-   and installs an owned one-minute trigger. The installer requires an idle script;
-   if another synchronization is running, wait for it to finish and run again.
+   and installs the single one-minute trigger (`installLumaMinute`). The initial snapshot needs the script
+   lock; if the minute run holds it for longer than 25 s, run it again.
 4. Stock is owned by the web app (D49): the `Inventory` tab is no longer read or watched, and an
    edit to it changes nothing. Edit Prices instead to see a fresh sync observation.
 5. For Drive copies: create a private Drive folder, set Script Property
    `LUMA_DRIVE_FOLDER_ID` to its id, run `installDriveExport` (it asks for the new Drive
-   permission and installs an owned one-minute trigger). Do not share the folder publicly.
+   permission and installs the single minute trigger). Do not share the folder publicly.
 
 The backend validates exact headers, unique/matching SKU sets, catalog-backed
 specifications, USD decimal prices, effective dates, stock, pack size and approved
@@ -65,7 +91,8 @@ conflicting policies are rejected. A 202 edit hint alone is not an imported snap
 Timer pushes cover API edits that do not fire manual edit triggers. Google schedules
 timers approximately, so stale evidence must still block finalization. Failed pushes
 are retried with a fresh full read by the next timer; they never refresh backend
-freshness. The script lock coordinates this script, not human/API writers. Double
+freshness. The script lock coordinates this script (the minute run, manual runs and the
+edit handler), not human/API writers. Double
 reads detect changes during capture but cannot provide an atomic multi-tab Sheets
 transaction; avoid simultaneous multi-tab administrative updates during import.
 
@@ -77,7 +104,7 @@ transaction; avoid simultaneous multi-tab administrative updates during import.
    example mails sent to `your.address+quotes@gmail.com`. A different label name goes in the Script
    Property `LUMA_GMAIL_LABEL`.
 2. Push the project (the manifest now includes the `https://mail.google.com/` scope), run
-   `installLumaMail` once and approve the new Gmail permission.
+   `installLumaMail` (or `installLumaMinute`) once and approve the new Gmail permission.
 3. Test from a different address than the script's account: the script skips its own messages.
    With only one account, run `enableMailSelfTest` (accepts own mails sent to the `+quotes` alias)
    and `disableMailSelfTest` afterwards.
@@ -89,7 +116,7 @@ address; approve both new permissions when the editor asks.
 cursor in code, because the filter labels only the first mail and a customer reply to the plain shop
 address carries no label (see [how threads are found](../docs/reference/EMAIL.md#how-threads-are-found-fix-of-2026-11-11)).
 
-`pollLumaMail` and `sendLumaMail` run every minute. Status codes only are kept in
+The poll and send tasks run every minute inside `runLumaMinute`. Status codes only are kept in
 `LUMA_LAST_MAIL_STATUS` and `LUMA_LAST_MAIL_SEND_STATUS`. See
 [email channel](../docs/reference/EMAIL.md).
 
@@ -107,7 +134,7 @@ using the authorizing Google account; it does not forward Google tokens to the b
 
 Stock export (D49): `POST /callbacks/google/stock/claim` and `/callbacks/google/stock/receipt` use the
 same signed envelope; see [Inventory](../docs/reference/INVENTORY.md). After pushing `Stock.gs`, run
-`installStockExport` once (or `installDriveExport` if a Drive folder is set) and approve any new
+`installLumaMinute` once (`installStockExport` and `installDriveExport` call it) and approve any new
 permission. Push is a live step: `npm run google:push`.
 
 Both snapshot routes require `X-Luma-Signature`: lowercase SHA-256 HMAC hex over the exact
@@ -166,7 +193,7 @@ Run locally from the repository root:
 npm run check:architecture
 node scripts/python.cjs -m ruff check app/backend/luma/features/google_sync app/backend/luma/google_gateway.py tests/integration/test_google_callback.py tests/integration/test_gas_snapshots.py
 node scripts/python.cjs -m pytest tests/integration/test_google_callback.py tests/integration/test_gas_snapshots.py -q --tb=short
-Get-Content gas/Configuration.gs,gas/Notifications.gs,gas/Synchronization.gs,gas/Workbook.gs,gas/Exports.gs,gas/Stock.gs | node --check
+Get-Content gas/Configuration.gs,gas/Notifications.gs,gas/Synchronization.gs,gas/Workbook.gs,gas/Exports.gs,gas/Stock.gs,gas/Mail.gs,gas/Scheduler.gs | node --check
 ```
 
 These checks cover Python structure/contracts, lint, HTTP/database behavior and GAS

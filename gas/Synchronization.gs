@@ -35,54 +35,49 @@ function readSupplierTable_(book, name) {
   });
 }
 
-/** Push one complete signed snapshot under a script lock; failure never reports fresh commercial data. */
-function synchronizeSupplierWorkbook() {
-  var config = configuration_();
-  var lock = LockService.getScriptLock();
-  lock.waitLock(LOCK_WAIT_MS);
-  try {
-    var book = SpreadsheetApp.openById(config.spreadsheetId);
-    var tables = {};
-    ['Products', 'Prices', 'Policies'].forEach(function collectTable_(name) {
-      /** Read only the three configured supplier input tables (stock is owned by the web app, D49), never quotation/customer tabs. */
-      tables[name] = readSupplierTable_(book, name);
-    });
-    ['Products', 'Prices', 'Policies'].forEach(function confirmStableRead_(name) {
-      /** Detect edits across the sequential table reads; retry on the next trigger instead of pushing mixed records. */
-      if (JSON.stringify(tables[name]) !== JSON.stringify(readSupplierTable_(book, name))) {
-        throw new Error('Supplier tables changed during synchronization; retry after the edit completes.');
-      }
-    });
-    var payload = JSON.stringify({ schema_version: 1, company_id: config.companyId,
-      spreadsheet_id: config.spreadsheetId, timestamp: Math.floor(Date.now() / 1000),
-      nonce: Utilities.getUuid(), event: 'supplier_snapshot', tables: tables });
-    if (Utilities.newBlob(payload).getBytes().length > 524288) throw new Error('Supplier snapshot exceeds 512 KiB.');
-    var response = UrlFetchApp.fetch(config.callbackUrl + '/snapshot', {
-      method: 'post', contentType: 'application/json', payload: payload,
-      headers: { 'X-Luma-Signature': signPayload_(payload, config.secret) },
-      followRedirects: false, muteHttpExceptions: true
-    });
-    PropertiesService.getScriptProperties().setProperty('LUMA_LAST_SNAPSHOT_STATUS', String(response.getResponseCode()));
-    if (response.getResponseCode() !== 202) throw new Error('Supplier snapshot rejected; check backend validation and connection.');
-    PropertiesService.getScriptProperties().setProperty('LUMA_LAST_SNAPSHOT_AT', new Date().toISOString());
-    console.log('Supplier snapshot accepted by backend validation.');
-  } finally {
-    lock.releaseLock();
-  }
+/**
+ * Push one complete signed snapshot; failure never reports fresh commercial data. The caller holds the shared
+ * script lock (runLumaMinute or synchronizeSupplierWorkbook). Throws when a table is invalid, changes during
+ * the read, is too large, or the backend does not answer 202.
+ */
+function synchronizeSupplierWorkbook_(config) {
+  var book = SpreadsheetApp.openById(config.spreadsheetId);
+  var tables = {};
+  ['Products', 'Prices', 'Policies'].forEach(function collectTable_(name) {
+    /** Read only the three configured supplier input tables (stock is owned by the web app, D49), never quotation/customer tabs. */
+    tables[name] = readSupplierTable_(book, name);
+  });
+  ['Products', 'Prices', 'Policies'].forEach(function confirmStableRead_(name) {
+    /** Detect edits across the sequential table reads; retry on the next trigger instead of pushing mixed records. */
+    if (JSON.stringify(tables[name]) !== JSON.stringify(readSupplierTable_(book, name))) {
+      throw new Error('Supplier tables changed during synchronization; retry after the edit completes.');
+    }
+  });
+  var payload = JSON.stringify({ schema_version: 1, company_id: config.companyId,
+    spreadsheet_id: config.spreadsheetId, timestamp: Math.floor(Date.now() / 1000),
+    nonce: Utilities.getUuid(), event: 'supplier_snapshot', tables: tables });
+  if (Utilities.newBlob(payload).getBytes().length > 524288) throw new Error('Supplier snapshot exceeds 512 KiB.');
+  var response = UrlFetchApp.fetch(config.callbackUrl + '/snapshot', {
+    method: 'post', contentType: 'application/json', payload: payload,
+    headers: { 'X-Luma-Signature': signPayload_(payload, config.secret) },
+    followRedirects: false, muteHttpExceptions: true
+  });
+  PropertiesService.getScriptProperties().setProperty('LUMA_LAST_SNAPSHOT_STATUS', String(response.getResponseCode()));
+  if (response.getResponseCode() !== 202) throw new Error('Supplier snapshot rejected; check backend validation and connection.');
+  PropertiesService.getScriptProperties().setProperty('LUMA_LAST_SNAPSHOT_AT', new Date().toISOString());
+  console.log('Supplier snapshot accepted by backend validation.');
 }
 
-/** Validate an initial snapshot, then install one one-minute reconciliation trigger without changing other handlers. */
+/** Manual entry point: push one snapshot under the shared script lock (the timer uses runLumaMinute; an edit calls this too). */
+function synchronizeSupplierWorkbook() {
+  var config = configuration_();
+  withScriptLock_(function runSync_() {
+    synchronizeSupplierWorkbook_(config);
+  });
+}
+
+/** Validate an initial snapshot, then install the single one-minute trigger (installLumaMinute, Scheduler.gs). */
 function installSupplierSynchronization() {
   synchronizeSupplierWorkbook();
-  var lock = LockService.getScriptLock();
-  lock.waitLock(10000);
-  try {
-    ScriptApp.getProjectTriggers().forEach(function removeDuplicateSync_(trigger) {
-      /** Replace only this account's owned periodic supplier synchronization triggers. */
-      if (trigger.getHandlerFunction() === 'synchronizeSupplierWorkbook') ScriptApp.deleteTrigger(trigger);
-    });
-    ScriptApp.newTrigger('synchronizeSupplierWorkbook').timeBased().everyMinutes(1).create();
-  } finally {
-    lock.releaseLock();
-  }
+  installLumaMinute();
 }

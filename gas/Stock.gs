@@ -109,18 +109,7 @@ function exportStockTabs_(config) {
   return false;
 }
 
-/** Install the one-minute export timer (Drive PDFs and stock tabs share exportApprovedQuotations) without needing Drive. */
+/** Install the single one-minute trigger (installLumaMinute, Scheduler.gs); the stock export needs no Drive folder. */
 function installStockExport() {
-  configuration_();
-  var lock = LockService.getScriptLock();
-  lock.waitLock(10000);
-  try {
-    ScriptApp.getProjectTriggers().forEach(function removeDuplicateExport_(trigger) {
-      /** Replace only this integration's own export trigger. */
-      if (trigger.getHandlerFunction() === 'exportApprovedQuotations') ScriptApp.deleteTrigger(trigger);
-    });
-    ScriptApp.newTrigger('exportApprovedQuotations').timeBased().everyMinutes(1).create();
-  } finally {
-    lock.releaseLock();
-  }
+  installLumaMinute();
 }

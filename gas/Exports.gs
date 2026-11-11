@@ -86,36 +86,28 @@ function exportDrivePdfs_(config) {
 }
 
 /**
- * Minute timer: file approved quotation PDFs in Drive, then write a queued stock export (Stock.gs) to the
- * workbook, under the shared script lock (waits up to LOCK_WAIT_MS). One part failing never skips the other;
- * the first error is rethrown at the end so the run shows as Failed. The backend owns retries.
+ * Export task of the minute run: file approved quotation PDFs in Drive, then write a queued stock export
+ * (Stock.gs) to the workbook. The caller holds the shared script lock (runLumaMinute or
+ * exportApprovedQuotations). One part failing never skips the other; the first error is rethrown at the end.
+ * The backend owns retries.
  */
-function exportApprovedQuotations() {
-  var config = configuration_();
-  var lock = LockService.getScriptLock();
-  lock.waitLock(LOCK_WAIT_MS);
+function exportApprovedQuotations_(config) {
   var failure = null;
-  try {
-    try { exportDrivePdfs_(config); } catch (driveError) { failure = driveError; }
-    try { exportStockTabs_(config); } catch (stockError) { failure = failure || stockError; }
-  } finally {
-    lock.releaseLock();
-  }
+  try { exportDrivePdfs_(config); } catch (driveError) { failure = driveError; }
+  try { exportStockTabs_(config); } catch (stockError) { failure = failure || stockError; }
   if (failure) throw failure;
 }
 
-/** Validate folder access, then install one one-minute export trigger without touching other handlers. */
+/** Manual entry point: run the Drive and stock export once under the shared script lock (the timer uses runLumaMinute). */
+function exportApprovedQuotations() {
+  var config = configuration_();
+  withScriptLock_(function runExport_() {
+    exportApprovedQuotations_(config);
+  });
+}
+
+/** Validate folder access, then install the single one-minute trigger (installLumaMinute, Scheduler.gs). */
 function installDriveExport() {
   exportFolder_();
-  var lock = LockService.getScriptLock();
-  lock.waitLock(10000);
-  try {
-    ScriptApp.getProjectTriggers().forEach(function removeDuplicateExport_(trigger) {
-      /** Replace only this integration's own export trigger. */
-      if (trigger.getHandlerFunction() === 'exportApprovedQuotations') ScriptApp.deleteTrigger(trigger);
-    });
-    ScriptApp.newTrigger('exportApprovedQuotations').timeBased().everyMinutes(1).create();
-  } finally {
-    lock.releaseLock();
-  }
+  installLumaMinute();
 }

@@ -1,21 +1,15 @@
 /**
- * Gmail channel (decision D47). Two one-minute triggers:
- * - pollLumaMail pushes new mails under the LumaQuote label to the signed gateway; the cursor moves
+ * Gmail channel (decision D47). Two tasks of the one-minute run `runLumaMinute` (Scheduler.gs, D50):
+ * - pollLumaMail_ pushes new mails under the LumaQuote label to the signed gateway; the cursor moves
  *   only after the backend has stored them. The account's own messages (our replies) are skipped.
- * - sendLumaMail claims replies the backend queued, sends each once from Gmail and reports the result.
+ * - sendLumaMail_ claims replies the backend queued, sends each once from Gmail and reports the result.
+ * `pollLumaMail` and `sendLumaMail` stay as manual entry points that take the script lock themselves.
  * Customer content is never logged; only HTTP status codes are kept in Script Properties.
  */
 
 var MAIL_BATCH = 5;
 var MAIL_BODY_CHARS = 8000;
 var MAIL_FIRST_RUN_MS = 60 * 60 * 1000;
-/**
- * How long a one-minute trigger waits for the shared script lock (shared by every .gs file). The supplier
- * sync can hold it for ~10 s; a 1 s try-lock made send/poll skip silently every minute. A timeout now
- * throws, so the run shows as Failed instead of Completed.
- */
-var LOCK_WAIT_MS = 25000;
-
 /** Return the Gmail label name that marks customer requests (Script Property LUMA_GMAIL_LABEL, default LumaQuote). */
 function mailLabelName_() {
   return PropertiesService.getScriptProperties().getProperty('LUMA_GMAIL_LABEL') || 'LumaQuote';
@@ -122,24 +116,28 @@ function mailPayload_(item) {
   };
 }
 
-/** Push the next batch of labelled mails; the cursor advances only after the backend stored them. */
+/**
+ * Push the next batch of labelled mails; the cursor advances only after the backend stored them. The caller
+ * holds the shared script lock (runLumaMinute or pollLumaMail). Throws when the backend does not answer 200.
+ */
+function pollLumaMail_(config) {
+  var properties = PropertiesService.getScriptProperties();
+  var cursor = Number(properties.getProperty('LUMA_MAIL_CURSOR') || String(Date.now() - MAIL_FIRST_RUN_MS));
+  var items = pendingMails_(cursor);
+  if (!items.length) return;
+  var response = signedExportPost_(config, '/mail/inbound', { event: 'gmail_messages',
+    messages: items.map(mailPayload_) });
+  properties.setProperty('LUMA_LAST_MAIL_STATUS', String(response.status));
+  if (response.status !== 200) throw new Error('Mail push was not accepted; check backend configuration and the connection.');
+  properties.setProperty('LUMA_MAIL_CURSOR', String(items[items.length - 1].at));
+}
+
+/** Manual entry point: run the mail poll once under the shared script lock (the timer uses runLumaMinute). */
 function pollLumaMail() {
   var config = configuration_();
-  var lock = LockService.getScriptLock();
-  lock.waitLock(LOCK_WAIT_MS);
-  try {
-    var properties = PropertiesService.getScriptProperties();
-    var cursor = Number(properties.getProperty('LUMA_MAIL_CURSOR') || String(Date.now() - MAIL_FIRST_RUN_MS));
-    var items = pendingMails_(cursor);
-    if (!items.length) return;
-    var response = signedExportPost_(config, '/mail/inbound', { event: 'gmail_messages',
-      messages: items.map(mailPayload_) });
-    properties.setProperty('LUMA_LAST_MAIL_STATUS', String(response.status));
-    if (response.status !== 200) throw new Error('Mail push was not accepted; check backend configuration and the connection.');
-    properties.setProperty('LUMA_MAIL_CURSOR', String(items[items.length - 1].at));
-  } finally {
-    lock.releaseLock();
-  }
+  withScriptLock_(function runPoll_() {
+    pollLumaMail_(config);
+  });
 }
 
 /** Return the id of the newest message this account sent in a thread, or null when none is visible yet. */
@@ -189,42 +187,34 @@ function sendOneMail_(config, mail) {
   PropertiesService.getScriptProperties().setProperty('LUMA_LAST_MAIL_SEND_STATUS', String(receipt.status));
 }
 
-/** Claim and send up to three queued replies per run under the script lock; the backend never resends a claimed one. */
-function sendLumaMail() {
-  var config = configuration_();
-  var lock = LockService.getScriptLock();
-  lock.waitLock(LOCK_WAIT_MS);
-  try {
-    for (var count = 0; count < 3; count++) {
-      var claim = signedExportPost_(config, '/mail/claim', { event: 'gmail_send_claim' });
-      if (claim.status !== 200) {
-        PropertiesService.getScriptProperties().setProperty('LUMA_LAST_MAIL_SEND_STATUS', String(claim.status));
-        throw new Error('Mail claim was not accepted; check backend configuration and the connection.');
-      }
-      if (!claim.body || !claim.body.mail) return;
-      sendOneMail_(config, claim.body.mail);
+/**
+ * Claim and send up to three queued replies; the backend never resends a claimed one. The caller holds the
+ * shared script lock (runLumaMinute or sendLumaMail). Throws when the backend refuses a claim.
+ */
+function sendLumaMail_(config) {
+  for (var count = 0; count < 3; count++) {
+    var claim = signedExportPost_(config, '/mail/claim', { event: 'gmail_send_claim' });
+    if (claim.status !== 200) {
+      PropertiesService.getScriptProperties().setProperty('LUMA_LAST_MAIL_SEND_STATUS', String(claim.status));
+      throw new Error('Mail claim was not accepted; check backend configuration and the connection.');
     }
-  } finally {
-    lock.releaseLock();
+    if (!claim.body || !claim.body.mail) return;
+    sendOneMail_(config, claim.body.mail);
   }
 }
 
-/** Check the label exists, then install one one-minute trigger each for polling and sending. */
+/** Manual entry point: send queued replies once under the shared script lock (the timer uses runLumaMinute). */
+function sendLumaMail() {
+  var config = configuration_();
+  withScriptLock_(function runSend_() {
+    sendLumaMail_(config);
+  });
+}
+
+/** Check the label exists, then install the single one-minute trigger (installLumaMinute, Scheduler.gs). */
 function installLumaMail() {
   if (!GmailApp.getUserLabelByName(mailLabelName_())) {
     throw new Error('Create the Gmail label ' + mailLabelName_() + ' and a filter that applies it first.');
   }
-  var lock = LockService.getScriptLock();
-  lock.waitLock(10000);
-  try {
-    ScriptApp.getProjectTriggers().forEach(function removeDuplicateMail_(trigger) {
-      /** Replace only this integration's own mail triggers. */
-      var handler = trigger.getHandlerFunction();
-      if (handler === 'pollLumaMail' || handler === 'sendLumaMail') ScriptApp.deleteTrigger(trigger);
-    });
-    ScriptApp.newTrigger('pollLumaMail').timeBased().everyMinutes(1).create();
-    ScriptApp.newTrigger('sendLumaMail').timeBased().everyMinutes(1).create();
-  } finally {
-    lock.releaseLock();
-  }
+  installLumaMinute();
 }

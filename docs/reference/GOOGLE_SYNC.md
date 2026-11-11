@@ -89,7 +89,7 @@ it authenticates exact callback bytes with the configured shared HMAC secret.
   needs the added `drive` scope and a private folder id in `LUMA_DRIVE_FOLDER_ID`.
 - `Stock.gs`: stock export to Google Sheets (D49): claims a queued export and writes only the
   `Stock`, `Customer Orders` and `Purchase Orders` tabs (see the stock export section). Called
-  by the same one-minute trigger as the Drive export (`exportApprovedQuotations`).
+  by the same minute run as the Drive export (`runLumaMinute`, task `exportApprovedQuotations_`).
 - `Mail.gs`: Gmail channel (D47): pushes mails under one label and sends queued replies; see
   [email channel](EMAIL.md). It needs the added `https://mail.google.com/` and `userinfo.email` scopes.
 - `appsscript.json`: V8, Africa/Cairo timezone and Sheets, Drive, Gmail, script-trigger and
@@ -209,7 +209,7 @@ sequenceDiagram
   Staff->>DB: Approve exact revision
   DB->>DB: Same transaction queues one export per quote
   Note over DB: Delivery and export are independent
-  loop One-minute trigger, local stand-in tested only
+  loop One-minute runLumaMinute trigger (export task), local stand-in tested only
     GAS->>API: Signed claim envelope
     API->>DB: Company lock, nonce check, lease oldest eligible row
     API->>Store: Read or once-create canonical PDF
@@ -258,8 +258,8 @@ envelope as snapshots, bodies bounded to 1 KiB and 2 KiB):
    replay after completion is idempotent; a different file id is a 409. Stale tokens
    are a 409, so a slow first holder cannot overwrite a reclaimed export.
 
-Scheduling is the one-minute `exportApprovedQuotations` trigger from
-`installDriveExport` (up to three exports per run under a script lock). Receipt
+Scheduling is the export task of the one-minute `runLumaMinute` trigger installed by
+`installLumaMinute` (up to three exports per run, under the script lock the minute run holds; D50). Receipt
 acceptance proves the Drive copy matched the digest, not that anyone can open it.
 
 Not covered: no staff UI shows export state or retries a blocked row (use the table and
@@ -295,7 +295,8 @@ step in `docs/MORNING_ACTIONS.md`).
 
 Manual edit triggers cover allowed human edits; API edits may not fire them.
 The timer takes a fresh complete read to reconcile missed changes. GAS uses a
-script lock to coordinate its own invocations and double-reads tables to detect
+script lock to coordinate its own invocations (one `runLumaMinute` trigger runs the mail, sync and export
+tasks in sequence under one lock, D50) and double-reads tables to detect
 changes during capture. Those controls do not create an atomic Sheets transaction
 across tabs or lock out independent users/API writers.
 
