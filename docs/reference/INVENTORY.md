@@ -519,7 +519,7 @@ sequenceDiagram
   Staff->>API: Export to Google Sheets
   API->>DB: Queue one export, or return the open one
   API-->>Staff: Status queued
-  loop One-minute trigger, local stand-in tested only
+  loop One-minute runLumaMinute trigger (export task), local stand-in tested only
     GAS->>GW: Signed claim envelope
     GW->>DB: Company lock, nonce check, lease oldest eligible export
     GW->>DB: Read stock, orders and purchase orders, guard text cells
@@ -562,8 +562,9 @@ Drive export.
    Cells are guarded text, ints, floats (money) and UTC date text (`YYYY-MM-DD HH:MM`, `YYYY-MM-DD`);
    missing values are empty strings. Each tab is capped at 5,000 data rows; a tab that was cut is named
    in `truncated`. `Movements` is not sent to Sheets.
-3. **Write.** `gas/Stock.gs` `exportStockTabs_()` runs inside `exportApprovedQuotations` (the existing
-   one-minute trigger, under the shared script lock with `waitLock(25 s)`). It checks all three tabs are
+3. **Write.** `gas/Stock.gs` `exportStockTabs_()` runs inside `exportApprovedQuotations_` (the export
+   task of the one-minute `runLumaMinute` trigger, under the script lock the minute run holds, D50; timing: the
+   export is picked up within about a minute, after that run's mail and sync tasks). It checks all three tabs are
    well formed first, then for each of `Stock`, `Customer Orders`, `Purchase Orders`: creates the tab
    if missing, `clearContents()`, sets the number format of every text column to plain text `@`
    **before** writing (numeric columns get `0`, or `#,##0.00` for price, total and cost), writes the

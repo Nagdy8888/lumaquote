@@ -1,0 +1,42 @@
+{
+  "date": "2026-11-11",
+  "commit": "26c1875",
+  "label": "live",
+  "command": "npm run google:push (9 files at 16:30 local, Africa/Cairo); installLumaMinute run once in the Apps Script editor of the owner account at 16:35:47; then the Triggers and Executions pages, the local database (luma.google_snapshot_receipts, luma.sheet_exports, luma.inbox, luma.email_dispatch via node scripts/python.cjs), the web app /inventory (local test admin) and Gmail (allowlisted sender account) driven through Claude in Chrome. Times are local unless marked UTC (local = UTC+2).",
+  "result": "passed: one time-driven runLumaMinute trigger replaced the four per-task triggers; 10 of 10 runs Completed over 9 minutes; snapshot receipts every 43-74 s; stock export done in 18 s; mail collected in about 27 s and answered in about 90 s.",
+  "scope": "Decision D50 (gas/Scheduler.gs) against the real Apps Script project: trigger list before and after, Executions of runLumaMinute from 16:36:41 to 16:45:41, supplier snapshot cadence, one Export to Google Sheets press, one Gmail request and its reply.",
+  "triggers_before": ["sendLumaMail (time-based)", "pollLumaMail (time-based)", "exportApprovedQuotations (time-based)", "synchronizeSupplierWorkbook (time-based)", "notifySupplierEdit (on edit)"],
+  "triggers_after": ["runLumaMinute (time-based)", "notifySupplierEdit (on edit)"],
+  "executions": {
+    "runLumaMinute_runs": 10,
+    "first_start": "16:36:41",
+    "last_start": "16:45:41",
+    "completed": 10,
+    "failed": 0,
+    "durations_s": [13.523, 13.25, 10.155, 26.625, 6.79, 10.792, 10.274, 19.207, 9.872, 9.074],
+    "min_s": 6.79,
+    "max_s": 26.625,
+    "error_text": "none",
+    "installLumaMinute": "Completed in 3.179 s at 16:35:47 (no new consent prompt)",
+    "before_for_comparison": "In the 16:26-16:35 window shown on the same page, the four old triggers still mostly Completed (the earlier 2026-11-11 history had error rates of 71-97 %); durations of the old tasks reached 53 s (pollLumaMail 16:35:10) and 50 s (synchronizeSupplierWorkbook 16:34:36), and one exportApprovedQuotations run at 16:31:40 Failed (29 s)."
+  },
+  "snapshot_receipts_utc": ["14:36:51", "14:37:52", "14:38:49", "14:40:03", "14:40:46", "14:41:49", "14:42:50", "14:43:58", "14:44:49", "14:45:48"],
+  "snapshot_gaps_s": [61, 56, 74, 43, 62, 60, 68, 51, 58],
+  "stock_export": {"pressed_utc": "14:36:36", "done_utc": "14:36:54", "seconds": 18, "app_result": "Done, Stock 72, Customer Orders 3, Purchase Orders 1 rows"},
+  "mail_check": {
+    "sent_local": "16:38:17",
+    "inbox_gm_row_utc": "14:38:44",
+    "collected_after_s": 27,
+    "reply_queued_utc": "14:38:51",
+    "reply_sent_receipt_utc": "14:39:47",
+    "reply_after_customer_mail_s": 90,
+    "dispatch_attempts": 1
+  },
+  "not_covered": [
+    "No run in which a task overran the 4.5-minute budget or another run still held the lock (the skip path of tryLock was not seen live).",
+    "The Executions page shows only status and duration; per-task failures that the run reports by throwing would show as Failed, none occurred.",
+    "Only 10 minutes were observed; no long-run or quota (Gmail/UrlFetch daily) evidence.",
+    "The on-edit trigger notifySupplierEdit was not fired in this run.",
+    "The timing of the mail path includes whatever the worker and AI took; it is one sample."
+  ]
+}

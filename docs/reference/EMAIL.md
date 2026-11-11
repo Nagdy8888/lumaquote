@@ -29,7 +29,7 @@ The company is `GOOGLE_COMPANY_ID`, bound to the signed envelope; nothing in a m
 
 | Module | Role |
 | --- | --- |
-| `gas/Mail.gs` | `pollLumaMail` (push), `sendLumaMail` (claim, send, receipt), `installLumaMail` (two one-minute triggers) |
+| `gas/Mail.gs` | `pollLumaMail_` (push), `sendLumaMail_` (claim, send, receipt), run by `runLumaMinute` (`gas/Scheduler.gs`, D50); `pollLumaMail`/`sendLumaMail` are manual entry points; `installLumaMail` installs the single minute trigger |
 | `messaging/email_routes.py` | gateway routes `/callbacks/google/mail/inbound`, `/claim`, `/receipt` |
 | `messaging/email_ingress.py` | envelope schema, `sender_authenticated`, `strip_quoted`, `reduce_mail`, `receive_mail` |
 | `messaging/email_dispatch.py` | `queue` (from the dispatcher), `claim_mail`, `record_mail_receipt`, lease and expiry `sweep` |
@@ -142,9 +142,10 @@ it. Apps Script moves its cursor only after the backend answered 200.
 
 ## Limits and cost
 
-Apps Script runs each trigger about once a minute (approximate). All `.gs` files share one script lock
-(`LockService.getScriptLock()`): supplier sync (8-11 s on 2026-11-07), mail poll, mail send and Drive export run
-one at a time, so a reply can be delayed by up to about one sync. Gmail and Apps Script daily quotas
+Apps Script runs the one trigger `runLumaMinute` about once a minute (approximate). It takes the shared script
+lock (`LockService.getScriptLock()`) once and runs mail poll, mail send, supplier sync (8-11 s on 2026-11-07),
+then Drive and stock export in sequence (D50). Latency of a customer mail or a queued reply is therefore up to
+one minute plus the time of the tasks before it in the run. Gmail and Apps Script daily quotas
 apply to the user's account (check the current quota page before relying on numbers). Each customer
 mail costs the same paid AI call as a Telegram message when paid AI is on.
 
@@ -170,7 +171,7 @@ the user must re-authorize the script.
 | Nobody collects a reply for 24 hours | outbox `failed` (`mail_not_collected`); a quotation reply also releases its stock reservation (`delivery_failed`, D49) |
 | A quotation PDF over 5 MiB at claim time | dispatch and outbox `failed` (`pdf_too_large`), the mail is never offered, and the stock reservation is released (`delivery_failed`, D49) |
 | A customer replies to the plain address after the labelled first mail is older than 8 days | not collected (outside the thread window); the quotation has expired by then |
-| Another trigger holds the script lock | `pollLumaMail`/`sendLumaMail` wait up to `LOCK_WAIT_MS` (25 s); on timeout the run throws (shows Failed). Before 2026-11-07 they used `tryLock(1000)` and returned silently, so a reply stayed `waiting` while the run showed Completed |
+| The previous minute run still holds the script lock | `runLumaMinute` skips that minute with a log line and no error; the next minute collects and sends. A manual `pollLumaMail`/`sendLumaMail` waits up to `LOCK_WAIT_MS` (25 s) and then throws. Before D50 four triggers waited on each other and most runs failed with a lock timeout |
 
 ## Configuration (names only)
 
@@ -224,13 +225,12 @@ order a new request drafts the next revision; while the order is pending the cus
 "waiting for confirmation" notice and the conversation is `needs_staff`. See
 [INVENTORY](INVENTORY.md).
 
-Apps Script lock contention (seen live 2026-11-11, not fixed): the Executions page showed many runs
-failing after about 25-27 s while waiting for the shared script lock. Error rates over the shown
-history: `sendLumaMail` 89%, `exportApprovedQuotations` 71%, `synchronizeSupplierWorkbook` 97%,
-`pollLumaMail` 2%. All time-driven triggers fire each minute and share one lock, so they queue behind
-each other and the sync (8-11 s) starves the others. A possible remedy is one one-minute trigger that
-runs the tasks in sequence under one lock; it is not implemented and is a decision for the user (see
-[morning actions](../MORNING_ACTIONS.md)).
+Resolved 2026-11-11 (Apps Script lock contention, D50): the Executions page had shown many runs failing
+after about 25-27 s while waiting for the shared script lock (error rates `sendLumaMail` 89%,
+`exportApprovedQuotations` 71%, `synchronizeSupplierWorkbook` 97%, `pollLumaMail` 2%), because four
+one-minute triggers started together and shared one lock. Now one trigger `runLumaMinute` runs the tasks in
+sequence under one lock (see [Apps Script guide](../../gas/README.md#trigger-model-d50)). Remaining limit: a task
+that always runs longer than 4.5 minutes would starve the tasks after it (the run logs the skipped names).
 
 Attachments (photos, voice) are not processed. HTML-only mails depend on Gmail's plain-text version.
 The cursor is time-based; two mails with the same millisecond at a batch edge could be skipped.

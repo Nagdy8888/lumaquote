@@ -10,7 +10,7 @@ sequenceDiagram
   Staff->>API: Export to Google Sheets
   API->>DB: Queue one export, or return the open one
   API-->>Staff: Status queued
-  loop One-minute trigger, local stand-in tested only
+  loop One-minute runLumaMinute trigger (export task), local stand-in tested only
     GAS->>GW: Signed claim envelope
     GW->>DB: Company lock, nonce check, lease oldest eligible export
     GW->>DB: Read stock, orders and purchase orders, guard text cells

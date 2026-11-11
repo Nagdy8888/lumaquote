@@ -61,7 +61,7 @@
         "supabase/migrations/20261029010000_quotation_domain.sql": "65b37c4e9358aa488174bf842b52c1100b2e83a44170c1b862fc9f25a75b2db6",
         "supabase/migrations/20261029131000_versioned_embeddings.sql": "71b6e35515d12ad5f116019b330790f6fdf00f4fc6162b38054b98b245f57e17"
       },
-      "svg_sha256": "9d5c4bb4e24e272c380e33ed8075eda4fdf1b2bbd8149f69b2f903710f1df70f",
+      "svg_sha256": "336f8b151308f5824dd8e3c21c8aee6789ec0b5c4550041bcaab42df92536d28",
       "width": 842.09,
       "height": 998.25
     },
@@ -72,7 +72,7 @@
         "supabase/migrations/20261029010000_quotation_domain.sql": "65b37c4e9358aa488174bf842b52c1100b2e83a44170c1b862fc9f25a75b2db6",
         "supabase/migrations/20261029100000_immutable_quotation_content.sql": "acd5b9a206ff4a23277a00499cfa6941217096edcbec3ba5c66db07d3e21078a"
       },
-      "svg_sha256": "2f7af0f925aa2cc6edb5e270bd715b45724dedb82c2a9201e48e5d7ba678bca9",
+      "svg_sha256": "bd75fa20ed7baef40a2cf6481c883e9bfc68c3e1ef88c779f3a2b89c22d36a3c",
       "width": 729.36,
       "height": 825
     },
@@ -84,7 +84,7 @@
         "supabase/migrations/20261029110000_voice_intake.sql": "60b4f99ab5d0ea74677e5c2522807539222a31cd5a3e8aae2dabf5850031bde0",
         "supabase/migrations/20261029111000_media_message_binding.sql": "369cc2db1bd77d42a170d32f2e1d2269207cf7c7c1b53b140ce489ea72140e52"
       },
-      "svg_sha256": "9d4f4a4337e4819a1017b9e61cd182bd0140ad9ea4703850ef233ec28b831b16",
+      "svg_sha256": "8bff40df321f38a4bdcb5dcca458ad795a377f1d4d0ba42f104e26b5aed90aaf",
       "width": 846.89,
       "height": 896.5
     },
@@ -99,7 +99,7 @@
         "app/agents/luma_agent/nodes/workflow.py": "27a7d902236459c1c684327a57aba755609c83b008a1cbcc09c3cfb103a95556",
         "app/agents/luma_agent/runtime/conversations.py": "2549b86bb326d8b7e0a4e7a72cfa82e825b7b0cbf90a86f51b4ee585f9cc90bc"
       },
-      "svg_sha256": "31a054d84c0e7f3a22d01b769c2a457de99456913dd04ff4afa1b28b4ce4eeeb",
+      "svg_sha256": "5c2448c644ba9dbe4d2a5c18662f041db7c2b8ca6a5914031801b2b6cf029214",
       "width": 685.62,
       "height": 888.34
     },
@@ -136,7 +136,7 @@
         "app/agents/luma_agent/runtime/media.py": "2491f1eed267ccd8a39c92d67bcadabd5fd09aa04afcb8552a0da8c84e7020c6",
         "app/agents/luma_agent/runtime/recovery.py": "3c51108e0b3c6277eaa6a0746114a43d0938775b101f94c021f937ea96f8e0e7"
       },
-      "svg_sha256": "6624b78df2e01cf1fc0a48ee75555a3f6869b729f29601bbcc456778df4090d8",
+      "svg_sha256": "11805e78608f439697570d90d667ecda7522dffa8b8b22c0cd52e48477dae857",
       "width": 1317.98,
       "height": 693.8
     },
@@ -183,7 +183,7 @@
       "source_sha256": "e0a9c8950dc6c1709019173df25918141aecbedf6901641420a523732b7c3a07",
       "renderer_sha256": "44f5712d92cb37910338d84507da5b3e04fe9603fb0fe445335fa85ef56cffb5",
       "bindings": {
-        "gas/Synchronization.gs": "d921866202e3ce8c5ef915744a8b5c042ce1351d00610fb4de3b376f353a1427",
+        "gas/Synchronization.gs": "2c73192ef1546c176d303da4b6b0d306dfb82e64a088d8e481c4c0677712bfa6",
         "app/backend/luma/features/google_sync/callbacks.py": "ac22cd0efe6cbd5f4d246933634b09ba338210d8c3bd3060dd963f81bc8c4b20",
         "app/backend/luma/features/google_sync/snapshots.py": "e27d0287aa5daed18f682fe76963c8892fc174ee09aaba2b1cfdd81e7124febf",
         "app/backend/luma/features/google_sync/validation.py": "a89c5f2659fad77310fa251d9a74f692d2051fffdec26c5d82e12d3bf9faba23"
@@ -193,33 +193,33 @@
       "height": 1235
     },
     "drive-export": {
-      "source_sha256": "2793759d907aa7a5217cfc797d3e9dc3299adb79457268ad6fbfd5b63dc7b1da",
+      "source_sha256": "4c150beeb4994b09d387ac926784a24de9676a9ebea1dd530619fb047ff95b45",
       "renderer_sha256": "44f5712d92cb37910338d84507da5b3e04fe9603fb0fe445335fa85ef56cffb5",
       "bindings": {
-        "gas/Exports.gs": "846ebdb09feb85e5f97a623ecb1239980bf2f3105253396e87667143e462dd86",
+        "gas/Exports.gs": "27a301200eb2b7814b77946fd7c264944636875514001ec222b6b7384c2e5549",
         "app/backend/luma/features/google_sync/exports.py": "65d42214dbeede271a778b3b4b09006c9a878b5cd4de1961542d3f1901954b64",
         "app/backend/luma/features/quotations/approval.py": "631ee9aa01d32db872df30bffd7189f94215ac4bbfd7ac39e8d6bd7d1dbc9e86",
         "app/backend/luma/features/quotations/documents.py": "26088f412c068b8f0e7ae9e4be6511a914a140d3d705f9f4fe46c9a6678c3496",
         "supabase/migrations/20261102000000_drive_exports.sql": "43837378d3f8c8ebe7dc9482a4a847b2a1fae1a5dca9a36522fd1f0c960362e9"
       },
-      "svg_sha256": "61ca3b983b22ffb11da51a0be6f99d1a36cd19cccd9f822f098a0cc12a849490",
+      "svg_sha256": "c5a131a143c177ea07d80fc68a7747ccd779dc0a1360b60a2b6161393ce73c10",
       "width": 1250,
-      "height": 1067
+      "height": 1081
     },
     "stock-sheet-export": {
-      "source_sha256": "1c3c318b9315e14fea002404de475d1304269f5305d1165a673f9d6856abe026",
+      "source_sha256": "94ebf3c4a646fa687ee173b8eda0c2ea54be107cedb1e5f37da1728d7ea9bd4e",
       "renderer_sha256": "44f5712d92cb37910338d84507da5b3e04fe9603fb0fe445335fa85ef56cffb5",
       "bindings": {
-        "gas/Stock.gs": "c3a787d521c3dc09af7e35140e9b562ee176d527ca4213a4c2111c11c02e2fa6",
-        "gas/Exports.gs": "846ebdb09feb85e5f97a623ecb1239980bf2f3105253396e87667143e462dd86",
+        "gas/Stock.gs": "49af3c2331ef2f698131359fcf9333c53c95e62d99282315b505db84bb44279f",
+        "gas/Exports.gs": "27a301200eb2b7814b77946fd7c264944636875514001ec222b6b7384c2e5549",
         "app/backend/luma/features/google_sync/stock_exports.py": "ec93e17432b59dae9ec14fb1c9e1b3fa50fb0032a3520ee5ae52e645430266b7",
         "app/backend/luma/features/inventory/sheet_queue.py": "845b8ca1c4036cde89d019a240a4fc4ab8276b5e75564db7989c3613bc2673af",
         "app/backend/luma/features/inventory/exports.py": "614de71241140d40adec96888171f0f0d114798ed1709a462a02de8bb3b8ce3d",
         "supabase/migrations/20261108010000_sheet_export_attempts.sql": "c2712b89308a5cb37d59e1022a589d71e93b6009b6ba16b2f39ba8922f4f8f84"
       },
-      "svg_sha256": "3d876588376ebde49d7ca20c56db7b69b005d14bf40c72ef25211be8397dce18",
+      "svg_sha256": "4063cf282e17640006c1bec7b431a9cfa83e013e5a19a4252f82f076f3498b82",
       "width": 1258,
-      "height": 1147
+      "height": 1181
     },
     "verification-scope": {
       "source_sha256": "e28a3844b8f4e4a35aa2bf183e7838e59ff77b582b772f163bd252965b14d2c3",
@@ -375,7 +375,7 @@
         "app/backend/luma/features/inventory/ledger.py": "642f3ded1b9c0558c50b3f75dc1878c02a92df7a0659264feac57028e86606c5",
         "supabase/migrations/20261107030000_stock_ledger.sql": "ef33242ec456563ecfae028ec3963cbb481232cc99a2ff8172c93642d69ed3e1"
       },
-      "svg_sha256": "af3a3c4c09ee4a9f4eadb1fe20be84b57a38b4158ed2d78de16b8f983a99586b",
+      "svg_sha256": "a4711156ffc0c4c36ba45b24798c07e7930b5dd764b190a8bd7d00bb76c14a31",
       "width": 1460.96,
       "height": 1099.6
     },
@@ -388,7 +388,7 @@
         "app/backend/luma/features/inventory/ledger.py": "642f3ded1b9c0558c50b3f75dc1878c02a92df7a0659264feac57028e86606c5",
         "supabase/migrations/20261107030000_stock_ledger.sql": "ef33242ec456563ecfae028ec3963cbb481232cc99a2ff8172c93642d69ed3e1"
       },
-      "svg_sha256": "d65387c4f64238e2a0c23fd4a3fbba3fcf43be80339d90028faa89422ab84418",
+      "svg_sha256": "370112399bf0575e2d718aac2d7ca0ada1e0e44b4a9c01201f528fb337c552aa",
       "width": 911.29,
       "height": 619.8
     },
