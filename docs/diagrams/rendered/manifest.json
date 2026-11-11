@@ -61,7 +61,7 @@
         "supabase/migrations/20261029010000_quotation_domain.sql": "65b37c4e9358aa488174bf842b52c1100b2e83a44170c1b862fc9f25a75b2db6",
         "supabase/migrations/20261029131000_versioned_embeddings.sql": "71b6e35515d12ad5f116019b330790f6fdf00f4fc6162b38054b98b245f57e17"
       },
-      "svg_sha256": "78c6739c24193f3afcd55bc9acbb1867d11bc05b683fff68a3570d979cc6047a",
+      "svg_sha256": "362ec4307ae916233788d2d5d077c775bf65171b7b962e0160c6989c55d9ef97",
       "width": 842.09,
       "height": 998.25
     },
@@ -72,7 +72,7 @@
         "supabase/migrations/20261029010000_quotation_domain.sql": "65b37c4e9358aa488174bf842b52c1100b2e83a44170c1b862fc9f25a75b2db6",
         "supabase/migrations/20261029100000_immutable_quotation_content.sql": "acd5b9a206ff4a23277a00499cfa6941217096edcbec3ba5c66db07d3e21078a"
       },
-      "svg_sha256": "d68ee983b70ea1392c1bdeec3f63515279fce8f33a71c498d7a782459baad880",
+      "svg_sha256": "3c5f669b1ed9fecc4828fbaa1e685843cc0247dc32aea0548391778c56feef76",
       "width": 729.36,
       "height": 825
     },
@@ -84,7 +84,7 @@
         "supabase/migrations/20261029110000_voice_intake.sql": "60b4f99ab5d0ea74677e5c2522807539222a31cd5a3e8aae2dabf5850031bde0",
         "supabase/migrations/20261029111000_media_message_binding.sql": "369cc2db1bd77d42a170d32f2e1d2269207cf7c7c1b53b140ce489ea72140e52"
       },
-      "svg_sha256": "e28a286eef08df708a4f520f2ec47a83fa0debdf4016a6809b77a7cd56cb0a92",
+      "svg_sha256": "0b820d7bef3396dd8a98d56e23a83a76a5f84923f690c481345aab782506e4ac",
       "width": 846.89,
       "height": 896.5
     },
@@ -99,7 +99,7 @@
         "app/agents/luma_agent/nodes/workflow.py": "27a7d902236459c1c684327a57aba755609c83b008a1cbcc09c3cfb103a95556",
         "app/agents/luma_agent/runtime/conversations.py": "b5afbb3cf434a52320b4be14b5fa3e42a2877111f902574eccf4f174ddb0e8c1"
       },
-      "svg_sha256": "8a58beaaff083e64c82d9033e4e41dec25469f83179da8841a9ced00f62eefb9",
+      "svg_sha256": "a598de7225a14de428ea3215f41880368dedd7902d13e51edb54ffbbaef87fdd",
       "width": 685.62,
       "height": 888.34
     },
@@ -136,7 +136,7 @@
         "app/agents/luma_agent/runtime/media.py": "2491f1eed267ccd8a39c92d67bcadabd5fd09aa04afcb8552a0da8c84e7020c6",
         "app/agents/luma_agent/runtime/recovery.py": "3c51108e0b3c6277eaa6a0746114a43d0938775b101f94c021f937ea96f8e0e7"
       },
-      "svg_sha256": "7237afd5247e24919af4ed9844a98b163292b2dd85914663eb55fcd9d67776f3",
+      "svg_sha256": "bce03c651655e90f0518e22b08b21e1093f254f9ccb768fe0022179fb705e562",
       "width": 1317.98,
       "height": 693.8
     },
@@ -368,14 +368,14 @@
       "source_sha256": "beb8c1d19e66fd5f54cc16936434bbea8e6023b09c3b7314cf1ec321c9431c94",
       "renderer_sha256": "44f5712d92cb37910338d84507da5b3e04fe9603fb0fe445335fa85ef56cffb5",
       "bindings": {
-        "app/backend/luma/features/orders/acceptance.py": "7111bebf2a16e1f547543364053aeb93346e144bfacb8037143e3b777b0f76e2",
+        "app/backend/luma/features/orders/acceptance.py": "dd9c275b2860be8854ee36ef4be1f997e3c45472572a9c61ec082dd45f944223",
         "app/backend/luma/features/orders/service.py": "5b7744582bf91c90a5500850c9a9f31f6e2494fab0edd4fe7ee291ea09485d6b",
         "app/backend/luma/features/orders/management.py": "f45af9806e9930a4cc2af1b2d14ece8441e9a9a76d444b3e824d0e04bde5e74c",
         "app/backend/luma/features/conversations/participation.py": "f0078064965e49dd19d6f56075b56e54a6dd1aa6cc95c707a6942855dda22294",
         "app/backend/luma/features/inventory/ledger.py": "642f3ded1b9c0558c50b3f75dc1878c02a92df7a0659264feac57028e86606c5",
         "supabase/migrations/20261107030000_stock_ledger.sql": "ef33242ec456563ecfae028ec3963cbb481232cc99a2ff8172c93642d69ed3e1"
       },
-      "svg_sha256": "e3a686a77572c03519c2bb5bbf1c8b89107f8162c4e790eaf6e8c711e33a637b",
+      "svg_sha256": "4f0c2f5eb0ac6d7b49544e9ab982b0c62a6349893c8611e253524bb66f05e7aa",
       "width": 1460.96,
       "height": 1029.2
     },
@@ -388,7 +388,7 @@
         "app/backend/luma/features/inventory/ledger.py": "642f3ded1b9c0558c50b3f75dc1878c02a92df7a0659264feac57028e86606c5",
         "supabase/migrations/20261107030000_stock_ledger.sql": "ef33242ec456563ecfae028ec3963cbb481232cc99a2ff8172c93642d69ed3e1"
       },
-      "svg_sha256": "9e75f56c49efbc9829a020e60b7305d828a64526b591c42729b429c23fd9e065",
+      "svg_sha256": "33b46a46ec1b9843b2ca15b2bc68732837c5e10f07192e4c7762e91881821272",
       "width": 911.29,
       "height": 619.8
     },

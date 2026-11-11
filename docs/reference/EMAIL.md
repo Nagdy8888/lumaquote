@@ -53,7 +53,9 @@ Push (`gmail_messages`, at most 5 mails from Apps Script, schema allows 10, body
 `auth_results` (Gmail's `Authentication-Results` header), `body` (plain text, Apps Script sends at
 most 8000 characters), `attachments` (count). The stored event text is the new part of the body
 (`strip_quoted` stops at an `On ... wrote:` line, an Arabic `في ... كتب ...:` line, `>` lines, an
-`Original Message` divider or a `-- ` signature), else the subject, cut to 4000 characters. A mail
+`Original Message` divider, a `-- ` signature or a whole-line mobile client signature such as
+"Sent from my iPhone", "Get Outlook for Android", "Sent from Mail for Windows" or "Sent from Yahoo
+Mail"; a sentence that only mentions a phone is kept), else the subject, cut to 4000 characters. A mail
 with no text but attachments becomes `unsupported` and gets the fixed notice. When a mail has text and
 attachments, the text is processed and a system note records that attachments were not processed.
 
@@ -95,8 +97,9 @@ and plays no part in the decision. `inbound.handle_message` sends the text throu
 `accept_customer_text`, where an exact phrase (`orders.acceptance.parse_answer`) is routed to
 `orders.service.answer_quote` (see [INVENTORY](INVENTORY.md#customer-acceptance-and-orders-task-t3)).
 The sender must already be authenticated and allowlisted. The confirmation notice is an ordinary
-email reply queued through the same gated pull dispatch. A reply with a signature line or a second
-sentence ("Accept, thanks") is not an exact phrase and is treated as ordinary text (re-quote).
+email reply queued through the same gated pull dispatch. "Accept, thanks" and an "Accept" above a
+mobile signature are answers; a reply with a name or company signature line or a second sentence is
+not an exact phrase and is treated as ordinary text (re-quote).
 
 ## Database writes and transactions
 

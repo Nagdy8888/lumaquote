@@ -7,8 +7,8 @@ the application reads stock, and the reservation lifecycle (hold at approval, re
 every exit, the dispatch check and the worker's reconcile) and customer acceptance (the
 pending order a customer's Accept creates) and the staff routes (confirm and cancel orders,
 purchase orders and receipts, adjustments, reorder levels, alerts) and the Excel and Google
-Sheets exports (T5). The UI is a later task (T6); it is listed under
-[Open gaps](#open-gaps) and is not described as working.
+Sheets exports (T5). The staff screens (T6) are described in
+[the Inventory UI section](#inventory-ui-task-t6); they were checked with mocked-API unit tests only.
 
 ## Purpose and ownership
 
@@ -232,7 +232,11 @@ involved. The agent and the worker only record the answer; they cannot confirm a
 on-hand stock. Staff confirm or cancel an order through the T4 routes below.
 
 **Recognizing the answer** (`orders/acceptance.py`, `parse_answer`). Lowercase, trim, collapse
-spaces, strip trailing `.` and `!`; the whole message (at most 40 characters) must equal one phrase.
+spaces (line breaks too), strip trailing `.` and `!`; the message must be at most 60 characters.
+It is matched against the table as is, then once more after dropping one leading and one trailing
+courtesy word (`thanks`, `thank you`, `thx`, `many thanks`, `thanks a lot`), so "Accept, thanks"
+and "Thanks, I accept" accept while "please accept" and "accept, thanks, change qty to 20" do not.
+The remainder (at most 40 characters) must equal one phrase.
 Accept: `accept`, `i accept`, `accepted`, `yes i accept`, `yes, i accept`, `accept quotation`,
 `accept the quotation`, `i accept the quotation`. Decline: `decline`, `i decline`, `declined`,
 `reject`, `no thanks`, `decline quotation`. Plain `yes` is not an acceptance (D46 uses YES to confirm
@@ -626,23 +630,44 @@ cursor), and `open_alerts`.
   `seed_opening` and deletes the ledger rows of its tenant on teardown.
 - Evidence label for these tests: `local` (isolated local Supabase).
 
+## Inventory UI (task T6)
+
+Code: `app/frontend/src/features/inventory/`. The full contract (roles, query keys, dialogs,
+polling, failures) is in [Frontend: Inventory page](FRONTEND.md#inventory-page-order-banner-and-stock-card).
+Summary of how the screens use the API above:
+
+| Screen | API | Who |
+|---|---|---|
+| Stock tab, status chip OK / Low / Out | `GET /api/inventory/stock` (Out: available <= 0; Low: server `low` flag) | any staff |
+| Adjust, Reorder level dialogs | `POST /api/inventory/adjustments`, `/reorder-levels` | admin controls; salesperson never sees them, server 403 otherwise |
+| Movement history drawer | `GET /api/inventory/movements` (cursor `before`) | any staff |
+| Customer orders tab, order banner in the quotation panel | `GET /api/orders[?status=pending]`, `POST /api/orders/{id}/confirm`, `/cancel` | any staff |
+| Purchase orders tab, New and Receive dialogs, Cancel | `GET/POST /api/purchase-orders`, `/receive`, `/cancel` | create, receive, cancel: admin controls |
+| Alerts tab, nav badge, overview stock card | `GET /api/inventory/alerts`, `POST .../acknowledge` | any staff (badge = `counts.total`) |
+| Download Excel, Export to Google Sheets | `GET /api/inventory/export.xlsx`, `POST /api/inventory/sheet-exports`, `GET .../latest` (polled every 5 s while queued or claimed) | any staff |
+
+Every mutation sends a fresh `Idempotency-Key`; the screens refresh stock, orders, alerts,
+purchase orders, the workspace and open conversations from the server after each answer and show
+nothing optimistically. The role comes from the workspace payload (`data.role`); hiding is a
+convenience, the 403 sentence is shown inline if a salesperson ever reaches an admin route.
+
 ## Open gaps
 
 - `stock_reserved` in the hashed quotation content stays `false` by design (see above). PDFs
   stored before T2 keep the old "does not reserve stock" sentence. The review-screen text in
-  `QuoteSummary.tsx` is only reworded; the inventory UI is task T6.
+  `QuoteSummary.tsx` is only reworded.
 - A WhatsApp `failed` delivery receipt does not release at once; reconcile does within a tick.
 - Quotes approved and queued before T2 have no hold and are blocked at dispatch.
 - Release on order cancel and on customer decline is done (T4, T3).
-- Confirm, cancel, acknowledging alerts, purchase orders, adjustments and reorder levels are API
-  routes (T4). They have no screen yet: the status labels `order_pending`, `declined` and
-  `ordered`, the Inventory page and the nav badge are task T6 (the UI falls back to plain text, and
-  the overview counts those conversations as open).
+- Confirm, cancel, acknowledging alerts, purchase orders, adjustments and reorder levels have
+  screens since T6 (see the UI section). The status labels `order_pending`, `declined` and
+  `ordered` exist, and the overview no longer counts those conversations as open.
 - A customer who accepted and then writes ordinary text re-opens nothing: the accepted quotation
   stays, the agent is queued, and its draft is refused with a 409 until staff handle the order.
-- An accept typed with extra words or an email signature ("Accept, thanks") is ordinary text.
-- The UI, including the Download Excel and Export to Google Sheets buttons, is not built (task T6);
-  the exports are API routes (T5).
+- An accept typed with any word beyond one courtesy word, or followed by a signature other than a
+  `-- ` block or a whole-line mobile client line ("Sent from my iPhone"), is ordinary text.
+- The Download Excel and Export to Google Sheets buttons exist (T6). No real-browser, axe or
+  live-data review of the inventory screens has been done.
 - Confirming a pending order whose stock hold was released by some other path is a 409; the
   staff member must cancel the order (there is no "re-reserve" action).
 - A confirmed order queues one customer notice (action key `order-confirmed:<order id>`); a
