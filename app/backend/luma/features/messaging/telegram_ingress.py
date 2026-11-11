@@ -45,7 +45,9 @@ def reduce_callback(query) -> tuple[str, str, dict] | None:
     Accepted only when the button sits on a message in a private chat, the presser is a human
     whose user id equals that chat id, the query id is well formed and `data` is exactly
     `acc:<uuid>` or `dec:<uuid>` (the format `outbound.answer_buttons` sends). The quote id is
-    only a claim: `inbound.handle_message` proves it is the sender's own current quotation.
+    only a claim: `inbound.handle_message` proves it is the sender's own current quotation. The
+    message the button sits on is carried as `message_id` (when it is a positive integer) so the
+    worker can clear the keyboard after answering; `chat_id` is the sender id checked above.
     Anything else (other data, groups, bots, inaccessible messages) is skipped, which still lets
     the offset confirm the update.
     """
@@ -74,6 +76,9 @@ def reduce_callback(query) -> tuple[str, str, dict] | None:
         "quote_id": matched.group(2),
         "callback_id": callback,
     }
+    message_id = message.get("message_id")
+    if isinstance(message_id, int) and not isinstance(message_id, bool) and message_id > 0:
+        event["message_id"] = message_id  # lets the inbox worker remove the buttons once the press is settled
     return identity, "message", event
 
 

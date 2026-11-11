@@ -338,7 +338,7 @@ administrator can ..."). The customer, the agent and the worker can do none of t
 | Method and path | Role | Effect |
 |---|---|---|
 | `GET /api/inventory/stock` | staff | Stock table rows plus `low_count` |
-| `GET /api/inventory/movements?product_id=&limit=&before=` | staff | Newest-first keyset page (limit 1-200, default 50); `next` is an opaque cursor (`<microseconds since 1970>_<uuid>`), pass it back as `before` |
+| `GET /api/inventory/movements?product_id=&limit=&before=` | staff | Newest-first keyset page (limit 1-200, default 50); `next` is an opaque cursor (`<microseconds since 1970>_<uuid>`), pass it back as `before`. Each item also carries `reference`, the human number of the referenced document: `PO-0001` for a `receipt`, `SO-0001` for an `order` or `order_cancel` movement (two left joins on company and id), null for opening and adjustment movements or when the document is gone; `reference_id` stays the raw id |
 | `POST /api/inventory/adjustments` | admin | `ledger.apply_movement(kind='adjustment')`; body `product_id`, `delta` (-100000..100000, not 0), `reason` (3-200) |
 | `POST /api/inventory/reorder-levels` | admin | `ledger.set_reorder_level`; body `product_id`, `reorder_level` 0..100000; no movement |
 | `GET /api/inventory/alerts` | staff | Open stored alerts (shortage, acceptance_refused) with SKU, name, conversation, plus the live low-stock list and counts |
@@ -392,6 +392,11 @@ push cumulative received above ordered is a 409 with nothing written. Each line 
 `received` when every line is complete, else `partially_received`. Cancel is allowed only for
 status `ordered` with zero received (409 otherwise; correct received goods with an adjustment).
 
+**Purchase-order products.** `purchasing.service.create` refuses a product that does not exist in
+the company ("A product on the purchase order does not exist.") and a discontinued one ("Discontinued
+products cannot be ordered: <SKU list>."), both 422 with nothing written and no number consumed. The
+New purchase order dialog hides discontinued products and says so.
+
 **Adjustments and reorder levels** (`inventory/service.py`). An adjustment below the quantity
 reserved for quotations, or below zero, is the ledger's 409; an unknown product is a 404. The
 reason (3-200 characters) is stored on the movement and is not copied into the audit detail.
@@ -415,7 +420,8 @@ returns the stored response. A 429 is not recorded as an operation.
 **Tests.** `tests/integration/test_stock_staff_routes.py` (label `local`): confirm once and
 replay, hold gone, cancel pending and confirmed, list filters, purchase-order partial and full
 receipt, over-receipt, cancel rules, input validation table, adjustments (including below reserved),
-reorder levels and the live low list, movement paging, shortage alert via the real `prepare`,
+reorder levels and the live low list, movement paging, the PO and SO numbers on movements, a
+discontinued product refused on a purchase order, shortage alert via the real `prepare`,
 acknowledge, salesperson 403 on every admin route, salesperson allowed actions, cross-company 404,
 OpenAPI coverage.
 
@@ -643,7 +649,7 @@ Summary of how the screens use the API above:
 | Movement history drawer | `GET /api/inventory/movements` (cursor `before`) | any staff |
 | Customer orders tab, order banner in the quotation panel | `GET /api/orders[?status=pending]`, `POST /api/orders/{id}/confirm`, `/cancel` | any staff |
 | Purchase orders tab, New and Receive dialogs, Cancel | `GET/POST /api/purchase-orders`, `/receive`, `/cancel` | create, receive, cancel: admin controls |
-| Alerts tab, nav badge, overview stock card | `GET /api/inventory/alerts`, `POST .../acknowledge` | any staff (badge = `counts.total`) |
+| Alerts tab, nav badge, overview stock card | `GET /api/inventory/alerts`, `POST .../acknowledge` | any staff (badge and the card's "Open alerts" = `counts.total`; the card's "Low / out of stock" = `counts.low_stock`) |
 | Download Excel, Export to Google Sheets | `GET /api/inventory/export.xlsx`, `POST /api/inventory/sheet-exports`, `GET .../latest` (polled every 5 s while queued or claimed) | any staff |
 
 Every mutation sends a fresh `Idempotency-Key`; the screens refresh stock, orders, alerts,

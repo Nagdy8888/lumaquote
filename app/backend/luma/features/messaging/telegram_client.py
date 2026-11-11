@@ -149,6 +149,26 @@ def answer_callback(callback_id: str, text: str = "") -> bool:
     return True
 
 
+def clear_buttons(chat_id: str, message_id: int) -> bool:
+    """Remove the inline keyboard from one message with `editMessageReplyMarkup`; best effort, True on success.
+
+    Omitting `reply_markup` removes the keyboard (Bot API: the parameter is optional and is an
+    InlineKeyboardMarkup when present). Called after a button press is settled so a stale
+    Accept/Decline cannot be pressed again. Side effect: one Telegram call, never retried and never
+    inside a database transaction. A refusal (for example "message is not modified" when the
+    keyboard is already gone, or a message older than Telegram allows) is swallowed and logged as an
+    opaque code only; chat id, message id, customer text and the token-bearing URL are never logged.
+    """
+    if not (CHAT_ID.fullmatch(chat_id) and isinstance(message_id, int) and message_id > 0):
+        return False
+    try:
+        call("editMessageReplyMarkup", json={"chat_id": int(chat_id), "message_id": message_id})
+    except ProviderError as error:
+        logger.warning("Telegram button removal failed: %s", error.code)
+        return False
+    return True
+
+
 def fetch_media(file_id: str, maximum: int, allowed_mime: tuple[str, ...], declared_mime: str) -> tuple[bytes, str]:
     """Resolve a `file_id` through getFile and download it with type, size and path limits.
 

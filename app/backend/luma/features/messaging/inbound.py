@@ -223,12 +223,18 @@ def process_next() -> bool:
 
 
 def acknowledge_button(row, outcome: str) -> None:
-    """Stop a Telegram button's spinner once its inbox row is settled; best effort, after the commit.
+    """Answer a Telegram button press and clear its keyboard once its inbox row is settled; best effort, after the commit.
 
     Runs outside any database transaction (the row is already finished) and only for a settled
-    `quote_answer` event: "Recorded" when the press was processed, no text otherwise. The call
-    is never retried, and a failure is logged as an opaque code only by the adapter.
+    `quote_answer` event. `answerCallbackQuery` always stops the spinner ("Recorded" when the press
+    was processed, no text otherwise). When the press was processed (`done`: the answer was
+    recorded or an old or forged button was refused and the customer notified), the Accept and
+    Decline buttons are removed from that message with `editMessageReplyMarkup`, so a second press
+    cannot be made; an ignored press (sender not on the allowlist) leaves the message untouched.
+    Neither call is retried, and a failure is logged as an opaque code only by the adapter.
     """
     event = row["payload"]
     if row["kind"] == "message" and event.get("type") == "quote_answer" and event.get("callback_id"):
         telegram_client.answer_callback(event["callback_id"], "Recorded" if outcome == "done" else "")
+        if outcome == "done" and isinstance(event.get("message_id"), int):
+            telegram_client.clear_buttons(event["from"], event["message_id"])

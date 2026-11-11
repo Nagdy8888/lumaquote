@@ -51,7 +51,8 @@ def list_orders(conn, member) -> dict:
 def create(conn, member, user, body) -> dict:
     """Record a purchase order in status `ordered` and return it (admin-only, 403 otherwise).
 
-    Every product must belong to the company (422 otherwise). The number `PO-0001` comes from the
+    Every product must belong to the company and be current, not discontinued (422 otherwise, each
+    with its own sentence; there is no reason to buy a discontinued product). The number `PO-0001` comes from the
     company's serialized counter. Writes `purchase_orders`, `purchase_order_lines` and audit
     `purchase_order.created`; stock is untouched until goods are received.
     """
@@ -59,10 +60,13 @@ def create(conn, member, user, body) -> dict:
     company = member["company_id"]
     wanted = [line.product_id for line in body.lines]
     known = conn.execute(
-        "select id from luma.products where company_id=%s and id=any(%s::uuid[])", (company, wanted)
+        "select id,sku,discontinued from luma.products where company_id=%s and id=any(%s::uuid[])", (company, wanted)
     ).fetchall()
-    if len(known) != len(wanted):
+    if len(known) != len(set(wanted)):
         raise DomainError("A product on the purchase order does not exist.", 422)
+    stopped = sorted(row["sku"] for row in known if row["discontinued"])
+    if stopped:
+        raise DomainError(f"Discontinued products cannot be ordered: {', '.join(stopped)}.", 422)
     order = conn.execute(
         """insert into luma.purchase_orders(id,company_id,number,supplier,expected_on,notes,created_by)
         values(%s,%s,%s,%s,%s,%s,%s) returning id""",

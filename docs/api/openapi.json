@@ -2609,6 +2609,17 @@
             ],
             "title": "Reference Id"
           },
+          "reference": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reference"
+          },
           "reason": {
             "anyOf": [
               {
@@ -2639,6 +2650,7 @@
           "delta",
           "kind",
           "reference_id",
+          "reference",
           "reason",
           "actor",
           "created_at"

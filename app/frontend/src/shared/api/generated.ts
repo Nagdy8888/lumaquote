@@ -1108,6 +1108,8 @@ export interface components {
             kind: "opening" | "adjustment" | "receipt" | "order" | "order_cancel";
             /** Reference Id */
             reference_id: string | null;
+            /** Reference */
+            reference: string | null;
             /** Reason */
             reason: string | null;
             /** Actor */

@@ -339,7 +339,10 @@ count (jobs with status `running` among the 20 newest) from returned stored coll
 "Open conversations" uses `isOpenConversation` (`features/overview/conversationGroups.ts`):
 `quoted`, `order_pending`, `declined` and `ordered` are not open requests (the customer
 answered or the order moved on); `needs_staff` stays open. A stock card below the metric
-strip shows low-stock products, orders to confirm and open alerts and links to `/inventory`.
+strip shows "Low / out of stock" (`counts.low_stock`), "Orders to confirm" and "Open alerts"
+(`counts.total` of `GET /api/inventory/alerts`, the same number as the Inventory nav badge and the Alerts
+tab, so the card never says 0 while the badge says 6) and links to `/inventory`. Two-digit zero padding is
+the overview's own style for every metric.
 It does not invent revenue, conversion improvements or measured hours saved.
 `CatalogPage` presents product/source evidence from workspace data.
 `QuotationsPage` presents stored revisions and their current lifecycle labels.
@@ -385,10 +388,13 @@ returns 403 "administrators only" and the dialogs show that sentence inline if i
   number except zero, reason 3 to 200 characters), `ReorderDialog` (0 to 100000),
   `CancelOrderDialog` (reason 3 to 200), `NewPurchaseOrderDialog` (supplier 1 to 120, optional
   date and notes up to 500, 1 to 100 lines, one per product, quantity 1 to 100000, unit cost 0 to
-  1,000,000 with two decimals; the product picker hides products already on another line),
+  1,000,000 with two decimals; the product picker hides products already on another line and
+  discontinued products, with the helper line "Discontinued products are not listed." shown when any are
+  hidden; the API refuses a discontinued product with a 422 too),
   `ReceiveDialog` (a box per line with units outstanding; a value above the outstanding quantity
   shows "Cannot exceed the N still outstanding." and keeps the button disabled) and
-  `MovementsDrawer` (right-hand drawer, 50 movements per page, "Load older movements"). Focus
+  `MovementsDrawer` (right-hand drawer, 50 movements per page, "Load older movements"; a receipt reads
+  "Supplier receipt · PO-0007" and an order movement "Customer order · SO-0002" from the API's `reference`). Focus
   moves into the dialog on open and back to the trigger on close; Escape closes; every input has
   a label; server errors (409 stock below reserved, 403, 429) are shown inline in `role="alert"`
   with the typed values kept.
@@ -431,7 +437,8 @@ GET, so it carries no key.
 banner or stock card shows nothing or an em dash instead of an invented zero, so an inventory
 outage never blocks the shell. A 429 on the download (10 per minute) is shown beside the buttons.
 
-**Tests and evidence.** Vitest files in `features/inventory/` (stock table rows, chips, filters
+**Tests and evidence.** Vitest files in `features/inventory/` (stock card numbers equal the badge total; movement references; the
+discontinued-products hint; stock table rows, chips, filters
 and role hiding; banner confirm with idempotency key and cache invalidation, server error,
 cancel reason; receive dialog over-receipt refusal and partial receipt; export toolbar queued
 then done by polling; nav badge; purchase tab role hiding and line bounds) and

@@ -20,7 +20,7 @@ const KIND_LABELS: Record<string, string> = {
 /**
  * Newest-first movement history of one product in a right-hand drawer. Inputs: the product `row`
  * (null closes it) and `onClose`. Data: `GET /inventory/movements` paged 50 at a time with a
- * "Load older movements" button. The sign of each change is written (+ or -), not only coloured.
+ * "Load older movements" button. Each row names its source document (`reference`: the purchase order number for a receipt, the order number for an order movement) when the API has one. The sign of each change is written (+ or -), not only coloured.
  */
 function MovementList({ row }: { row: StockRow }) {
   const movements = useMovements(row.product_id);
@@ -43,7 +43,10 @@ function MovementList({ row }: { row: StockRow }) {
               {item.delta > 0 ? `+${item.delta}` : `${item.delta}`}
             </strong>
             <div>
-              <span>{KIND_LABELS[item.kind] ?? item.kind}</span>
+              <span>
+                {KIND_LABELS[item.kind] ?? item.kind}
+                {item.reference ? ` · ${item.reference}` : ""}
+              </span>
               {item.reason && <small>{item.reason}</small>}
               <time dateTime={item.created_at}>
                 {new Date(item.created_at).toLocaleString("en-US", {

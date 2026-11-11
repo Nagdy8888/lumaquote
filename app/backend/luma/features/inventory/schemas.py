@@ -80,6 +80,7 @@ class MovementRow(ResponseModel):
     delta: int
     kind: Literal["opening", "adjustment", "receipt", "order", "order_cancel"]
     reference_id: UUID | None
+    reference: str | None  # PO number for a receipt, SO number for an order movement; null otherwise
     reason: str | None
     actor: str
     created_at: datetime

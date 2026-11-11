@@ -37,6 +37,7 @@ class Bot:
         self.send_error = None
         self.poll_error = None
         self.fail_answer = False
+        self.fail_clear = False
         self.file = {"file_id": "x", "file_unique_id": "u", "file_size": 100, "file_path": "voice/file_1.oga"}
         self.file_bytes = b""
 
@@ -61,6 +62,10 @@ class Bot:
             return httpx.Response(200, json={"ok": True, "result": {"message_id": self.next_message}})
         if method == "answerCallbackQuery":
             if self.fail_answer:
+                return httpx.Response(400, json={"ok": False, "error_code": 400})
+            return httpx.Response(200, json={"ok": True, "result": True})
+        if method == "editMessageReplyMarkup":
+            if self.fail_clear:
                 return httpx.Response(400, json={"ok": False, "error_code": 400})
             return httpx.Response(200, json={"ok": True, "result": True})
         if method == "getFile":

@@ -52,12 +52,19 @@ def movements_page(
     `limit` is clamped to 1..200. `before` is the `next` cursor of the previous page, a
     (created_at, id) pair; rows strictly older are returned, newest first, so concurrent
     inserts never shift a page. Returns {"items": [...], "next": cursor-or-None}. Each item has
-    the movement fields plus the product `sku` and `name`. Read-only, scoped by company.
+    the movement fields plus the product `sku` and `name`, and `reference`: the human number of
+    the referenced document (`PO-0001` for a `receipt`, `SO-0001` for an `order` or `order_cancel`
+    movement), or None when there is no reference or the document no longer exists. Both joins are
+    left joins on (company, id), so one row per movement and no cross-tenant match. Read-only,
+    scoped by company.
     """
     limit = max(1, min(int(limit), 200))
     rows = conn.execute(
-        """select m.id,m.product_id,p.sku,p.name,m.delta,m.kind,m.reference_id,m.reason,m.actor,m.created_at
+        """select m.id,m.product_id,p.sku,p.name,m.delta,m.kind,m.reference_id,m.reason,m.actor,m.created_at,
+        case when m.kind='receipt' then po.number when m.kind in ('order','order_cancel') then so.number end as reference
         from luma.stock_movements m join luma.products p on p.company_id=m.company_id and p.id=m.product_id
+        left join luma.purchase_orders po on po.company_id=m.company_id and po.id=m.reference_id and m.kind='receipt'
+        left join luma.orders so on so.company_id=m.company_id and so.id=m.reference_id and m.kind in ('order','order_cancel')
         where m.company_id=%s and (%s::uuid is null or m.product_id=%s::uuid)
         and (%s::timestamptz is null or (m.created_at,m.id)<(%s::timestamptz,%s::uuid))
         order by m.created_at desc,m.id desc limit %s""",

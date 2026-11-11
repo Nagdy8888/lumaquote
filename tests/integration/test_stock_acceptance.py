@@ -390,7 +390,11 @@ def test_callback_updates_reduce_only_when_well_formed():
         "answer": "accept",
         "quote_id": qid,
         "callback_id": "777",
+        "message_id": 50,
     }
+    odd = callback(13, qid)
+    odd["callback_query"]["message"]["message_id"] = "50"
+    assert "message_id" not in reduce_update(odd)[2]
     assert reduce_update(callback(2, qid, action="dec"))[2]["answer"] == "decline"
     bad_message = callback(3, qid)
     del bad_message["callback_query"]["message"]
@@ -447,6 +451,8 @@ def test_accept_button_creates_the_order_and_answers_the_callback(environment, b
     assert one(conn, "select status from luma.inbox where provider_id='tgcb:cb20'")[0]["status"] == "done"
     [answer] = bot.calls("answerCallbackQuery")
     assert json.loads(answer.content) == {"callback_query_id": "cb20", "text": "Recorded"}
+    [cleared] = bot.calls("editMessageReplyMarkup")
+    assert json.loads(cleared.content) == {"chat_id": int(USER), "message_id": 50}
     assert notices(conn, cid)[-1].startswith("Thank you. Your acceptance of quotation")
     # Telegram redelivers the same press: stored once, no second order.
     bot.updates = [callback(20, qid)]
@@ -465,6 +471,7 @@ def test_decline_button_releases_the_hold(environment, bot, conn):  # noqa: F811
     assert quote_status(conn, qid) == "declined"
     assert reservations(conn, qid) == [("released", "declined")]
     assert one(conn, "select body from luma.messages where provider_id='tgcb:cb30'")[0]["body"] == "[Button] Decline"
+    assert len(bot.calls("editMessageReplyMarkup")) == 1
 
 
 def test_forged_or_old_button_for_another_chats_quote_is_refused(environment, bot, conn):  # noqa: F811
@@ -485,6 +492,7 @@ def test_forged_or_old_button_for_another_chats_quote_is_refused(environment, bo
     assert reasons == ["not_current_quotation"] * 2
     assert REFUSED in notices(conn, cid)
     assert get_detail(env, other_cid)["conversation"]["status"] != "needs_staff"
+    assert len(bot.calls("editMessageReplyMarkup")) == 2  # an old or forged button is cleared too
 
 
 def test_a_button_from_a_user_off_the_allowlist_is_ignored_but_still_answered(environment, bot, conn, monkeypatch):  # noqa: F811
@@ -498,6 +506,7 @@ def test_a_button_from_a_user_off_the_allowlist_is_ignored_but_still_answered(en
     assert (row["status"], row["error_code"]) == ("ignored", "sender_not_allowed")
     assert quote_status(conn, qid) == "approved"
     assert json.loads(bot.calls("answerCallbackQuery")[0].content) == {"callback_query_id": "cb50", "text": ""}
+    assert bot.calls("editMessageReplyMarkup") == []  # an ignored presser leaves the message untouched
 
 
 def test_callback_answer_failure_is_best_effort_and_logs_only_a_code(environment, bot, conn, caplog):  # noqa: F811
@@ -514,6 +523,22 @@ def test_callback_answer_failure_is_best_effort_and_logs_only_a_code(environment
     assert len(bot.calls("answerCallbackQuery")) == 1
     assert "Telegram callback answer failed: telegram_400" in caplog.text
     assert "cb60" not in caplog.text and "123456789" not in caplog.text
+
+
+def test_button_removal_failure_is_best_effort_and_logs_only_a_code(environment, bot, conn, caplog):  # noqa: F811
+    """A failing editMessageReplyMarkup never fails the inbox row, is not retried and leaks neither token nor ids."""
+    env = environment
+    cid, qid = telegram_quote(env, bot)
+    bot.fail_clear = True
+    caplog.set_level("WARNING")
+    bot.updates = [callback(70, qid)]
+    poll_once(None, timeout=0)
+    drain()
+    assert one(conn, "select status from luma.inbox where provider_id='tgcb:cb70'")[0]["status"] == "done"
+    assert quote_status(conn, qid) == "accepted"
+    assert len(bot.calls("editMessageReplyMarkup")) == 1
+    assert "Telegram button removal failed: telegram_400" in caplog.text
+    assert "cb70" not in caplog.text and "123456789" not in caplog.text and USER not in caplog.text
 
 
 # ---- Gmail replies ---------------------------------------------------------------------------
@@ -552,3 +577,4 @@ def test_gmail_reply_with_quoted_history_accepts_the_quotation(environment, scri
     assert order["accepted_via"] == "reply"
     assert reservations(conn, quote["id"]) == [("held", None)]
     assert datetime.now(UTC) - timedelta(minutes=5) < order["accepted_at"]
+

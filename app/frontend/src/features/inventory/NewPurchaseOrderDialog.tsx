@@ -43,7 +43,7 @@ export function lineIsValid(line: DraftLine): boolean {
  * Admin form that records a supplier purchase order: supplier (1 to 120 characters), optional
  * expected date and notes (up to 500), and 1 to 100 lines, each a distinct product with a quantity
  * and unit cost (informational; cost does not value stock). The product picker lists only
- * products not already on another line. Side effects: one idempotent POST; on success the
+ * products not already on another line, and says so when discontinued products are left out (the API refuses them too). Side effects: one idempotent POST; on success the
  * inventory queries refresh and the dialog closes. Errors: the server's sentence is shown inline.
  */
 function NewOrderForm({ onDone }: { onDone: () => void }) {
@@ -57,7 +57,9 @@ function NewOrderForm({ onDone }: { onDone: () => void }) {
   const [lines, setLines] = useState<DraftLine[]>([
     { id: 1, product: "", quantity: "", cost: "" },
   ]);
-  const products = (stock.data?.items ?? []).filter((p) => !p.discontinued);
+  const all = stock.data?.items ?? [];
+  const products = all.filter((p) => !p.discontinued);
+  const hidden = all.length - products.length;
   const valid =
     supplier.trim().length >= 1 &&
     supplier.trim().length <= 120 &&
@@ -122,6 +124,9 @@ function NewOrderForm({ onDone }: { onDone: () => void }) {
       </div>
       <fieldset className="inv-lines-editor">
         <legend>Lines ({lines.length} of {MAX_LINES})</legend>
+        {hidden > 0 && (
+          <p className="inv-hint">Discontinued products are not listed.</p>
+        )}
         {lines.map((line, index) => {
           const taken = new Set(
             lines.filter((other) => other.id !== line.id).map((o) => o.product),

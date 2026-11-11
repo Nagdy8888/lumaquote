@@ -302,6 +302,43 @@ def test_purchase_order_needs_real_products_and_receive_lines_on_the_order(envir
     assert post(env, f"/purchase-orders/{pid}/receive", receive_body(env, [(DL1, 1), (DL1, 1)])).status_code == 422
 
 
+def test_purchase_order_refuses_a_discontinued_product(environment, conn):
+    """A discontinued product cannot be ordered: 422 naming the SKU, nothing is written and no number is used."""
+    env = environment
+    conn.execute("update luma.products set discontinued=true where id=%s", (env["products"][DL2],))
+    conn.commit()
+    refused = post(env, "/purchase-orders", po_body(env, lines=[(DL1, 5, "2.00"), (DL2, 1, "2.00")]))
+    assert refused.status_code == 422
+    assert refused.json()["detail"].startswith("Discontinued products cannot be ordered: ")
+    assert rows(conn, "select 1 from luma.purchase_orders where company_id=%s", env["company"]) == []
+    ok = post(env, "/purchase-orders", po_body(env, lines=[(DL1, 5, "2.00")]))
+    assert ok.status_code == 200 and ok.json()["number"] == "PO-0001"
+
+
+def test_movements_carry_the_po_and_so_numbers(environment, conn):
+    """Receipt movements show the PO number and order and order_cancel movements the SO number; adjustments none."""
+    env = environment
+    pid = post(env, "/purchase-orders", po_body(env, lines=[(DL1, 10, "5.00")])).json()["id"]
+    assert post(env, f"/purchase-orders/{pid}/receive", receive_body(env, [(DL1, 10)])).status_code == 200
+    cid, qid, oid = pending_order(env, conn)
+    assert post(env, f"/orders/{oid}/confirm", {}).status_code == 200
+    assert post(env, f"/orders/{oid}/cancel", {"reason": "Customer changed the project"}).status_code == 200
+    adjust = post(
+        env, "/inventory/adjustments", {"product_id": str(env["products"][DL1]), "delta": 1, "reason": "Recount found one"}
+    )
+    assert adjust.status_code == 200, adjust.text
+    page = get(env, f"/inventory/movements?product_id={env['products'][DL1]}&limit=50").json()
+    seen = {(item["kind"], item["reference"]) for item in page["items"]}
+    assert seen == {
+        ("opening", None),
+        ("receipt", "PO-0001"),
+        ("order", "SO-0001"),
+        ("order_cancel", "SO-0001"),
+        ("adjustment", None),
+    }
+    assert all((item["reference_id"] is None) == (item["reference"] is None) for item in page["items"])
+
+
 # ---------------------------------------------------------------- adjustments and reorder levels
 
 

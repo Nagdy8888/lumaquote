@@ -31,7 +31,7 @@ inbound HTTP endpoint, so there is no webhook signature to forge. The company is
 
 | Module | Role |
 | --- | --- |
-| `messaging/telegram_client.py` | Bot API calls: `getUpdates`, `sendMessage`, `sendDocument` (with optional inline buttons), `answerCallbackQuery`, `getFile` plus the file download; maps failures to `ProviderError` |
+| `messaging/telegram_client.py` | Bot API calls: `getUpdates`, `sendMessage`, `sendDocument` (with optional inline buttons), `answerCallbackQuery`, `editMessageReplyMarkup` (clears the buttons), `getFile` plus the file download; maps failures to `ProviderError` |
 | `messaging/telegram_ingress.py` | `reduce_update` and `reduce_callback` (Update to event) and `poll_once` (fetch, persist, return the confirming offset) |
 | `luma_agent/worker.py` | starts the `poll_telegram` daemon thread when a token and company are configured |
 | `messaging/inbound.py` | same inbox processing as WhatsApp, with `channel` picking the allowlist and conversation channel |
@@ -73,7 +73,10 @@ Fields checked against the Bot API page on 2026-11-08 (R3): `sendDocument.reply_
 optional `message` (a `Message`, or an `InaccessibleMessage` with only `chat`, `message_id`, `date`
 once the message is old) and `data`. `answerCallbackQuery` takes `callback_query_id` and an
 optional `text` of 0-200 characters; Telegram shows a progress bar on the button until it is called.
-`getUpdates.allowed_updates` is a JSON list of update types.
+`getUpdates.allowed_updates` is a JSON list of update types. `editMessageReplyMarkup` (read 2026-11-11)
+takes `chat_id` (Integer or String, required without `inline_message_id`), `message_id` (Integer,
+same rule) and an optional `reply_markup` (`InlineKeyboardMarkup`); omitting `reply_markup`
+removes the inline keyboard, and a bot's own message is answered with the edited `Message`.
 
 - **Send.** A quotation `sendDocument` to a Telegram conversation (`outbound.answer_buttons`) carries
   `reply_markup={"inline_keyboard":[[{"text":"Accept","callback_data":"acc:<quote id>"},
@@ -84,7 +87,8 @@ optional `text` of 0-200 characters; Telegram shows a progress bar on the button
   `private` chat, `from.id` equals `chat.id`, the presser is not a bot, the query id matches
   `[A-Za-z0-9_-]{1,64}` and `data` is exactly `acc:<uuid>` or `dec:<uuid>`. The event is
   `{id: "tgcb:<callback id>", from, name, provider, channel: "telegram", type: "quote_answer",
-  answer, quote_id, callback_id}` and is stored in `luma.inbox` under that id (dedupe on
+  answer, quote_id, callback_id, message_id}` (`message_id` is the id of the message the button
+  sits on, kept only when it is a positive integer) and is stored in `luma.inbox` under that id (dedupe on
   redelivery). Anything else is skipped but still confirmed by the offset.
 - **Processing.** `inbound.handle_message` applies the normal sender allowlist, opens the sender's
   own conversation and calls `participation.accept_quote_button`: rate limit (6 per minute,
@@ -100,6 +104,18 @@ optional `text` of 0-200 characters; Telegram shows a progress bar on the button
   failure logs only `Telegram callback answer failed: <opaque code>`: no callback id, token,
   URL or customer text. A requeued (rate-limited) press is acknowledged when it finally settles; a
   press that is never acknowledged only leaves the spinner running until Telegram times it out.
+- **Clear the buttons.** When the press was processed (inbox row `done`: the answer was recorded,
+  or an old or forged button was refused and the customer got the refusal notice),
+  `inbound.acknowledge_button` then calls `telegram_client.clear_buttons(chat id, message id)`, which
+  sends `editMessageReplyMarkup` with `chat_id` (the presser's id, equal to the chat id) and
+  `message_id` and no `reply_markup`, so the Accept and Decline buttons disappear from that
+  quotation message and cannot be pressed twice. The same rules apply as for the acknowledgement:
+  after the commit, no database transaction, never retried, and a failure (for example the message
+  is too old, was deleted, or the keyboard is already gone: "message is not modified") logs only
+  `Telegram button removal failed: <opaque code>`. A press from a sender off the allowlist
+  (`ignored`) and a press that failed or is requeued leave the message untouched. A press whose
+  update carries no message id leaves its keyboard, and a later press on it is answered by the
+  binding rules above.
 
 ## State transitions
 
@@ -162,7 +178,8 @@ numeric user ids; empty admits nobody), `ENABLE_LIVE_TELEGRAM`. See [configurati
 
 `tests/integration/test_stock_acceptance.py` adds the button tests (callback reduction table,
 buttons in `sendDocument`, accept and decline presses, redelivery, forged and old quote ids, a
-presser off the allowlist, a failing `answerCallbackQuery`). `tests/integration/test_telegram.py` (17 tests, real PostgreSQL and Storage, mock Bot API, label
+presser off the allowlist, a failing `answerCallbackQuery`, the keyboard cleared after accept, decline
+and a refused button but not for an ignored presser, and a failing `editMessageReplyMarkup`). `tests/integration/test_telegram.py` (17 tests, real PostgreSQL and Storage, mock Bot API, label
 `local-substitute`): private-chat reduction and photo choice; persist-before-confirm offsets;
 allowlist; `/start` greeting; voice download into the media pipeline; two hostile-file cases; a
 single send without a window; six failure classes; both gates; exact PDF bytes in `sendDocument`;
@@ -172,8 +189,8 @@ bot. **Not proven:** `sendDocument` with a real PDF, real voice and photo file p
 ## Open gaps
 
 The Accept and Decline buttons are proven only against the mock Bot API; a live press needs the
-running bot (see [morning actions](../MORNING_ACTIONS.md)). The keyboard stays on the old message after
-an answer (it is not edited away), so a later press is answered by the binding rules above.
+running bot (see [morning actions](../MORNING_ACTIONS.md)), including the keyboard removal. If
+Telegram refuses the removal the keyboard stays, and a later press is answered by the binding rules above.
 The offset is not persisted, so a restart re-reads (and deduplicates) unconfirmed updates. Only
 private chats are supported. Captions on photos and voice notes are ignored, as for WhatsApp. No
 read state is shown for Telegram sends.
