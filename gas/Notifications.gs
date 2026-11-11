@@ -20,7 +20,7 @@ function notifySupplierEdit(event) {
   if (!event || !event.source || !event.range) throw new Error('An installable spreadsheet edit event is required.');
   var config = configuration_();
   if (event.source.getId() !== config.spreadsheetId) throw new Error('Unexpected workbook.');
-  var allowed = ['Products', 'Prices', 'Inventory', 'Policies'];
+  var allowed = ['Products', 'Prices', 'Policies'];
   if (allowed.indexOf(event.range.getSheet().getName()) < 0) return;
   var payload = JSON.stringify({ schema_version: 1, company_id: config.companyId,
     spreadsheet_id: config.spreadsheetId, timestamp: Math.floor(Date.now() / 1000),

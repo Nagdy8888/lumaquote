@@ -157,3 +157,78 @@ engine alone is not proof Auth/Storage are ready.
 and the separate Smart RAG project's resources intact. For a failed Docker/WSL
 engine, inspect the historical recovery notes; do not factory-reset Docker,
 delete a VHDX or rewrite migrations as a routine workaround.
+
+### Local sign-in fails while Windows reserves the Supabase ports
+
+The current sign-in form uses one generic credential-error message for all
+Supabase Auth failures, including an unreachable local service. That message
+does not establish that the password is wrong. The native API's `/api/health`
+checks only its process; HTTP 200 there does not prove Auth or PostgreSQL is up.
+The browser signs in against `VITE_SUPABASE_URL`, normally loopback port 55321.
+
+First check Docker/container status, reachability of port 55321 and
+`netsh interface ipv4 show excludedportrange protocol=tcp`. An excluded range
+such as 55320-55419 covers this project's database and gateway ports, even if
+the Docker engine itself is available. Confirm the failure through
+`npm run db:start` and its private startup log: unavailable ports plus a Windows
+socket access-permission error on 55322 identify this collision. An inaccessible
+service cannot validate the staff password, so do not reset accounts as a first repair.
+
+For this diagnosed collision, an operator can try the following in **PowerShell
+as Administrator**, from the project root. Stopping WinNAT briefly interrupts
+container networking; the `finally` block restores it even if startup fails.
+This is a recovery attempt, not a guarantee that every Windows port exclusion
+is owned by WinNAT. If stopping the service fails, resolve that permission/error
+before continuing; do not disable firewall rules or change account privileges.
+
+```powershell
+Stop-Service -Name winnat -ErrorAction Stop
+try {
+  npm.cmd run db:start
+} finally {
+  Start-Service -Name winnat
+}
+```
+
+The npm helper starts this project's stack, preserves named volumes and restricts
+published ports to loopback. It keeps CLI output containing keys in ignored
+`supabase/.temp/start.log`; never paste that whole file. No database reset,
+port renumbering, migrations or password changes are required by this procedure.
+After startup, verify Auth readiness and retry the existing staff credentials
+privately. If the service is reachable but rejects them, investigate the actual
+Auth response separately. A non-administrator session can diagnose the collision
+but must leave elevated recovery and subsequent sign-in verification pending.
+
+References: [local Supabase prerequisites](https://supabase.com/docs/guides/local-development),
+[Stop-Service](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.management/stop-service?view=powershell-5.1)
+and [Start-Service](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.management/start-service?view=powershell-5.1).
+
+### Auth succeeds but the workspace request fails
+
+Separate the browser's Supabase sign-in from the authenticated staff API request
+to `/api/workspace`. The workspace can return HTTP 500 even when Auth and all
+Supabase containers are healthy. A plain-text error becomes the frontend's
+generic request-failed message; it does not identify an incorrect password.
+Check the authenticated response both on API port 8001 and through the frontend
+proxy on 5173. Report status/shape only; never print a bearer token or workspace
+records while diagnosing it.
+
+The native Windows API command deliberately omits reload. It retains the routes,
+query code, response models and cached settings imported when that process
+started. Restarting Vite does not refresh them. After switching branches or
+changing backend code, compare the running `/openapi.json` with current routes.
+An older route inventory and a successful workspace read using freshly imported
+current code identify a stale process rather than a need to reset data/accounts.
+
+Restart only this checkout's staff API, using `npm run dev:api` from the project
+root. Verify the executable, application (`luma.main:app`) and port 8001 before
+stopping a background instance; Windows can have a virtual-environment launcher
+and a child Python process. The Google gateway on 8002 and the worker are separate
+processes and do not need restarting for this case. Keep the existing restricted
+database identities and authorization checks.
+
+Verify existing staff sign-in, authenticated workspace HTTP 200 through both
+origins, then the browser's visible `#workspace-main` without its failure alert.
+Use the workspace's **Try again** button or refresh the page after recovery.
+This bounded read-only check does not establish readiness of unrelated inventory,
+provider or release workflows. An API health response alone is insufficient.

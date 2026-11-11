@@ -10,6 +10,7 @@ import pytest
 from fastapi.testclient import TestClient
 from langgraph.checkpoint.postgres import PostgresSaver
 from luma.core.config import settings
+from luma.features.inventory.ledger import seed_opening
 from luma.main import app
 from psycopg.conninfo import conninfo_to_dict
 from psycopg.rows import dict_row
@@ -84,10 +85,11 @@ def environment(monkeypatch):
                 pid = uuid4()
                 products.append(pid)
                 conn.execute(
-                    """insert into luma.products(id,company_id,sku,name,family,description,watts,lumens,cct,ip_rating,price,available,source_id,page,snapshot_id)
-                    values(%s,%s,%s,'Synthetic downlight','Downlights','Synthetic test evidence',18,1800,4000,'IP44',%s,%s,%s,1,%s)""",
-                    (pid, company, sku, price, available, source, snapshot),
+                    """insert into luma.products(id,company_id,sku,name,family,description,watts,lumens,cct,ip_rating,price,source_id,page,snapshot_id)
+                    values(%s,%s,%s,'Synthetic downlight','Downlights','Synthetic test evidence',18,1800,4000,'IP44',%s,%s,1,%s)""",
+                    (pid, company, sku, price, source, snapshot),
                 )
+                seed_opening(conn, company, pid, available, "test")
         files = []
         with TestClient(app) as api:
             yield TestEnvironment(
@@ -156,9 +158,19 @@ def environment(monkeypatch):
                 "media",
                 "messages",
                 "drive_exports",
+                "sheet_exports",
+                "stock_alerts",
+                "order_lines",
+                "orders",
+                "stock_reservations",
                 "quotes",
                 "conversations",
                 "catalog_embeddings",
+                "purchase_order_lines",
+                "purchase_orders",
+                "stock_movements",
+                "stock_levels",
+                "document_counters",
                 "products",
                 "sources",
                 "snapshots",

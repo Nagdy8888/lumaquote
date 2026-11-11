@@ -9,7 +9,8 @@ Policy (from the approved plan):
 - Runtime media (private original and normalized objects): deleted after 7 days. The row is kept with
   `purged_at`; its transcript/reading text is business data and follows the 90-day rule below.
 - Business data: a conversation idle for more than 90 days is deleted with its messages, quotes,
-  approvals, outbox, jobs, Drive exports, media rows, idempotency responses (they embed the
+  approvals, stock reservations (held ones are released first so `reserved` stays equal to the held
+  total, decision D49), outbox, jobs, Drive exports, media rows, idempotency responses (they embed the
   conversation), quote PDFs, private media and LangGraph checkpoint thread. A conversation with unfinished work (queued/running jobs, queued/submitting sends)
   is skipped and reported. Audit events and WhatsApp inbox rows older than 90 days are deleted.
 - Preserved on purpose: `luma.usage` (financial/budget accounting holds only opaque ids and amounts)
@@ -28,6 +29,7 @@ import psycopg
 from langgraph.checkpoint.postgres import PostgresSaver
 from luma.core.config import settings
 from luma.core.storage import delete_files
+from luma.features.inventory import ledger
 from psycopg.conninfo import conninfo_to_dict
 from psycopg.rows import dict_row
 
@@ -67,11 +69,16 @@ def purge_media(conn, company: UUID, now: datetime, execute: bool) -> dict:
 
 
 def idle_conversations(conn, company: UUID, now: datetime) -> tuple[list[UUID], list[UUID]]:
-    """Split conversations idle for 90+ days into (deletable, skipped because work is unfinished)."""
+    """Split conversations idle for 90+ days into (deletable, skipped because work is unfinished).
+
+    A conversation with an order is always skipped: an order is a business record that references
+    its conversation and quotation (decision D49), so retention never deletes it.
+    """
     rows = conn.execute(
         """select c.id,
         exists(select 1 from luma.jobs j where j.conversation_id=c.id and j.status in ('queued','running'))
         or exists(select 1 from luma.outbox o where o.conversation_id=c.id and o.status in ('queued','submitting'))
+        or exists(select 1 from luma.orders od where od.conversation_id=c.id)
         or exists(select 1 from luma.drive_exports d join luma.quotes q on q.id=d.quote_id and q.company_id=d.company_id
                   where q.conversation_id=c.id and d.status in ('queued','claimed')) as busy
         from luma.conversations c where c.company_id=%s and c.updated_at < %s""",
@@ -95,10 +102,14 @@ def purge_conversations(conn, company: UUID, ids: list[UUID], execute: bool) -> 
         p for row in media for p in (row["original_path"], row["normalized_path"]) if p
     ]
     if execute:
+        for quote in quotes:
+            ledger.release_quote(conn, company, quote, "retention")
         statements = [
             ("delete from luma.operations where company_id=%s and split_part(action,':',2)=any(%s)", None),
             ("delete from luma.drive_exports where quote_id=any(%s)", quotes),
             ("delete from luma.approvals where quote_id=any(%s)", quotes),
+            ("delete from luma.stock_reservations where quote_id=any(%s)", quotes),
+            ("delete from luma.stock_alerts where conversation_id=any(%s)", ids),
             ("delete from luma.outbox where conversation_id=any(%s)", ids),
             ("delete from luma.jobs where conversation_id=any(%s)", ids),
             ("delete from luma.media where conversation_id=any(%s)", ids),

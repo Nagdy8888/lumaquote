@@ -34,7 +34,10 @@ class ConversationView(BaseModel):
 
 
 class ProductView(BaseModel):
-    """Validated catalog and commercial snapshot fields; embeddings are never sent to the UI."""
+    """Validated catalog and commercial snapshot fields; embeddings are never sent to the UI.
+
+    `available` is on hand minus reserved from the stock ledger, not a stored product column.
+    """
 
     id: UUID
     sku: str

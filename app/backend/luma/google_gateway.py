@@ -3,7 +3,8 @@
 Routes: signed Google callbacks, the Meta webhook (`/webhooks/whatsapp`), the Twilio webhooks
 (`/webhooks/twilio`, `/webhooks/twilio/status`) and the HMAC-signed, expiring quotation PDF
 link Twilio fetches (`/media/quotations/...`), and the signed Apps Script Gmail endpoints
-(`/callbacks/google/mail/inbound|claim|receipt`, D47). Each route refuses work unless configured.
+(`/callbacks/google/mail/inbound|claim|receipt`, D47) and the signed stock-export pull for Sheets
+(`/callbacks/google/stock/claim|receipt`, D49). Each route refuses work unless configured.
 """
 
 from fastapi import FastAPI

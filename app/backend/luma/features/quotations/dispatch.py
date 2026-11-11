@@ -7,7 +7,11 @@ from .rules import assert_dispatchable
 
 
 def check_quotation(conn, item, current):
-    """Verify this immutable quotation's exact approval, active approver, recipient, expiry, and current commercial snapshot."""
+    """Verify this immutable quotation's exact approval, active approver, recipient, expiry, current commercial snapshot and held stock.
+
+    The quote row is locked first. Stock is proved by the quotation's own `held` reservations
+    (`check_snapshot(dispatch=True)`), not by available stock, which the hold itself lowered.
+    """
     quote = None
     if item["quote_id"]:
         quote = conn.execute(
@@ -26,5 +30,5 @@ def check_quotation(conn, item, current):
         if not allowed:
             raise DomainError("Approver no longer has active staff access.")
         assert_dispatchable(quote, approval, current, datetime.now(UTC))
-        check_snapshot(conn, quote, current)
+        check_snapshot(conn, quote, current, dispatch=True)
     return quote

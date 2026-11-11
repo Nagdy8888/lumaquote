@@ -132,10 +132,10 @@ def ready() -> bool:
     return bool(config.whatsapp_token.get_secret_value() and config.whatsapp_phone_id)
 
 
-def send_pdf(to: str, data: bytes, filename: str, caption: str, reference: str) -> str:
+def send_pdf(to: str, data: bytes, filename: str, caption: str, reference: str, buttons=None) -> str:
     """Upload the PDF, then send it as a document; an upload failure is a definite non-send.
 
-    `reference` (the outbox id) is unused by Graph, which accepts uploaded bytes; it exists so
+    `buttons` is ignored (only Telegram attaches inline buttons). `reference` (the outbox id) is unused by Graph, which accepts uploaded bytes; it exists so
     both providers share one signature. Upload errors are re-raised as `rejected` with an
     `upload_` code because no message can have reached the customer before the send call.
     """

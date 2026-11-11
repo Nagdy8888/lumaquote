@@ -39,15 +39,15 @@ function readSupplierTable_(book, name) {
 function synchronizeSupplierWorkbook() {
   var config = configuration_();
   var lock = LockService.getScriptLock();
-  if (!lock.tryLock(1000)) throw new Error('Supplier synchronization is already running; retry after it completes.');
+  lock.waitLock(LOCK_WAIT_MS);
   try {
     var book = SpreadsheetApp.openById(config.spreadsheetId);
     var tables = {};
-    ['Products', 'Prices', 'Inventory', 'Policies'].forEach(function collectTable_(name) {
-      /** Read only the four configured supplier input tables, never quotation/customer tabs. */
+    ['Products', 'Prices', 'Policies'].forEach(function collectTable_(name) {
+      /** Read only the three configured supplier input tables (stock is owned by the web app, D49), never quotation/customer tabs. */
       tables[name] = readSupplierTable_(book, name);
     });
-    ['Products', 'Prices', 'Inventory', 'Policies'].forEach(function confirmStableRead_(name) {
+    ['Products', 'Prices', 'Policies'].forEach(function confirmStableRead_(name) {
       /** Detect edits across the sequential table reads; retry on the next trigger instead of pushing mixed records. */
       if (JSON.stringify(tables[name]) !== JSON.stringify(readSupplierTable_(book, name))) {
         throw new Error('Supplier tables changed during synchronization; retry after the edit completes.');

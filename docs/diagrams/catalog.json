@@ -223,6 +223,22 @@
       ]
     },
     {
+      "id": "stock-sheet-export",
+      "title": "Stock export to Google Sheets, pulled by Apps Script",
+      "scope": "Queue, signed claim, tab write and receipt of the stock export (task T5); backend protocol locally tested with a Python stand-in, Apps Script run in Google unverified",
+      "embeds": [
+        "docs/reference/INVENTORY.md"
+      ],
+      "bindings": [
+        "gas/Stock.gs",
+        "gas/Exports.gs",
+        "app/backend/luma/features/google_sync/stock_exports.py",
+        "app/backend/luma/features/inventory/sheet_queue.py",
+        "app/backend/luma/features/inventory/exports.py",
+        "supabase/migrations/20261108010000_sheet_export_attempts.sql"
+      ]
+    },
+    {
       "id": "verification-scope",
       "title": "Offline, local integration and explicit live evidence boundaries",
       "scope": "Actual runner/CI responsibilities, not a claim that every gate passed in this task",
@@ -373,6 +389,36 @@
         "app/backend/luma/core/database.py",
         "app/backend/luma/core/storage.py",
         "app/agents/luma_agent/runtime/conversations.py"
+      ]
+    },
+    {
+      "id": "order-lifecycle",
+      "title": "Quotation answer and order lifecycle with stock holds",
+      "scope": "Accept, decline, expiry, pending order (task T3) and staff confirm and cancel with their stock effect (task T4); local tests only.",
+      "embeds": [
+        "docs/reference/INVENTORY.md"
+      ],
+      "bindings": [
+        "app/backend/luma/features/orders/acceptance.py",
+        "app/backend/luma/features/orders/service.py",
+        "app/backend/luma/features/orders/management.py",
+        "app/backend/luma/features/conversations/participation.py",
+        "app/backend/luma/features/inventory/ledger.py",
+        "supabase/migrations/20261107030000_stock_ledger.sql"
+      ]
+    },
+    {
+      "id": "purchase-order-lifecycle",
+      "title": "Supplier purchase order lifecycle",
+      "scope": "Create, partial and full receipt, and cancel of supplier purchase orders (task T4); administrator-only, local tests only.",
+      "embeds": [
+        "docs/reference/INVENTORY.md"
+      ],
+      "bindings": [
+        "app/backend/luma/features/purchasing/service.py",
+        "app/backend/luma/features/purchasing/routes.py",
+        "app/backend/luma/features/inventory/ledger.py",
+        "supabase/migrations/20261107030000_stock_ledger.sql"
       ]
     },
     {

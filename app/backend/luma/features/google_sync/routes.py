@@ -8,6 +8,7 @@ from luma.core.errors import DomainError
 from .callbacks import accept_hint, verify_hint
 from .exports import claim_export, record_receipt
 from .snapshots import receive_snapshot
+from .stock_exports import claim_stock_export, record_stock_receipt
 
 router = APIRouter()
 
@@ -67,3 +68,17 @@ async def drive_export_receipt(request: Request):
     """Record the signed outcome of one claimed export; the digest must equal the canonical PDF's (body at most 2 KiB)."""
     body, signature = await signed_body(request, 2048)
     return await run_in_threadpool(record_receipt, body, signature)
+
+
+@router.post("/callbacks/google/stock/claim")
+async def stock_export_claim(request: Request):
+    """Lease the next queued stock export, with its three tabs of rows, to the signed Apps Script poller (body at most 1 KiB)."""
+    body, signature = await signed_body(request, 1024)
+    return await run_in_threadpool(claim_stock_export, body, signature)
+
+
+@router.post("/callbacks/google/stock/receipt")
+async def stock_export_receipt(request: Request):
+    """Record the signed outcome of one claimed stock export: row counts when stored, a short code when failed (body at most 2 KiB)."""
+    body, signature = await signed_body(request, 2048)
+    return await run_in_threadpool(record_stock_receipt, body, signature)

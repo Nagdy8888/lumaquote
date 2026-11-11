@@ -151,6 +151,16 @@ order. Unsupported types (stickers, documents, locations) get a fixed notice.
    known message id can be reconciled. An `unknown` send with no message id cannot be matched to a
    receipt and needs staff review.
 
+Accept or decline (D49): the quotation caption ends with "Reply ACCEPT to accept or DECLINE to
+decline." WhatsApp has no buttons in this app, so the customer types the answer. The text goes
+through `accept_customer_text`, which routes an exact phrase (`orders.acceptance.parse_answer`; a
+plain "yes" is not one) to `orders.service.answer_quote` instead of superseding the offer. The
+answer binds only the newest sent, approved, unexpired quotation of that sender's own conversation;
+otherwise the fixed refusal notice is queued and staff get an alert. The confirmation notices are
+ordinary fixed replies, so they obey the same gates, including the 24-hour service window: a
+customer who answers is inside it by definition. Details: [INVENTORY](INVENTORY.md#customer-acceptance-and-orders-task-t3).
+Twilio (D43) sends the same caption text; its `send_pdf` accepts and ignores the Telegram-only `buttons` argument.
+
 Takeover boundary: a takeover after step 2's commit cannot recall a call already in flight, so the
 message may still reach the customer; the audit events and status record what happened.
 

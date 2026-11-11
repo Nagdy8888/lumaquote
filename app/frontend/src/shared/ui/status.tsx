@@ -23,6 +23,10 @@ const labels: Record<string, string> = {
   submitted: "Submitted",
   delivered: "Delivered",
   rejected: "Rejected",
+  accepted: "Customer accepted",
+  declined: "Customer declined",
+  order_pending: "Order to confirm",
+  ordered: "Order confirmed",
 };
 
 /** Render an explicit textual status; a provider submission is never relabeled as customer delivery. */

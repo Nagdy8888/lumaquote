@@ -32,7 +32,7 @@ sequenceDiagram
     API-->>GAS: 202 pending, not imported
   end
   GAS->>GAS: Acquire script lock
-  GAS->>Sheet: Read four bounded value-only tables twice
+  GAS->>Sheet: Read three bounded value-only tables twice
   Sheet-->>GAS: Complete records or unstable-read failure
   GAS->>API: HMAC signed full snapshot and observation time
   API->>API: Check signature, mapping, timestamp and schema
@@ -61,8 +61,10 @@ does not need a Google OAuth client/refresh token. GAS still needs the user's
 Google authorization for its declared scopes; Apps Script-only does not mean
 anonymous access to Sheets.
 
-The workbook supplies commercial prices, observed stock and allowed product policy
-fields. Independently ingested catalog evidence supplies supported specifications.
+The workbook supplies commercial prices and allowed product policy fields. Since D49 it
+no longer supplies stock: the `Inventory` table is optional and ignored (an older Apps Script may
+still send it; it is accepted but never validated, hashed into the snapshot digest or stored), and
+stock lives in the web app's ledger (see [Inventory](INVENTORY.md)). Independently ingested catalog evidence supplies supported specifications.
 The receiver cannot treat a newly typed SKU/specification as automatically backed
 by a PDF. Quotes, approvals and delivery states remain backend-owned.
 
@@ -85,6 +87,9 @@ it authenticates exact callback bytes with the configured shared HMAC secret.
   reads, signs a full snapshot and manages the owned approximate one-minute timer.
 - `Exports.gs`: pull-based Drive export poller (see the Drive export section). It
   needs the added `drive` scope and a private folder id in `LUMA_DRIVE_FOLDER_ID`.
+- `Stock.gs`: stock export to Google Sheets (D49): claims a queued export and writes only the
+  `Stock`, `Customer Orders` and `Purchase Orders` tabs (see the stock export section). Called
+  by the same one-minute trigger as the Drive export (`exportApprovedQuotations`).
 - `Mail.gs`: Gmail channel (D47): pushes mails under one label and sends queued replies; see
   [email channel](EMAIL.md). It needs the added `https://mail.google.com/` and `userinfo.email` scopes.
 - `appsscript.json`: V8, Africa/Cairo timezone and Sheets, Drive, Gmail, script-trigger and
@@ -124,7 +129,8 @@ per company is counted under the same lock. This acknowledgment is not imported
 price data and must not refresh commercial freshness.
 
 `POST /callbacks/google/snapshot` accepts at most 512 KiB and the
-`supplier_snapshot` event with complete Products, Prices, Inventory and Policies.
+`supplier_snapshot` event with complete Products, Prices and Policies (an optional `Inventory`
+list of at most 1,000 rows is accepted and ignored, D49).
 It caps at 30 new snapshots/minute per company. Database work has a five-second
 statement timeout and failures return unavailable rather than accepted. The HTTP
 routes enforce actual bytes, but do not currently implement the staff media
@@ -136,16 +142,16 @@ abuse or deployment policy.
 
 ## Whole-snapshot validation
 
-Schemas reject unknown fields. Product/price/inventory tables each contain
+Schemas reject unknown fields. Product and price tables each contain
 1..1,000 records; policies contain 1..50. Each table must have unique stable keys,
-and the three SKU sets must be identical. Backend catalog SKU set must also match
+and the two SKU sets must be identical. An edit to `Inventory` neither fails
+validation nor changes the digest, so it never creates a new snapshot id. Backend catalog SKU set must also match
 exactly: a partial snapshot cannot quietly drop existing products.
 
 Product name/family/watts/lumens/CCT/IP must match already ingested catalog records.
 Input pack size and discontinued state can update as validated policy fields.
-Stock is a bounded nonnegative strict integer; prices are finite nonnegative USD
-decimals with at most two decimal places and no future effective date in Cairo.
-Location is recorded input, not a delivery guarantee or stock reservation.
+Prices are finite nonnegative USD decimals with at most two decimal places and no future
+effective date in Cairo. Stock and location are not read (D49).
 
 Policies must contain exactly the approved values and primitive types: synthetic
 dataset disclosure, USD, tax excluded, seven-day validity, max admin discount 10,
@@ -260,6 +266,30 @@ Not covered: no staff UI shows export state or retries a blocked row (use the ta
 audit events `drive_export.done|failed|blocked`), the poller's Drive calls have only run
 in a Python stand-in, and the live Google run, folder sharing and tunnel are account
 actions in `docs/MORNING_ACTIONS.md`.
+
+## Stock export to Google Sheets
+
+The web app is the stock master (D49); the workbook receives a read-only copy. A staff member
+presses Export to Google Sheets, which queues one `luma.sheet_exports` row. Apps Script pulls it
+with the same signed protocol as the Drive export (envelope `extra="forbid"`, HMAC, five-minute
+window, nonce replay refused, company and workbook binding, 120 new envelopes per company per
+minute, lease and claim token):
+
+- `POST /callbacks/google/stock/claim` (event `stock_export_claim`, at most 1 KiB) leases the oldest
+  queued export, or one whose 5-minute lease expired, for at most 5 attempts, and returns
+  `{"status": "claimed", "export_id", "claim_token", "tabs", "truncated"}` or `{"status": "idle"}`.
+  `tabs` holds `Stock`, `Customer Orders` and `Purchase Orders` as header row plus data rows
+  (at most 5,000 per tab); every text cell passed through `safe_text`.
+- `POST /callbacks/google/stock/receipt` (event `stock_export_receipt`, at most 2 KiB) reports
+  `stored` with row counts or `failed` with a short code; only the current claim token may report.
+  Failures requeue until 5 attempts, then the export is `failed`.
+
+`gas/Stock.gs` writes only those three tabs (plain-text format set before the values, bold frozen
+header) and never touches `Products`, `Prices`, `Policies`, `Inventory` or `Quote Register`. The full
+contract, columns, guard, failures and tests are in
+[Inventory](INVENTORY.md#excel-and-google-sheets-export-task-t5), with the sequence diagram there.
+Backend protocol is locally tested with a Python stand-in; the script has not run in Google (live
+step in `docs/MORNING_ACTIONS.md`).
 
 ## Trigger/reconciliation limitations
 

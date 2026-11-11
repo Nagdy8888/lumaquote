@@ -80,7 +80,7 @@ def send_text(to: str, body: str) -> str:
     raise ProviderError("rejected", "email_is_pulled")
 
 
-def send_pdf(to: str, data: bytes, filename: str, caption: str, reference: str) -> str:
+def send_pdf(to: str, data: bytes, filename: str, caption: str, reference: str, buttons=None) -> str:
     """Email is pulled by Apps Script; a direct send is a programming error, reported as a refusal."""
     raise ProviderError("rejected", "email_is_pulled")
 
@@ -121,7 +121,13 @@ def queue(conn, plan: dict) -> None:
 
 
 def sweep(conn, company) -> None:
-    """Expire leases (claimed -> unknown) and uncollected rows (24 h -> failed) and mirror them on the outbox."""
+    """Expire leases (claimed -> unknown) and uncollected rows (24 h -> failed) and mirror them on the outbox.
+
+    An uncollected quotation mail (`failed`) never left Gmail, so its stock reservation is released
+    (reason `delivery_failed`, D49). An expired lease (`unknown`) may have been sent and keeps the hold.
+    """
+    from .outbound import release_hold  # outbound imports provider, which imports this module
+
     for status, code, condition in (
         ("unknown", "mail_receipt_missing", "status='claimed' and lease_until < now()"),
         ("failed", "mail_not_collected", "status='waiting' and created_at < now() - interval '24 hours'"),
@@ -132,11 +138,13 @@ def sweep(conn, company) -> None:
             (status, code, company),
         ).fetchall()
         for row in rows:
-            conn.execute(
+            item = conn.execute(
                 """update luma.outbox set status=%s,error_code=%s,updated_at=now()
-                where id=%s and status='submitting'""",
+                where id=%s and status='submitting' returning id,company_id,quote_id""",
                 (status, code, row["outbox_id"]),
-            )
+            ).fetchone()
+            if item and status == "failed":
+                release_hold(conn, item, "delivery_failed")
             audit(conn, company, ACTOR, f"delivery.{status}", row["outbox_id"])
 
 
@@ -144,8 +152,11 @@ def claim_mail(body: bytes, signature: str) -> dict:
     """Lease the next waiting reply to Apps Script, or return `{"mail": None}` when nothing is due.
 
     The outbox must still be `submitting`; otherwise the row is failed (`outbox_changed`) and
-    skipped. A quotation reply carries the canonical stored PDF (at most 5 MiB) and its SHA-256.
+    skipped. A quotation reply carries the canonical stored PDF (at most 5 MiB) and its SHA-256;
+    a larger one fails the intent and releases the quotation's stock reservation (D49).
     """
+    from .outbound import release_hold  # outbound imports provider, which imports this module
+
     claim = verify_envelope(MailClaim, body, signature)
     try:
         with database(worker=True) as conn:
@@ -186,6 +197,7 @@ def claim_mail(body: bytes, signature: str) -> dict:
                         "update luma.outbox set status='failed',error_code='pdf_too_large',updated_at=now() where id=%s",
                         (row["outbox_id"],),
                     )
+                    release_hold(conn, {"company_id": claim.company_id, "quote_id": row["quote_id"]}, "delivery_failed")
                     return {"mail": None}
                 attachment = {
                     "filename": drive_filename(quote),

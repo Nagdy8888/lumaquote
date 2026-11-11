@@ -18,6 +18,7 @@ from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer
 from luma.core.config import ROOT, settings
 from luma.core.contracts import digest
 from luma.core.storage import put_file
+from luma.features.inventory.ledger import seed_opening
 
 NAMESPACE = UUID("19a71aa1-1970-4525-ad66-77eda4770091")
 COMPANY = uuid5(NAMESPACE, "luma-company")
@@ -136,8 +137,8 @@ def main():
                 description = f"{light} lm, {ip}, {cct}K. Fictional technical data; electrical compatibility requires staff confirmation."
                 conn.execute(
                     """insert into luma.products(id,company_id,sku,name,family,description,watts,lumens,cct,
-                    ip_rating,price,available,discontinued,source_id,page,snapshot_id)
-                    values(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,1,%s) on conflict do nothing""",
+                    ip_rating,price,discontinued,source_id,page,snapshot_id)
+                    values(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,1,%s) on conflict do nothing""",
                     (
                         stable(sku),
                         COMPANY,
@@ -150,12 +151,13 @@ def main():
                         cct,
                         ip,
                         price,
-                        0 if i == 10 else 180 - i * 9,
                         i == 11,
                         sid,
                         snapshot,
                     ),
                 )
+                # Opening stock enters the ledger once; a rerun leaves the current stock alone.
+                seed_opening(conn, COMPANY, stable(sku), 0 if i == 10 else 180 - i * 9, "seed")
                 story.extend(
                     [
                         Paragraph(sku + " / " + name, styles["Heading3"]),

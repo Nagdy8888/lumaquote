@@ -1,13 +1,13 @@
 sequenceDiagram
   accTitle: Exact quotation review and revalidated local delivery
-  accDescr: The backend creates immutable canonical content, staff approves that revision, and the worker rechecks ownership, approval, expiry and commercial evidence before the local effect.
+  accDescr: The backend creates immutable canonical content, staff approves that revision and the approval holds its stock in the same transaction, and the worker rechecks ownership, approval, expiry, commercial evidence and the held stock before the local effect. Blocked, failed, superseded and expired quotes release the hold.
   actor Staff as Salesperson
   participant API as Staff API
   participant DB as PostgreSQL
   participant W as Outbox worker
   Staff->>API: Save selections and expected conversation version
   API->>DB: Lock conversation, read current products and snapshot
-  API->>DB: Insert canonical revision and hash, supersede old offer
+  API->>DB: Insert canonical revision and hash, supersede old offer and release its stock hold
   DB-->>API: Commit reviewable revision
   API-->>Staff: Stored totals and revision for review
   Staff->>API: Approve or reject expected quote revision
@@ -15,9 +15,10 @@ sequenceDiagram
   alt Rejected
     API->>DB: Record rejection and review-only job
   else Approved with current ownership and evidence
+    API->>DB: Hold the stock of every line (409 and full rollback if short)
     API->>DB: Commit exact approval, quotation outbox intent and one Drive export row
     W->>DB: Lock conversation before queued outbox
-    W->>DB: Recheck author, approval, recipient, expiry and snapshot
+    W->>DB: Recheck author, approval, recipient, expiry, snapshot and the held stock
     alt Eligible local-test intent
       W->>DB: Commit local message and local_delivered together
     else WhatsApp channel, gated and mock-tested only
@@ -25,5 +26,6 @@ sequenceDiagram
     else Ineligible channel
       W->>DB: Record blocked outcome
     end
+    Note over W,DB: Blocked, failed or expired: hold released. Unknown: kept.
   end
   Note over Staff,W: Approval queues work. It is not a provider delivery receipt, and the Drive export is independent of delivery.

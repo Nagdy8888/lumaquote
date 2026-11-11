@@ -1,0 +1,8 @@
+{
+  "date": "2026-11-11",
+  "commit": "1d3b4e1",
+  "label": "live",
+  "command": "Manual live run in the browser by a Sonnet subagent: web app at 127.0.0.1:5173 (local test admin), Telegram Web chat with the project bot, worker long polling",
+  "result": "Passed. Request '10 x DL-001' sent from Telegram Web; agent asked for YES confirmation (D46), drafted LQ-DA457964 revision 4 (USD 320.00); approval reserved 10 (DL-001 reserved 0 -> 10, available 180 -> 170); PDF arrived with Accept/Decline buttons and the 'Reply ACCEPT to accept or DECLINE to decline.' caption; Accept button recorded the acceptance notice, created SO-0001 pending (accepted via Telegram button) and the 'Customer accepted' banner; staff confirm moved stock out of on-hand (DL-001 on hand 180 -> 170, reserved 10 -> 0) and Telegram received the order-confirmed notice. Inventory page: 72 stock rows, tabs and search work, no console errors; Excel download lumaquote-stock-20261111.xlsx with 4 sheets; PO-0001 for DL-003 ordered 6, received 2 then 4 (on hand 162 -> 164 -> 168, status Partly received -> Received); adjustments +1/-1 net zero.",
+  "not_covered": "Google Sheets stock export and Gmail accept reply: the browser's Google account does not own the Apps Script project (403), so the stock export trigger and Gmail self-test property could not be checked. Left in place: SO-0001 confirmed and PO-0001 received (real local rows)."
+}

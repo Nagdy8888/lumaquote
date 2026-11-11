@@ -70,25 +70,38 @@ function exportOne_(config, folder, claimed) {
   return false;
 }
 
-/** Claim and file up to three approved quotation PDFs per run under a script lock; the backend owns retries. */
+/** File up to three approved quotation PDFs per run; the caller holds the shared script lock. Skipped when no Drive folder is set. */
+function exportDrivePdfs_(config) {
+  if (!PropertiesService.getScriptProperties().getProperty('LUMA_DRIVE_FOLDER_ID')) return;
+  var folder = exportFolder_();
+  for (var count = 0; count < 3; count++) {
+    var claim = signedExportPost_(config, '/exports/claim', { event: 'drive_export_claim' });
+    if (claim.status !== 200) {
+      PropertiesService.getScriptProperties().setProperty('LUMA_LAST_EXPORT_STATUS', String(claim.status));
+      throw new Error('Export claim was not accepted; check backend configuration and the connection.');
+    }
+    if (!claim.body || !claim.body.export) return;
+    exportOne_(config, folder, claim.body.export);
+  }
+}
+
+/**
+ * Minute timer: file approved quotation PDFs in Drive, then write a queued stock export (Stock.gs) to the
+ * workbook, under the shared script lock (waits up to LOCK_WAIT_MS). One part failing never skips the other;
+ * the first error is rethrown at the end so the run shows as Failed. The backend owns retries.
+ */
 function exportApprovedQuotations() {
   var config = configuration_();
   var lock = LockService.getScriptLock();
-  if (!lock.tryLock(1000)) return;
+  lock.waitLock(LOCK_WAIT_MS);
+  var failure = null;
   try {
-    var folder = exportFolder_();
-    for (var count = 0; count < 3; count++) {
-      var claim = signedExportPost_(config, '/exports/claim', { event: 'drive_export_claim' });
-      if (claim.status !== 200) {
-        PropertiesService.getScriptProperties().setProperty('LUMA_LAST_EXPORT_STATUS', String(claim.status));
-        throw new Error('Export claim was not accepted; check backend configuration and the connection.');
-      }
-      if (!claim.body || !claim.body.export) return;
-      exportOne_(config, folder, claim.body.export);
-    }
+    try { exportDrivePdfs_(config); } catch (driveError) { failure = driveError; }
+    try { exportStockTabs_(config); } catch (stockError) { failure = failure || stockError; }
   } finally {
     lock.releaseLock();
   }
+  if (failure) throw failure;
 }
 
 /** Validate folder access, then install one one-minute export trigger without touching other handlers. */

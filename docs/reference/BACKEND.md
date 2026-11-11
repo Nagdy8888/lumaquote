@@ -20,14 +20,14 @@ Actual transaction sequence and implemented local-channel delivery. See the surr
 ```mermaid
 sequenceDiagram
   accTitle: Exact quotation review and revalidated local delivery
-  accDescr: The backend creates immutable canonical content, staff approves that revision, and the worker rechecks ownership, approval, expiry and commercial evidence before the local effect.
+  accDescr: The backend creates immutable canonical content, staff approves that revision and the approval holds its stock in the same transaction, and the worker rechecks ownership, approval, expiry, commercial evidence and the held stock before the local effect. Blocked, failed, superseded and expired quotes release the hold.
   actor Staff as Salesperson
   participant API as Staff API
   participant DB as PostgreSQL
   participant W as Outbox worker
   Staff->>API: Save selections and expected conversation version
   API->>DB: Lock conversation, read current products and snapshot
-  API->>DB: Insert canonical revision and hash, supersede old offer
+  API->>DB: Insert canonical revision and hash, supersede old offer and release its stock hold
   DB-->>API: Commit reviewable revision
   API-->>Staff: Stored totals and revision for review
   Staff->>API: Approve or reject expected quote revision
@@ -35,9 +35,10 @@ sequenceDiagram
   alt Rejected
     API->>DB: Record rejection and review-only job
   else Approved with current ownership and evidence
+    API->>DB: Hold the stock of every line (409 and full rollback if short)
     API->>DB: Commit exact approval, quotation outbox intent and one Drive export row
     W->>DB: Lock conversation before queued outbox
-    W->>DB: Recheck author, approval, recipient, expiry and snapshot
+    W->>DB: Recheck author, approval, recipient, expiry, snapshot and the held stock
     alt Eligible local-test intent
       W->>DB: Commit local message and local_delivered together
     else WhatsApp channel, gated and mock-tested only
@@ -45,6 +46,7 @@ sequenceDiagram
     else Ineligible channel
       W->>DB: Record blocked outcome
     end
+    Note over W,DB: Blocked, failed or expired: hold released. Unknown: kept.
   end
   Note over Staff,W: Approval queues work. It is not a provider delivery receipt, and the Drive export is independent of delivery.
 ```
@@ -105,15 +107,15 @@ reach its normal response path. This coarse declaration check does not replace
 the actual-byte limits implemented by media and callback routes. CORS accepts the
 two configured loopback Vite origins and explicit headers; it is not authorization.
 
-## Surface inventory (reviewed 2026-11-03)
+## Surface inventory (reviewed 2026-11-08)
 
 Two processes, two different exposures. `tests/unit/test_surface_inventory.py` fails when either
 list changes without this table being reviewed.
 
 | Process | Reachable from | Operations |
 |---|---|---|
-| Staff API `luma.main:app` (port 8001) | this machine only; never tunneled | 17 operations under `/api/` (workspace, events, conversations and their draft/decision/ownership/reply/messages/customer-reply/audio/image actions, media preview, quote and source PDFs, catalog search) all behind a bearer credential, plus unauthenticated `GET /api/health`. FastAPI's `/docs`, `/redoc` and `/openapi.json` are also served unauthenticated, acceptable only because the process is local; disable them before any non-local exposure. |
-| Signed gateway `luma.google_gateway:app` (port 8002) | the internet, through a tunnel, once live | `POST /callbacks/google`, `/callbacks/google/snapshot`, `/callbacks/google/exports/claim`, `/callbacks/google/exports/receipt` (HMAC and nonce) and `GET`/`POST /webhooks/whatsapp` (verify token and raw-body signature). No staff route and no documentation endpoints. |
+| Staff API `luma.main:app` (port 8001) | this machine only; never tunneled | 30 operations under `/api/` (workspace, events, conversations and their draft/decision/ownership/reply/messages/customer-reply/audio/image actions, media preview, quote and source PDFs, catalog search, and the D49 stock, order, purchase-order and alert routes listed in [INVENTORY](INVENTORY.md#staff-actions-purchasing-and-alerts-task-t4)) all behind a bearer credential, plus unauthenticated `GET /api/health`. FastAPI's `/docs`, `/redoc` and `/openapi.json` are also served unauthenticated, acceptable only because the process is local; disable them before any non-local exposure. |
+| Signed gateway `luma.google_gateway:app` (port 8002) | the internet, through a tunnel, once live | `POST /callbacks/google`, `/callbacks/google/snapshot`, `/callbacks/google/exports/claim`, `/callbacks/google/exports/receipt`, `/callbacks/google/stock/claim`, `/callbacks/google/stock/receipt` (HMAC and nonce; stock export for Sheets, see [Inventory](INVENTORY.md#excel-and-google-sheets-export-task-t5)) and `GET`/`POST /webhooks/whatsapp` (verify token and raw-body signature). No staff route and no documentation endpoints. |
 | Direct Supabase paths | the browser, by design only Auth | `anon` and `authenticated` hold no grants on any `luma` table (asserted against the clean-install schema in `test_migrations.py`); the `luma-private` Storage bucket is private. Business data is reached only through the staff API. |
 | Outbound adapters | this machine to providers | OpenAI (Responses, transcription, vision, embeddings), LangSmith export, Meta Graph (fixed host), Google through Apps Script callbacks (no backend Google credentials), local Supabase Auth and Storage. |
 
@@ -128,7 +130,7 @@ approval, attachment-type and conversation-turn keys. It is a fixed-window count
 not a sliding-window limiter. Counter retention and all public ingress profiles
 are not yet complete.
 
-Limits per user per minute: reads 120, catalog search 30, mutations 30, staff replies 10,
+Limits per user per minute: reads 120 (the stock, order, purchase-order and alert reads use their own `stock-read` bucket of 120), catalog search 30, mutations 30, staff replies 10,
 decisions 10, voice or photo uploads 6 each; per conversation 6 customer messages or media
 (a shared key for the staff-operated reply, WhatsApp ingress and uploads). Each is exercised
 through the real API by `tests/integration/test_admission_limits.py` (the n-th request passes,
@@ -176,12 +178,13 @@ changes:
   outbound intent or change the customer's requested products.
 - `record_customer_reply`: staff-operated simulation restricted to `local_test`.
   It delegates to `accept_customer_text`, which records customer activity (deduplicated by an
-  optional provider id), supersedes review/approved quotes, blocks queued sends and enqueues
+  optional provider id), supersedes review/approved quotes (releasing their stock reservations),
+  blocks queued sends and enqueues
   preparation only when ownership permits automation. The verified WhatsApp ingress and the
   Telegram poller call the same function, so every channel invalidates old decisions identically;
   see [WhatsApp channel](WHATSAPP.md) and [Telegram channel](TELEGRAM.md).
 - `change_ownership`: requires `expected_version`. Takeover blocks queued
-  non-staff intents. Resume blocks queued staff-origin replies and can enqueue
+  non-staff intents and releases the stock reservation of each quotation whose send it blocked. Resume blocks queued staff-origin replies and can enqueue
   preparation. Neither operation fabricates a quotation approval.
 - `queue_staff_reply`: requires current staff ownership, expected version and an
   active authenticated author. It queues a reply with persisted staff origin and
@@ -224,16 +227,23 @@ database authorization or cryptographic tamper-proof storage.
 `approval.decide` locks conversation then latest quote and requires the displayed
 revision to remain in review and unexpired. Rejection sets needs-staff status,
 queues only review completion and audits the decision. Approval additionally
-requires agent ownership and current commercial eligibility. It atomically writes
-the approver/hash/recipient binding, approved status, quotation outbox intent and
-review-completion job. Current active admin and salesperson memberships can make
+requires agent ownership and current commercial eligibility. It then reserves the
+quotation's stock (`inventory/ledger.reserve_quote`, decision D49; lock order conversation,
+quote, stock levels in product-id order) and atomically writes the approver/hash/recipient
+binding, approved status, quotation outbox intent and review-completion job. If another
+approval took the stock first, the ledger's 409 ("Stock changed. Create a new revision.")
+rolls the whole transaction back: no approval, outbox row, Drive export or hold remains. Current active admin and salesperson memberships can make
 this decision; discount authorization is a separate admin rule.
 
 `freshness.check_snapshot` is called at approval and again at dispatch. Synthetic
 snapshots can finalize only on the local-test channel. Google observations must
 be no more than 90 seconds old. Every persisted line must still refer to an active
 source and matching product snapshot, source ID, page and unit price, with valid
-pack quantity, sufficient available stock and a non-discontinued product. A
+pack quantity and a non-discontinued product. Stock differs by phase
+([Inventory](INVENTORY.md#reservation-lifecycle-task-t2)): at approval
+every line needs `available >= quantity` (on hand minus reserved, from the stock ledger);
+at dispatch (`dispatch=True`, the approved quote's own hold already lowered available) the
+quote must still own `held` reservations equal to its line quantities. A
 failure requires reviewing a fresh revision; it is not a reason to silently
 substitute a model or rewrite an approved price.
 
@@ -246,7 +256,8 @@ matching approval, active approver, recipient, expiry and freshness checks.
 matching edit/approval/takeover transactions. It reselects queued work under lock
 before applying the local effect. A local message ID derives from its outbox ID;
 the message and `local_delivered` outcome commit together. Nonlocal delivery is
-currently blocked with `live_adapter_not_enabled`. Supported status vocabulary
+currently blocked with `live_adapter_not_enabled`. A blocked or definitely failed quotation
+intent releases its stock reservation (`outbound.release_hold`); an `unknown` outcome never does. Supported status vocabulary
 does not establish a working Meta sender or receipt reconciler.
 
 ## Private PDFs and read models

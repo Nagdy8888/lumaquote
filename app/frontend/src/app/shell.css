@@ -333,12 +333,15 @@
   border-color: #dfe2d6;
 }
 .status-review,
-.status-clarifying {
+.status-clarifying,
+.status-order_pending {
   background: #f6eddb;
   color: #81611e;
   border-color: #e8d9b3;
 }
 .status-approved,
+.status-accepted,
+.status-ordered,
 .status-quoted,
 .status-local_delivered,
 .status-enabled {
@@ -347,6 +350,7 @@
   border-color: #d3dfc7;
 }
 .status-needs_staff,
+.status-declined,
 .status-failed,
 .status-blocked {
   background: #fae8df;

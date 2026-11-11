@@ -6,6 +6,7 @@ import {
   ArrowUpRight,
   BookOpen,
   Camera,
+  Boxes,
   Check,
   FileText,
   Inbox,
@@ -18,6 +19,7 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import { useWorkspace } from "@/features/workspace/api";
+import { InventoryNavCount } from "@/features/inventory/InventoryNavCount";
 import { useLiveUpdates } from "@/features/workspace/useLiveUpdates";
 import { auth } from "@/shared/auth/client";
 import { Button } from "@/shared/ui/button";
@@ -28,6 +30,7 @@ const navigation = [
   { to: "/", label: "Overview", icon: LayoutDashboard, end: true },
   { to: "/inbox", label: "Inbox", icon: Inbox },
   { to: "/quotations", label: "Quotations", icon: FileText },
+  { to: "/inventory", label: "Inventory", icon: Boxes },
   { to: "/catalog", label: "Catalog & evidence", icon: BookOpen },
   { to: "/integrations", label: "Connections", icon: Plug },
 ];
@@ -97,6 +100,7 @@ export function AppShell() {
               {item.label === "Inbox" && pending > 0 && (
                 <span className="nav-count">{pending}</span>
               )}
+              {item.to === "/inventory" && <InventoryNavCount />}
             </NavLink>
           ))}
         </nav>
@@ -105,6 +109,9 @@ export function AppShell() {
             <Menu />
           </summary>
           <nav aria-label="Additional workspace navigation">
+            <Link to="/inventory" viewTransition>
+              Inventory
+            </Link>
             <Link to="/catalog" viewTransition>
               Catalog & evidence
             </Link>

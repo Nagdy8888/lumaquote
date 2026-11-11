@@ -8,6 +8,13 @@ this document or a Git commit.
 
 ## Waiting on you (as of 2026-11-03)
 
+**Local sign-in/workspace recovery verified on 2026-11-08:** the user completed
+the administrator WinNAT/Supabase startup. Existing staff authentication and
+workspace loading now pass, including a browser sign-in check, after restarting
+the stale staff API. No further administrator action is pending for this outage.
+See [workspace recovery](reference/CONFIGURATION.md#auth-succeeds-but-the-workspace-request-fails)
+for diagnosis if the symptom recurs. No password or account change was made.
+
 1. **Internet provider notice: resolved 2026-11-05.** HTTP and HTTPS work again and the ngrok tunnel
    starts. `installSupplierSynchronization` ran and a timer refresh was seen
    ([evidence](evidence/google-live-sync-2026-11-05.json)). The Meta webhook still needs your Meta account.
@@ -79,6 +86,15 @@ workbook and export folder. Apps Script edit notifications do not cover API edit
 so the GAS-only adapter includes a one-minute reconciliation trigger. Its installation
 and live execution remain pending. Apps Script scheduling is approximate; stale
 commercial evidence continues to block finalization.
+
+## Stock export to Google Sheets (D49, task T5)
+
+- [ ] Push `gas/Stock.gs` (and the changed `Exports.gs`, `Synchronization.gs`, `Notifications.gs`,
+  `Workbook.gs`) with `npm run google:push`, run `installStockExport` once in the editor (it keeps the
+  one-minute `exportApprovedQuotations` trigger; no Drive folder needed), then press Export to Google
+  Sheets once in the app (after task T6 adds the button; until then `POST /api/inventory/sheet-exports`)
+  and confirm the `Stock`, `Customer Orders` and `Purchase Orders` tabs fill and `latest` shows `done`.
+  Claude may do this in the browser (D37). Not done: the script has never run in Google.
 
 ## Gmail requests (D47)
 

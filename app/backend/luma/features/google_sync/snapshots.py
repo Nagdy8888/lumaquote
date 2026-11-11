@@ -22,7 +22,10 @@ def receive_snapshot(body: bytes, signature: str):
     """Verify a complete signed snapshot, then serialize imports and replay decisions per company.
 
     No product is inserted without catalog evidence. Unchanged snapshots refresh
-    observation time; changed business data creates a new evidence version.
+    observation time; changed business data creates a new evidence version. The
+    Inventory table is ignored (D49): it is neither validated, hashed nor stored, so
+    editing it never creates a new snapshot id. Stock is owned by the web app's
+    ledger; no stock level or movement is ever written here.
     """
     verify_signature(body, signature)
     try:
@@ -32,11 +35,10 @@ def receive_snapshot(body: bytes, signature: str):
     verify_mapping(envelope)
     if envelope.timestamp > time.time() + 5:
         raise DomainError("Snapshot observation is in the future.", 401)
-    products, prices, inventory = validate_tables(envelope)
+    products, prices = validate_tables(envelope)
     canonical = {
         "products": [products[sku].model_dump(mode="json") for sku in sorted(products)],
         "prices": [prices[sku].model_dump(mode="json") for sku in sorted(prices)],
-        "inventory": [inventory[sku].model_dump(mode="json") for sku in sorted(inventory)],
     }
     digest = hashlib.sha256(json.dumps(canonical, sort_keys=True).encode()).hexdigest()
     fingerprint = hashlib.sha256(body).hexdigest()
@@ -91,11 +93,10 @@ def receive_snapshot(body: bytes, signature: str):
             for row in catalog:
                 sku = row["sku"]
                 conn.execute(
-                    "update luma.products set price=%s,available=%s,pack_size=%s,discontinued=%s,snapshot_id=%s "
+                    "update luma.products set price=%s,pack_size=%s,discontinued=%s,snapshot_id=%s "
                     "where id=%s and company_id=%s",
                     (
                         prices[sku].unit_price,
-                        inventory[sku].available,
                         products[sku].pack_size,
                         products[sku].discontinued,
                         sid,
@@ -107,7 +108,7 @@ def receive_snapshot(body: bytes, signature: str):
                 "insert into luma.google_sync_state(company_id,snapshot_id,observed_at,digest,source_tables) "
                 "values(%s,%s,%s,%s,%s) on conflict(company_id) do update set snapshot_id=excluded.snapshot_id,"
                 "observed_at=excluded.observed_at,digest=excluded.digest,source_tables=excluded.source_tables",
-                (company, sid, observed, digest, Jsonb(envelope.tables.model_dump(mode="json"))),
+                (company, sid, observed, digest, Jsonb(envelope.tables.model_dump(mode="json", exclude={"Inventory"}))),
             )
             conn.execute(
                 "insert into luma.google_snapshot_receipts(company_id,nonce,fingerprint) values(%s,%s,%s)",

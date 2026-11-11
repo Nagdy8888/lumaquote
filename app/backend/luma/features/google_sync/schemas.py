@@ -2,7 +2,7 @@
 
 from datetime import date
 from decimal import Decimal
-from typing import Annotated, Literal
+from typing import Annotated, Any, Literal
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field
@@ -40,14 +40,6 @@ class PriceInput(InputRecord):
     effective_from: date
 
 
-class InventoryInput(InputRecord):
-    """Available stock at one named location, never a reservation or delivery promise."""
-
-    sku: Text
-    available: Annotated[int, Field(strict=True, ge=0, le=10000000)]
-    location: Text
-
-
 class PolicyInput(InputRecord):
     """Primitive policy cells are checked against the approved fixed commercial defaults."""
 
@@ -56,11 +48,15 @@ class PolicyInput(InputRecord):
 
 
 class SupplierTables(InputRecord):
-    """Complete bounded tables; empty or partial snapshots cannot retire or overwrite existing records."""
+    """Complete bounded tables; empty or partial snapshots cannot retire or overwrite existing records.
+
+    `Inventory` is optional and ignored (decision D49: the web app's ledger owns stock). Older Apps Script
+    versions still send it; it is accepted so their pushes do not break, but never read, validated or hashed.
+    """
 
     Products: Annotated[list[ProductInput], Field(min_length=1, max_length=1000)]
     Prices: Annotated[list[PriceInput], Field(min_length=1, max_length=1000)]
-    Inventory: Annotated[list[InventoryInput], Field(min_length=1, max_length=1000)]
+    Inventory: Annotated[list[dict[str, Any]], Field(max_length=1000)] | None = None
     Policies: Annotated[list[PolicyInput], Field(min_length=1, max_length=50)]
 
 

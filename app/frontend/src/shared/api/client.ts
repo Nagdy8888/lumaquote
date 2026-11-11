@@ -61,3 +61,35 @@ export async function documentUrl(path: string): Promise<string> {
     );
   return URL.createObjectURL(await response.blob());
 }
+
+/**
+ * Download an authorized file as a Blob plus the filename the server chose. Inputs: an API path
+ * such as `/inventory/export.xlsx`. Output: `{ blob, filename }`; the filename comes from the
+ * `Content-Disposition` header and falls back to `fallbackName`. Side effects: one authenticated
+ * GET. Errors: `ApiError` with the server's plain `detail` text when present (for example a 429
+ * rate limit), never the response body of a file. The caller saves the Blob.
+ */
+export async function downloadFile(
+  path: string,
+  fallbackName: string,
+): Promise<{ blob: Blob; filename: string }> {
+  const {
+    data: { session },
+  } = await auth.auth.getSession();
+  if (!session) throw new ApiError("Sign in again to download this file.", 401);
+  const response = await fetch(`/api${path}`, {
+    headers: { Authorization: `Bearer ${session.access_token}` },
+  });
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    throw new ApiError(
+      typeof error.detail === "string"
+        ? error.detail
+        : "The file could not be downloaded. Try again.",
+      response.status,
+    );
+  }
+  const header = response.headers.get("Content-Disposition") ?? "";
+  const match = /filename="?([^";]+)"?/i.exec(header);
+  return { blob: await response.blob(), filename: match?.[1] ?? fallbackName };
+}

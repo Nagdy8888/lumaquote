@@ -134,7 +134,7 @@ async function followStream(
  * while a staff session exists. Output: `{ connected }`, true only while a stream is
  * open, so callers can slow their fallback polling. Side effects: at most one
  * stream per mounted caller (mount it once, in the shell); invalidates the
- * `workspace` and `conversation` queries when the company revision changes; signs
+ * `workspace`, `conversation` and `inventory` (stock, orders, alerts, purchase orders) queries when the company revision changes; signs
  * out when the server reports revoked membership; aborts on unmount or when the
  * staff identity changes. Authority: the server authorizes the stream and rechecks
  * membership before every event; this hook only reacts to it.
@@ -155,6 +155,7 @@ export function useLiveUpdates(): { connected: boolean } {
         function refreshQueries() {
           void queryClient.invalidateQueries({ queryKey: ["workspace"] });
           void queryClient.invalidateQueries({ queryKey: ["conversation"] });
+          void queryClient.invalidateQueries({ queryKey: ["inventory"] });
         },
         setConnected,
       );

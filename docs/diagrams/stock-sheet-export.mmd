@@ -1,0 +1,29 @@
+sequenceDiagram
+  accTitle: Stock export to Google Sheets, pulled by Apps Script
+  accDescr: A staff member presses Export to Google Sheets and the web app queues one export row; a second press returns the same row. The one-minute Apps Script trigger sends a signed claim. The gateway checks the signature, window, nonce, company and workbook, leases the oldest queued export for five minutes and returns the Stock, Customer Orders and Purchase Orders rows with every text cell formula-guarded. Apps Script writes only those three tabs with plain-text formats and posts a signed receipt with row counts. The backend marks the export done, or requeues it after a reported failure and fails it after five attempts. Live Apps Script execution is unverified.
+  participant Staff as Staff member
+  participant API as Staff API
+  participant DB as PostgreSQL
+  participant GW as Signed callback gateway
+  participant GAS as Authorized Apps Script
+  participant Book as Workbook tabs
+  Staff->>API: Export to Google Sheets
+  API->>DB: Queue one export, or return the open one
+  API-->>Staff: Status queued
+  loop One-minute trigger, local stand-in tested only
+    GAS->>GW: Signed claim envelope
+    GW->>DB: Company lock, nonce check, lease oldest eligible export
+    GW->>DB: Read stock, orders and purchase orders, guard text cells
+    GW-->>GAS: Export id, claim token and rows of three tabs
+    GAS->>Book: Set plain-text format, clear, write Stock, Customer Orders, Purchase Orders
+    GAS->>GW: Signed receipt with row counts, or a short error code
+    alt Stored receipt, claim token current
+      GW->>DB: Mark done with row counts
+    else Reported failure
+      GW->>DB: Requeue, fail after five attempts
+    else Stale claim token or expired lease
+      GW-->>GAS: 409 or reclaimed by the next claim
+    end
+  end
+  Staff->>API: Read latest export status
+  API-->>Staff: done with row counts, or failed with a code

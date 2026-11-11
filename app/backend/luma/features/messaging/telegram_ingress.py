@@ -6,6 +6,10 @@ The tenant is `TELEGRAM_COMPANY_ID` from configuration. Only private chats are a
 id then equals the sender's user id), and the sender allowlist is applied later by the inbox
 worker exactly as for WhatsApp.
 
+Updates are `message` (text, voice, photo) and `callback_query` (the Accept and Decline buttons on a
+quotation, decision D49). A press becomes a `quote_answer` event keyed `tgcb:<callback id>`; the
+inbox worker proves the quotation belongs to the presser's conversation before acting on it.
+
 Durability: updates are written to `luma.inbox` (idempotent on `tg:<chat id>:<message id>`)
 before the next poll passes `offset = highest update_id + 1`, which is what confirms them to
 Telegram. A crash between the two only causes Telegram to resend those updates, which the
@@ -24,6 +28,8 @@ from .webhook import persist
 
 logger = logging.getLogger("luma.telegram")
 USER_ID = re.compile(r"[0-9]{1,20}")
+CALLBACK_ID = re.compile(r"[A-Za-z0-9_-]{1,64}")
+ANSWER_DATA = re.compile(r"(acc|dec):([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})")
 AUDIO_FALLBACK = "audio/ogg"
 
 
@@ -33,8 +39,56 @@ def largest_photo(sizes) -> dict | None:
     return max(candidates, key=lambda s: int(s.get("width", 0)) * int(s.get("height", 0)), default=None)
 
 
+def reduce_callback(query) -> tuple[str, str, dict] | None:
+    """Reduce an Accept or Decline button press to a `quote_answer` event, or None to skip it.
+
+    Accepted only when the button sits on a message in a private chat, the presser is a human
+    whose user id equals that chat id, the query id is well formed and `data` is exactly
+    `acc:<uuid>` or `dec:<uuid>` (the format `outbound.answer_buttons` sends). The quote id is
+    only a claim: `inbound.handle_message` proves it is the sender's own current quotation. The
+    message the button sits on is carried as `message_id` (when it is a positive integer) so the
+    worker can clear the keyboard after answering; `chat_id` is the sender id checked above.
+    Anything else (other data, groups, bots, inaccessible messages) is skipped, which still lets
+    the offset confirm the update.
+    """
+    if not isinstance(query, dict):
+        return None
+    sender, message, data, callback = query.get("from"), query.get("message"), query.get("data"), query.get("id")
+    chat = message.get("chat") if isinstance(message, dict) else None
+    if not (isinstance(sender, dict) and isinstance(chat, dict) and chat.get("type") == "private"):
+        return None
+    user_id, chat_id = str(sender.get("id", "")), str(chat.get("id", ""))
+    if not (USER_ID.fullmatch(user_id) and chat_id == user_id and sender.get("is_bot") is not True):
+        return None
+    matched = ANSWER_DATA.fullmatch(data) if isinstance(data, str) else None
+    if not (matched and isinstance(callback, str) and CALLBACK_ID.fullmatch(callback)):
+        return None
+    name = " ".join(str(sender.get(k, "")) for k in ("first_name", "last_name") if sender.get(k))[:120]
+    identity = f"tgcb:{callback}"
+    event = {
+        "id": identity,
+        "from": user_id,
+        "name": name,
+        "provider": "telegram",
+        "channel": "telegram",
+        "type": "quote_answer",
+        "answer": "accept" if matched.group(1) == "acc" else "decline",
+        "quote_id": matched.group(2),
+        "callback_id": callback,
+    }
+    message_id = message.get("message_id")
+    if isinstance(message_id, int) and not isinstance(message_id, bool) and message_id > 0:
+        event["message_id"] = message_id  # lets the inbox worker remove the buttons once the press is settled
+    return identity, "message", event
+
+
 def reduce_update(update: dict) -> tuple[str, str, dict] | None:
-    """Reduce one Update to `(provider_id, "message", event)` in the shared event shape, or None to skip it."""
+    """Reduce one Update to `(provider_id, "message", event)` in the shared event shape, or None to skip it.
+
+    Handles a `message` (text, voice, photo) and a `callback_query` (Accept or Decline button).
+    """
+    if "callback_query" in update:
+        return reduce_callback(update["callback_query"])
     message = update.get("message")
     if not isinstance(message, dict):
         return None

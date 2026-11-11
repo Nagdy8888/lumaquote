@@ -1,0 +1,15 @@
+stateDiagram-v2
+  accTitle: Supplier purchase order lifecycle
+  accDescr: An administrator records a purchase order in status ordered. Each receipt raises stock and moves the order to partially received until every line is complete, then to received. An order with nothing received can be cancelled. Received goods can only be corrected with a stock adjustment.
+  [*] --> ordered: Administrator creates PO number
+  ordered --> partially_received: Receipt of part of a line or some lines
+  ordered --> received: Receipt completes every line
+  ordered --> cancelled: Cancel while nothing is received
+  partially_received --> partially_received: Further receipt, total never above ordered
+  partially_received --> received: Receipt completes every line
+  received --> [*]
+  cancelled --> [*]
+  note right of partially_received
+    Each receipt appends a receipt movement
+    and raises on-hand. Cancel is refused here.
+  end note

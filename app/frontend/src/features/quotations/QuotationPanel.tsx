@@ -4,6 +4,7 @@ import { ChevronDown, FileCheck2 } from "lucide-react";
 import type { ConversationDetail, Product } from "@/shared/api/types";
 import { useWorkspaceContext } from "@/shared/api/workspace-context";
 import { useConversationAction } from "@/features/conversations/api";
+import { OrderBanner } from "@/features/inventory/OrderBanner";
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
 import { Status } from "@/shared/ui/status";
@@ -13,7 +14,10 @@ import { ProductSelections } from "./ui/ProductSelections";
 import { QuoteSummary } from "./ui/QuoteSummary";
 import { ReviewActions } from "./ui/ReviewActions";
 
-/** Edit product selections and review server-calculated quotations; approval never uses a browser-calculated total. */
+/**
+ * Edit product selections and review server-calculated quotations; approval never uses a browser-calculated total.
+ * When the customer accepted the quotation, a banner above the quote offers Confirm order and Cancel order.
+ */
 export function QuotationPanel({
   detail,
   products,
@@ -75,6 +79,10 @@ export function QuotationPanel({
         <span>{quote ? `Revision ${quote.revision}` : "New draft"}</span>
       </header>
       <div className="quotation-panel-body">
+        <OrderBanner
+          conversationId={conversation.id}
+          quoteNumber={quote?.number ?? null}
+        />
         <div className="quote-context">
           <h3>{quote?.number ?? "Make the brief a proposal."}</h3>
           <p>

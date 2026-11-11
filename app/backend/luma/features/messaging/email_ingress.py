@@ -36,6 +36,12 @@ QUOTE_START = (
     re.compile(r"^_{5,}\s*$"),
     re.compile(r"^في\s.{0,300}كتب.{0,300}:\s*$"),
 )
+# Whole-line mobile client signatures; the text below them is never the customer's new message.
+MOBILE_SIGNATURE = re.compile(
+    r"^(sent from my [a-z0-9][a-z0-9 ]{0,40}|get outlook for (ios|android)"
+    r"|sent from (mail|outlook) for windows( 10| 11)?|sent from yahoo mail( for (iphone|android))?)$",
+    re.IGNORECASE,
+)
 
 
 class MailItem(BaseModel):
@@ -91,13 +97,14 @@ def sender_authenticated(results: str, address: str) -> bool:
 
 
 def strip_quoted(body: str) -> str:
-    """Keep only the new text of a reply: stop at a quote header, a `>` line or a `-- ` signature."""
+    """Keep only the new text of a reply: stop at a quote header, a `>` line, a `-- ` signature or a
+    whole-line mobile client signature such as "Sent from my iPhone" (`MOBILE_SIGNATURE`)."""
     lines = body.replace("\r\n", "\n").split("\n")
     kept = []
     for index, line in enumerate(lines):
         stripped = line.strip()
         joined = f"{stripped} {lines[index + 1].strip()}" if index + 1 < len(lines) else stripped
-        if stripped.startswith(">") or line.rstrip("\n") == "-- ":
+        if stripped.startswith(">") or line.rstrip("\n") == "-- " or MOBILE_SIGNATURE.match(stripped):
             break
         if any(pattern.match(stripped) or pattern.match(joined) for pattern in QUOTE_START):
             break

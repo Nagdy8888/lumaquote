@@ -27,7 +27,13 @@ sources and [catalog.json](catalog.json) are the maintained source of truth.
 - [Authenticated live updates](rendered/frontend-live-updates.svg).
 - [Signed GAS snapshots](rendered/google-snapshot.svg).
 - [Drive export of approved PDFs](rendered/drive-export.svg).
+- [Stock export to Google Sheets](rendered/stock-sheet-export.svg): queue, signed claim, tab write and
+  receipt.
 - [WhatsApp ingress and gated egress](rendered/whatsapp-channel.svg).
+- [Quotation answer and order lifecycle](rendered/order-lifecycle.svg): accept, decline, expiry,
+  pending order, staff confirm and cancel, and the stock hold.
+- [Supplier purchase order lifecycle](rendered/purchase-order-lifecycle.svg): ordered, partial and full
+  receipt, cancel.
 - [Verification scopes](rendered/verification-scope.svg).
 - [Working-rule enforcement](rendered/rule-enforcement.svg).
 

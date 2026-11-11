@@ -344,6 +344,313 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/inventory/stock": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Stock
+         * @description Read the company's stock table (on hand, reserved, available, reorder level, low flag) for any staff member.
+         */
+        get: operations["stock_api_inventory_stock_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/inventory/movements": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Movements
+         * @description Read a newest-first page of stock movements, optionally for one product, using the `before` cursor.
+         */
+        get: operations["movements_api_inventory_movements_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/inventory/adjustments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Adjustments
+         * @description Idempotently apply an administrator's stock correction with a mandatory reason (403 for other roles).
+         */
+        post: operations["adjustments_api_inventory_adjustments_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/inventory/reorder-levels": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Reorder Levels
+         * @description Idempotently set one product's low-stock threshold (administrators only).
+         */
+        post: operations["reorder_levels_api_inventory_reorder_levels_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/inventory/alerts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Alerts
+         * @description Read open shortage and refused-acceptance alerts plus the live low-stock list for any staff member.
+         */
+        get: operations["alerts_api_inventory_alerts_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/inventory/alerts/{alert_id}/acknowledge": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Acknowledge
+         * @description Idempotently acknowledge one open alert (any staff role); an already acknowledged alert is a 409.
+         */
+        post: operations["acknowledge_api_inventory_alerts__alert_id__acknowledge_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/inventory/export.xlsx": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Export Xlsx
+         * @description Download the stock, movements, customer-order and purchase-order workbook (any staff member).
+         *
+         *     Own admission bucket (10 per minute) because it reads thousands of rows. Read only apart from
+         *     the audit event `inventory.exported`. Text cells are formula-guarded (`exports.safe_text`).
+         */
+        get: operations["export_xlsx_api_inventory_export_xlsx_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/inventory/sheet-exports": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Queue Sheet Export
+         * @description Idempotently queue a Google Sheets stock export, or return the one already queued or running.
+         */
+        post: operations["queue_sheet_export_api_inventory_sheet_exports_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/inventory/sheet-exports/latest": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Latest Sheet Export
+         * @description Read the latest Sheets export's status, times, row counts and error code (status `none` if never requested).
+         */
+        get: operations["latest_sheet_export_api_inventory_sheet_exports_latest_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/orders": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Orders
+         * @description Read the company's customer orders with their lines, newest first, optionally filtered by status.
+         */
+        get: operations["orders_api_orders_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/orders/{order_id}/confirm": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Confirm
+         * @description Idempotently confirm a pending order so its reserved stock leaves on-hand (any staff role).
+         */
+        post: operations["confirm_api_orders__order_id__confirm_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/orders/{order_id}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Cancel
+         * @description Idempotently cancel a pending or confirmed order with a reason; its stock is released or returned.
+         */
+        post: operations["cancel_api_orders__order_id__cancel_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/purchase-orders": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Purchase Orders
+         * @description Read the company's purchase orders with their lines, newest first, for any staff member.
+         */
+        get: operations["purchase_orders_api_purchase_orders_get"];
+        put?: never;
+        /**
+         * Create
+         * @description Idempotently record a supplier purchase order in status `ordered` (administrators only).
+         */
+        post: operations["create_api_purchase_orders_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/purchase-orders/{order_id}/receive": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Receive
+         * @description Idempotently receive goods against a purchase order, raising stock (administrators only).
+         */
+        post: operations["receive_api_purchase_orders__order_id__receive_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/purchase-orders/{order_id}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Cancel
+         * @description Idempotently cancel a purchase order that has received nothing (administrators only).
+         */
+        post: operations["cancel_api_purchase_orders__order_id__cancel_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/health": {
         parameters: {
             query?: never;
@@ -384,6 +691,110 @@ export interface components {
              * Format: date-time
              */
             created_at: string;
+        };
+        /**
+         * AdjustmentInput
+         * @description Admin command to correct one product's on-hand stock by a signed, non-zero amount with a reason.
+         */
+        AdjustmentInput: {
+            /**
+             * Product Id
+             * Format: uuid
+             */
+            product_id: string;
+            /** Delta */
+            delta: number;
+            /** Reason */
+            reason: string;
+        };
+        /**
+         * AlertAck
+         * @description Result of acknowledging an alert.
+         */
+        AlertAck: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Status
+             * @constant
+             */
+            status: "acknowledged";
+        };
+        /**
+         * AlertCounts
+         * @description Open alert totals for the navigation badge: stored alerts by kind, live low-stock products, and their sum.
+         */
+        AlertCounts: {
+            /** Shortage */
+            shortage: number;
+            /** Acceptance Refused */
+            acceptance_refused: number;
+            /** Low Stock */
+            low_stock: number;
+            /** Total */
+            total: number;
+        };
+        /**
+         * AlertRow
+         * @description A stored alert (shortage or refused acceptance) with the product and conversation it names.
+         */
+        AlertRow: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "shortage" | "acceptance_refused";
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "open" | "acknowledged";
+            /** Product Id */
+            product_id: string | null;
+            /** Sku */
+            sku: string | null;
+            /** Name */
+            name: string | null;
+            /** Conversation Id */
+            conversation_id: string | null;
+            /** Quote Id */
+            quote_id: string | null;
+            /** Requested */
+            requested: number | null;
+            /** Available */
+            available: number | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
+        /**
+         * AlertsView
+         * @description Open stored alerts, the live low-stock list and the counts.
+         */
+        AlertsView: {
+            /** Alerts */
+            alerts: components["schemas"]["AlertRow"][];
+            /** Low Stock */
+            low_stock: components["schemas"]["StockRow"][];
+            counts: components["schemas"]["AlertCounts"];
+        };
+        /**
+         * CancelInput
+         * @description Staff command to cancel an order; the reason (3-200 characters) is stored and audited.
+         */
+        CancelInput: {
+            /** Reason */
+            reason: string;
         };
         /**
          * CatalogHit
@@ -612,6 +1023,25 @@ export interface components {
             error_code: string | null;
         };
         /**
+         * LevelView
+         * @description A product's ledger position after an adjustment or a reorder-level change.
+         */
+        LevelView: {
+            /**
+             * Product Id
+             * Format: uuid
+             */
+            product_id: string;
+            /** On Hand */
+            on_hand: number;
+            /** Reserved */
+            reserved: number;
+            /** Available */
+            available: number;
+            /** Reorder Level */
+            reorder_level: number;
+        };
+        /**
          * MessageView
          * @description Plain text or an authorized media reference; never a public raw-file capability.
          */
@@ -651,6 +1081,146 @@ export interface components {
             image_available: boolean;
         };
         /**
+         * MovementRow
+         * @description One append-only stock movement with its product identity and optional reference (order or purchase order).
+         */
+        MovementRow: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Product Id
+             * Format: uuid
+             */
+            product_id: string;
+            /** Sku */
+            sku: string;
+            /** Name */
+            name: string;
+            /** Delta */
+            delta: number;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "opening" | "adjustment" | "receipt" | "order" | "order_cancel";
+            /** Reference Id */
+            reference_id: string | null;
+            /** Reference */
+            reference: string | null;
+            /** Reason */
+            reason: string | null;
+            /** Actor */
+            actor: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
+        /**
+         * MovementsPage
+         * @description A newest-first page of movements; `next` is the opaque `before` cursor of the following page, or null.
+         */
+        MovementsPage: {
+            /** Items */
+            items: components["schemas"]["MovementRow"][];
+            /** Next */
+            next: string | null;
+        };
+        /**
+         * OrderLineRow
+         * @description One order line copied from the accepted quotation: prices are the quoted ones, never recomputed.
+         */
+        OrderLineRow: {
+            /**
+             * Product Id
+             * Format: uuid
+             */
+            product_id: string;
+            /** Sku */
+            sku: string;
+            /** Name */
+            name: string;
+            /** Quantity */
+            quantity: number;
+            /** Unit Price */
+            unit_price: string;
+            /** Line Total */
+            line_total: string;
+        };
+        /**
+         * OrderRow
+         * @description A customer order with its lines and lifecycle stamps (pending, confirmed or cancelled).
+         */
+        OrderRow: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Number */
+            number: string;
+            /**
+             * Conversation Id
+             * Format: uuid
+             */
+            conversation_id: string;
+            /**
+             * Quote Id
+             * Format: uuid
+             */
+            quote_id: string;
+            /** Revision */
+            revision: number;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "pending" | "confirmed" | "cancelled";
+            /**
+             * Accepted Via
+             * @enum {string}
+             */
+            accepted_via: "telegram_button" | "reply" | "staff";
+            /**
+             * Accepted At
+             * Format: date-time
+             */
+            accepted_at: string;
+            /** Confirmed At */
+            confirmed_at: string | null;
+            /** Cancelled At */
+            cancelled_at: string | null;
+            /** Cancel Reason */
+            cancel_reason: string | null;
+            /** Currency */
+            currency: string;
+            /** Total */
+            total: string;
+            /** Customer Name */
+            customer_name: string;
+            /** Customer Company */
+            customer_company: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Lines */
+            lines: components["schemas"]["OrderLineRow"][];
+        };
+        /**
+         * OrdersView
+         * @description Orders newest first (at most 200), pending ones included, each with its lines.
+         */
+        OrdersView: {
+            /** Items */
+            items: components["schemas"]["OrderRow"][];
+        };
+        /**
          * Ownership
          * @description Versioned staff command to pause automation or explicitly return a conversation to the agent.
          */
@@ -666,6 +1236,8 @@ export interface components {
         /**
          * ProductView
          * @description Validated catalog and commercial snapshot fields; embeddings are never sent to the UI.
+         *
+         *     `available` is on hand minus reserved from the stock ledger, not a stored product column.
          */
         ProductView: {
             /**
@@ -709,6 +1281,105 @@ export interface components {
              * Format: uuid
              */
             snapshot_id: string;
+        };
+        /**
+         * PurchaseLineInput
+         * @description One ordered product: how many and what each unit costs (informational; cost does not value stock).
+         */
+        PurchaseLineInput: {
+            /**
+             * Product Id
+             * Format: uuid
+             */
+            product_id: string;
+            /** Quantity */
+            quantity: number;
+            /** Unit Cost */
+            unit_cost: number | string;
+        };
+        /**
+         * PurchaseLineRow
+         * @description A purchase-order line with ordered and received quantities.
+         */
+        PurchaseLineRow: {
+            /**
+             * Product Id
+             * Format: uuid
+             */
+            product_id: string;
+            /** Sku */
+            sku: string;
+            /** Name */
+            name: string;
+            /** Quantity Ordered */
+            quantity_ordered: number;
+            /** Quantity Received */
+            quantity_received: number;
+            /** Unit Cost */
+            unit_cost: string;
+        };
+        /**
+         * PurchaseOrderInput
+         * @description Admin command to record a supplier purchase order (status `ordered`).
+         */
+        PurchaseOrderInput: {
+            /** Supplier */
+            supplier: string;
+            /** Expected On */
+            expected_on?: string | null;
+            /** Notes */
+            notes?: string | null;
+            /** Lines */
+            lines: components["schemas"]["PurchaseLineInput"][];
+        };
+        /**
+         * PurchaseOrderRow
+         * @description A purchase order with its lines; status moves ordered -> partially_received -> received, or ordered -> cancelled.
+         */
+        PurchaseOrderRow: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Number */
+            number: string;
+            /** Supplier */
+            supplier: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "ordered" | "partially_received" | "received" | "cancelled";
+            /** Expected On */
+            expected_on: string | null;
+            /** Notes */
+            notes: string | null;
+            /**
+             * Created By
+             * Format: uuid
+             */
+            created_by: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+            /** Lines */
+            lines: components["schemas"]["PurchaseLineRow"][];
+        };
+        /**
+         * PurchaseOrdersView
+         * @description Purchase orders newest first (at most 200), each with its lines.
+         */
+        PurchaseOrdersView: {
+            /** Items */
+            items: components["schemas"]["PurchaseOrderRow"][];
         };
         /**
          * QuoteContentView
@@ -810,6 +1481,40 @@ export interface components {
             delivery?: string | null;
         };
         /**
+         * ReceiveInput
+         * @description Admin command to receive part or all of a purchase order; each line adds to `quantity_received`.
+         */
+        ReceiveInput: {
+            /** Lines */
+            lines: components["schemas"]["ReceiveLineInput"][];
+        };
+        /**
+         * ReceiveLineInput
+         * @description Goods that arrived for one product of the purchase order in this delivery.
+         */
+        ReceiveLineInput: {
+            /**
+             * Product Id
+             * Format: uuid
+             */
+            product_id: string;
+            /** Quantity */
+            quantity: number;
+        };
+        /**
+         * ReorderLevelInput
+         * @description Admin command to set the low-stock threshold of one product (0..100000).
+         */
+        ReorderLevelInput: {
+            /**
+             * Product Id
+             * Format: uuid
+             */
+            product_id: string;
+            /** Reorder Level */
+            reorder_level: number;
+        };
+        /**
          * Selection
          * @description A staff-selected product identity and bounded integral quantity; prices always come from the server.
          */
@@ -821,6 +1526,30 @@ export interface components {
             product_id: string;
             /** Quantity */
             quantity: number;
+        };
+        /**
+         * SheetExportView
+         * @description Progress of the Google Sheets stock export: `none` before the first request, then queued,
+         *     claimed (Apps Script is writing), done (with row counts per tab) or failed (with a short error code).
+         */
+        SheetExportView: {
+            /** Id */
+            id: string | null;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "none" | "queued" | "claimed" | "done" | "failed";
+            /** Requested At */
+            requested_at: string | null;
+            /** Completed At */
+            completed_at: string | null;
+            /** Row Counts */
+            row_counts: {
+                [key: string]: number;
+            } | null;
+            /** Error Code */
+            error_code: string | null;
         };
         /**
          * SourceView
@@ -851,6 +1580,45 @@ export interface components {
             text: string;
             /** Expected Version */
             expected_version: number;
+        };
+        /**
+         * StockRow
+         * @description One product's stock position: available is on_hand minus reserved, `low` means at or below its reorder level.
+         */
+        StockRow: {
+            /**
+             * Product Id
+             * Format: uuid
+             */
+            product_id: string;
+            /** Sku */
+            sku: string;
+            /** Name */
+            name: string;
+            /** Family */
+            family: string;
+            /** Discontinued */
+            discontinued: boolean;
+            /** On Hand */
+            on_hand: number;
+            /** Reserved */
+            reserved: number;
+            /** Available */
+            available: number;
+            /** Reorder Level */
+            reorder_level: number;
+            /** Low */
+            low: boolean;
+        };
+        /**
+         * StockView
+         * @description The stock table plus how many products are low.
+         */
+        StockView: {
+            /** Items */
+            items: components["schemas"]["StockRow"][];
+            /** Low Count */
+            low_count: number;
         };
         /**
          * TextInput
@@ -1456,6 +2224,479 @@ export interface operations {
                 };
                 content: {
                     "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    stock_api_inventory_stock_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StockView"];
+                };
+            };
+        };
+    };
+    movements_api_inventory_movements_get: {
+        parameters: {
+            query?: {
+                product_id?: string | null;
+                limit?: number;
+                before?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MovementsPage"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    adjustments_api_inventory_adjustments_post: {
+        parameters: {
+            query?: never;
+            header: {
+                "Idempotency-Key": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AdjustmentInput"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LevelView"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    reorder_levels_api_inventory_reorder_levels_post: {
+        parameters: {
+            query?: never;
+            header: {
+                "Idempotency-Key": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReorderLevelInput"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LevelView"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    alerts_api_inventory_alerts_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AlertsView"];
+                };
+            };
+        };
+    };
+    acknowledge_api_inventory_alerts__alert_id__acknowledge_post: {
+        parameters: {
+            query?: never;
+            header: {
+                "Idempotency-Key": string;
+            };
+            path: {
+                alert_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AlertAck"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    export_xlsx_api_inventory_export_xlsx_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+        };
+    };
+    queue_sheet_export_api_inventory_sheet_exports_post: {
+        parameters: {
+            query?: never;
+            header: {
+                "Idempotency-Key": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SheetExportView"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    latest_sheet_export_api_inventory_sheet_exports_latest_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SheetExportView"];
+                };
+            };
+        };
+    };
+    orders_api_orders_get: {
+        parameters: {
+            query?: {
+                status?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OrdersView"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    confirm_api_orders__order_id__confirm_post: {
+        parameters: {
+            query?: never;
+            header: {
+                "Idempotency-Key": string;
+            };
+            path: {
+                order_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OrderRow"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    cancel_api_orders__order_id__cancel_post: {
+        parameters: {
+            query?: never;
+            header: {
+                "Idempotency-Key": string;
+            };
+            path: {
+                order_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CancelInput"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OrderRow"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    purchase_orders_api_purchase_orders_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PurchaseOrdersView"];
+                };
+            };
+        };
+    };
+    create_api_purchase_orders_post: {
+        parameters: {
+            query?: never;
+            header: {
+                "Idempotency-Key": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PurchaseOrderInput"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PurchaseOrderRow"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    receive_api_purchase_orders__order_id__receive_post: {
+        parameters: {
+            query?: never;
+            header: {
+                "Idempotency-Key": string;
+            };
+            path: {
+                order_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReceiveInput"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PurchaseOrderRow"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    cancel_api_purchase_orders__order_id__cancel_post: {
+        parameters: {
+            query?: never;
+            header: {
+                "Idempotency-Key": string;
+            };
+            path: {
+                order_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PurchaseOrderRow"];
                 };
             };
             /** @description Validation Error */

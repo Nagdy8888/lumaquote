@@ -48,7 +48,9 @@ sign-in or the authenticated router. `AppShell` owns workspace loading/failure,
 navigation, responsive shell and capture-mode context.
 
 Routes are overview `/`, inbox `/inbox/:id?`, new request `/requests/new`,
-quotations `/quotations`, catalog `/catalog` and connections `/integrations`.
+quotations `/quotations`, inventory `/inventory` (lazy loaded, see
+[Inventory page](#inventory-page-order-banner-and-stock-card)), catalog `/catalog` and
+connections `/integrations`.
 Any other path renders `NotFoundPage` (`features/not-found`) inside the shell: the
 heading "This page does not exist." with links to `/` and `/inbox`. It requests no data
 and names no resource.
@@ -334,6 +336,13 @@ Acrobat-style precise cited-line highlighting.
 
 `Overview` derives request/review/quoted counters and the "Assistant jobs running"
 count (jobs with status `running` among the 20 newest) from returned stored collections.
+"Open conversations" uses `isOpenConversation` (`features/overview/conversationGroups.ts`):
+`quoted`, `order_pending`, `declined` and `ordered` are not open requests (the customer
+answered or the order moved on); `needs_staff` stays open. A stock card below the metric
+strip shows "Low / out of stock" (`counts.low_stock`), "Orders to confirm" and "Open alerts"
+(`counts.total` of `GET /api/inventory/alerts`, the same number as the Inventory nav badge and the Alerts
+tab, so the card never says 0 while the badge says 6) and links to `/inventory`. Two-digit zero padding is
+the overview's own style for every metric.
 It does not invent revenue, conversion improvements or measured hours saved.
 `CatalogPage` presents product/source evidence from workspace data.
 `QuotationsPage` presents stored revisions and their current lifecycle labels.
@@ -348,6 +357,99 @@ card says every step, model call and tool call is exported with inputs and outpu
 with keys, tokens and phone numbers masked. The status badge on each card comes only
 from the server (`data.integrations`); the copy never claims a verified connection.
 See [Google synchronization](GOOGLE_SYNC.md) and `gas/README.md` for the contract.
+
+## Inventory page, order banner and stock card
+
+Decision D49, plan task T6. Backend contracts: [Inventory](INVENTORY.md). Owner of the code:
+`app/frontend/src/features/inventory/`. Nothing here is authority: every number, status and
+refusal comes from the staff API, and nothing is shown optimistically.
+
+**Actors and role handling.** Any staff role reads everything and may confirm or cancel customer
+orders, acknowledge alerts, download Excel and request a Google Sheets export. Only administrators
+create, receive and cancel purchase orders, adjust stock and set reorder levels. The UI learns the
+role from the existing workspace payload (`data.role` from `GET /api/workspace`, reached through
+`useWorkspaceContext`), so no backend change was needed. `InventoryPage` passes `isAdmin` down;
+`StockTable` omits Adjust and Reorder level, and `PurchaseOrdersTab` omits New purchase order,
+Receive goods and Cancel purchase order for a salesperson. This is convenience only: the server
+returns 403 "administrators only" and the dialogs show that sentence inline if it ever happens.
+
+**Screens.**
+- `/inventory?tab=stock|orders|purchase-orders|alerts` (default `stock`; the tab is in the URL so
+  the overview and alerts can deep-link). Tabs: Stock (`StockTable`, text search over SKU, name
+  and family, status filter, columns SKU, name, family, on hand, reserved, available, reorder
+  level and a status chip), Customer orders (`OrdersTab`, pending first), Purchase orders
+  (`PurchaseOrdersTab`) and Alerts (`AlertsTab`: stored shortage and refused-acceptance alerts
+  with Acknowledge, plus the live low-stock table).
+- Status chip rule (`stockState`): `Out` when available <= 0, `Low` when the server flag `low`
+  is set (available <= reorder level, discontinued never), else `OK`. Chips always carry an icon
+  and a text label; order and purchase-order chips follow the same rule, so colour is never the
+  only signal.
+- Dialogs (`shared/ui/dialog.tsx`, Radix Dialog, no animation): `AdjustDialog` (signed whole
+  number except zero, reason 3 to 200 characters), `ReorderDialog` (0 to 100000),
+  `CancelOrderDialog` (reason 3 to 200), `NewPurchaseOrderDialog` (supplier 1 to 120, optional
+  date and notes up to 500, 1 to 100 lines, one per product, quantity 1 to 100000, unit cost 0 to
+  1,000,000 with two decimals; the product picker hides products already on another line and
+  discontinued products, with the helper line "Discontinued products are not listed." shown when any are
+  hidden; the API refuses a discontinued product with a 422 too),
+  `ReceiveDialog` (a box per line with units outstanding; a value above the outstanding quantity
+  shows "Cannot exceed the N still outstanding." and keeps the button disabled) and
+  `MovementsDrawer` (right-hand drawer, 50 movements per page, "Load older movements"; a receipt reads
+  "Supplier receipt · PO-0007" and an order movement "Customer order · SO-0002" from the API's `reference`). Focus
+  moves into the dialog on open and back to the trigger on close; Escape closes; every input has
+  a label; server errors (409 stock below reserved, 403, 429) are shown inline in `role="alert"`
+  with the typed values kept.
+- `ExportToolbar`: **Download Excel** calls `downloadFile("/inventory/export.xlsx")` (bearer token,
+  Blob, filename from `Content-Disposition`) and clicks a temporary object URL that is revoked
+  at once. **Export to Google Sheets** POSTs `/inventory/sheet-exports`, writes the reply into the
+  status cache and then `useSheetExport` re-reads `/inventory/sheet-exports/latest` every 5 s
+  while the status is `queued` or `claimed`. The status line (`aria-live="polite"`) says
+  "Queued. Apps Script picks it up within about a minute.", "Apps Script is writing the Google
+  Sheet...", "Done at 8:01 AM. Rows written: Stock 12, Customer Orders 3, Purchase Orders 2." or
+  "Failed (code). You can export again."; the button is disabled while queued or claimed.
+- `OrderBanner` (inside `QuotationPanel`, above the quote): when this conversation has a pending
+  order the banner reads "Customer accepted LQ-... revision n" with **Confirm order** and
+  **Cancel order**. The API has no per-conversation filter, so the banner reads
+  `GET /api/orders?status=pending` (the same query the overview card uses) and picks the order
+  whose `conversation_id` matches. It renders nothing while loading or on error.
+- Statuses: `Status` labels `accepted` "Customer accepted", `declined` "Customer declined",
+  `order_pending` "Order to confirm", `ordered` "Order confirmed" (quote and conversation lists).
+- `InventoryNavCount` adds a count badge to the "Inventory" nav item: `counts.total` of
+  `GET /api/inventory/alerts` (open shortage and refused-acceptance alerts plus low-stock
+  products). It renders nothing at zero, while loading or on error. The mobile menu also links
+  Inventory because the fourth and later nav items are hidden on narrow screens.
+
+**Query keys** (`inventoryKeys` in `api.ts`, all start with `inventory` and carry the user id):
+`["inventory","stock",uid]`, `["inventory","alerts",uid]` (re-read every 15 s for the badge),
+`["inventory","orders",uid,status|"all"]` (every 15 s), `["inventory","purchase-orders",uid]`,
+`["inventory","movements",uid,productId]` (infinite query, cursor `before`),
+`["inventory","sheet-export",uid]`. `useLiveUpdates` invalidates the `inventory` prefix on
+every company revision change, together with `workspace` and `conversation`.
+
+**Mutations.** `useCommand` in `api.ts` POSTs JSON with a new `crypto.randomUUID()`
+`Idempotency-Key` per click and, after the server answers, invalidates `["inventory"]`,
+`["workspace"]` (catalog availability, quote status) and `["conversation"]` (conversation status).
+Hooks: `useAdjust`, `useSetReorderLevel`, `useConfirmOrder`, `useCancelOrder`,
+`useCreatePurchaseOrder`, `useReceivePurchaseOrder`, `useCancelPurchaseOrder`,
+`useAcknowledgeAlert`; `useQueueSheetExport` writes the reply into the cache; the download is a
+GET, so it carries no key.
+
+**Failures.** A failed list shows the server sentence in place of the list; a failed badge,
+banner or stock card shows nothing or an em dash instead of an invented zero, so an inventory
+outage never blocks the shell. A 429 on the download (10 per minute) is shown beside the buttons.
+
+**Tests and evidence.** Vitest files in `features/inventory/` (stock card numbers equal the badge total; movement references; the
+discontinued-products hint; stock table rows, chips, filters
+and role hiding; banner confirm with idempotency key and cache invalidation, server error,
+cancel reason; receive dialog over-receipt refusal and partial receipt; export toolbar queued
+then done by polling; nav badge; purchase tab role hiding and line bounds) and
+`features/overview/conversationGroups.test.ts`. Label: `local` (jsdom with a mocked API; no real
+browser look at the new screens, no axe run, no live data).
+
+**Open gaps.** No browser (Playwright) or axe review of the inventory page yet, and the page was
+not looked at in a real browser. Local Supabase was unavailable while T6 was written. Receipts
+cannot be undone from the UI (use an adjustment). The movement drawer does not show who made a
+movement (the API returns an actor id, not a name). Orders are listed up to the API's 200; no
+paging.
 
 ## Optional 3D and presentation limits
 

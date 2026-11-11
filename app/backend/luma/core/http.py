@@ -1,3 +1,4 @@
+from http.cookiejar import CookieJar, DefaultCookiePolicy
 from typing import Annotated
 from uuid import UUID
 
@@ -10,6 +11,24 @@ from .config import settings
 from .errors import DomainError
 
 bearer = HTTPBearer()
+_auth_client: httpx.Client | None = None
+
+
+def auth_client() -> httpx.Client:
+    """Return the process-wide HTTP client used to verify staff bearer tokens, creating it on first use.
+
+    A fresh `httpx.get` builds a new client and TLS context per call, which cost about 0.25-0.55 s
+    per request on the Windows development machine (measured 2026-11-08) and starved the 120-reads
+    per minute test; a shared client reuses connections and answers in about 4 ms. The client has
+    no base URL or credentials, and its cookie jar refuses every cookie, so no state set by one
+    staff member's response can ride along on another's request. Every call passes its own
+    headers. Thread-safe.
+    """
+    global _auth_client
+    if _auth_client is None:
+        refuse_all = CookieJar(policy=DefaultCookiePolicy(allowed_domains=[]))
+        _auth_client = httpx.Client(timeout=5, cookies=refuse_all)
+    return _auth_client
 
 
 async def domain_error(request: Request, exc: DomainError):
@@ -57,9 +76,8 @@ def staff(credentials: Annotated[HTTPAuthorizationCredentials, Depends(bearer)])
     """Validate the bearer token with local Supabase Auth; return its verified user ID, never self-reported metadata."""
     config = settings()
     try:
-        response = httpx.get(
+        response = auth_client().get(
             f"{config.supabase_url}/auth/v1/user",
-            timeout=5,
             headers={
                 "apikey": config.supabase_anon_key.get_secret_value(),
                 "Authorization": f"Bearer {credentials.credentials}",

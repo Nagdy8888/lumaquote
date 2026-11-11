@@ -189,3 +189,14 @@ npm run typecheck
 
 Do not hand-edit generated declarations. The separate Google callback gateway has
 different HMAC contracts documented in [the GAS guide](../../gas/README.md).
+
+## Stock, order and purchase-order endpoints (decision D49, task T4)
+
+Thirteen staff routes under `/api/inventory`, `/api/orders` and `/api/purchase-orders` (stock table,
+movements, adjustments, reorder levels, alerts and acknowledgement, order list, confirm and cancel,
+purchase-order list, create, receive and cancel). Their roles, bounds, status codes, idempotency and
+failure handling are in [the inventory guide](../reference/INVENTORY.md#staff-actions-purchasing-and-alerts-task-t4).
+The live app serves them at `/openapi.json` with response models; the committed `openapi.json` in
+this directory and `app/frontend/src/shared/api/generated.ts` were regenerated in task T6 with the
+method above (the generator is deterministic; the first regeneration also picked up older drift,
+so that diff was large).

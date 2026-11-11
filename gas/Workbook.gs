@@ -17,7 +17,6 @@ function initializeSyntheticWorkbook(spreadsheetId) {
   ];
   var products = [['sku','name','family','watts','lumens','cct','ip_rating','pack_size','discontinued']];
   var prices = [['sku','currency','unit_price','effective_from']];
-  var inventory = [['sku','available','location']];
   families.forEach(function makeFamily_(family) {
     /** Generate coherent, labeled fictional SKUs; the production importer validates each commercial field. */
     for (var i=0; i<12; i++) {
@@ -27,10 +26,9 @@ function initializeSyntheticWorkbook(spreadsheetId) {
       products.push([sku,family[2]+' '+watts+'W / '+cct+'K',family[0],watts,
         family[4]+Math.floor(i/3)*250,cct,(['OD','HB'].indexOf(family[1])>=0?'IP65':'IP44'),1,i===11]);
       prices.push([sku,'USD',family[5]+Math.floor(i/3)*8,'2026-10-29']);
-      inventory.push([sku,i===10?0:180-i*9,'Synthetic main warehouse']);
     }
   });
-  var tabs = {Products:products,Prices:prices,Inventory:inventory,
+  var tabs = {Products:products,Prices:prices,
     Policies:[['key','value'],['dataset','Synthetic supplier records for portfolio testing'],['currency','USD'],
       ['tax','excluded'],['quote_valid_days',7],['max_admin_discount_percent',10],['stock_reserved',false],
       ['delivery','Staff confirmation required']],
@@ -55,7 +53,7 @@ function inspectSupplierWorkbook() {
   if (!id) throw new Error('LUMA_SPREADSHEET_ID is missing in Script Properties.');
   var book = SpreadsheetApp.openById(id);
   console.log('Configured workbook: ' + book.getUrl());
-  ['Products', 'Prices', 'Inventory', 'Policies', 'Quote Register'].forEach(function reportTab_(name) {
+  ['Products', 'Prices', 'Policies', 'Quote Register', 'Stock', 'Customer Orders', 'Purchase Orders'].forEach(function reportTab_(name) {
     /** Report only tab presence and occupied dimensions to diagnose skipped initialization safely. */
     var sheet = book.getSheetByName(name);
     console.log(name + ': ' + (sheet ? sheet.getLastRow() + ' rows, ' + sheet.getLastColumn() + ' columns' : 'MISSING'));
