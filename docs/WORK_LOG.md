@@ -1295,3 +1295,10 @@ these entries were logged during the original steps or freshly rerun today.
 - Checked: `tests/unit/test_acceptance_phrases.py` -> 60 passed; `test_stock_acceptance.py` + `test_email.py` -> 37 passed; `lint:python`, `check:architecture` (118 modules), `check:docs` -> passed. Not run: full suite (T7).
 - Evidence: none.
 - Open: a name or company signature line under "Accept" is still ordinary text by design.
+
+### 2026-11-11 - Stock-orders full local gate and plan status (phase 7, local)
+- Why: plan task T7 of D49 (final checks, plan status, knowledge graph).
+- Changed: `docs/evidence/stock-orders-local-2026-11-11.json` (new); `docs/IMPLEMENTATION_PLAN.md` section 7 (three items ticked with local evidence; accept/decline and Inventory page stay open until live checks); `graphify-out/` (`npm run graph:update`). Pushed `gas/` to Apps Script with `npm run google:push` (8 files incl. `Stock.gs`) as the user asked.
+- Checked: `npm run verify` -> 12 of 12 passed; `npm run test:python` -> 680 passed, 66 skipped, 4 deselected, 1 xfailed, 0 failed (698 s); `npm run graph:update` -> rebuilt; `check:docs` -> passed. Not run: `verify:full` (needs `test:browser`), live Telegram/Gmail/Apps Script checks.
+- Evidence: `docs/evidence/stock-orders-local-2026-11-11.json`.
+- Open: live checks in Chrome and Telegram (the Claude in Chrome extension was not connected), PR and merge.

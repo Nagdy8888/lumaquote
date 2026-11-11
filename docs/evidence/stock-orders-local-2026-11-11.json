@@ -1,0 +1,9 @@
+{
+  "date": "2026-11-11",
+  "commit": "cc64b88 plus graphify-out update",
+  "label": "local",
+  "command": "npm run verify; npm run test:python",
+  "result": "npm run verify: 12 of 12 steps passed (lint:python, check:architecture, check:docs, skills:check, check:frontend, test:diagrams, diagrams:check, typecheck, test:unit, test:ui 86 tests, build, check:secrets). npm run test:python: 680 passed, 66 skipped (opt-in paid live tests), 4 deselected (browser), 1 xfailed, 0 failed, 698 s.",
+  "scope": "Plan D49 tasks T1-T6 on branch feat/stock-orders: stock ledger and single writer, reservations on approval and release on every exit, customer accept/decline (exact phrases, Telegram buttons, Gmail replies), staff order/purchase-order/adjustment/alert routes, Excel download and signed Google Sheets pull export, Inventory page. Integration tests ran against local Supabase quotation-local-dev with mocked Telegram/Gmail transports.",
+  "not_covered": "No live Telegram button press, live Gmail accept reply or live Apps Script stock export; no browser visual review; test:browser not run."
+}
