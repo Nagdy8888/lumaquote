@@ -42,7 +42,8 @@ agent** explicitly restores ownership, blocks queued human replies that no longe
 have the matching ownership, and queues permitted preparation. It does not grant
 approval to an existing quotation.
 
-Customer edits and attachments supersede affected offers and block queued sends.
+Customer edits and attachments supersede affected offers and block queued sends, except
+fixed order notices (accepted, declined, waiting, confirmed), which are still delivered.
 Dirty editor values survive background refreshes. A 409 conflict leaves the local
 draft intact; review the new state, then use **Discard local edits & load latest**
 before intentionally editing the newer version.

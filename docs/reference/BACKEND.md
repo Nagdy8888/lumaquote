@@ -179,12 +179,13 @@ changes:
 - `record_customer_reply`: staff-operated simulation restricted to `local_test`.
   It delegates to `accept_customer_text`, which records customer activity (deduplicated by an
   optional provider id), supersedes review/approved quotes (releasing their stock reservations),
-  blocks queued sends and enqueues
+  blocks queued sends (all but fixed order notices, `payload.notice = 'order'`; see
+  [Inventory](INVENTORY.md#customer-acceptance-and-orders-task-t3)) and enqueues
   preparation only when ownership permits automation. The verified WhatsApp ingress and the
   Telegram poller call the same function, so every channel invalidates old decisions identically;
   see [WhatsApp channel](WHATSAPP.md) and [Telegram channel](TELEGRAM.md).
 - `change_ownership`: requires `expected_version`. Takeover blocks queued
-  non-staff intents and releases the stock reservation of each quotation whose send it blocked. Resume blocks queued staff-origin replies and can enqueue
+  non-staff intents (order notices included) and releases the stock reservation of each quotation whose send it blocked. Resume blocks queued staff-origin replies and can enqueue
   preparation. Neither operation fabricates a quotation approval.
 - `queue_staff_reply`: requires current staff ownership, expected version and an
   active authenticated author. It queues a reply with persisted staff origin and

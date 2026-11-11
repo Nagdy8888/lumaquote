@@ -109,7 +109,9 @@ def confirm(conn, member, user, order_id) -> dict:
         "update luma.conversations set status=%s,updated_at=now() where id=%s",
         ("needs_staff" if waiting else "ordered", current["id"]),
     )
-    queue_notice(conn, company, current, CONFIRMED_NOTICE.format(number=order["number"]), f"order-confirmed:{order_id}")
+    queue_notice(
+        conn, company, current, CONFIRMED_NOTICE.format(number=order["number"]), f"order-confirmed:{order_id}", order=True
+    )
     audit(conn, company, user, "order.confirmed", order_id, number=order["number"])
     return order_rows(conn, company, order_id=order_id)[0]
 

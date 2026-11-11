@@ -299,6 +299,22 @@ after a request was parked, `orders/management.confirm` keeps the conversation `
 (instead of `ordered`) because a customer message is newer than `accepted_at`; staff reply, or the
 customer's next message drafts the next revision.
 
+**Order notices and the customer's next message.** Every fixed order notice (accept, decline,
+refusal, order waiting, order confirmed) is queued by `conversations/service.queue_notice(...,
+order=True)`, which stores `payload {"text": ..., "notice": "order"}`; the outbox `action_key`
+(`inbound-notice:<provider id>`, `order-waiting:<order id>`, `order-confirmed:<order id>`) is unique,
+so a notice is never queued, and therefore never sent, twice. New customer text
+(`participation.accept_customer_text`) and a new attachment (`media/intake.store_media`) block every
+queued outbox row with `error_code customer_revision` **except** rows whose `payload->>'notice'` is
+`order`: those state facts about an order that a later message cannot change, so a customer who
+writes again before the dispatcher runs still learns that the order was accepted, declined,
+waiting or confirmed. Still blocked by that rule, unchanged: a queued quotation send (its hold is
+released as `superseded`), a clarification or other agent reply, the Telegram greeting and the
+attachment-refused or unsupported-type notices. Staff takeover (`participation.change_ownership`)
+still blocks queued non-staff rows including order notices (`staff_takeover`), and
+`authorize_outbound` refuses automation under staff ownership at dispatch. Tests:
+`tests/integration/test_stock_order_notices.py`.
+
 **A failed agent job never goes silent.** `worker.tick` calls `runtime/escalation.escalate_unanswered`
 after an agent job ends `blocked` or `failed`: when the conversation is agent-owned, still `new`
 (set by every customer text) and no newer customer message exists, it becomes `needs_staff`, gets
@@ -690,9 +706,10 @@ convenience, the 403 sentence is shown inline if a salesperson ever reaches an a
 - Confirm, cancel, acknowledging alerts, purchase orders, adjustments and reorder levels have
   screens since T6 (see the UI section). The status labels `order_pending`, `declined` and
   `ordered` exist, and the overview no longer counts those conversations as open.
-- Repeat requests are resolved (see "Repeat requests after an accepted quotation"). Still open:
-  the existing rule that new customer text blocks queued replies (`error_code customer_revision`)
-  also blocks an order-confirmed or acceptance notice that has not been delivered yet.
+- Repeat requests are resolved (see "Repeat requests after an accepted quotation"), and so is the
+  revision block on order notices (see "Order notices and the customer's next message").
+- Staff takeover blocks an undelivered order notice (`staff_takeover`) and resume does not bring it
+  back; staff then tell the customer themselves. This is deliberate: staff own the conversation.
 - An accept typed with any word beyond one courtesy word, or followed by a signature other than a
   `-- ` block or a whole-line mobile client line ("Sent from my iPhone"), is ordinary text.
 - The Download Excel and Export to Google Sheets buttons exist (T6). No real-browser, axe or

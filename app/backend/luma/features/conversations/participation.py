@@ -41,6 +41,11 @@ def accept_customer_text(conn, company, current, text, *, provider_id=None):
     (the accepted quotation stays `accepted`). Every quotation this
     supersedes releases its stock reservation (reason `superseded`, decision D49) in the same
     transaction, under the caller's conversation lock.
+
+    New text blocks every queued outbox row (`error_code customer_revision`) except fixed order
+    notices (`payload.notice = 'order'`, see `service.queue_notice`): those state facts about an
+    order the text cannot change, so they stay queued and are delivered. Queued quotation sends,
+    clarification replies and agent/brain replies are still blocked.
     """
     cid = current["id"]
     rate_limit(conn, f"conversation:{cid}", 6)
@@ -69,7 +74,7 @@ def accept_customer_text(conn, company, current, text, *, provider_id=None):
     for row in superseded:
         ledger.release_quote(conn, company, row["id"], "superseded")
     conn.execute(
-        "update luma.outbox set status='blocked',error_code='customer_revision',updated_at=now() where conversation_id=%s and status='queued'",
+        "update luma.outbox set status='blocked',error_code='customer_revision',updated_at=now() where conversation_id=%s and status='queued' and (payload->>'notice') is distinct from 'order'",
         (cid,),
     )
     if current["owner"] == "agent":
@@ -115,6 +120,8 @@ def change_ownership(conn, member, user, cid, body: Ownership):
     Takeover also releases the stock reservation of every quotation whose queued send it blocked
     (reason `staff_takeover`, decision D49): that offer can no longer reach the customer, and
     the hold must not outlive it. An already-submitted send is untouched and keeps its hold.
+    Takeover also blocks queued fixed order notices (staff own the conversation then, and the
+    dispatcher refuses automation under staff ownership anyway); a customer's new text does not.
     """
     company = member["company_id"]
     current = conversation(conn, company, cid, lock=True)
