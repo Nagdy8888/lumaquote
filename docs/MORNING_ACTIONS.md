@@ -106,13 +106,17 @@ implemented: one one-minute trigger that runs poll, send, stock export and the s
 sequence under one lock (the sync less often). This changes how the live integration runs, so say
 whether to do it. Details: [email channel](reference/EMAIL.md#open-gaps).
 
-## Decision needed: new request after an accepted quotation (found live 2026-11-11)
+## Resolved: new request after an accepted quotation (found live 2026-11-11, fixed the same day)
 
-An email conversation is one per sender. When its latest quotation is `accepted` (an order exists), a
-new request from that sender makes the agent job fail with `DomainError` ("The customer accepted this
-quotation...") and the customer gets no reply; staff must cancel the order first. Options: open a new
-conversation per request after acceptance, or tell the customer a salesperson will follow up. Not
-changed (R2). Details: [email channel](reference/EMAIL.md#open-gaps).
+Behavior chosen (one conversation per sender is kept): after staff **confirm** the order a new request
+drafts the next revision and can be accepted into a second order; the accepted quotation stays
+`accepted`. While the order is **pending** the request is parked before any job or model call: the
+conversation becomes `needs_staff`, staff see a system message, and the customer gets one fixed notice
+("Your order {SO number} is waiting for confirmation by our sales team. We will reply to your new
+request after that."). Confirm or cancel the order, then reply. A cancelled order needs nothing. Any
+agent job that fails now also leaves `needs_staff` plus a system message. Details:
+[inventory](reference/INVENTORY.md). Nothing is needed from you unless you want different wording
+for that notice.
 
 ## Gmail requests (D47)
 

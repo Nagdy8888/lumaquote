@@ -101,10 +101,8 @@ def extract(state):
                 )
             if not config.openai_api_key.get_secret_value():
                 raise DomainError("OpenAI is enabled but its key is missing.", 503)
-            prompt = model_input(
-                transcript(conn, state["company_id"], state["conversation_id"]),
-                catalog_context(conn, state["company_id"], text),
-            )
+            history = transcript(conn, state["company_id"], state["conversation_id"])
+            prompt = model_input(history, catalog_context(conn, state["company_id"], text, history))
             reserve(conn, state["company_id"], state["job_id"])
     if not config.enable_paid_ai:
         result = baseline_extract(text)

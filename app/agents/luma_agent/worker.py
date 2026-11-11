@@ -16,6 +16,7 @@ from .observability import finish, flush, job_trace
 from .runtime.audio import process_audio
 from .runtime.conversations import process_conversation
 from .runtime.delivery import deliver_one
+from .runtime.escalation import escalate_unanswered
 from .runtime.jobs import claim_job, finish_job
 from .runtime.media import process_media
 
@@ -42,13 +43,28 @@ def reconcile_stock() -> int:
     return result["released"]
 
 
+def escalate_failed_agent_job(job, failure: str) -> None:
+    """Make staff aware of a failed agent job whose customer message went unanswered.
+
+    Delegates to `runtime.escalation.escalate_unanswered` in its own transaction after the job
+    outcome is stored. Any error is logged as its class name only and swallowed, so the signal
+    can never turn a recorded job outcome into a tick failure.
+    """
+    try:
+        escalate_unanswered(job, failure)
+    except Exception as error:
+        logger.warning("Job %s escalation: %s", str(job["id"]), type(error).__name__)
+
+
 def tick():
     """Run one claimed graph job, one dispatch, one inbound event and one stock reconcile.
 
     Each job runs inside a masked LangSmith root trace when tracing is enabled
     (`observability.job_trace`, decision D24); its graph steps and model calls nest
     under it, and the root records the outcome and error class. Logs keep safe failure
-    codes only. Trace export never changes the job outcome. The stock reconcile
+    codes only. A failed agent job whose customer message is still unanswered makes the
+    conversation `needs_staff` with a system message (`escalate_failed_agent_job`). Trace
+    export never changes the job outcome. The stock reconcile
     (`reconcile_stock`) runs last, after the dispatch and inbound work of the tick.
     """
     job = claim_job()
@@ -70,6 +86,8 @@ def tick():
                 failure = type(error).__name__
                 finish_job(job, outcome, failure)
                 logger.warning("Job %s: %s", str(job["id"]), failure)
+                if job["kind"] == "agent":
+                    escalate_failed_agent_job(job, failure)
             finish(run, outcome, failure)
         flush()
     dispatched = deliver_one()

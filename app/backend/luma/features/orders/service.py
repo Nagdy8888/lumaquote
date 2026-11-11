@@ -17,7 +17,7 @@ from uuid import uuid4
 
 from luma.core.audit import audit
 from luma.core.numbering import next_number
-from luma.features.conversations.service import queue_notice
+from luma.features.conversations.service import add_message, queue_notice
 from luma.features.inventory import ledger
 
 SENT = ("submitted", "delivered", "read", "local_delivered")
@@ -27,6 +27,10 @@ ACCEPTED_NOTICE = (
 )
 DECLINED_NOTICE = "Thank you. Quotation {number} is declined. Send a new request any time."
 REFUSED_NOTICE = "This quotation can no longer be accepted. Our sales team will contact you."
+WAITING_NOTICE = (
+    "Your order {number} is waiting for confirmation by our sales team. "
+    "We will reply to your new request after that."
+)
 
 
 def refusal_reason(conn, current, quote, quote_id) -> str | None:
@@ -164,3 +168,51 @@ def answer_quote(conn, company, current, answer, via, quote_id=None, provider_id
     queue_notice(conn, company, current, DECLINED_NOTICE.format(**newest), key)
     audit(conn, company, "customer", "quotation.declined", newest["id"], via=via)
     return {"outcome": "declined"}
+
+
+def pending_order(conn, company, quote_id) -> dict | None:
+    """Return the `pending` order (id, number) placed from this quotation, or None.
+
+    Read only and scoped by company; `orders.quote_id` is unique, so there is at most one. A
+    pending order still holds the quotation's stock reservation (D49).
+    """
+    return conn.execute(
+        "select id,number from luma.orders where company_id=%s and quote_id=%s and status='pending'",
+        (company, quote_id),
+    ).fetchone()
+
+
+def hold_for_pending_order(conn, company, current) -> bool:
+    """Park a new customer request while the newest quotation's order awaits staff; True when parked.
+
+    Applies only when the conversation's newest quotation is `accepted` and its order is
+    `pending`: staff have not yet confirmed or cancelled, and the order's stock is still held, so
+    no new quotation may be drafted (`quotations.drafting.draft` refuses with 409 in that state).
+    Instead of that late failure this runs before any job or paid model call (decision D46 cost):
+    the conversation becomes `needs_staff`, a system message tells staff, one fixed notice per
+    order is queued while the agent owns the conversation (action key `order-waiting:<order id>`,
+    so a repeated request or a redelivered message adds nothing) and audit `order.request_held`
+    records it. The customer message is already stored by the caller. No agent job is queued and
+    nothing is superseded. Returns False, with no effect, in every other state. The caller holds
+    the conversation lock and owns the transaction.
+    """
+    newest = conn.execute(
+        """select id,status from luma.quotes where company_id=%s and conversation_id=%s
+        order by revision desc limit 1 for update""",
+        (company, current["id"]),
+    ).fetchone()
+    order = pending_order(conn, company, newest["id"]) if newest and newest["status"] == "accepted" else None
+    if not order:
+        return False
+    conn.execute("update luma.conversations set status='needs_staff',updated_at=now() where id=%s", (current["id"],))
+    add_message(
+        conn,
+        company,
+        current["id"],
+        "system",
+        f"The customer sent a new request while order {order['number']} awaits confirmation. "
+        "No quotation was drafted. Confirm or cancel the order, then reply to the customer.",
+    )
+    queue_notice(conn, company, current, WAITING_NOTICE.format(number=order["number"]), f"order-waiting:{order['id']}")
+    audit(conn, company, "customer", "order.request_held", order["id"], number=order["number"])
+    return True
