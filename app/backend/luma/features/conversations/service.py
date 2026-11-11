@@ -40,17 +40,28 @@ def add_message(conn, company, cid, actor, body, kind="text", object_path=None, 
     return inserted["id"]
 
 
-def queue_notice(conn, company, current, text: str, key: str) -> None:
+ORDER_NOTICE = "order"
+
+
+def queue_notice(conn, company, current, text: str, key: str, *, order: bool = False) -> None:
     """Queue one fixed, customer-visible notice, only while the agent (not staff) owns the conversation.
 
     `key` is the outbox `action_key` (unique); a repeated key is ignored, so a redelivered inbound
-    message queues its notice once. The text must be fixed product wording, never customer
-    content. The notice goes through the normal dispatcher gates (allowlist, live switch).
+    message queues its notice once, and an order notice can never be queued twice. The text must
+    be fixed product wording, never customer content. The notice goes through the normal
+    dispatcher gates (allowlist, live switch).
+
+    `order=True` marks a fixed order notice (acceptance, decline, refusal, order waiting, order
+    confirmed): payload `{"notice": "order"}`. It states a fact a later customer message cannot
+    change, so a new customer text or attachment does not block it (`error_code customer_revision`,
+    see `participation.accept_customer_text` and `media.intake.accept_media`). Only staff takeover
+    still blocks it. Greeting and refusal-of-attachment notices stay unmarked and are blocked.
     """
     if current["owner"] != "agent":
         return
+    payload = {"text": text, "notice": ORDER_NOTICE} if order else {"text": text}
     conn.execute(
         """insert into luma.outbox(id,company_id,conversation_id,kind,payload,action_key)
         values(%s,%s,%s,'reply',%s,%s) on conflict(action_key) do nothing""",
-        (uuid4(), company, current["id"], Jsonb({"text": text}), key),
+        (uuid4(), company, current["id"], Jsonb(payload), key),
     )

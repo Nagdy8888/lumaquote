@@ -142,7 +142,7 @@ def answer_quote(conn, company, current, answer, via, quote_id=None, provider_id
         ).fetchone()
         status = "order_pending" if current["owner"] == "agent" else "needs_staff"
         conn.execute("update luma.conversations set status=%s,updated_at=now() where id=%s", (status, current["id"]))
-        queue_notice(conn, company, current, ACCEPTED_NOTICE.format(**newest), key)
+        queue_notice(conn, company, current, ACCEPTED_NOTICE.format(**newest), key, order=True)
         return {"outcome": "already_accepted", "order_id": order["id"] if order else None}
     reason = refusal_reason(conn, current, newest, quote_id)
     if reason:
@@ -151,7 +151,7 @@ def answer_quote(conn, company, current, answer, via, quote_id=None, provider_id
             (company, current["id"], newest["id"] if newest else None),
         )
         conn.execute("update luma.conversations set status='needs_staff',updated_at=now() where id=%s", (current["id"],))
-        queue_notice(conn, company, current, REFUSED_NOTICE, key)
+        queue_notice(conn, company, current, REFUSED_NOTICE, key, order=True)
         audit(conn, company, "customer", "order.acceptance_refused", current["id"], reason=reason, answer=answer, via=via)
         return {"outcome": "refused", "reason": reason}
     status = "needs_staff" if current["owner"] != "agent" else {"accept": "order_pending", "decline": "declined"}[answer]
@@ -159,13 +159,13 @@ def answer_quote(conn, company, current, answer, via, quote_id=None, provider_id
         conn.execute("update luma.quotes set status='accepted' where id=%s", (newest["id"],))
         order = create_order(conn, company, current, newest, via)
         conn.execute("update luma.conversations set status=%s,updated_at=now() where id=%s", (status, current["id"]))
-        queue_notice(conn, company, current, ACCEPTED_NOTICE.format(**newest), key)
+        queue_notice(conn, company, current, ACCEPTED_NOTICE.format(**newest), key, order=True)
         audit(conn, company, "customer", "order.accepted", order["id"], number=order["number"], quote_id=str(newest["id"]), via=via)
         return {"outcome": "accepted", "order_id": order["id"], "number": order["number"]}
     conn.execute("update luma.quotes set status='declined' where id=%s", (newest["id"],))
     ledger.release_quote(conn, company, newest["id"], "declined")
     conn.execute("update luma.conversations set status=%s,updated_at=now() where id=%s", (status, current["id"]))
-    queue_notice(conn, company, current, DECLINED_NOTICE.format(**newest), key)
+    queue_notice(conn, company, current, DECLINED_NOTICE.format(**newest), key, order=True)
     audit(conn, company, "customer", "quotation.declined", newest["id"], via=via)
     return {"outcome": "declined"}
 
@@ -213,6 +213,8 @@ def hold_for_pending_order(conn, company, current) -> bool:
         f"The customer sent a new request while order {order['number']} awaits confirmation. "
         "No quotation was drafted. Confirm or cancel the order, then reply to the customer.",
     )
-    queue_notice(conn, company, current, WAITING_NOTICE.format(number=order["number"]), f"order-waiting:{order['id']}")
+    queue_notice(
+        conn, company, current, WAITING_NOTICE.format(number=order["number"]), f"order-waiting:{order['id']}", order=True
+    )
     audit(conn, company, "customer", "order.request_held", order["id"], number=order["number"])
     return True

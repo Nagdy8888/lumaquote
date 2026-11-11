@@ -23,7 +23,7 @@ key conflicts.
 `intake.accept_media` locks/checks the conversation and expected version, checks
 nonempty bytes/size and the conversation-turn limit, uploads an opaque private
 original, inserts the customer message/media row, supersedes review/approved
-offers, blocks queued sends and creates the appropriate transcribe/read_photo
+offers, blocks queued sends (not fixed order notices, which state order facts) and creates the appropriate transcribe/read_photo
 job. The acceptance response is `message_id` plus queued status, not a reading.
 `intake.store_media` holds the shared part (size bounds, the conversation-turn limit, immutable
 storage, supersession, job admission, optional provider-id deduplication) so a verified, allow-listed

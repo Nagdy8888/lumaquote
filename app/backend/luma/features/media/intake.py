@@ -42,7 +42,9 @@ def store_media(conn, company, actor, cid, data, *, kind, provider_id=None):
     verified, allow-listed WhatsApp sender) and hold the conversation lock. This applies the
     shared size bounds, the per-conversation rate limit, immutable storage, revision
     invalidation and job admission. `provider_id` deduplicates a re-delivered provider
-    message: a repeat returns None without storing anything again.
+    message: a repeat returns None without storing anything again. Like new text, the original
+    blocks every queued outbox row (`customer_revision`) except fixed order notices
+    (`payload.notice = 'order'`), which state order facts the attachment cannot change.
     """
     label, maximum, job_kind = (
         ("Voice note", 10, "transcribe") if kind == "audio" else ("Product-label photo", 5, "read_photo")
@@ -75,7 +77,7 @@ def store_media(conn, company, actor, cid, data, *, kind, provider_id=None):
     for row in superseded:
         ledger.release_quote(conn, company, row["id"], "superseded")
     conn.execute(
-        "update luma.outbox set status='blocked',error_code='customer_revision',updated_at=now() where conversation_id=%s and status='queued'",
+        "update luma.outbox set status='blocked',error_code='customer_revision',updated_at=now() where conversation_id=%s and status='queued' and (payload->>'notice') is distinct from 'order'",
         (cid,),
     )
     conn.execute(
