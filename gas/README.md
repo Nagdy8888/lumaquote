@@ -85,6 +85,10 @@ transaction; avoid simultaneous multi-tab administrative updates during import.
 The manifest also needs `userinfo.email` so `Session.getEffectiveUser()` can return the account
 address; approve both new permissions when the editor asks.
 
+`pollLumaMail` finds threads by `label:<LumaQuote> newer_than:8d` and filters messages newer than its
+cursor in code, because the filter labels only the first mail and a customer reply to the plain shop
+address carries no label (see [how threads are found](../docs/reference/EMAIL.md#how-threads-are-found-fix-of-2026-11-11)).
+
 `pollLumaMail` and `sendLumaMail` run every minute. Status codes only are kept in
 `LUMA_LAST_MAIL_STATUS` and `LUMA_LAST_MAIL_SEND_STATUS`. See
 [email channel](../docs/reference/EMAIL.md).
