@@ -8,6 +8,13 @@ this document or a Git commit.
 
 ## Waiting on you (as of 2026-11-03)
 
+**Local sign-in/workspace recovery verified on 2026-11-08:** the user completed
+the administrator WinNAT/Supabase startup. Existing staff authentication and
+workspace loading now pass, including a browser sign-in check, after restarting
+the stale staff API. No further administrator action is pending for this outage.
+See [workspace recovery](reference/CONFIGURATION.md#auth-succeeds-but-the-workspace-request-fails)
+for diagnosis if the symptom recurs. No password or account change was made.
+
 1. **Internet provider notice: resolved 2026-11-05.** HTTP and HTTPS work again and the ngrok tunnel
    starts. `installSupplierSynchronization` ran and a timer refresh was seen
    ([evidence](evidence/google-live-sync-2026-11-05.json)). The Meta webhook still needs your Meta account.

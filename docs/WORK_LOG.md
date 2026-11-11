@@ -1260,3 +1260,24 @@ these entries were logged during the original steps or freshly rerun today.
 - Checked: none for this partial state (the Sonnet subagent was stopped mid-task). Not run: `check:frontend`, typecheck, `test:ui`, build.
 - Evidence: none.
 - Open: resume T6 (finish, then `check:frontend`, typecheck, `test:ui`, build, `diagrams:check`), then T7 (docs, `graph:update`, full `npm run verify`, PR, merge). Local Supabase is down: Windows reserves TCP 55320-55419, which holds the DB port 55322; run `net stop winnat`, `npm run db:start`, `net start winnat` as administrator. Rerun `tests/integration/test_stock_*.py` and `test_migrations.py` after T5.
+
+### 2026-11-08 - Restart the frontend on port 5173 (phase 5, local)
+- Why: The user explicitly requested restarting the frontend on 5173.
+- Changed: Restarted only the verified Vite process serving this checkout on 5173 with `npm run dev:ui`; appended this work-log entry. No application code, configuration, branch, backend or worker changed.
+- Checked: Vite 8.3.5 started successfully; HTTP GET of `/`, `/@vite/client`, `/src/main.tsx` and `/src/app/App.tsx` -> 200; `npm run check:docs` -> R8-R10 passed for 86 files. Not run: browser visual review, feature tests, full verification (operational restart only).
+- Evidence: Ignored `.local/frontend-5173-2026-11-08.out.log` and `.local/frontend-5173-2026-11-08.err.log`; direct HTTP checks (local).
+- Open: Refresh `http://127.0.0.1:5173`. Existing partial inventory implementation remains paused; this restart does not verify its feature behavior.
+
+### 2026-11-08 - Diagnose local sign-in outage (phase 5, local)
+- Why: The user reported the sign-in form's generic staff email/password error after the frontend restart.
+- Changed: Added the diagnosed port-collision recovery and verification contract to `docs/reference/CONFIGURATION.md`, linked the administrator action in `docs/MORNING_ACTIONS.md`, and appended this entry. Application code, accounts, passwords, security policy and paused inventory work were left unchanged.
+- Checked: Docker 29.6.1 is available but no containers are running; local Auth on 55321 is unreachable; the native API `/api/health` returns 200 (process-only); Windows excludes TCP 55320-55419; `npm run db:start` failed. Inspected the private startup log without printing its contents: unavailable-port/socket-access error includes 55322. The session is not Administrator and WinNAT is running. Not run: elevated service recovery, credential verification, browser sign-in, feature suites or full verification.
+- Evidence: Ignored `supabase/.temp/start.log`; bounded health, port-exclusion and privilege checks (local). `npm run check:docs` passed R8-R10 for 86 files; scoped whitespace review passed.
+- Open: An administrator must perform the prepared recovery attempt before Auth/login can be verified. No credential values were read out or printed, no password reset was attempted, and no Windows service/network configuration was changed by this session.
+
+### 2026-11-08 - Restore workspace loading after Supabase recovery (phase 5, local)
+- Why: After completing the administrator recovery, the user could sign in but saw the workspace request-failed alert.
+- Changed: Restarted only this checkout's stale staff API on 8001 with `npm run dev:api`; updated `docs/reference/CONFIGURATION.md` with Auth-versus-workspace diagnosis and native API restart/verification contracts; marked this outage's action resolved in `docs/MORNING_ACTIONS.md`; appended this entry. No application code, database data, account, role, password, worker or gateway changed.
+- Checked: Supabase containers healthy; existing staff Auth -> 200; authenticated workspace before restart -> plain-text 500 directly and through Vite. Fresh current-code TestClient -> 200 with required workspace collections; after restart both API 8001 and proxy 5173 -> 200, and current inventory routes appear in the running API contract. A bounded headless browser used the existing staff sign-in privately and reached visible `#workspace-main` with no workspace-failure alert; requests were restricted to the declared loopback services and no screenshot, token or business content was emitted. One initial diagnostic router inspection raised AttributeError on an unsupported `.path` attribute and was corrected without changing source. Not run: broader feature suites, paid inference, external sends or full verification.
+- Evidence: Ignored `.local/api-recovery-2026-11-08.out.log` and `.local/api-recovery-2026-11-08.err.log`; bounded authenticated HTTP/TestClient/browser results (local). `npm run check:docs` passed R8-R10 for 86 files; scoped whitespace review passed.
+- Open: The user can click Try again or refresh port 5173. The paused partial inventory task remains unverified and was not resumed by this operational repair.
